@@ -32,7 +32,7 @@ Sauvegarde LOCAL
 Sauvegarde SERVEUR 
 
 # LICENSE 
-Consultez le fichier LICENSE. 
+Consultez le fichier LICENSE pour connaître les conditions d'utilisation.
  
 # AUTEUR 
 Thorankamon, Crédit obligatoire 
