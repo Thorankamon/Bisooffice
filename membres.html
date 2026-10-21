@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Membres</title>
+    <link rel="stylesheet" href="stylem.css">
+    <!-- Ajout d'une icône Font Awesome pour le design -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="pdfmake.min.js"></script>
+    <script src="vfs_fonts.js"></script>
+    <script src="jszip.min.js"></script>
+    <style>
+        .btn-key {
+            background: linear-gradient(180deg, #ffe08a, #e8a800, #b47f00);
+            color: white;
+            border: 1px solid #a06f00;
+            box-shadow: 0 1px 5px rgba(232,168,0,.3);
+        }
+        .btn-key:hover {
+            background: linear-gradient(180deg, #ffe8a8, #f0b820, #c88f10);
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(232,168,0,.45);
+        }
+        .cred-row {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; padding: 12px 14px; margin-bottom: 10px;
+            background: var(--chalk, #eef6fc); border: 1px solid var(--border2, #d0e4f4);
+            border-radius: var(--radius, 12px);
+        }
+        .cred-row-label {
+            font-size: .72rem; font-weight: 800; letter-spacing: .04em;
+            text-transform: uppercase; color: var(--text3, #7a98b8); display: block; margin-bottom: 2px;
+        }
+        .cred-row-value {
+            font-size: 1.05rem; font-weight: 800; color: var(--text, #1a2b4a);
+            font-family: 'Courier New', monospace; letter-spacing: .03em;
+        }
+        .cred-row-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .cred-btn {
+            border: none; border-radius: 8px; width: 32px; height: 32px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: .85rem; transition: transform .15s ease;
+        }
+        .cred-btn:hover { transform: scale(1.1); }
+        .cred-btn-copy { background: linear-gradient(180deg,#7cc4f8,#2a7fd4); color: #fff; }
+        .cred-btn-regen { background: linear-gradient(180deg,#ffe08a,#e8a800); color: #fff; }
+        .cred-note {
+            font-size: .82rem; color: var(--text2, #4a6080); background: var(--blue-pale, #deeefb);
+            border-radius: 10px; padding: 10px 12px; margin-top: 4px;
+        }
+        .btn-scan-id {
+            background: linear-gradient(180deg, #8fd8ff, #2a9fd4, #1a6f9c);
+            color: white;
+            border: 1px solid #1a6f9c;
+            box-shadow: 0 1px 5px rgba(42,159,212,.3);
+        }
+        .btn-scan-id:hover:not(:disabled) {
+            background: linear-gradient(180deg, #a8e4ff, #3ab0e8, #2585b8);
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(42,159,212,.45);
+        }
+        .btn-scan-id:disabled { opacity: .65; cursor: wait; transform: none; }
+        .btn-scan-id .fa-spin { animation: fa-spin 1s linear infinite; }
+        .form-anon-note {
+            font-size: .82rem; color: var(--text2, #4a6080); background: var(--blue-pale, #deeefb);
+            border: 1px solid var(--border2, #d0e4f4); border-radius: var(--radius, 12px);
+            padding: 10px 14px; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;
+        }
+        #eidStatus {
+            font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 50px;
+            background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; margin-left: 6px;
+        }
+        #eidStatus.ok    { background: #dcfce7; color: #15803d; border-color: #86efac; }
+        #eidStatus.err   { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+        #eidStatus.busy  { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+        /* ===== Formulaire en étapes ===== */
+        .step-indicator {
+            display: flex; align-items: flex-start; justify-content: center;
+            gap: 0; margin: 4px 0 22px 0;
+        }
+        .step-dot {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            min-width: 84px;
+        }
+        .step-dot-num {
+            width: 34px; height: 34px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1rem;
+            background: #f1f5f9; color: #94a3b8; border: 2px solid #dbe6f1;
+            transition: all .2s ease;
+        }
+        .step-dot-label {
+            font-size: .72rem; font-weight: 700; color: var(--text3, #7a98b8);
+            text-transform: uppercase; letter-spacing: .03em;
+        }
+        .step-dot.active .step-dot-num {
+            background: linear-gradient(180deg,#7cc4f8,#2a7fd4); color: #fff; border-color: #2a7fd4;
+            box-shadow: 0 2px 8px rgba(42,127,212,.35);
+        }
+        .step-dot.active .step-dot-label { color: var(--blue, #2a7fd4); }
+        .step-dot.done .step-dot-num {
+            background: linear-gradient(180deg,#8ee6ac,#22a559); color: #fff; border-color: #22a559;
+        }
+        .step-dot.done .step-dot-num::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; }
+        .step-dot.done .step-dot-num span { display: none; }
+        .step-line { flex: 0 0 50px; height: 2px; background: #dbe6f1; margin-top: 17px; }
+
+        .form-step { display: none; }
+        .form-step.active { display: block; animation: stepFadeIn .18s ease; }
+        @keyframes stepFadeIn { from { opacity: 0; transform: translateX(6px); } to { opacity: 1; transform: none; } }
+
+        .form-step-nav {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; margin-top: 18px;
+        }
+        .btn-step-next, .btn-step-prev {
+            border: none; border-radius: 50px; padding: 12px 22px;
+            font-size: .95rem; font-weight: 800; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+        .btn-step-next {
+            background: linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color: #fff;
+            box-shadow: 0 2px 8px rgba(42,127,212,.35);
+        }
+        .btn-step-next:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(42,127,212,.45); }
+        .btn-step-prev {
+            background: #eef2f7; color: var(--text2, #4a6080); border: 1px solid var(--border, #b0cce8);
+        }
+        .btn-step-prev:hover { background: #e2e9f2; transform: scale(1.03); }
+
+        .recap-box {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px;
+            background: var(--chalk, #eef6fc); border: 1px solid var(--border2, #d0e4f4);
+            border-radius: var(--radius-lg, 18px); padding: 18px 20px; margin-bottom: 8px;
+        }
+        .recap-item { display: flex; flex-direction: column; gap: 2px; }
+        .recap-item-label {
+            font-size: .7rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+            color: var(--text3, #7a98b8);
+        }
+        .recap-item-value { font-size: 1rem; font-weight: 700; color: var(--text, #1a2b4a); }
+        .recap-item-value.is-anonyme { color: #b45309; font-style: italic; font-weight: 600; }
+        @media (max-width: 640px) {
+            .recap-box { grid-template-columns: 1fr; }
+            .step-dot-label { display: none; }
+            .step-line { flex-basis: 30px; }
+        }
+
+        .btn-add-membre:hover { border-color: var(--blue, #2a7fd4); }
+        .btn-add-membre .action-icon {
+            background: linear-gradient(180deg, #7cc4f8, #2a7fd4);
+            color: white;
+            box-shadow: 0 2px 6px rgba(42,127,212,.3);
+        }
+
+        /* La modale membre a plus de contenu (étapes) qu'une modale classique :
+           on lui laisse davantage de hauteur utile avant de scroller. */
+        #membreModal .modal-body { max-height: calc(92vh - 90px); }
+
+        .badge-eid {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: linear-gradient(180deg, #a8e4ff, #2a9fd4);
+            color: white; font-size: 10px; margin-left: 4px;
+            box-shadow: 0 1px 3px rgba(42,159,212,.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <h1><i class="fas fa-users"></i> Gestion des Membres</h1>
+                <span id="serverStatusBadge" style="font-size:12px; font-weight:700; padding:4px 12px; border-radius:50px; background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1;">⏳ Connexion...</span>
+                <button id="refreshBtn" style="background:linear-gradient(135deg,#2a7fd4,#1558b0); color:white; border:none; border-radius:50px; padding:6px 14px; font-size:12px; font-weight:800; cursor:pointer;">🔄 Actualiser</button>
+            </div>
+            <button class="btn-back" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Retour
+            </button>
+        </header>
+
+
+        <!-- Barre d'actions liste -->
+        <div class="list-actions-bar" id="panelsGrid">
+            <button class="list-action-btn btn-add-membre" onclick="openMembreModal()">
+                <span class="action-icon"><i class="fas fa-user-plus"></i></span>
+                <span class="action-text">
+                    <strong>Ajouter un membre</strong>
+                    <small>À la main ou via carte d'identité</small>
+                </span>
+            </button>
+            <button class="list-action-btn btn-data" onclick="openModalData()">
+                <span class="action-icon"><i class="fas fa-database"></i></span>
+                <span class="action-text">
+                    <strong>Import / Export</strong>
+                    <small>CSV &amp; JSON</small>
+                </span>
+            </button>
+            <button class="list-action-btn btn-docs" onclick="openModalDocs()">
+                <span class="action-icon"><i class="fas fa-file-pdf"></i></span>
+                <span class="action-text">
+                    <strong>Documents PDF</strong>
+                    <small>Cartes &amp; Liste</small>
+                </span>
+            </button>
+        </div>
+
+        <!-- Champs cachés nécessaires au JS (logo, fichiers) -->
+        <div style="display:none;">
+            <input type="file" id="importFile"     accept=".csv"   onchange="importCSV(this.files[0])">
+            <input type="file" id="importJSONFile" accept=".json"  onchange="importJSON(this.files[0])">
+            <input type="file" id="logoFile"       accept="image/*">
+            <span id="logoFileName"></span>
+            <div id="csvButtons"></div>
+            <div id="jsonButtons"></div>
+            <div id="logoImport"></div>
+            <div id="pdfButtons"></div>
+        </div>
+
+
+
+        <!-- Tableau -->
+        <div id="tableContainer">
+            <div class="table-header">
+                <h3><i class="fas fa-table"></i> Liste des Membres</h3>
+                <div class="table-info" id="tableInfo">
+                    <span id="totalCount">0</span> membres
+                </div>
+            </div>
+            <div class="search-bar-membres">
+                <i class="fas fa-search search-bar-icon"></i>
+                <input type="text" id="searchMembres" placeholder="Rechercher par nom, prénom ou ID..." autocomplete="off">
+                <button type="button" id="searchClear" class="search-clear hidden" title="Effacer la recherche"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="table-responsive">
+                <table id="membresTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Prénom</th>
+                            <th>Nom</th>
+                            <th>Adresse</th>
+                            <th>Localité</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Statut</th>
+                            <th>Date adhésion</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Contrôles de pagination améliorés -->
+        <div id="paginationControls">
+            <div class="pagination-container">
+                <div class="pagination-info" id="paginationInfo"></div>
+                
+                <div class="pagination-buttons" id="pageButtons">
+                    <!-- Les boutons seront ajoutés dynamiquement -->
+                </div>
+                
+                <div class="pagination-actions">
+                    <!-- Boutons pour aller au début et à la fin -->
+                    <button class="pagination-action-btn" onclick="goToFirstPage()" title="Première page">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button class="pagination-action-btn" onclick="goToLastPage()" title="Dernière page">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+    <!-- ===== MODALES (hors du .container : le backdrop-filter du container
+         crée un containing block qui coupait les modales en position:fixed) ===== -->
+
+        <div id="membreModal" class="modal hidden">
+            <div class="modal-content modal-wide">
+                <div class="modal-header">
+                    <h3><i class="fas fa-user-edit"></i> <span id="membreModalTitle">Ajouter un Membre</span></h3>
+                    <button class="close-modal" onclick="closeMembreModal()"><i class="fas fa-times"></i></button>
+                </div>
+
+                <form id="membreForm">
+                <div class="modal-body">
+                    <input type="hidden" id="membreId">
+
+                    <div class="form-anon-note">
+                        <i class="fas fa-user-shield"></i>
+                        Tous les champs sont facultatifs : remplis-les à la main, scanne une carte d'identité, ou ne touche à rien — un membre laissé vide est enregistré comme <strong>Anonyme</strong>.
+                    </div>
+
+                    <!-- Indicateur d'étapes -->
+                    <div class="step-indicator" id="stepIndicator">
+                        <div class="step-dot active" data-step-dot="1">
+                            <span class="step-dot-num">1</span>
+                            <span class="step-dot-label">Identité</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-dot" data-step-dot="2">
+                            <span class="step-dot-num">2</span>
+                            <span class="step-dot-label">Contact</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-dot" data-step-dot="3">
+                            <span class="step-dot-num">3</span>
+                            <span class="step-dot-label">Récap</span>
+                        </div>
+                    </div>
+
+                    <!-- Étape 1 : Identité (à la main ou via scan carte d'identité) -->
+                    <div class="form-step active" data-step="1">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="prenom"><i class="fas fa-user"></i> Prénom</label>
+                                <input type="text" id="prenom" placeholder="Entrez le prénom (facultatif)">
+                                <div class="input-underline"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nom"><i class="fas fa-user"></i> Nom</label>
+                                <input type="text" id="nom" placeholder="Entrez le nom (facultatif)">
+                                <div class="input-underline"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="adresse"><i class="fas fa-home"></i> Adresse</label>
+                                <input type="text" id="adresse" placeholder="Adresse complète">
+                                <div class="input-underline"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="localite"><i class="fas fa-map-marker-alt"></i> Localité</label>
+                                <input type="text" id="localite" placeholder="Ville, Code postal">
+                                <div class="input-underline"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-scan-id" id="btnScanId" onclick="scannerCarteIdentite()">
+                                <i class="fas fa-id-card" id="scanIdIcon"></i> <span id="scanIdLabel">Scanner la carte d'identité</span>
+                            </button>
+                            <span id="eidStatus">⏳ lecteur non testé</span>
+                            <button type="button" class="btn-keyboard" id="btnToggleKeyboard" onclick="vkbToggleMode()">
+                                <i class="fas fa-keyboard"></i> <span id="keyboardBtnLabel">Clavier virtuel</span>
+                            </button>
+                            <button type="button" class="btn-reset" onclick="resetForm()">
+                                <i class="fas fa-undo"></i> Réinitialiser
+                            </button>
+                        </div>
+
+                        <div class="form-step-nav">
+                            <span></span>
+                            <button type="button" class="btn-step-next" onclick="stepMembreForm(2)">
+                                Suivant <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Étape 2 : Contact (facultatif, reste anonyme si vide) -->
+                    <div class="form-step" data-step="2">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                                <input type="text" inputmode="email" id="email" placeholder="exemple@email.com" autocomplete="email">
+                                <div class="input-underline"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="telephone"><i class="fas fa-phone"></i> Téléphone</label>
+                                <input type="tel" id="telephone" placeholder="+32 XXX XX XX XX">
+                                <div class="input-underline"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="statut"><i class="fas fa-user-tag"></i> Statut</label>
+                                <div class="select-wrapper">
+                                    <select id="statut">
+                                        <option value="inactif"><i class="fas fa-user-slash"></i> Inactif</option>
+                                        <option value="benevole"><i class="fas fa-hands-helping"></i> Bénévole</option>
+                                        <option value="admin"><i class="fas fa-user-shield"></i> Admin</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-step-nav">
+                            <button type="button" class="btn-step-prev" onclick="stepMembreForm(1)">
+                                <i class="fas fa-arrow-left"></i> Précédent
+                            </button>
+                            <button type="button" class="btn-step-next" onclick="stepMembreForm(3)">
+                                Suivant <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Étape 3 : Récapitulatif -->
+                    <div class="form-step" data-step="3">
+                        <div class="recap-box" id="recapBox"></div>
+
+                        <div class="form-footer">
+                            <small><i class="fas fa-info-circle"></i> Tous les champs sont facultatifs — un formulaire vide crée un membre anonyme</small>
+                        </div>
+
+                        <div class="form-step-nav">
+                            <button type="button" class="btn-step-prev" onclick="stepMembreForm(2)">
+                                <i class="fas fa-arrow-left"></i> Précédent
+                            </button>
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-save"></i> <span id="submit-text">Ajouter le Membre</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="modalData" class="modal hidden">
+            <div class="modal-content modal-wide">
+                <div class="modal-header">
+                    <h3><i class="fas fa-database"></i> Import / Export des données</h3>
+                    <button class="close-modal" onclick="closeModalData()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body modal-grid">
+                    <div class="modal-card">
+                        <div class="modal-card-icon" style="background:#ecfdf5;color:#059669"><i class="fas fa-file-csv"></i></div>
+                        <h4>CSV</h4>
+                        <p>Exporte ou importe ta liste au format tableur</p>
+                        <div class="modal-card-actions">
+                            <button class="btn-export" onclick="exportCSV()"><i class="fas fa-download"></i> Exporter</button>
+                            <label class="btn-import"><i class="fas fa-upload"></i> Importer<input type="file" accept=".csv" onchange="importCSV(this.files[0])" style="display:none;"></label>
+                        </div>
+                    </div>
+                    <div class="modal-card">
+                        <div class="modal-card-icon" style="background:#eef2ff;color:#4f46e5"><i class="fas fa-file-code"></i></div>
+                        <h4>JSON</h4>
+                        <p>Exporte ou importe au format JSON (sauvegarde complète)</p>
+                        <div class="modal-card-actions">
+                            <button class="btn-export" onclick="exportJSON()"><i class="fas fa-download"></i> Exporter</button>
+                            <label class="btn-import"><i class="fas fa-upload"></i> Importer<input type="file" accept=".json" onchange="importJSON(this.files[0])" style="display:none;"></label>
+                        </div>
+                    </div>
+                    <div class="modal-card">
+                        <div class="modal-card-icon" style="background:#fff7ed;color:#d97706"><i class="fas fa-file-excel"></i></div>
+                        <h4>Excel (.xlsx)</h4>
+                        <p>Sauvegarde sur le serveur + téléchargement Excel (anti-panne de courant 💪)</p>
+                        <div class="modal-card-actions">
+                            <button class="btn-export" onclick="exportExcelMembres()"><i class="fas fa-download"></i> Exporter</button>
+                            <label class="btn-import"><i class="fas fa-upload"></i> Importer<input type="file" accept=".xlsx" onchange="importExcelMembres(this.files[0])" style="display:none;"></label>
+                        </div>
+                    </div>
+                    <div class="modal-card">
+                        <div class="modal-card-icon" style="background:#eef6ff;color:#2563eb"><i class="fas fa-key"></i></div>
+                        <h4>Codes &amp; Pseudos</h4>
+                        <p>Exporte Nom, Prénom, Pseudo et Code d'accès de tous les membres (s'ouvre directement dans Excel)</p>
+                        <div class="modal-card-actions">
+                            <button class="btn-export" onclick="exportCredentialsCSV()"><i class="fas fa-download"></i> Exporter</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick="closeModalData()"><i class="fas fa-times"></i> Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modalDocs" class="modal hidden">
+            <div class="modal-content modal-wide">
+                <div class="modal-header">
+                    <h3><i class="fas fa-file-pdf"></i> Documents PDF</h3>
+                    <button class="close-modal" onclick="closeModalDocs()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body modal-grid">
+                    <div class="modal-card">
+                        <div class="modal-card-icon" style="background:#fff1f2;color:#e11d48"><i class="fas fa-id-card"></i></div>
+                        <h4>Toutes les cartes</h4>
+                        <p>Génère un PDF avec la carte de chaque membre</p>
+                        <div class="modal-card-actions">
+                            <button class="btn-pdf" onclick="generateAllCards()"><i class="fas fa-id-card"></i> Générer</button>
+                        </div>
+                    </div>
+                    <div class="modal-card">
+                        <div class="modal-card-icon" style="background:#f0fdf4;color:#16a34a"><i class="fas fa-file-archive"></i></div>
+                        <h4>ZIP — cartes individuelles</h4>
+                        <p>Génère un fichier ZIP avec un PDF par membre, prêts à envoyer</p>
+                        <div class="modal-card-actions">
+                            <button class="btn-pdf" style="background:linear-gradient(135deg,#16a34a,#15803d);border-color:#14532d;" onclick="generateZipCards()"><i class="fas fa-file-archive"></i> Générer ZIP</button>
+                        </div>
+                    </div>
+                    <div class="modal-card">
+                        <div class="modal-card-icon" style="background:#fff7ed;color:#d97706"><i class="fas fa-list-alt"></i></div>
+                        <h4>Liste horizontale</h4>
+                        <p>Génère un tableau PDF de tous les membres</p>
+                        <div class="modal-card-actions">
+                            <button class="btn-pdf" onclick="generateListPDF()"><i class="fas fa-list-alt"></i> Générer</button>
+                        </div>
+                    </div>
+                    <div class="modal-card" style="grid-column:1/-1;">
+                        <div class="modal-card-icon" style="background:#f5f3ff;color:#7c3aed"><i class="fas fa-image"></i></div>
+                        <h4>Logo pour les cartes</h4>
+                        <p>Importe un logo à afficher sur les cartes membres</p>
+                        <div class="modal-card-actions">
+                            <label class="btn-import" id="logoUploadLabel">
+                                <i class="fas fa-cloud-upload-alt"></i> Choisir un logo
+                                <input type="file" accept="image/*" onchange="handleLogoUpload(this)" style="display:none;">
+                            </label>
+                            <button class="btn-cancel" id="logoResetBtn" onclick="resetLogoOverride()" title="Revenir au logo de Paramètres" style="font-size:.8rem;padding:6px 10px;">
+                                <i class="fas fa-undo"></i> Réinitialiser
+                            </button>
+                            <span id="logoFileNameDisplay" style="font-size:.85rem;color:#64748b;align-self:center;"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick="closeModalDocs()"><i class="fas fa-times"></i> Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="ticketsModal" class="modal hidden">
+            <div class="modal-content modal-tickets">
+                <div class="modal-header">
+                    <h3><i class="fas fa-receipt"></i> Tickets de <span id="ticketsModalNom"></span></h3>
+                    <button class="close-modal" onclick="closeTicketsModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body" style="padding:0;">
+                    <div id="ticketsModalStats" class="tickets-stats"></div>
+                    <div id="ticketsModalListe" class="tickets-liste"></div>
+                    <div id="ticketsPagination" class="tickets-pagination"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick="closeTicketsModal()"><i class="fas fa-times"></i> Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="ticketDetailModal" class="modal hidden">
+            <div class="modal-content modal-detail-ticket">
+                <div class="modal-header">
+                    <button class="btn-back-modal" onclick="closeTicketDetail()">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </button>
+                    <h3><i class="fas fa-receipt"></i> Détail du ticket</h3>
+                    <div style="width:90px;"></div>
+                </div>
+                <div class="modal-body" style="padding:0;">
+                    <div id="ticketDetailContent" class="tdetail-body"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="emailModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-envelope"></i> Envoyer la carte par email</h3>
+                    <button class="close-modal" onclick="closeEmailModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="emailMembreSelect"><i class="fas fa-user"></i> Membre :</label>
+                        <select id="emailMembreSelect" class="modal-select"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailSubject"><i class="fas fa-tag"></i> Objet :</label>
+                        <input type="text" id="emailSubject" class="modal-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailBody"><i class="fas fa-comment"></i> Message :</label>
+                        <textarea id="emailBody" rows="5" class="modal-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-send" onclick="sendEmail()">
+                        <i class="fas fa-paper-plane"></i> Envoyer
+                    </button>
+                    <button class="btn-cancel" onclick="closeEmailModal()">
+                        <i class="fas fa-times"></i> Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="credModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-key"></i> Accès Espace Membre — <span id="credModalNom"></span></h3>
+                    <button class="close-modal" onclick="closeCredModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="cred-row">
+                        <div>
+                            <span class="cred-row-label">Code d'accès</span>
+                            <span class="cred-row-value" id="credCode">—</span>
+                        </div>
+                        <div class="cred-row-actions">
+                            <button class="cred-btn cred-btn-copy" title="Copier" onclick="copierAcces(document.getElementById('credCode').textContent,'Code copié')"><i class="fas fa-copy"></i></button>
+                            <button class="cred-btn cred-btn-regen" title="Régénérer" onclick="regenererCodeAcces(credCurrentId())"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="cred-row">
+                        <div>
+                            <span class="cred-row-label">Pseudo (identifiant de connexion)</span>
+                            <span class="cred-row-value" id="credPseudo">—</span>
+                        </div>
+                        <div class="cred-row-actions">
+                            <button class="cred-btn cred-btn-copy" title="Copier" onclick="copierAcces(document.getElementById('credPseudo').textContent,'Pseudo copié')"><i class="fas fa-copy"></i></button>
+                            <button class="cred-btn cred-btn-regen" title="Régénérer" onclick="regenererPseudo(credCurrentId())"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="cred-row">
+                        <div>
+                            <span class="cred-row-label">Mot de passe</span>
+                            <span class="cred-row-value" id="credPass">—</span>
+                        </div>
+                        <div class="cred-row-actions">
+                            <button class="cred-btn cred-btn-copy" title="Copier" onclick="copierAcces(document.getElementById('credPass').textContent,'Mot de passe copié')"><i class="fas fa-copy"></i></button>
+                            <button class="cred-btn cred-btn-regen" title="Régénérer" onclick="regenererMotDePasse(credCurrentId())"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="cred-note">
+                        <i class="fas fa-info-circle"></i> Le membre se connecte à l'Espace Membre avec son <strong>pseudo</strong> et son <strong>mot de passe</strong>. Le code d'accès est une référence complémentaire (envoyée elle aussi par email).
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick="closeCredModal()"><i class="fas fa-times"></i> Fermer</button>
+                </div>
+            </div>
+        </div>
+
+    <!-- ===== CLAVIER VIRTUEL ===== -->
+    <div id="vKeyboard">
+        <div class="vkb-topbar">
+            <span class="vkb-label" id="vkbLabel">⌨️ Clavier</span>
+            <button class="vkb-close" onclick="vkbClose()"><i class="fas fa-times"></i> Fermer</button>
+        </div>
+        <div class="vkb-preview">
+            <span class="vkb-preview-text" id="vkbPreview"></span>
+            <span class="vkb-cursor"></span>
+        </div>
+        <div class="vkb-rows" id="vkbRows"></div>
+    </div>
+
+    <script src="membres.js"></script>
+
+    <script>
+        // Mettre à jour le texte du bouton submit en fonction du mode
+        document.addEventListener('DOMContentLoaded', function() {
+            const submitText = document.getElementById('submit-text');
+            const form = document.getElementById('membreForm');
+            
+            form.addEventListener('input', function() {
+                const membreId = document.getElementById('membreId').value;
+                submitText.textContent = membreId ? "Modifier le Membre" : "Ajouter le Membre";
+            });
+        });
+
+        // Gestion du nom du fichier logo
+        document.getElementById('logoFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Aucun fichier sélectionné';
+            document.getElementById('logoFileName').textContent = fileName;
+        });
+
+        // Attacher le bouton Actualiser (membres.js est chargé à ce stade)
+        document.getElementById("refreshBtn").addEventListener("click", refreshMembres);
+
+        // Charger les membres depuis le serveur dès que le DOM est prêt (un seul appel)
+        loadMembresFromServer().then(() => { migrerAccesMembres(); renderTable(); });
+    </script>
+
+    <script>
+    /* ===== CLAVIER VIRTUEL ===== */
+    (function(){
+        const LAYOUTS = {
+            text: {
+                normal: [
+                    ['a','z','e','r','t','y','u','i','o','p'],
+                    ['q','s','d','f','g','h','j','k','l','m'],
+                    ['SHIFT','w','x','c','v','b','n','⌫'],
+                    ['123','@','.','ESPACE','_','-','OK']
+                ],
+                shifted: [
+                    ['A','Z','E','R','T','Y','U','I','O','P'],
+                    ['Q','S','D','F','G','H','J','K','L','M'],
+                    ['SHIFT','W','X','C','V','B','N','⌫'],
+                    ['123','@','.','ESPACE','_','-','OK']
+                ],
+                num: [
+                    ['1','2','3','4','5','6','7','8','9','0'],
+                    ['-','_','@','.','com','.be','.fr','⌫'],
+                    ['ABC','(',')','/','\\','\'','"','OK']
+                ]
+            },
+            tel: {
+                normal: [
+                    ['1','2','3'],
+                    ['4','5','6'],
+                    ['7','8','9'],
+                    ['+','0','⌫'],
+                    ['ESPACE','(',')','-'],
+                    ['OK']
+                ]
+            },
+            email: {
+                normal: [
+                    ['a','z','e','r','t','y','u','i','o','p'],
+                    ['q','s','d','f','g','h','j','k','l','m'],
+                    ['w','x','c','v','b','n','_','.','⌫'],
+                    ['@','gmail','hotmail','yahoo','ESPACE','OK']
+                ]
+            }
+        };
+
+        let activeInput = null;
+        let currentLayout = 'text';
+        let currentLayer  = 'normal';
+        let shiftOn = false;
+        let vkbEnabled = false;
+
+        function getRows(){ const l=LAYOUTS[currentLayout]||LAYOUTS.text; return l[currentLayer]||l['normal']; }
+
+        function render(){
+            const rows = getRows();
+            const container = document.getElementById('vkbRows');
+            container.innerHTML = '';
+            rows.forEach(row => {
+                const rowEl = document.createElement('div');
+                rowEl.className = 'vkb-row';
+                row.forEach(key => {
+                    const btn = document.createElement('button');
+                    btn.className = 'vkb-key';
+                    btn.type = 'button';
+                    if      (key==='ESPACE') { btn.className+=' wider'; btn.textContent='␣ espace'; }
+                    else if (key==='OK')     { btn.className+=' wide action'; btn.innerHTML='<i class="fas fa-check"></i> OK'; }
+                    else if (key==='⌫')      { btn.className+=' wide delete'; btn.innerHTML='<i class="fas fa-backspace"></i>'; }
+                    else if (key==='SHIFT')  { btn.className+=' wide'+(shiftOn?' shift-active':''); btn.innerHTML='<i class="fas fa-arrow-up"></i>'; }
+                    else if (key==='123'||key==='ABC') { btn.className+=' wide action'; btn.textContent=key; }
+                    else if (['gmail','hotmail','yahoo','com','.be','.fr'].includes(key)) { btn.className+=' wide action'; btn.textContent=key.startsWith('.')?key:'@'+key; }
+                    else { btn.textContent=key; }
+                    btn.addEventListener('mousedown', e=>{ e.preventDefault(); handleKey(key); });
+                    btn.addEventListener('touchstart', e=>{ e.preventDefault(); handleKey(key); },{passive:false});
+                    rowEl.appendChild(btn);
+                });
+                container.appendChild(rowEl);
+            });
+            updatePreview();
+        }
+
+        function handleKey(key){
+            if(!activeInput) return;
+            if(key==='OK'){ vkbClose(); return; }
+            if(key==='⌫'){
+                const v=activeInput.value;
+                const s=(activeInput.selectionStart!=null)?activeInput.selectionStart:v.length;
+                if(s>0){ activeInput.value=v.slice(0,s-1)+v.slice(s); try{activeInput.selectionStart=activeInput.selectionEnd=s-1;}catch(e){} }
+                activeInput.dispatchEvent(new Event('input'));
+                updatePreview(); return;
+            }
+            if(key==='ESPACE'){ insert(' '); return; }
+            if(key==='SHIFT'){ shiftOn=!shiftOn; currentLayer=shiftOn?'shifted':'normal'; render(); return; }
+            if(key==='123'){ currentLayer='num'; render(); return; }
+            if(key==='ABC'){ currentLayer='normal'; render(); return; }
+            if(['gmail','hotmail','yahoo'].includes(key)){ insert('@'+key+'.com'); return; }
+            if(['.be','.fr','com'].includes(key)){ insert(key); return; }
+            insert(key);
+            if(shiftOn){ shiftOn=false; currentLayer='normal'; render(); return; }
+            updatePreview();
+        }
+
+        function insert(str){
+            if(!activeInput) return;
+            const v=activeInput.value;
+            const s=(activeInput.selectionStart!=null)?activeInput.selectionStart:v.length;
+            activeInput.value=v.slice(0,s)+str+v.slice(s);
+            try{activeInput.selectionStart=activeInput.selectionEnd=s+str.length;}catch(e){}
+            activeInput.dispatchEvent(new Event('input'));
+            updatePreview();
+        }
+
+        function updatePreview(){
+            const el=document.getElementById('vkbPreview');
+            if(el&&activeInput) el.textContent=activeInput.value||'';
+        }
+
+        function vkbOpen(input){
+            if(!vkbEnabled) return;
+            activeInput=input;
+            shiftOn=false; currentLayer='normal';
+            const type=input.type;
+            if(type==='tel') currentLayout='tel';
+            else if(type==='email') currentLayout='email';
+            else currentLayout='text';
+            const label=input.closest('.form-group')?.querySelector('label')?.textContent||'Clavier';
+            document.getElementById('vkbLabel').textContent='⌨️ '+label.trim().replace(/^\s*[\uE000-\uF8FF]\s*/,'');
+            render();
+            document.getElementById('vKeyboard').classList.add('active');
+            setTimeout(()=>input.scrollIntoView({behavior:'smooth',block:'center'}),150);
+        }
+
+        window.vkbClose = function(){
+            document.getElementById('vKeyboard').classList.remove('active');
+            if(activeInput){ activeInput.blur(); activeInput=null; }
+        };
+
+        window.vkbToggleMode = function(){
+            vkbEnabled=!vkbEnabled;
+            const ids=['prenom','nom','adresse','localite','email','telephone'];
+            const btn=document.getElementById('btnToggleKeyboard');
+            const lbl=document.getElementById('keyboardBtnLabel');
+            ids.forEach(id=>{
+                const el=document.getElementById(id);
+                if(!el) return;
+                if(vkbEnabled){
+                    el.setAttribute('readonly','readonly');
+                    el._vkbHandler=e=>{ e.preventDefault(); vkbOpen(el); };
+                    el.addEventListener('click',el._vkbHandler);
+                    el.addEventListener('focus',el._vkbHandler);
+                } else {
+                    el.removeAttribute('readonly');
+                    if(el._vkbHandler){
+                        el.removeEventListener('click',el._vkbHandler);
+                        el.removeEventListener('focus',el._vkbHandler);
+                    }
+                    vkbClose();
+                }
+            });
+            if(vkbEnabled){
+                btn.classList.add('active');
+                lbl.textContent='Clavier actif';
+            } else {
+                btn.classList.remove('active');
+                lbl.textContent='Clavier virtuel';
+            }
+        };
+    })();
+    </script>
+</body>
+</html>

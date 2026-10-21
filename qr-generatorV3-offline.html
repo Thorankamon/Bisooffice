@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Générateur QR Code</title>
+  <!-- Bibliothèques locales (offline) -->
+  <script src="qrcode.min.js"></script>
+  <script src="html2canvas.min.js"></script>
+  <style>
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#7c3aed; --orange:#d97706; --orange-pale:#fff7ed;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --glass:rgba(255,255,255,0.82);
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      font-size:14px;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      padding:24px 16px 48px;
+      color:var(--text);
+    }
+    body::before {
+      content:''; position:fixed; top:-150px; left:-150px;
+      width:550px; height:550px;
+      background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+    body::after {
+      content:''; position:fixed; bottom:-100px; right:5%;
+      width:450px; height:450px;
+      background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+
+    .page-wrap {
+      max-width:900px; margin:0 auto; position:relative; z-index:1;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      text-align:center; margin-bottom:28px;
+    }
+    .page-header .icon-badge {
+      width:68px; height:68px;
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      border-radius:20px; margin:0 auto 14px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:2rem;
+      box-shadow:0 6px 20px rgba(30,80,180,.3),0 1px 0 rgba(255,255,255,.5) inset;
+      position:relative; overflow:hidden;
+    }
+    .page-header .icon-badge::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:20px 20px 0 0; pointer-events:none;
+    }
+    .page-header h1 {
+      font-size:2rem; font-weight:900; color:var(--blue3); letter-spacing:-.5px;
+    }
+    .page-header p {
+      font-size:.92rem; color:var(--text2); font-weight:600; margin-top:5px;
+    }
+
+    /* ── Grid layout ── */
+    .main-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+      align-items:start;
+    }
+    @media(max-width:640px) {
+      .main-grid { grid-template-columns:1fr; }
+    }
+
+    /* ── Cartes ── */
+    .card {
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-xl);
+      padding:22px 24px;
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden;
+      margin-bottom:18px;
+    }
+    .card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:35%;
+      background:rgba(255,255,255,.42); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .card-title {
+      font-size:.82rem; font-weight:800; color:var(--text3);
+      text-transform:uppercase; letter-spacing:.06em;
+      margin-bottom:16px; display:flex; align-items:center; gap:7px;
+    }
+    .card-title span { font-size:1rem; }
+
+    /* ── Champs ── */
+    .field { margin-bottom:14px; }
+    .field label {
+      display:block; font-weight:800; color:var(--text2);
+      font-size:.82rem; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;
+    }
+    .field textarea, .field input[type=text], .field input[type=url] {
+      width:100%; padding:10px 13px;
+      border:1.5px solid var(--border); border-radius:var(--radius);
+      font-family:'Nunito',sans-serif; font-size:.92rem; font-weight:600;
+      background:rgba(255,255,255,.88); color:var(--text);
+      box-shadow:0 1px 4px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      transition:all .2s; resize:vertical;
+    }
+    .field textarea { height:64px; }
+    .field textarea:focus, .field input:focus {
+      border-color:var(--blue-light); outline:none;
+      box-shadow:0 0 0 3px rgba(42,127,212,.15), 0 1px 4px var(--shadow2);
+    }
+
+    /* Slider */
+    .slider-row { display:flex; align-items:center; gap:10px; }
+    .slider-row input[type=range] {
+      flex:1; -webkit-appearance:none; height:6px;
+      background:linear-gradient(90deg,var(--blue),var(--blue-light));
+      border-radius:50px; outline:none; cursor:pointer;
+    }
+    .slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance:none; width:20px; height:20px;
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4);
+      border-radius:50%; border:2px solid white;
+      box-shadow:0 2px 8px rgba(30,80,180,.3);
+      cursor:pointer;
+    }
+    .slider-val {
+      min-width:44px; text-align:right;
+      font-weight:800; font-size:.88rem; color:var(--blue2);
+      background:rgba(255,255,255,.8); border:1px solid var(--border2);
+      border-radius:var(--radius); padding:3px 8px;
+    }
+
+    /* Color picker */
+    .color-row { display:flex; align-items:center; gap:10px; }
+    .color-row input[type=color] {
+      width:40px; height:36px;
+      border:1.5px solid var(--border); border-radius:var(--radius);
+      cursor:pointer; padding:3px; background:rgba(255,255,255,.88);
+      box-shadow:0 1px 4px var(--shadow2);
+    }
+    .color-hex {
+      font-weight:800; font-size:.88rem; color:var(--text2);
+      font-family:'Courier New',monospace;
+      background:rgba(255,255,255,.8); border:1px solid var(--border2);
+      border-radius:var(--radius); padding:5px 10px;
+    }
+
+    /* ── Thèmes ── */
+    .theme-grid {
+      display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:4px;
+    }
+    .theme-btn {
+      border:1.5px solid var(--border2); border-radius:var(--radius);
+      padding:8px 4px 7px; cursor:pointer; text-align:center;
+      font-size:.75rem; font-weight:800; color:var(--text2);
+      background:rgba(255,255,255,.7); transition:all .2s;
+      position:relative; overflow:hidden;
+    }
+    .theme-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .theme-btn:hover { transform:translateY(-2px); box-shadow:0 4px 12px var(--shadow2); }
+    .theme-btn.active {
+      border-color:var(--blue); color:var(--blue3);
+      background:rgba(255,255,255,.95);
+      box-shadow:0 0 0 2px rgba(42,127,212,.2), 0 4px 12px var(--shadow2);
+    }
+    .theme-preview {
+      height:18px; border-radius:5px; margin-bottom:5px;
+    }
+
+    /* ── Emoji pills ── */
+    .emoji-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+    .emoji-btn {
+      padding:5px 12px; border-radius:50px;
+      border:1.5px solid var(--border2); font-size:.82rem; font-weight:700;
+      cursor:pointer; background:rgba(255,255,255,.7); color:var(--text2);
+      transition:all .2s;
+    }
+    .emoji-btn:hover { background:rgba(255,255,255,.95); border-color:var(--border); }
+    .emoji-btn.active {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),var(--blue-pale));
+      border-color:var(--blue-light); color:var(--blue3);
+      box-shadow:0 2px 8px var(--shadow2);
+    }
+
+    /* ── Preview ── */
+    .preview-card {
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-xl);
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      overflow:hidden; position:relative;
+    }
+    .preview-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:30%;
+      background:rgba(255,255,255,.42); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none; z-index:0;
+    }
+    .preview-title {
+      font-size:.82rem; font-weight:800; color:var(--text3);
+      text-transform:uppercase; letter-spacing:.06em;
+      padding:16px 20px 0; position:relative; z-index:1;
+    }
+    .preview-zone {
+      min-height:280px;
+      display:flex; align-items:center; justify-content:center;
+      padding:24px; transition:background .4s;
+      position:relative; z-index:1;
+    }
+
+    /* La carte QR exportable */
+    #qrCard {
+      display:inline-block; text-align:center;
+      background:white; border:2.5px solid #e5e7eb;
+      border-radius:18px; padding:20px;
+      box-shadow:0 6px 24px rgba(30,80,160,.15);
+      transition:all .3s;
+    }
+    #qrCanvasWrap canvas { display:block !important; border-radius:8px; }
+    #qrCanvasWrap img { display:none !important; }
+    #topLabel { }
+    #botLabel { }
+
+    /* ── Boutons export ── */
+    .export-zone {
+      padding:16px 20px 20px; position:relative; z-index:1;
+      border-top:1px solid rgba(255,255,255,.7);
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:7px;
+      padding:10px 20px; border:none; border-radius:var(--radius);
+      cursor:pointer; font-family:'Nunito',sans-serif; font-weight:800; font-size:.88rem;
+      transition:all .2s; position:relative; overflow:hidden; flex:1;
+    }
+    .btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .btn-primary {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white;
+      border:1px solid #1050a0;
+      box-shadow:0 2px 8px rgba(30,80,180,.25),0 1px 0 rgba(255,255,255,.4) inset;
+    }
+    .btn-primary:hover { background:linear-gradient(180deg,#90d4ff,#3a90e4,#1a6cc0); transform:translateY(-2px); box-shadow:0 4px 14px rgba(30,80,180,.4); }
+    .btn-glass {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(200,228,252,.85));
+      color:var(--blue2); border:1px solid rgba(255,255,255,.9);
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    }
+    .btn-glass:hover { background:linear-gradient(180deg,#fff,#d0e8ff); transform:translateY(-2px); }
+
+    /* ── Toast ── */
+    #toastContainer { position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+    .toast {
+      padding:12px 20px; border-radius:var(--radius-lg);
+      font-weight:800; font-size:.88rem;
+      box-shadow:0 6px 24px var(--shadow),0 1px 0 rgba(255,255,255,.9) inset;
+      border:1px solid rgba(255,255,255,.85);
+      display:flex; align-items:center; gap:8px;
+      animation:slideIn .3s ease-out;
+      background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(215,245,185,.9));
+      color:var(--green2); pointer-events:none;
+      position:relative; overflow:hidden;
+    }
+    .toast.error { background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(255,220,220,.9)); color:var(--red); }
+    .toast::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:45%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 60% 60%; pointer-events:none;
+    }
+    @keyframes slideIn { from{transform:translateX(400px);opacity:0} to{transform:none;opacity:1} }
+    @keyframes slideOut { from{transform:none;opacity:1} to{transform:translateX(400px);opacity:0} }
+
+    /* ── Back btn ── */
+    .back-btn {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(200,228,252,.85));
+      border:1px solid rgba(255,255,255,.9); color:var(--blue2);
+      padding:9px 20px; border-radius:50px; cursor:pointer;
+      font-family:'Nunito',sans-serif; font-weight:800; font-size:.9rem;
+      margin-bottom:22px; display:inline-flex; align-items:center; gap:8px;
+      transition:all .2s;
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden;
+    }
+    .back-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .back-btn:hover { background:linear-gradient(180deg,#fff,#d0e8ff); transform:translateX(-3px); box-shadow:0 4px 14px var(--shadow); }
+  </style>
+</head>
+<body>
+<div id="toastContainer"></div>
+
+<div class="page-wrap">
+
+  <button class="back-btn" onclick="window.history.back()">← Retour</button>
+
+  <div class="page-header">
+    <div class="icon-badge">📲</div>
+    <h1>Générateur QR Code</h1>
+    <p>Créez, personnalisez et exportez vos QR codes en PNG</p>
+  </div>
+
+  <div class="main-grid">
+
+    <!-- ── Colonne gauche : paramètres ── -->
+    <div>
+
+      <!-- Contenu -->
+      <div class="card">
+        <div class="card-title"><span>🔗</span> Contenu</div>
+        <div class="field">
+          <label>URL ou texte</label>
+          <textarea id="qrText" placeholder="https://monsite.com ou n'importe quel texte…">http://192.168.1.1:8000/espace-membres.html</textarea>
+        </div>
+        <div class="field">
+          <label>Taille du QR</label>
+          <div class="slider-row">
+            <input type="range" id="qrSize" min="100" max="320" value="200" step="10">
+            <span class="slider-val" id="sizeLabel">200px</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Couleurs -->
+      <div class="card">
+        <div class="card-title"><span>🎨</span> Couleurs du QR</div>
+        <div class="field">
+          <label>Modules (carrés)</label>
+          <div class="color-row">
+            <input type="color" id="colorDark" value="#0d4f9a">
+            <span class="color-hex" id="colorDarkHex">#0d4f9a</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Fond du QR</label>
+          <div class="color-row">
+            <input type="color" id="colorLight" value="#ffffff">
+            <span class="color-hex" id="colorLightHex">#ffffff</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Décor -->
+      <div class="card">
+        <div class="card-title"><span>✨</span> Décor autour</div>
+
+        <div class="field">
+          <label>Thème</label>
+          <div class="theme-grid" id="themeGrid">
+            <div class="theme-btn active" data-theme="none">
+              <div class="theme-preview" style="background:#f0f4f8;border:1px dashed #ccc"></div>Aucun
+            </div>
+            <div class="theme-btn" data-theme="blue">
+              <div class="theme-preview" style="background:linear-gradient(135deg,#1558b0,#5ba3e8)"></div>Bleu
+            </div>
+            <div class="theme-btn" data-theme="green">
+              <div class="theme-preview" style="background:linear-gradient(135deg,#3d8a18,#a4e474)"></div>Vert
+            </div>
+            <div class="theme-btn" data-theme="dark">
+              <div class="theme-preview" style="background:linear-gradient(135deg,#1a2b4a,#2d4a7a)"></div>Sombre
+            </div>
+            <div class="theme-btn" data-theme="sunset">
+              <div class="theme-preview" style="background:linear-gradient(135deg,#b86200,#f59e0b)"></div>Soleil
+            </div>
+            <div class="theme-btn" data-theme="rose">
+              <div class="theme-preview" style="background:linear-gradient(135deg,#9f1239,#fb7185)"></div>Rose
+            </div>
+            <div class="theme-btn" data-theme="purple">
+              <div class="theme-preview" style="background:linear-gradient(135deg,#4c1d95,#a78bfa)"></div>Violet
+            </div>
+            <div class="theme-btn" data-theme="print">
+              <div class="theme-preview" style="background:#fff;border:1.5px solid #222"></div>Print
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Texte au-dessus</label>
+          <input type="text" id="labelTop" value="Espace Membres" placeholder="Titre…">
+        </div>
+        <div class="field">
+          <label>Texte en dessous</label>
+          <input type="text" id="labelBottom" value="Scannez pour accéder !" placeholder="Sous-titre…">
+        </div>
+
+        <div class="field">
+          <label>Icône</label>
+          <div class="emoji-row" id="emojiPicker">
+            <span class="emoji-btn active" data-emoji="">Aucune</span>
+            <span class="emoji-btn" data-emoji="🎫">🎫</span>
+            <span class="emoji-btn" data-emoji="📲">📲</span>
+            <span class="emoji-btn" data-emoji="🔗">🔗</span>
+            <span class="emoji-btn" data-emoji="⭐">⭐</span>
+            <span class="emoji-btn" data-emoji="🏠">🏠</span>
+            <span class="emoji-btn" data-emoji="🛒">🛒</span>
+            <span class="emoji-btn" data-emoji="📍">📍</span>
+            <span class="emoji-btn" data-emoji="🎯">🎯</span>
+            <span class="emoji-btn" data-emoji="💡">💡</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Padding autour du QR</label>
+          <div class="slider-row">
+            <input type="range" id="padSize" min="8" max="50" value="20" step="2">
+            <span class="slider-val" id="padLabel">20px</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Colonne droite : aperçu ── -->
+    <div style="position:sticky;top:20px">
+      <div class="preview-card">
+        <div class="preview-title">📐 Aperçu</div>
+        <div class="preview-zone" id="previewZone">
+          <div id="qrCard">
+            <div id="topLabel"></div>
+            <div id="qrCanvasWrap"></div>
+            <div id="botLabel"></div>
+          </div>
+        </div>
+        <div class="export-zone">
+          <button class="btn btn-primary" onclick="exportPNG()">📥 Télécharger PNG</button>
+          <button class="btn btn-glass" onclick="copyURL()">🔗 Copier l'URL</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentTheme = 'none';
+  let currentEmoji = '';
+
+  const themes = {
+    none:   { bg: null, card: '#ffffff', border: '#e5e7eb', shadow: '0 6px 24px rgba(30,80,160,.12)', textTop: '#1a2b4a', textBot: '#4a6080', topSize: '15px', botSize: '12px' },
+    blue:   { bg: 'linear-gradient(135deg,#1558b0,#2a7fd4,#5ba3e8)', card: 'rgba(255,255,255,0.95)', border: 'rgba(255,255,255,0.8)', shadow: '0 8px 32px rgba(20,60,180,.25)', textTop: '#0d3a7a', textBot: '#1558b0', topSize: '15px', botSize: '12px' },
+    green:  { bg: 'linear-gradient(135deg,#3d8a18,#5aad2e,#a4e474)', card: 'rgba(255,255,255,0.95)', border: 'rgba(255,255,255,0.8)', shadow: '0 8px 32px rgba(30,120,20,.25)', textTop: '#1f5c00', textBot: '#3d8a18', topSize: '15px', botSize: '12px' },
+    dark:   { bg: 'linear-gradient(135deg,#1a2b4a,#2d4a7a,#1a3a6a)', card: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.2)', shadow: '0 8px 32px rgba(0,0,0,.4)', textTop: '#ffffff', textBot: 'rgba(255,255,255,0.7)', topSize: '15px', botSize: '12px' },
+    sunset: { bg: 'linear-gradient(135deg,#b86200,#d97706,#f59e0b)', card: 'rgba(255,255,255,0.95)', border: 'rgba(255,255,255,0.8)', shadow: '0 8px 32px rgba(200,100,0,.3)', textTop: '#7c3900', textBot: '#b86200', topSize: '15px', botSize: '12px' },
+    rose:   { bg: 'linear-gradient(135deg,#9f1239,#e11d48,#fb7185)', card: 'rgba(255,255,255,0.95)', border: 'rgba(255,255,255,0.8)', shadow: '0 8px 32px rgba(180,20,60,.3)', textTop: '#7f1d3b', textBot: '#c41340', topSize: '15px', botSize: '12px' },
+    purple: { bg: 'linear-gradient(135deg,#4c1d95,#7c3aed,#a78bfa)', card: 'rgba(255,255,255,0.95)', border: 'rgba(255,255,255,0.8)', shadow: '0 8px 32px rgba(100,30,200,.3)', textTop: '#3b0f8a', textBot: '#5b21b6', topSize: '15px', botSize: '12px' },
+    print:  { bg: '#ffffff', card: '#ffffff', border: '#1a1a1a', shadow: 'none', textTop: '#111111', textBot: '#444444', topSize: '14px', botSize: '11px' }
+  };
+
+  function genQR() {
+    const txt   = document.getElementById('qrText').value.trim() || 'https://example.com';
+    const size  = parseInt(document.getElementById('qrSize').value);
+    const dark  = document.getElementById('colorDark').value;
+    const light = document.getElementById('colorLight').value;
+    const pad   = parseInt(document.getElementById('padSize').value);
+    const top   = document.getElementById('labelTop').value.trim();
+    const bot   = document.getElementById('labelBottom').value.trim();
+    const th    = themes[currentTheme];
+
+    // Regénérer le QR (un seul canvas, pas d'img)
+    const wrap = document.getElementById('qrCanvasWrap');
+    wrap.innerHTML = '';
+    new QRCode(wrap, { text: txt, width: size, height: size, colorDark: dark, colorLight: light, correctLevel: QRCode.CorrectLevel.M });
+    setTimeout(() => {
+      wrap.querySelectorAll('img').forEach(i => i.style.display = 'none');
+      wrap.querySelectorAll('canvas').forEach(c => { c.style.display = 'block'; c.style.borderRadius = '8px'; });
+    }, 40);
+
+    // Style carte
+    const card = document.getElementById('qrCard');
+    card.style.cssText = `display:inline-block;text-align:center;background:${th.card};border:2.5px solid ${th.border};border-radius:18px;padding:${pad}px;box-shadow:${th.shadow};transition:all .3s;`;
+
+    // Label haut
+    const topEl = document.getElementById('topLabel');
+    if (top || currentEmoji) {
+      topEl.style.marginBottom = '12px';
+      topEl.innerHTML =
+        (currentEmoji ? `<div style="font-size:26px;line-height:1.2;margin-bottom:4px">${currentEmoji}</div>` : '') +
+        (top ? `<div style="font-family:'Nunito',sans-serif;font-size:${th.topSize};font-weight:900;color:${th.textTop};letter-spacing:-.2px">${top}</div>` : '');
+    } else {
+      topEl.innerHTML = ''; topEl.style.marginBottom = '0';
+    }
+
+    // Label bas
+    const botEl = document.getElementById('botLabel');
+    if (bot) {
+      botEl.style.marginTop = '12px';
+      botEl.innerHTML = `<div style="font-family:'Nunito',sans-serif;font-size:${th.botSize};font-weight:700;color:${th.textBot}">${bot}</div>`;
+    } else {
+      botEl.innerHTML = ''; botEl.style.marginTop = '0';
+    }
+
+    // Fond zone aperçu
+    const pz = document.getElementById('previewZone');
+    pz.style.background = th.bg || 'linear-gradient(145deg,rgba(215,238,255,.4),rgba(232,245,220,.4))';
+    pz.style.transition = 'background .4s';
+  }
+
+  function exportPNG() {
+    const zone = document.getElementById('previewZone');
+    html2canvas(zone, { backgroundColor: null, scale: 3, useCORS: true, logging: false }).then(canvas => {
+      const a = document.createElement('a');
+      a.download = 'qrcode.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+      showToast('✅ PNG téléchargé avec succès !');
+    }).catch(() => showToast('❌ Erreur lors de l\'export', 'error'));
+  }
+
+  function copyURL() {
+    const txt = document.getElementById('qrText').value.trim();
+    navigator.clipboard.writeText(txt).then(() => {
+      showToast('📋 URL copiée dans le presse-papier !');
+    }).catch(() => showToast('❌ Impossible de copier', 'error'));
+  }
+
+  function showToast(msg, type = 'success') {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast' + (type === 'error' ? ' error' : '');
+    t.innerHTML = `<span style="position:relative;z-index:1">${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.animation = 'slideOut .3s forwards'; setTimeout(() => t.remove(), 320); }, 3000);
+  }
+
+  function debounce(fn, ms) { let timer; return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); }; }
+
+  // Events
+  document.getElementById('qrText').addEventListener('input', debounce(genQR, 380));
+  document.getElementById('labelTop').addEventListener('input', debounce(genQR, 280));
+  document.getElementById('labelBottom').addEventListener('input', debounce(genQR, 280));
+
+  document.getElementById('qrSize').addEventListener('input', function () {
+    document.getElementById('sizeLabel').textContent = this.value + 'px'; genQR();
+  });
+  document.getElementById('padSize').addEventListener('input', function () {
+    document.getElementById('padLabel').textContent = this.value + 'px'; genQR();
+  });
+  document.getElementById('colorDark').addEventListener('input', function () {
+    document.getElementById('colorDarkHex').textContent = this.value; genQR();
+  });
+  document.getElementById('colorLight').addEventListener('input', function () {
+    document.getElementById('colorLightHex').textContent = this.value; genQR();
+  });
+
+  document.getElementById('themeGrid').addEventListener('click', function (e) {
+    const btn = e.target.closest('.theme-btn');
+    if (!btn) return;
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTheme = btn.dataset.theme;
+    genQR();
+  });
+
+  document.getElementById('emojiPicker').addEventListener('click', function (e) {
+    const btn = e.target.closest('.emoji-btn');
+    if (!btn) return;
+    document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentEmoji = btn.dataset.emoji;
+    genQR();
+  });
+
+  setTimeout(genQR, 500);
+</script>
+</body>
+</html>

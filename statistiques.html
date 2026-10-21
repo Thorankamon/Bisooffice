@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Statistiques — Fréquentation & Ventes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+  :root {
+    --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+    --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+    --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+    --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+    --purple:#7c3aed; --purple-pale:#f5f3ff;
+    --orange:#d97706; --orange-pale:#fff7ed;
+    --cyan:#0891b2; --cyan-pale:#ecfeff;
+    --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+    --border:#b0cce8; --border2:#d0e4f4;
+    --glass:rgba(255,255,255,0.82);
+    --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+    --radius:12px; --radius-lg:18px; --radius-xl:22px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family:'Nunito','Segoe UI',sans-serif;
+    font-size:14px;
+    background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+    min-height:100vh;
+    padding:24px;
+    color:var(--text);
+  }
+  body::before {
+    content:''; position:fixed; top:-150px; left:-150px;
+    width:550px; height:550px;
+    background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+    pointer-events:none; z-index:0; border-radius:50%;
+  }
+  body::after {
+    content:''; position:fixed; bottom:-100px; right:5%;
+    width:450px; height:450px;
+    background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+    pointer-events:none; z-index:0; border-radius:50%;
+  }
+
+  /* ── Bouton retour ── */
+  .back-btn {
+    background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(200,228,252,.85));
+    border:1px solid rgba(255,255,255,.9);
+    color:var(--blue2);
+    padding:9px 20px;
+    border-radius:50px;
+    cursor:pointer;
+    font-family:'Nunito',sans-serif;
+    font-weight:800; font-size:.9rem;
+    margin-bottom:20px;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:all .2s;
+    box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    position:relative; overflow:hidden; z-index:1;
+  }
+  .back-btn::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:50%;
+    background:rgba(255,255,255,.4); border-radius:50px 50px 0 0; pointer-events:none;
+  }
+  .back-btn:hover { background:linear-gradient(180deg,#fff,#d0e8ff); transform:translateX(-3px); box-shadow:0 4px 14px var(--shadow); }
+
+  /* ── En-tête entreprise ── */
+  .company-header {
+    background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(180,220,250,.88),rgba(120,185,240,.92));
+    border:1px solid rgba(255,255,255,.95);
+    color:var(--blue3);
+    padding:20px 28px;
+    border-radius:var(--radius-xl);
+    margin-bottom:20px;
+    box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    position:relative; overflow:hidden; z-index:1;
+  }
+  .company-header::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:50%;
+    background:rgba(255,255,255,.4); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+    pointer-events:none;
+  }
+  .company-header strong { font-size:1.3em; font-weight:900; display:block; margin-bottom:6px; }
+
+  h1 {
+    margin-bottom:8px; color:var(--blue3);
+    text-align:center; font-size:2rem; font-weight:900;
+    font-family:'Nunito',sans-serif; letter-spacing:-.5px;
+    position:relative; z-index:1;
+  }
+  .subtitle {
+    text-align:center; color:var(--text2); font-weight:700; font-size:.95rem;
+    margin-bottom:22px; position:relative; z-index:1;
+  }
+
+  /* ── Barre de contrôle (période / année) ── */
+  .controls {
+    margin-bottom:22px; padding:18px 22px;
+    background:var(--glass); backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.95);
+    border-radius:var(--radius-xl);
+    box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;
+    position:relative; overflow:hidden; z-index:1;
+  }
+  .controls::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:40%;
+    background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+    pointer-events:none;
+  }
+  .controls-left, .controls-right { display:flex; flex-wrap:wrap; gap:10px; align-items:center; position:relative; z-index:1; }
+
+  .toggle-group { display:flex; gap:6px; background:rgba(255,255,255,.6); border:1px solid var(--border2); border-radius:50px; padding:4px; }
+  .toggle-btn {
+    padding:8px 18px; border:none; border-radius:50px; cursor:pointer;
+    font-family:'Nunito',sans-serif; font-weight:800; font-size:.86rem;
+    background:transparent; color:var(--text2); transition:all .2s;
+  }
+  .toggle-btn.active { background:linear-gradient(180deg,var(--blue-light),var(--blue2)); color:#fff; box-shadow:0 2px 8px var(--shadow); }
+  .toggle-btn:hover:not(.active) { background:rgba(255,255,255,.8); color:var(--blue3); }
+
+  .controls select {
+    padding:9px 14px; border:1px solid var(--border);
+    border-radius:var(--radius); font-size:.9rem; font-family:'Nunito',sans-serif; font-weight:700;
+    background:rgba(255,255,255,.85); color:var(--text); cursor:pointer;
+    box-shadow:0 1px 4px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+  }
+  .controls select:focus { border-color:var(--blue-light); outline:none; box-shadow:0 0 0 3px rgba(42,127,212,.15); }
+
+  .export-btn {
+    padding:9px 18px; border:none; border-radius:var(--radius);
+    cursor:pointer; font-weight:800; font-size:.86rem; font-family:'Nunito',sans-serif;
+    background:linear-gradient(180deg,#8fd85f,var(--green),var(--green2));
+    color:#fff; box-shadow:0 2px 8px rgba(74,148,34,.3),0 1px 0 rgba(255,255,255,.4) inset;
+    display:flex; align-items:center; gap:8px; transition:all .2s;
+  }
+  .export-btn:hover { transform:translateY(-2px); box-shadow:0 4px 14px rgba(74,148,34,.4); }
+
+  /* ── Cartes KPI ── */
+  .kpi-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:16px; margin-bottom:24px; position:relative; z-index:1;
+  }
+  .kpi-card {
+    border:1px solid rgba(255,255,255,.95);
+    border-radius:var(--radius-xl);
+    padding:18px 20px;
+    background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+    backdrop-filter:blur(10px);
+    box-shadow:0 4px 16px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    position:relative; overflow:hidden; transition:all .3s ease;
+  }
+  .kpi-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:5px;
+    background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));
+  }
+  .kpi-card::after {
+    content:''; position:absolute; top:5px; left:0; right:0; height:38%;
+    background:rgba(255,255,255,.42); border-radius:0 0 60% 60%;
+    pointer-events:none;
+  }
+  .kpi-card:hover { transform:translateY(-4px); box-shadow:0 10px 28px var(--shadow); }
+  .kpi-card.creux::before { background:linear-gradient(90deg,#e8897c,var(--red)); }
+  .kpi-card.fort::before { background:linear-gradient(90deg,#8fd85f,var(--green)); }
+  .kpi-label { font-size:.78rem; font-weight:800; color:var(--text2); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; position:relative; z-index:1; }
+  .kpi-value { font-size:1.6rem; font-weight:900; color:var(--blue3); position:relative; z-index:1; }
+  .kpi-sub { font-size:.78rem; font-weight:700; color:var(--text3); margin-top:2px; position:relative; z-index:1; }
+
+  /* ── Cartes graphiques ── */
+  .chart-card {
+    background:var(--glass); backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.95);
+    border-radius:var(--radius-xl);
+    padding:22px 24px 14px;
+    margin-bottom:22px;
+    box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    position:relative; overflow:hidden; z-index:1;
+  }
+  .chart-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:30%;
+    background:rgba(255,255,255,.4); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+    pointer-events:none;
+  }
+  .chart-title { font-size:1.15rem; font-weight:900; color:var(--blue3); margin-bottom:4px; position:relative; z-index:1; display:flex; align-items:center; gap:8px; }
+  .chart-legend { font-size:.8rem; font-weight:700; color:var(--text3); margin-bottom:14px; position:relative; z-index:1; }
+  .chart-svg { width:100%; height:auto; display:block; position:relative; z-index:1; }
+  .legend-row { display:flex; gap:18px; flex-wrap:wrap; margin-top:6px; font-size:.78rem; font-weight:800; color:var(--text2); position:relative; z-index:1; }
+  .legend-dot { display:inline-block; width:11px; height:11px; border-radius:4px; margin-right:5px; vertical-align:-1px; }
+
+  /* ── Encart insight ── */
+  .insight-card {
+    background:linear-gradient(135deg,rgba(255,248,220,.9),rgba(255,235,180,.75));
+    border:1px solid rgba(255,255,255,.9);
+    border-radius:var(--radius-xl);
+    padding:18px 22px;
+    margin-bottom:22px;
+    box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    position:relative; overflow:hidden; z-index:1;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .insight-icon { font-size:1.6rem; line-height:1; }
+  .insight-text { font-weight:700; color:var(--text); line-height:1.5; font-size:.92rem; }
+  .insight-text b { color:var(--blue3); }
+
+  /* ── Tableau récap ── */
+  .table-card {
+    background:var(--glass); backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.95);
+    border-radius:var(--radius-xl);
+    padding:20px 22px;
+    margin-bottom:22px;
+    box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    position:relative; overflow:hidden; z-index:1; overflow-x:auto;
+  }
+  table.stats-table { width:100%; border-collapse:collapse; font-size:.88rem; position:relative; z-index:1; }
+  table.stats-table th {
+    text-align:left; padding:10px 14px; background:rgba(180,220,250,.4);
+    color:var(--blue3); font-weight:900; text-transform:uppercase; font-size:.75rem; letter-spacing:.03em;
+    border-bottom:2px solid var(--border);
+  }
+  table.stats-table td { padding:10px 14px; border-bottom:1px solid var(--border2); font-weight:600; color:var(--text); }
+  table.stats-table tr:hover td { background:rgba(222,238,251,.5); }
+  table.stats-table tr.row-min td { background:rgba(253,232,232,.5); }
+  table.stats-table tr.row-max td { background:rgba(232,245,220,.5); }
+  table.stats-table td.num { text-align:right; font-variant-numeric:tabular-nums; font-weight:800; }
+  .tag-mini { padding:2px 8px; border-radius:50px; font-size:.7rem; font-weight:900; }
+  .tag-min { background:var(--red-pale); color:var(--red2); }
+  .tag-max { background:var(--green-pale); color:var(--green2); }
+
+  .empty-state {
+    text-align:center; padding:50px 20px; color:var(--text3); font-weight:700;
+    background:var(--glass); border-radius:var(--radius-xl); position:relative; z-index:1;
+  }
+
+  @media (max-width:700px) {
+    .controls { flex-direction:column; align-items:stretch; }
+    .controls-left, .controls-right { justify-content:center; }
+  }
+</style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.history.back()">← Retour</button>
+
+  <div id="companyHeader" class="company-header"></div>
+
+  <h1>📊 Statistiques Fréquentation & Ventes</h1>
+  <div class="subtitle">Repère les mois creux et les mois forts pour préparer ton étude marketing</div>
+
+  <div class="controls">
+    <div class="controls-left">
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="btnMode3" onclick="setMode('3mois')">📆 3 derniers mois</button>
+        <button class="toggle-btn" id="btnModeAn" onclick="setMode('annee')">🗓 Vue annuelle</button>
+      </div>
+      <select id="yearSelect" onchange="render()"></select>
+    </div>
+    <div class="controls-right">
+      <button class="export-btn" onclick="exportExcel()">📤 Exporter en Excel</button>
+    </div>
+  </div>
+
+  <div id="content"></div>
+
+<script>
+  const companySettings = JSON.parse(localStorage.getItem("companySettings")) || {};
+  function renderCompanyHeader() {
+    const header = document.getElementById("companyHeader");
+    if (!header) return;
+    header.innerHTML = `
+      <strong>${companySettings.companyName || "Mon Entreprise"}</strong><br>
+      ${companySettings.companyAddress || ""} ${companySettings.companyLocality || ""}<br>
+      N° Entreprise : ${companySettings.companyNumber || ""}
+    `;
+  }
+
+  const MOIS_LABELS = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
+  const MOIS_LONG = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+
+  let mode = '3mois'; // '3mois' | 'annee'
+
+  // ── Chargement des données ──
+  const ticketsHistorique = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+  const membres = JSON.parse(localStorage.getItem("membres")) || [];
+
+  function parseTicketDate(ticket) {
+    if (!ticket) return null;
+    if (ticket.isoPaiement) { const d = new Date(ticket.isoPaiement); return isNaN(d) ? null : d; }
+    if (ticket.datePaiement) {
+      const parts = ticket.datePaiement.split('/');
+      if (parts.length === 3) {
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+        const d = new Date(`${year}-${month}-${day}T${ticket.heurePaiement || '00:00:00'}`);
+        return isNaN(d) ? null : d;
+      }
+    }
+    return null;
+  }
+
+  function parseMembreDate(membre) {
+    if (!membre || !membre.dateAdhesion) return null;
+    const s = String(membre.dateAdhesion).trim();
+    const parts = s.split('/');
+    if (parts.length === 3) {
+      let day = parseInt(parts[0], 10), month = parseInt(parts[1], 10), year = parseInt(parts[2], 10);
+      if (year < 100) year += 2000;
+      if (month > 12 && day <= 12) { const tmp = day; day = month; month = tmp; }
+      if (!day || !month || !year) return null;
+      const d = new Date(year, month - 1, day);
+      return isNaN(d) ? null : d;
+    }
+    const d = new Date(s);
+    return isNaN(d) ? null : d;
+  }
+
+  const ticketsAvecDate = ticketsHistorique.map(t => ({ t, date: parseTicketDate(t) })).filter(x => x.date);
+  const membresAvecDate = membres.map(m => ({ m, date: parseMembreDate(m) })).filter(x => x.date);
+
+  // ── Référence temporelle : la donnée la plus récente connue (fallback = aujourd'hui) ──
+  function getRefDate() {
+    let max = null;
+    ticketsAvecDate.forEach(x => { if (!max || x.date > max) max = x.date; });
+    membresAvecDate.forEach(x => { if (!max || x.date > max) max = x.date; });
+    return max || new Date();
+  }
+  const refDate = getRefDate();
+
+  // ── Années disponibles ──
+  function getAvailableYears() {
+    const years = new Set();
+    ticketsAvecDate.forEach(x => years.add(x.date.getFullYear()));
+    membresAvecDate.forEach(x => years.add(x.date.getFullYear()));
+    years.add(refDate.getFullYear());
+    return Array.from(years).sort((a, b) => b - a);
+  }
+
+  function populateYearSelect() {
+    const sel = document.getElementById("yearSelect");
+    const years = getAvailableYears();
+    sel.innerHTML = years.map(y => `<option value="${y}">Année ${y}</option>`).join('');
+    sel.value = refDate.getFullYear();
+  }
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById("btnMode3").classList.toggle("active", m === '3mois');
+    document.getElementById("btnModeAn").classList.toggle("active", m === 'annee');
+    document.getElementById("yearSelect").style.display = (m === 'annee') ? 'inline-block' : 'none';
+    render();
+  }
+
+  // ── Construit la liste des mois à afficher (avec année) selon le mode ──
+  function getMonthsForView() {
+    if (mode === 'annee') {
+      const year = parseInt(document.getElementById("yearSelect").value, 10) || refDate.getFullYear();
+      const list = [];
+      for (let m = 0; m < 12; m++) list.push({ year, month: m });
+      return list;
+    }
+    // 3 derniers mois glissants, ancrés sur la donnée la plus récente
+    const list = [];
+    for (let i = 2; i >= 0; i--) {
+      const d = new Date(refDate.getFullYear(), refDate.getMonth() - i, 1);
+      list.push({ year: d.getFullYear(), month: d.getMonth() });
+    }
+    return list;
+  }
+
+  function buildMonthlyStats(monthsList) {
+    return monthsList.map(({ year, month }) => {
+      const ticketsDuMois = ticketsAvecDate.filter(x => x.date.getFullYear() === year && x.date.getMonth() === month);
+      const membresDuMois = membresAvecDate.filter(x => x.date.getFullYear() === year && x.date.getMonth() === month);
+      const ca = ticketsDuMois.reduce((s, x) => s + (parseFloat(x.t.total) || 0), 0);
+      const nbTickets = ticketsDuMois.length;
+      const panierMoyen = nbTickets ? ca / nbTickets : 0;
+      return {
+        year, month,
+        label: `${MOIS_LABELS[month]}${mode === '3mois' ? " '" + String(year).slice(2) : ''}`,
+        labelLong: `${MOIS_LONG[month]} ${year}`,
+        nbTickets, ca, panierMoyen,
+        nouveauxMembres: membresDuMois.length
+      };
+    });
+  }
+
+  function fmtEUR(v) { return v.toLocaleString('fr-BE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+  function fmtEUR0(v) { return Math.round(v).toLocaleString('fr-BE') + ' €'; }
+
+  // ── Graphique en barres SVG générique ──
+  function svgBarChart(data, { valueKey, valueLabelFn, highlightMinMax = true }) {
+    const width = 900, height = 300;
+    const leftPad = 10, rightPad = 10, topPad = 34, bottomPad = 40;
+    const chartW = width - leftPad - rightPad;
+    const chartH = height - topPad - bottomPad;
+    const n = data.length;
+    const barGap = n <= 3 ? 40 : 14;
+    const barW = (chartW - barGap * (n - 1)) / n;
+    const values = data.map(d => d[valueKey]);
+    const max = Math.max(...values, 0.0001);
+    let minIdx = -1, maxIdx = -1;
+    if (highlightMinMax) {
+      const nonZero = values.map((v, i) => ({ v, i })).filter(x => x.v > 0);
+      if (nonZero.length) {
+        minIdx = nonZero.reduce((a, b) => b.v < a.v ? b : a).i;
+        maxIdx = nonZero.reduce((a, b) => b.v > a.v ? b : a).i;
+        if (minIdx === maxIdx) minIdx = -1;
+      }
+    }
+    let gridlines = '';
+    for (let i = 0; i <= 4; i++) {
+      const y = topPad + chartH - (chartH * i / 4);
+      gridlines += `<line x1="${leftPad}" y1="${y.toFixed(1)}" x2="${width - rightPad}" y2="${y.toFixed(1)}" stroke="#d0e4f4" stroke-width="1" stroke-dasharray="4,4"/>`;
+    }
+    let bars = '';
+    data.forEach((d, i) => {
+      const x = leftPad + i * (barW + barGap);
+      const v = d[valueKey];
+      const h = max > 0 ? (v / max) * chartH : 0;
+      const y = topPad + chartH - h;
+      let fill = 'url(#gradBlue)';
+      if (i === maxIdx) fill = 'url(#gradGreen)';
+      else if (i === minIdx) fill = 'url(#gradRed)';
+      const vLabel = valueLabelFn ? valueLabelFn(v) : v;
+      bars += `
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(h,0).toFixed(1)}" rx="7" fill="${fill}"/>
+        <text x="${(x + barW / 2).toFixed(1)}" y="${(y - 9).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="800" font-family="Nunito,sans-serif" fill="#1a2b4a">${vLabel}</text>
+        <text x="${(x + barW / 2).toFixed(1)}" y="${(height - bottomPad + 22).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="700" font-family="Nunito,sans-serif" fill="#4a6080">${d.label}</text>
+      `;
+    });
+    return `<svg viewBox="0 0 ${width} ${height}" class="chart-svg">
+      <defs>
+        <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7fc0f0"/><stop offset="100%" stop-color="#1a6bbf"/></linearGradient>
+        <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a3e075"/><stop offset="100%" stop-color="#4a9422"/></linearGradient>
+        <linearGradient id="gradRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0a89c"/><stop offset="100%" stop-color="#922b21"/></linearGradient>
+      </defs>
+      ${gridlines}
+      ${bars}
+    </svg>`;
+  }
+
+  function render() {
+    const monthsList = getMonthsForView();
+    const stats = buildMonthlyStats(monthsList);
+
+    const totalTickets = stats.reduce((s, m) => s + m.nbTickets, 0);
+    const totalCA = stats.reduce((s, m) => s + m.ca, 0);
+    const totalMembres = stats.reduce((s, m) => s + m.nouveauxMembres, 0);
+    const panierMoyenGlobal = totalTickets ? totalCA / totalTickets : 0;
+
+    const moisAvecActivite = stats.filter(m => m.nbTickets > 0);
+    let moisCreux = null, moisFort = null;
+    if (moisAvecActivite.length) {
+      moisCreux = moisAvecActivite.reduce((a, b) => b.nbTickets < a.nbTickets ? b : a);
+      moisFort = moisAvecActivite.reduce((a, b) => b.nbTickets > a.nbTickets ? b : a);
+    }
+
+    let html = '';
+
+    if (!ticketsHistorique.length && !membres.length) {
+      html += `<div class="empty-state">Aucune donnée trouvée. Enregistre d'abord des tickets et des membres pour voir apparaître les statistiques ici.</div>`;
+      document.getElementById("content").innerHTML = html;
+      return;
+    }
+
+    // KPI
+    html += `<div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">🎟 Tickets</div><div class="kpi-value">${totalTickets}</div><div class="kpi-sub">sur la période</div></div>
+      <div class="kpi-card"><div class="kpi-label">💶 Chiffre d'affaires</div><div class="kpi-value">${fmtEUR0(totalCA)}</div><div class="kpi-sub">panier moyen ${fmtEUR(panierMoyenGlobal)}</div></div>
+      <div class="kpi-card"><div class="kpi-label">👥 Nouveaux membres</div><div class="kpi-value">${totalMembres}</div><div class="kpi-sub">inscriptions sur la période</div></div>
+      <div class="kpi-card creux"><div class="kpi-label">📉 Mois le plus creux</div><div class="kpi-value">${moisCreux ? moisCreux.label : '—'}</div><div class="kpi-sub">${moisCreux ? moisCreux.nbTickets + ' ticket(s)' : ''}</div></div>
+      <div class="kpi-card fort"><div class="kpi-label">📈 Mois le plus fort</div><div class="kpi-value">${moisFort ? moisFort.label : '—'}</div><div class="kpi-sub">${moisFort ? moisFort.nbTickets + ' ticket(s)' : ''}</div></div>
+    </div>`;
+
+    // Insight
+    if (moisCreux && moisFort && moisCreux !== moisFort) {
+      const ecart = moisFort.nbTickets > 0 ? Math.round((1 - moisCreux.nbTickets / moisFort.nbTickets) * 100) : 0;
+      html += `<div class="insight-card">
+        <div class="insight-icon">💡</div>
+        <div class="insight-text">
+          <b>${moisCreux.labelLong}</b> est le mois le plus calme (${moisCreux.nbTickets} ticket${moisCreux.nbTickets > 1 ? 's' : ''}, ${fmtEUR0(moisCreux.ca)}),
+          contre <b>${moisFort.labelLong}</b> pour le pic d'activité (${moisFort.nbTickets} tickets, ${fmtEUR0(moisFort.ca)}) —
+          soit un écart de fréquentation d'environ <b>${ecart}%</b>. De quoi cibler une action marketing (promo, soirée à thème, com' ciblée) sur les périodes creuses.
+        </div>
+      </div>`;
+    }
+
+    // Chart tickets
+    html += `<div class="chart-card">
+      <div class="chart-title">🎟 Nombre de tickets par mois</div>
+      <div class="chart-legend">Rouge = mois le plus creux · Vert = mois le plus fort</div>
+      ${svgBarChart(stats, { valueKey: 'nbTickets', valueLabelFn: v => v })}
+    </div>`;
+
+    // Chart CA
+    html += `<div class="chart-card">
+      <div class="chart-title">💶 Chiffre d'affaires par mois</div>
+      <div class="chart-legend">Rouge = CA le plus bas · Vert = CA le plus haut</div>
+      ${svgBarChart(stats, { valueKey: 'ca', valueLabelFn: v => Math.round(v) + ' €' })}
+    </div>`;
+
+    // Chart membres
+    html += `<div class="chart-card">
+      <div class="chart-title">👥 Nouveaux membres par mois</div>
+      <div class="chart-legend">Rouge = moins d'inscriptions · Vert = plus d'inscriptions</div>
+      ${svgBarChart(stats, { valueKey: 'nouveauxMembres', valueLabelFn: v => v })}
+    </div>`;
+
+    // Tableau
+    html += `<div class="table-card">
+      <table class="stats-table">
+        <thead><tr>
+          <th>Mois</th><th class="num">Tickets</th><th class="num">Chiffre d'affaires</th><th class="num">Panier moyen</th><th class="num">Nouveaux membres</th><th>Repère</th>
+        </tr></thead>
+        <tbody>
+        ${stats.map(m => {
+          let rowClass = '', tag = '';
+          if (moisCreux && m === moisCreux) { rowClass = 'row-min'; tag = '<span class="tag-mini tag-min">Creux</span>'; }
+          if (moisFort && m === moisFort) { rowClass = 'row-max'; tag = '<span class="tag-mini tag-max">Fort</span>'; }
+          return `<tr class="${rowClass}">
+            <td>${m.labelLong}</td>
+            <td class="num">${m.nbTickets}</td>
+            <td class="num">${fmtEUR(m.ca)}</td>
+            <td class="num">${m.nbTickets ? fmtEUR(m.panierMoyen) : '—'}</td>
+            <td class="num">${m.nouveauxMembres}</td>
+            <td>${tag}</td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+    document.getElementById("content").innerHTML = html;
+    window._currentStats = stats;
+  }
+
+  function exportExcel() {
+    const stats = window._currentStats || [];
+    if (!stats.length) { alert('Aucune donnée à exporter.'); return; }
+    const rows = stats.map(m => ({
+      "Mois": m.labelLong,
+      "Tickets": m.nbTickets,
+      "Chiffre d'affaires (€)": Number(m.ca.toFixed(2)),
+      "Panier moyen (€)": m.nbTickets ? Number(m.panierMoyen.toFixed(2)) : 0,
+      "Nouveaux membres": m.nouveauxMembres
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{ wch: 16 }, { wch: 10 }, { wch: 20 }, { wch: 16 }, { wch: 18 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Statistiques");
+    const nomFichier = `Statistiques_${mode === 'annee' ? document.getElementById('yearSelect').value : '3derniersmois'}_${new Date().toLocaleDateString('fr-BE').replace(/\//g, '-')}.xlsx`;
+    XLSX.writeFile(wb, nomFichier);
+  }
+
+  // Init
+  renderCompanyHeader();
+  populateYearSelect();
+  document.getElementById("yearSelect").style.display = 'none';
+  render();
+</script>
+</body>
+</html>

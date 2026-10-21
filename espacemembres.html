@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace Membre</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --sky: #e8f4fd; --sky2: #c8e6f8;
+    --blue: #2a7fd4; --blue2: #1a6bbf; --blue3: #0d4f9a;
+    --blue-pale: #deeefb;
+    --green: #5aad2e; --green2: #4a9422; --green-pale: #e8f5dc;
+    --yellow: #e8a800; --yellow2: #d49400; --yellow-pale: #fff8dc;
+    --red: #c0392b; --red-pale: #fde8e8;
+    --white: #ffffff;
+    --glass: rgba(255,255,255,0.85);
+    --text: #1a2b4a; --text2: #4a6080; --text3: #7a98b8;
+    --border: #b0cce8; --border2: #d0e4f4;
+    --radius: 12px; --radius-lg: 18px; --radius-xl: 22px;
+    --chalk: #eef6fc;
+    --shadow-md: 0 4px 16px rgba(30,80,160,.12);
+    --shadow-lg: 0 8px 40px rgba(30,80,160,.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Nunito', 'Segoe UI', sans-serif;
+    background: linear-gradient(160deg, #cde8f8 0%, #e2f0fb 25%, #d8edff 50%, #e8f5dc 75%, #fff8dc 100%);
+    min-height: 100vh;
+    color: var(--text);
+    padding: 20px;
+}
+
+.wrap { max-width: 640px; margin: 0 auto; }
+
+/* ---- Bandeau statut serveur ---- */
+.server-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 50px;
+    background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;
+    margin-bottom: 14px;
+}
+.server-badge.ok { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+.server-badge.off { background: #fef9c3; color: #854d0e; border-color: #fde047; }
+
+/* ---- Carte glass générique ---- */
+.card {
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.95);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg), 0 1px 0 rgba(255,255,255,0.9) inset;
+    padding: 32px;
+    animation: slideUp .4s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes slideUp { from { opacity:0; transform: translateY(16px);} to {opacity:1; transform:none;} }
+
+/* ---- Login ---- */
+#loginScreen { display: flex; flex-direction: column; align-items: center; padding-top: 6vh; }
+.login-logo {
+    width: 74px; height: 74px; border-radius: 50%; object-fit: cover;
+    box-shadow: var(--shadow-md); margin-bottom: 14px; background: #fff;
+}
+.login-logo-fallback {
+    width: 74px; height: 74px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--blue3));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 30px; box-shadow: var(--shadow-md); margin-bottom: 14px;
+}
+.login-title { font-size: 1.4rem; font-weight: 900; text-align: center; }
+.login-sub { font-size: .92rem; color: var(--text3); margin-top: 4px; margin-bottom: 26px; text-align: center; }
+
+.login-card { width: 100%; max-width: 380px; }
+.field { margin-bottom: 16px; }
+.field label {
+    display: block; font-size: .78rem; font-weight: 800; color: var(--text2);
+    text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px;
+}
+.field .input-wrap { position: relative; }
+.field .input-wrap i.icon-left {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text3);
+}
+.field input {
+    width: 100%; padding: 13px 14px 13px 40px; border-radius: var(--radius);
+    border: 1.5px solid var(--border2); font-family: inherit; font-size: 1rem;
+    background: #fff; color: var(--text); outline: none; transition: border-color .15s;
+}
+.field input:focus { border-color: var(--blue); }
+.toggle-pass {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--text3); cursor: pointer; font-size: .9rem;
+}
+
+.btn-primary {
+    width: 100%; padding: 14px; border: none; border-radius: 50px;
+    background: linear-gradient(135deg, var(--blue), var(--blue3));
+    color: #fff; font-weight: 800; font-size: 1rem; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(42,127,212,.35);
+    transition: transform .15s ease;
+}
+.btn-primary:hover { transform: translateY(-2px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: .6; cursor: default; transform:none; }
+
+.login-error {
+    display: none; background: var(--red-pale); color: var(--red);
+    border-radius: 10px; padding: 10px 14px; font-size: .88rem; font-weight: 700;
+    margin-bottom: 16px; align-items: center; gap: 8px;
+}
+.login-error.show { display: flex; }
+
+/* ---- Header portail ---- */
+#portalHeader {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; gap: 12px; flex-wrap: wrap;
+}
+.who { display: flex; align-items: center; gap: 12px; }
+.who-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--green), var(--green2));
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 1.1rem; flex-shrink: 0;
+}
+.who-name { font-weight: 900; font-size: 1.05rem; }
+.who-sub { font-size: .78rem; color: var(--text3); }
+.btn-logout {
+    border: none; border-radius: 50px; padding: 9px 16px; font-size: .82rem; font-weight: 800;
+    background: #fff; color: var(--text2); border: 1.5px solid var(--border2); cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+}
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* ---- Tabs ---- */
+.tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.tab-btn {
+    flex: 1; padding: 12px; border-radius: 50px; border: 1.5px solid var(--border2);
+    background: #fff; color: var(--text2); font-weight: 800; font-size: .88rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 7px; transition: all .15s;
+}
+.tab-btn.active {
+    background: linear-gradient(135deg, var(--blue), var(--blue3)); color: #fff; border-color: transparent;
+    box-shadow: 0 4px 14px rgba(42,127,212,.3);
+}
+.tab-badge {
+    background: rgba(255,255,255,.35); border-radius: 50px; font-size: .72rem; padding: 1px 8px;
+}
+.tab-btn:not(.active) .tab-badge { background: var(--chalk); color: var(--text3); }
+
+/* ---- Liste tickets ---- */
+.tlist { display: flex; flex-direction: column; gap: 12px; }
+.tcard {
+    background: var(--glass); border: 1px solid rgba(255,255,255,.9); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md); padding: 18px 20px; animation: slideUp .3s ease both;
+}
+.tcard-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 10px; flex-wrap: wrap; }
+.tcard-id { font-weight: 900; font-size: .95rem; }
+.tcard-date { font-size: .78rem; color: var(--text3); }
+.badge { font-size: .72rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; display: inline-flex; align-items: center; gap: 5px; }
+.badge-paye { background: var(--green-pale); color: var(--green2); }
+.badge-encours { background: var(--yellow-pale); color: var(--yellow2); }
+.tcard-articles { font-size: .85rem; color: var(--text2); margin: 8px 0; }
+.tcard-article-row { display: flex; justify-content: space-between; padding: 3px 0; }
+.tcard-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border2); }
+.tcard-total { font-weight: 900; font-size: 1.05rem; color: var(--blue3); }
+.btn-download {
+    border: none; border-radius: 50px; padding: 9px 16px; font-weight: 800; font-size: .82rem;
+    background: linear-gradient(135deg, var(--green), var(--green2)); color: #fff; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(90,173,46,.3);
+}
+.btn-download:hover { transform: translateY(-1px); }
+
+.locked-note {
+    margin-top: 10px; background: var(--yellow-pale); color: var(--yellow2);
+    border-radius: 10px; padding: 10px 12px; font-size: .82rem; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+}
+
+.empty-state {
+    text-align: center; padding: 40px 20px; color: var(--text3);
+}
+.empty-state i { font-size: 2.2rem; margin-bottom: 10px; display: block; opacity: .5; }
+
+.refresh-row { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+.btn-refresh {
+    border: none; background: none; color: var(--text3); font-size: .8rem; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.btn-refresh:hover { color: var(--blue); }
+
+/* ---- Liste compacte + pagination ---- */
+.tab-pane { display: block; }
+.trow-list { display: flex; flex-direction: column; gap: 10px; }
+.trow {
+    background: var(--glass); border: 1px solid rgba(255,255,255,.9); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md); padding: 14px 18px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease;
+    animation: slideUp .3s ease both;
+}
+.trow:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(30,80,160,.18); }
+.trow-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.trow-id { font-weight: 900; font-size: .92rem; }
+.trow-date { font-size: .76rem; color: var(--text3); }
+.trow-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.trow-total { font-weight: 900; color: var(--blue3); font-size: .98rem; }
+.trow-chevron { color: var(--text3); font-size: .85rem; }
+
+.tpagination {
+    display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px;
+}
+.tpage-btn {
+    border: 1.5px solid var(--border2); background: #fff; color: var(--text2);
+    border-radius: 50px; padding: 8px 14px; font-weight: 800; font-size: .82rem; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+}
+.tpage-btn:disabled { opacity: .4; cursor: default; }
+.tpage-btn:not(:disabled):hover { border-color: var(--blue); color: var(--blue); }
+.tpage-info { font-size: .8rem; font-weight: 800; color: var(--text3); }
+
+/* ---- Modale détail ticket ---- */
+.tmodal-overlay {
+    position: fixed; inset: 0; background: rgba(15,30,55,.55); backdrop-filter: blur(3px);
+    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 500;
+}
+.tmodal {
+    background: #fff; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);
+    max-width: 420px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 28px 24px 24px;
+    position: relative; animation: slideUp .25s cubic-bezier(.16,1,.3,1) both;
+}
+.tmodal-close {
+    position: absolute; top: 14px; right: 14px; border: none; background: var(--chalk);
+    color: var(--text2); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: .85rem;
+}
+.tmodal-close:hover { background: var(--red-pale); color: var(--red); }
+
+.tdetail-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.tdetail-id { font-weight: 900; font-size: 1.1rem; }
+.tdetail-date { font-size: .8rem; color: var(--text3); margin-bottom: 14px; }
+.tdetail-articles { border-top: 1px dashed var(--border2); border-bottom: 1px dashed var(--border2); padding: 12px 0; margin: 10px 0; }
+.tdetail-article-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: .9rem; color: var(--text2); }
+.tdetail-total-row { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; }
+.tdetail-total-label { font-weight: 800; color: var(--text2); }
+.tdetail-total-value { font-weight: 900; font-size: 1.3rem; color: var(--blue3); }
+.tdetail-mode { font-size: .82rem; color: var(--text3); margin-bottom: 14px; }
+.tdetail-company {
+    text-align: center; padding-bottom: 12px; margin-bottom: 12px;
+    border-bottom: 1px dashed var(--border2);
+}
+.tdetail-company-name { font-weight: 900; font-size: 1rem; color: var(--text); }
+.tdetail-company-info { font-size: .76rem; color: var(--text3); font-weight: 600; margin-top: 3px; line-height: 1.5; }
+.tdetail-tva { font-size: .78rem; color: var(--text3); font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+
+.hidden { display: none !important; }
+
+/* ---- Toast ---- */
+#toastBox { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 999; display:flex; flex-direction:column; gap:8px; align-items:center; }
+.toast {
+    background: rgba(26,43,74,.92); color: #fff; padding: 11px 20px; border-radius: 50px;
+    font-size: .85rem; font-weight: 700; box-shadow: var(--shadow-md); opacity: 0; transform: translateY(10px);
+    transition: all .25s ease;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.error { background: rgba(192,57,43,.92); }
+
+footer.credit { text-align: center; font-size: .72rem; color: var(--text3); margin-top: 22px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+    <div id="serverBadgeWrap"></div>
+
+    <!-- ===================== ÉCRAN DE CONNEXION ===================== -->
+    <div id="loginScreen">
+        <div id="clubLogoZone"></div>
+        <div class="login-title" id="clubNameTitle">Espace Membre</div>
+        <div class="login-sub">Connecte-toi pour consulter tes tickets</div>
+
+        <div class="card login-card">
+            <div class="login-error" id="loginError"><i class="fas fa-triangle-exclamation"></i> <span id="loginErrorText"></span></div>
+            <form id="loginForm">
+                <div class="field">
+                    <label for="loginPseudo">Pseudo</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user icon-left"></i>
+                        <input type="text" id="loginPseudo" placeholder="ex: jdupont" autocomplete="username" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="loginPass">Mot de passe</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock icon-left"></i>
+                        <input type="password" id="loginPass" placeholder="••••••" autocomplete="current-password" required style="padding-right:44px;">
+                        <button type="button" class="toggle-pass" id="togglePassBtn"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="loginBtn"><i class="fas fa-right-to-bracket"></i>&nbsp; Se connecter</button>
+            </form>
+        </div>
+        <footer class="credit">Identifiants reçus par email avec ta carte de membre</footer>
+    </div>
+
+    <!-- ===================== PORTAIL (connecté) ===================== -->
+    <div id="portalScreen" class="hidden">
+        <div id="portalHeader">
+            <div class="who">
+                <div class="who-avatar" id="whoAvatar">?</div>
+                <div>
+                    <div class="who-name" id="whoName">—</div>
+                    <div class="who-sub" id="whoSub">—</div>
+                </div>
+            </div>
+            <button class="btn-logout" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> Déconnexion</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="tabPayes" data-tab="payes">
+                <i class="fas fa-circle-check"></i> Tickets payés <span class="tab-badge" id="countPayes">0</span>
+            </button>
+            <button class="tab-btn" id="tabEnCours" data-tab="encours">
+                <i class="fas fa-clock"></i> En cours <span class="tab-badge" id="countEnCours">0</span>
+            </button>
+        </div>
+
+        <div class="refresh-row">
+            <button class="btn-refresh" id="refreshBtn"><i class="fas fa-rotate"></i> Actualiser</button>
+        </div>
+
+        <div id="panePayes" class="tab-pane">
+            <div class="trow-list" id="listPayes"></div>
+            <div class="tpagination" id="pagPayes"></div>
+        </div>
+        <div id="paneEnCours" class="tab-pane hidden">
+            <div class="trow-list" id="listEnCours"></div>
+            <div class="tpagination" id="pagEnCours"></div>
+        </div>
+
+        <footer class="credit">Espace Membre — données stockées localement sur cet appareil</footer>
+    </div>
+</div>
+
+<!-- ===================== MODALE DÉTAIL TICKET ===================== -->
+<div id="ticketModal" class="tmodal-overlay hidden">
+    <div class="tmodal">
+        <button class="tmodal-close" id="ticketModalCloseBtn"><i class="fas fa-times"></i></button>
+        <div id="ticketModalBody"></div>
+    </div>
+</div>
+
+<div id="toastBox"></div>
+
+<script>
+/* ============================================================
+   CONFIG / DÉTECTION SERVEUR
+============================================================ */
+const IS_FILE_MODE = window.location.protocol === "file:";
+const SERVER_URL = IS_FILE_MODE ? null : window.location.origin;
+
+function showToast(message, type = "success") {
+    const box = document.getElementById("toastBox");
+    const t = document.createElement("div");
+    t.className = `toast ${type}`;
+    t.textContent = message;
+    box.appendChild(t);
+    setTimeout(() => t.classList.add("show"), 30);
+    setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+function renderServerBadge(state) {
+    const wrap = document.getElementById("serverBadgeWrap");
+    if (IS_FILE_MODE) {
+        wrap.innerHTML = `<span class="server-badge">📁 Mode local (fichier)</span>`;
+        return;
+    }
+    if (state === "ok") wrap.innerHTML = `<span class="server-badge ok">🟢 Connecté au serveur</span>`;
+    else if (state === "off") wrap.innerHTML = `<span class="server-badge off">🟡 Mode local — serveur injoignable</span>`;
+    else wrap.innerHTML = `<span class="server-badge">⏳ Connexion…</span>`;
+}
+
+/* ============================================================
+   DONNÉES — chargement local + tentative de sync serveur
+   (utilise le même endpoint /api/sync que tables.html / historique.html)
+============================================================ */
+let membres = JSON.parse(localStorage.getItem("membres") || "[]");
+let tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+let ticketsHistorique = JSON.parse(localStorage.getItem("ticketsHistorique") || "[]");
+let tables = JSON.parse(localStorage.getItem("tables") || "[]");
+
+async function syncFromServer() {
+    if (!SERVER_URL) { renderServerBadge(); return; }
+    renderServerBadge();
+    try {
+        const res = await fetch(SERVER_URL + "/api/sync", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                membres: membres,
+                tickets: tickets,
+                ticketsHistorique: ticketsHistorique,
+                tables: tables
+            })
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        const mapping = { membres: "membres", tickets: "tickets", ticketsHistorique: "ticketsHistorique", tables: "tables" };
+        for (const [serverKey, lsKey] of Object.entries(mapping)) {
+            const val = data[serverKey];
+            const isEmpty = val === undefined || val === null || (Array.isArray(val) && val.length === 0);
+            if (!isEmpty) localStorage.setItem(lsKey, JSON.stringify(val));
+        }
+        membres = JSON.parse(localStorage.getItem("membres") || "[]");
+        tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+        ticketsHistorique = JSON.parse(localStorage.getItem("ticketsHistorique") || "[]");
+        tables = JSON.parse(localStorage.getItem("tables") || "[]");
+        renderServerBadge("ok");
+    } catch (e) {
+        console.warn("Sync espace membre impossible :", e.message);
+        renderServerBadge("off");
+    }
+}
+
+/* ============================================================
+   IDENTITÉ DU CLUB (logo / nom) — companySettings partagé
+============================================================ */
+function initBranding() {
+    const settings = JSON.parse(localStorage.getItem("companySettings") || "{}");
+    const name = (settings.companyName || "").trim() || "Espace Membre";
+    document.getElementById("clubNameTitle").textContent = name;
+    const logoZone = document.getElementById("clubLogoZone");
+    if (settings.companyLogo) {
+        logoZone.innerHTML = `<img src="${settings.companyLogo}" class="login-logo" alt="logo">`;
+    } else {
+        logoZone.innerHTML = `<div class="login-logo-fallback"><i class="fas fa-music"></i></div>`;
+    }
+}
+
+/* ============================================================
+   AUTHENTIFICATION — pseudo + mot de passe
+============================================================ */
+const SESSION_KEY = "espaceMembre_session";
+
+function findMembreByCredentials(pseudo, motDePasse) {
+    const p = (pseudo || "").trim().toLowerCase();
+    return membres.find(m =>
+        (m.pseudo || "").trim().toLowerCase() === p &&
+        (m.motDePasse || "") === motDePasse
+    ) || null;
+}
+
+function currentMembre() {
+    const id = sessionStorage.getItem(SESSION_KEY);
+    if (!id) return null;
+    return membres.find(m => m.id === id) || null;
+}
+
+document.getElementById("togglePassBtn").addEventListener("click", () => {
+    const input = document.getElementById("loginPass");
+    const icon = document.querySelector("#togglePassBtn i");
+    if (input.type === "password") { input.type = "text"; icon.className = "fas fa-eye-slash"; }
+    else { input.type = "password"; icon.className = "fas fa-eye"; }
+});
+
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("loginBtn");
+    const errBox = document.getElementById("loginError");
+    errBox.classList.remove("show");
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>&nbsp; Connexion…';
+
+    // On retente une sync serveur juste avant de vérifier, au cas où les accès
+    // viennent d'être générés/régénérés sur le poste de gestion.
+    await syncFromServer();
+
+    const pseudo = document.getElementById("loginPseudo").value;
+    const pass = document.getElementById("loginPass").value;
+    const membre = findMembreByCredentials(pseudo, pass);
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-right-to-bracket"></i>&nbsp; Se connecter';
+
+    if (!membre) {
+        document.getElementById("loginErrorText").textContent = "Pseudo ou mot de passe incorrect.";
+        errBox.classList.add("show");
+        return;
+    }
+
+    sessionStorage.setItem(SESSION_KEY, membre.id);
+    enterPortal(membre);
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    sessionStorage.removeItem(SESSION_KEY);
+    document.getElementById("loginForm").reset();
+    document.getElementById("portalScreen").classList.add("hidden");
+    document.getElementById("loginScreen").classList.remove("hidden");
+});
+
+/* ============================================================
+   PORTAIL — affichage tickets
+============================================================ */
+function normNom(s) {
+    return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function ticketsPourMembre(membre) {
+    const nomComplet = normNom(`${membre.prenom || ""} ${membre.nom || ""}`);
+    const nomInverse = normNom(`${membre.nom || ""} ${membre.prenom || ""}`);
+
+    const match = t => {
+        if (t.membreId === membre.id) return true;
+        if (t.membreNom === membre.nom && t.membrePrenom === membre.prenom) return true;
+        // Correspondance via la table : si la table a été renommée au nom du membre
+        if (t.tableId != null) {
+            const table = tables.find(tb => tb.id === t.tableId);
+            const nomTable = table ? normNom(table.nom) : "";
+            if (nomTable && nomComplet && (nomTable === nomComplet || nomTable === nomInverse)) return true;
+        }
+        return false;
+    };
+
+    const enCours = tickets.filter(match).map(t => ({
+        ...t,
+        _paye: false,
+        _total: t.articles ? t.articles.reduce((s, a) => s + (a.prix * a.qte), 0) : 0
+    }));
+
+    const payes = [...ticketsHistorique.filter(match)].reverse().map(t => ({
+        ...t,
+        _paye: true,
+        _total: t.total || 0
+    }));
+
+    return { enCours, payes };
+}
+
+function fmtDateHeure(t) {
+    const d = t.datePaiement || t.date || "";
+    const h = t.heurePaiement || t.heure || "";
+    return `${d} ${h}`.trim();
+}
+
+/* ---- Infos entreprise / TVA (issues de parametres.html) ---- */
+function getCompanyInfos() {
+    const settings = JSON.parse(localStorage.getItem("companySettings") || "{}");
+    const tva = JSON.parse(localStorage.getItem("tvaSettings") || "null");
+    const tvaEnabled = !!(tva && tva.enabled === true);
+    return { settings, tvaEnabled };
+}
+
+function tvaMentionText(settings, tvaEnabled) {
+    if (tvaEnabled) {
+        return "TVA applicable" + (settings.companyNumber ? ` — Nº TVA : ${settings.companyNumber}` : "");
+    }
+    const type = (settings.companyType || "").trim();
+    return (type ? `${type} sous` : "Sous") + " le régime de la franchise de taxe — TVA non applicable";
+}
+
+function companyAddressLine(settings) {
+    const parts = [settings.companyAddress, settings.companyLocality].map(s => (s || "").trim()).filter(Boolean);
+    return parts.join(", ");
+}
+
+function renderArticlesHtml(t) {
+    const arts = t.articles || [];
+    if (!arts.length) return `<span style="opacity:.6">Aucun détail d'article</span>`;
+    return arts.map(a => `
+        <div class="tcard-article-row">
+            <span>${a.nom} ×${a.qte}</span>
+            <span>${(a.prix * a.qte).toFixed(2)} €</span>
+        </div>`).join("");
+}
+
+const PAGE_SIZE = 5;
+let pagePayes = 1;
+let pageEnCours = 1;
+let currentPayesData = [];
+let currentEnCoursData = [];
+
+function ticketKey(t) {
+    return `${t.id}_${t._paye ? 'p' : 'e'}`;
+}
+
+function renderPortal(membre) {
+    const { enCours, payes } = ticketsPourMembre(membre);
+    currentPayesData = payes;
+    currentEnCoursData = enCours;
+
+    document.getElementById("countPayes").textContent = payes.length;
+    document.getElementById("countEnCours").textContent = enCours.length;
+
+    const maxPagePayes = Math.max(1, Math.ceil(payes.length / PAGE_SIZE));
+    const maxPageEnCours = Math.max(1, Math.ceil(enCours.length / PAGE_SIZE));
+    if (pagePayes > maxPagePayes) pagePayes = maxPagePayes;
+    if (pageEnCours > maxPageEnCours) pageEnCours = maxPageEnCours;
+
+    renderListe("payes", currentPayesData, pagePayes);
+    renderListe("encours", currentEnCoursData, pageEnCours);
+}
+
+function renderListe(type, items, page) {
+    const listEl = document.getElementById(type === "payes" ? "listPayes" : "listEnCours");
+    const pagEl = document.getElementById(type === "payes" ? "pagPayes" : "pagEnCours");
+    const emptyIcon = type === "payes" ? "fa-receipt" : "fa-clock";
+    const emptyText = type === "payes" ? "Aucun ticket payé pour le moment" : "Aucun ticket en cours";
+
+    if (items.length === 0) {
+        listEl.innerHTML = `<div class="empty-state"><i class="fas ${emptyIcon}"></i>${emptyText}</div>`;
+        pagEl.innerHTML = "";
+        return;
+    }
+
+    const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+    const start = (page - 1) * PAGE_SIZE;
+    const pageItems = items.slice(start, start + PAGE_SIZE);
+
+    listEl.innerHTML = pageItems.map(t => `
+        <div class="trow" onclick="openTicketModal('${type}','${ticketKey(t)}')">
+            <div class="trow-left">
+                <div class="trow-id">Ticket #${t.numero || t.id || '—'}</div>
+                <div class="trow-date">${fmtDateHeure(t) || 'En cours de commande'}</div>
+            </div>
+            <div class="trow-right">
+                <span class="badge ${t._paye ? 'badge-paye' : 'badge-encours'}">
+                    <i class="fas ${t._paye ? 'fa-check' : 'fa-clock'}"></i> ${t._paye ? 'Payé' : 'En cours'}
+                </span>
+                <span class="trow-total">${(t._total || 0).toFixed(2)} €</span>
+                <i class="fas fa-chevron-right trow-chevron"></i>
+            </div>
+        </div>
+    `).join("");
+
+    pagEl.innerHTML = `
+        <button class="tpage-btn" ${page <= 1 ? 'disabled' : ''} onclick="changePage('${type}',-1)"><i class="fas fa-chevron-left"></i> Préc.</button>
+        <span class="tpage-info">Page ${page} / ${totalPages}</span>
+        <button class="tpage-btn" ${page >= totalPages ? 'disabled' : ''} onclick="changePage('${type}',1)">Suiv. <i class="fas fa-chevron-right"></i></button>
+    `;
+}
+
+function changePage(type, delta) {
+    if (type === "payes") {
+        pagePayes += delta;
+        renderListe("payes", currentPayesData, pagePayes);
+    } else {
+        pageEnCours += delta;
+        renderListe("encours", currentEnCoursData, pageEnCours);
+    }
+}
+
+/* ---- Modale de détail ---- */
+function openTicketModal(type, key) {
+    const data = type === "payes" ? currentPayesData : currentEnCoursData;
+    const t = data.find(x => ticketKey(x) === key);
+    if (!t) return;
+
+    const { settings, tvaEnabled } = getCompanyInfos();
+    const companyName = (settings.companyName || "").trim() || "Le Cube Club Karaoké ASBL";
+    const addressLine = companyAddressLine(settings);
+    const numberLine = settings.companyNumber ? `N° entreprise : ${settings.companyNumber}` : "";
+
+    const body = document.getElementById("ticketModalBody");
+    body.innerHTML = `
+        <div class="tdetail-company">
+            <div class="tdetail-company-name">${companyName}</div>
+            <div class="tdetail-company-info">
+                ${addressLine ? addressLine + "<br>" : ""}
+                ${[settings.companyPhone, numberLine].filter(Boolean).join(" · ")}
+            </div>
+        </div>
+        <div class="tdetail-head">
+            <div class="tdetail-id">Ticket #${t.numero || t.id || '—'}</div>
+            <span class="badge ${t._paye ? 'badge-paye' : 'badge-encours'}">
+                <i class="fas ${t._paye ? 'fa-check' : 'fa-clock'}"></i> ${t._paye ? 'Payé' : 'En cours'}
+            </span>
+        </div>
+        <div class="tdetail-date">${fmtDateHeure(t) || 'En cours de commande'}</div>
+        <div class="tdetail-articles">${renderArticlesHtml(t)}</div>
+        <div class="tdetail-total-row">
+            <span class="tdetail-total-label">Total</span>
+            <span class="tdetail-total-value">${(t._total || 0).toFixed(2)} €</span>
+        </div>
+        <div class="tdetail-tva"><i class="fas fa-receipt"></i> ${tvaMentionText(settings, tvaEnabled)}</div>
+        ${t.modePaiement ? `<div class="tdetail-mode"><i class="fas fa-credit-card"></i> Mode de paiement : ${t.modePaiement}</div>` : ''}
+        ${t._paye
+            ? `<button class="btn-download" style="width:100%;justify-content:center;padding:13px;" onclick='downloadTicketPNG(${JSON.stringify(t).replace(/'/g, "&#39;")})'>
+                   <i class="fas fa-download"></i> Télécharger en PNG
+               </button>`
+            : `<div class="locked-note"><i class="fas fa-lock"></i> Finalisez votre paiement pour pouvoir télécharger votre ticket.</div>`
+        }
+    `;
+
+    document.getElementById("ticketModal").classList.remove("hidden");
+}
+
+function closeTicketModal() {
+    document.getElementById("ticketModal").classList.add("hidden");
+}
+
+document.getElementById("ticketModalCloseBtn").addEventListener("click", closeTicketModal);
+document.getElementById("ticketModal").addEventListener("click", (e) => {
+    if (e.target.id === "ticketModal") closeTicketModal();
+});
+
+function enterPortal(membre) {
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("portalScreen").classList.remove("hidden");
+
+    document.getElementById("whoAvatar").textContent = (membre.prenom || "?").charAt(0).toUpperCase();
+    document.getElementById("whoName").textContent = `${membre.prenom || ''} ${membre.nom || ''}`.trim();
+    document.getElementById("whoSub").textContent = `@${membre.pseudo || '—'}`;
+
+    renderPortal(membre);
+}
+
+/* ---- Tabs ---- */
+document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.getElementById("panePayes").classList.toggle("hidden", tab !== "payes");
+        document.getElementById("paneEnCours").classList.toggle("hidden", tab !== "encours");
+    });
+});
+
+/* ---- Rafraîchir ---- */
+document.getElementById("refreshBtn").addEventListener("click", async () => {
+    await syncFromServer();
+    const membre = currentMembre();
+    if (membre) renderPortal(membre);
+    showToast("Liste mise à jour");
+});
+
+// Auto-refresh toutes les 20s en mode serveur
+if (!IS_FILE_MODE) {
+    setInterval(async () => {
+        await syncFromServer();
+        const membre = currentMembre();
+        if (membre) renderPortal(membre);
+    }, 20000);
+}
+
+/* ============================================================
+   GÉNÉRATION DU TICKET EN IMAGE PNG (canvas — aucune lib externe)
+============================================================ */
+function drawTicketCanvas(t) {
+    const articles = t.articles || [];
+    const { settings, tvaEnabled } = getCompanyInfos();
+    const addressLine = companyAddressLine(settings);
+    const numberLine = settings.companyNumber ? `N° entreprise : ${settings.companyNumber}` : "";
+    const tvaLine = tvaMentionText(settings, tvaEnabled);
+
+    const width = 380;
+    const lineHeight = 22;
+    // Lignes d'en-tête additionnelles (adresse, n° entreprise) + ligne TVA en pied de ticket
+    const headerExtraLines = (addressLine ? 1 : 0) + (numberLine ? 1 : 0);
+    const height = 210 + articles.length * lineHeight + 70 + headerExtraLines * 16 + 20;
+
+    const scale = 2; // rendu net (rétina)
+    const canvas = document.createElement("canvas");
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(scale, scale);
+
+    // Fond
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+    ctx.strokeStyle = "#2a7fd4";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(4, 4, width - 8, height - 8);
+
+    const companyName = (settings.companyName || "").trim() || "LE CUBE CLUB KARAOKE ASBL";
+
+    let y = 36;
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#1a2b4a";
+    ctx.font = "900 17px Nunito, sans-serif";
+    ctx.fillText(companyName, width / 2, y);
+    y += 20;
+
+    ctx.font = "600 11px Nunito, sans-serif";
+    ctx.fillStyle = "#7a98b8";
+    if (addressLine) { ctx.fillText(addressLine, width / 2, y); y += 15; }
+    if (numberLine)  { ctx.fillText(numberLine, width / 2, y); y += 15; }
+
+    y += 4;
+    ctx.font = "600 12px Nunito, sans-serif";
+    ctx.fillStyle = "#4a6080";
+    ctx.fillText("★ Ticket de caisse ★", width / 2, y);
+    y += 22;
+
+    function dashedLine(yy) {
+        ctx.strokeStyle = "#cbd5e1";
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath(); ctx.moveTo(20, yy); ctx.lineTo(width - 20, yy); ctx.stroke();
+        ctx.setLineDash([]);
+    }
+    dashedLine(y); y += 26;
+
+    ctx.textAlign = "left";
+    ctx.font = "800 13px Nunito, sans-serif";
+    ctx.fillStyle = "#1a2b4a";
+    ctx.fillText(`Ticket #${t.numero || t.id || '—'}`, 20, y);
+    ctx.textAlign = "right";
+    ctx.font = "600 12px Nunito, sans-serif";
+    ctx.fillStyle = "#4a6080";
+    ctx.fillText(fmtDateHeure(t), width - 20, y);
+    y += 24;
+
+    dashedLine(y); y += 24;
+
+    ctx.font = "600 13px Nunito, sans-serif";
+    if (articles.length) {
+        articles.forEach(a => {
+            ctx.textAlign = "left";
+            ctx.fillStyle = "#1a2b4a";
+            ctx.fillText(`${a.nom} ×${a.qte}`, 20, y);
+            ctx.textAlign = "right";
+            ctx.fillText(`${(a.prix * a.qte).toFixed(2)} €`, width - 20, y);
+            y += lineHeight;
+        });
+    } else {
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#7a98b8";
+        ctx.fillText("Aucun détail d'article", width / 2, y);
+        y += lineHeight;
+    }
+
+    y += 4;
+    dashedLine(y); y += 30;
+
+    ctx.textAlign = "left";
+    ctx.font = "900 17px Nunito, sans-serif";
+    ctx.fillStyle = "#2a7fd4";
+    ctx.fillText("TOTAL", 20, y);
+    ctx.textAlign = "right";
+    ctx.fillText(`${(t._total || 0).toFixed(2)} €`, width - 20, y);
+    y += 24;
+
+    ctx.textAlign = "center";
+    ctx.font = "700 10.5px Nunito, sans-serif";
+    ctx.fillStyle = "#7a98b8";
+    ctx.fillText(tvaLine, width / 2, y);
+    y += 18;
+
+    if (t.modePaiement) {
+        ctx.textAlign = "left";
+        ctx.font = "600 12px Nunito, sans-serif";
+        ctx.fillStyle = "#5a7898";
+        ctx.fillText(`Mode de paiement : ${t.modePaiement}`, 20, y);
+        y += 22;
+    }
+
+    y += 8;
+    ctx.textAlign = "center";
+    ctx.font = "italic 600 11px Nunito, sans-serif";
+    ctx.fillStyle = "#7a98b8";
+    ctx.fillText("Merci de votre visite ! 🎤", width / 2, y);
+    y += 16;
+    ctx.fillText("★ Membre officiel ★", width / 2, y);
+
+    return canvas;
+}
+
+function downloadTicketPNG(t) {
+    try {
+        const canvas = drawTicketCanvas(t);
+        canvas.toBlob(blob => {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `ticket_${t.numero || t.id || Date.now()}.png`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast("Ticket téléchargé ✓");
+        }, "image/png");
+    } catch (e) {
+        console.error(e);
+        showToast("Erreur lors de la génération du ticket", "error");
+    }
+}
+
+/* ============================================================
+   INITIALISATION
+============================================================ */
+(async function init() {
+    initBranding();
+    renderServerBadge();
+    await syncFromServer();
+
+    const membre = currentMembre();
+    if (membre) enterPortal(membre);
+})();
+</script>
+</body>
+</html>

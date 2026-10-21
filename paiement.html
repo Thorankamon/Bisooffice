@@ -1,0 +1,2514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paiement</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+  --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+  --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+  --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+  --purple:#7c3aed; --purple-pale:#f5f3ff;
+  --orange:#d97706; --orange-pale:#fff7ed;
+  --cyan:#0891b2; --cyan-pale:#ecfeff;
+  --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+  --border:#b0cce8; --border2:#d0e4f4;
+  --glass:rgba(255,255,255,0.82);
+  --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+  --radius:12px; --radius-lg:18px; --radius-xl:22px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'Nunito','Segoe UI',sans-serif;
+  font-size:14px;
+  background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+  min-height:100vh;
+  padding:20px;
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  position:relative;
+}
+
+body::before {
+  content:''; position:fixed; top:-150px; left:-150px;
+  width:550px; height:550px;
+  background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+  pointer-events:none; z-index:0; border-radius:50%;
+}
+body::after {
+  content:''; position:fixed; bottom:-100px; right:5%;
+  width:450px; height:450px;
+  background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+  pointer-events:none; z-index:0; border-radius:50%;
+}
+
+/* Header */
+.page-header {
+  width:100%;
+  max-width:800px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
+  padding:0 10px;
+  position:relative;
+  z-index:2;
+}
+
+h1 {
+  font-size:2.5rem;
+  font-weight:900;
+  color:var(--blue3);
+  text-align:center;
+  flex:1;
+  letter-spacing:-0.02em;
+}
+
+/* Bouton Annuler */
+.btn-annuler-page {
+  background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+  color:white;
+  border:1px solid #882020;
+  padding:14px 28px;
+  border-radius:50px;
+  font-weight:800;
+  font-size:1rem;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  box-shadow:0 4px 15px rgba(180,40,30,0.2);
+  position:relative; overflow:hidden;
+}
+.btn-annuler-page::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.3); border-radius:50px 50px 0 0; pointer-events:none;
+}
+.btn-annuler-page:hover {
+  background:linear-gradient(180deg,#f89898,#d44040,#a03030);
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(231,76,60,0.3);
+}
+
+/* Conteneur principal */
+.container {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:30px;
+  width:100%;
+  max-width:800px;
+  position:relative;
+  z-index:2;
+}
+
+@media (min-width:992px) {
+  .container {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+/* Résumé du ticket */
+.resume-card {
+  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:var(--radius-xl);
+  padding:25px;
+  box-shadow:0 4px 16px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+  backdrop-filter:blur(10px);
+  transition:all .3s ease;
+  position:relative; overflow:hidden;
+}
+.resume-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:5px;
+  background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));
+}
+.resume-card::after {
+  content:''; position:absolute; top:5px; left:0; right:0; height:25%;
+  background:rgba(255,255,255,.42); border-radius:0 0 60% 60%;
+  pointer-events:none;
+}
+.resume-card > * { position:relative; z-index:2; }
+.resume-card:hover { transform:translateY(-5px); box-shadow:0 12px 32px var(--shadow); }
+
+.resume-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+  padding-bottom:15px;
+  border-bottom:2px solid var(--border2);
+}
+
+.resume-header h3 {
+  font-size:1.3rem;
+  font-weight:900;
+  color:var(--blue3);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.total-amount {
+  background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+  color:white;
+  padding:10px 20px;
+  border-radius:50px;
+  font-weight:800;
+  font-size:1.4rem;
+  box-shadow:0 4px 15px rgba(42,127,212,0.3);
+  border:1px solid #1050a0;
+}
+
+.items-list {
+  margin:20px 0;
+}
+
+.item-row {
+  display:flex;
+  justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid var(--border2);
+}
+
+.item-name {
+  font-weight:600;
+  color:var(--text2);
+}
+
+.item-price {
+  font-weight:800;
+  color:var(--blue3);
+}
+
+/* Modes de paiement */
+.modes-container {
+  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:var(--radius-xl);
+  padding:25px;
+  box-shadow:0 4px 16px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+  backdrop-filter:blur(10px);
+  position:relative; overflow:hidden;
+}
+.modes-container::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:5px;
+  background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));
+}
+.modes-container::after {
+  content:''; position:absolute; top:5px; left:0; right:0; height:25%;
+  background:rgba(255,255,255,.42); border-radius:0 0 60% 60%;
+  pointer-events:none;
+}
+.modes-container > * { position:relative; z-index:2; }
+
+.modes-container h3 {
+  color:var(--blue3);
+  margin-bottom:25px;
+  font-size:1.3rem;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.modes-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:15px;
+  margin-bottom:25px;
+}
+
+.mode-btn {
+  border:none;
+  padding:22px 15px;
+  border-radius:var(--radius-lg);
+  font-weight:800;
+  font-size:1.1rem;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+  position:relative; overflow:hidden;
+  color:white;
+}
+.mode-btn::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+}
+.mode-btn:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 8px 25px rgba(0,0,0,0.2); }
+
+.mode-btn.especes { background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); border:1px solid #2d6a1a; }
+.mode-btn.banque { background:linear-gradient(180deg,#b486f0,#7c3aed,#5c22cd); border:1px solid #5c22cd; }
+.mode-btn.mixte { background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); border:1px solid #1558b0; }
+
+.mode-icon { font-size:2.5rem; }
+
+/* Bouton Imprimer */
+.print-btn {
+  width:100%;
+  margin-top:20px;
+  padding:16px;
+  background:linear-gradient(180deg,#ffc870,var(--orange),#b86200);
+  color:white;
+  border:1px solid #a05800;
+  border-radius:var(--radius-lg);
+  font-weight:800;
+  font-size:1rem;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 4px 15px rgba(200,120,0,0.3);
+  position:relative; overflow:hidden;
+}
+.print-btn::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+}
+.print-btn:hover { background:linear-gradient(180deg,#ffd080,#e8962a,#c87000); transform:translateY(-2px); box-shadow:0 6px 20px rgba(243,156,18,0.4); }
+
+/* MODALES */
+.modal-overlay-client, .modal-overlay {
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(10,40,90,.45);
+  backdrop-filter:blur(8px);
+  z-index:9998;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-client, .modal {
+  background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:var(--radius-xl);
+  padding:35px;
+  max-width:550px;
+  width:90%;
+  max-height:80vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(20,60,180,.25),0 1px 0 rgba(255,255,255,.9) inset;
+  animation:modalSlideIn 0.3s ease;
+  position:relative;
+}
+.modal::before, .modal-client::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:25%;
+  background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+  pointer-events:none;
+}
+.modal > *, .modal-client > * { position:relative; z-index:2; }
+
+@keyframes modalSlideIn {
+  from { opacity:0; transform:translateY(-30px) scale(0.95); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.close-modal {
+  position:absolute;
+  top:15px;
+  right:15px;
+  background:none;
+  border:none;
+  font-size:2rem;
+  cursor:pointer;
+  color:var(--text3);
+  transition:color 0.3s;
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  z-index:3;
+}
+.close-modal:hover {
+  color:var(--red);
+  background:var(--red-pale);
+}
+
+.modal h3, .modal-client h3 {
+  color:var(--blue3);
+  margin-bottom:25px;
+  font-size:1.5rem;
+  font-weight:900;
+  text-align:center;
+}
+
+/* Recherche client */
+.search-container {
+  position:relative;
+  margin-bottom:20px;
+}
+
+.search-icon {
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--text3);
+  font-size:1.2rem;
+}
+
+.membre-search input {
+  width:100%;
+  padding:16px 16px 16px 50px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  font-size:1rem;
+  transition:all .2s;
+  background:rgba(255,255,255,.85);
+  font-family:'Nunito',sans-serif;
+  font-weight:600;
+  color:var(--text);
+}
+.membre-search input:focus {
+  outline:none;
+  border-color:var(--blue-light);
+  box-shadow:0 0 0 3px rgba(42,127,212,.15);
+  background:white;
+}
+
+.membre-select select {
+  width:100%;
+  padding:16px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  font-size:1rem;
+  background:rgba(255,255,255,.85);
+  transition:all .2s;
+  margin-bottom:20px;
+  max-height:200px;
+  font-family:'Nunito',sans-serif;
+  font-weight:600;
+  color:var(--text);
+}
+.membre-select select:focus {
+  outline:none;
+  border-color:var(--blue-light);
+  box-shadow:0 0 0 3px rgba(42,127,212,.15);
+  background:white;
+}
+
+.modal-client-buttons {
+  display:flex;
+  gap:15px;
+  margin-top:25px;
+}
+
+.btn-passer {
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+  color:var(--text2);
+  border:1px solid var(--border);
+  padding:16px 32px;
+  border-radius:var(--radius);
+  font-weight:800;
+  font-size:1rem;
+  cursor:pointer;
+  transition:all .2s;
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+  position:relative; overflow:hidden;
+}
+.btn-passer::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.4); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+}
+.btn-passer:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); transform:translateY(-2px); }
+
+.btn-confirmer-client {
+  background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+  color:white;
+  border:1px solid #2d6a1a;
+  padding:16px 32px;
+  border-radius:var(--radius);
+  font-weight:800;
+  font-size:1rem;
+  cursor:pointer;
+  transition:all .2s;
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 4px 15px rgba(74,148,34,0.3);
+  position:relative; overflow:hidden;
+}
+.btn-confirmer-client::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+}
+.btn-confirmer-client:hover { background:linear-gradient(180deg,#a4e474,#5aad2e,#3d8a18); transform:translateY(-2px); box-shadow:0 6px 20px rgba(46,204,113,0.4); }
+
+/* Warning box */
+.warning-box {
+  background:linear-gradient(135deg,var(--yellow-pale),var(--yellow-light));
+  border:1.5px solid var(--orange);
+  border-radius:var(--radius-lg);
+  padding:20px;
+  margin:20px 0;
+  display:flex;
+  align-items:center;
+  gap:15px;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { transform:scale(1); }
+  50% { transform:scale(1.02); }
+}
+.warning-icon { font-size:2rem; color:var(--orange); }
+.warning-text h4 { color:var(--orange); font-weight:900; margin-bottom:5px; font-size:1.2rem; }
+.warning-text p { color:var(--text2); font-size:0.95rem; font-weight:600; }
+
+/* Numpad */
+.numpad {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:15px 0;
+}
+.numpad button {
+  padding:20px;
+  font-size:1.5rem;
+  font-weight:800;
+  border:1.5px solid var(--border);
+  background:rgba(255,255,255,.85);
+  border-radius:var(--radius);
+  cursor:pointer;
+  transition:all .2s;
+  color:var(--text2);
+  font-family:'Nunito',sans-serif;
+  position:relative; overflow:hidden;
+}
+.numpad button::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.4); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+}
+.numpad button:hover {
+  background:linear-gradient(180deg,#7cc4f8,#2a7fd4);
+  color:white;
+  border-color:var(--blue);
+  transform:scale(1.05);
+}
+.numpad button:active { transform:scale(0.95); }
+
+.montant-display {
+  background:rgba(255,255,255,.85);
+  padding:25px;
+  border-radius:var(--radius);
+  text-align:center;
+  font-size:2.5rem;
+  font-weight:800;
+  color:var(--blue3);
+  border:1.5px solid var(--border);
+  margin-bottom:15px;
+  box-shadow:inset 0 2px 8px var(--shadow2);
+}
+
+.rendu-info {
+  background:linear-gradient(180deg,#84d47c,#4a9422);
+  color:white;
+  padding:20px;
+  border-radius:var(--radius);
+  text-align:center;
+  font-size:1.3rem;
+  font-weight:800;
+  box-shadow:0 4px 15px rgba(74,148,34,0.3);
+  margin-top:15px;
+  border:1px solid #2d6a1a;
+}
+.rendu-negatif { background:linear-gradient(180deg,#f08080,#c0392b); border-color:#882020; }
+
+/* QR Code */
+.qr-container {
+  text-align:center;
+  margin:20px 0;
+}
+#qrcode, #qrcodeMixte {
+  display:inline-block;
+  padding:15px;
+  background:white;
+  border-radius:var(--radius);
+  box-shadow:0 4px 16px var(--shadow);
+  border:1px solid var(--border);
+}
+.qr-info-box {
+  margin-top:18px;
+  padding:14px 18px;
+  background:linear-gradient(135deg,var(--blue-pale),#dbeeff);
+  border:1.5px solid var(--blue-light);
+  border-radius:var(--radius);
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  text-align:left;
+}
+.qr-info-box span { font-size:1.4rem; flex-shrink:0; }
+.qr-info-box p { font-weight:700; color:var(--blue3); margin-bottom:4px; font-size:0.95rem; }
+.qr-info-box small { color:var(--blue2); font-size:0.88rem; line-height:1.5; display:block; }
+
+/* Mixte */
+.mixte-content { display:flex; flex-direction:column; gap:25px; }
+.mixte-display {
+  background:rgba(255,255,255,.85);
+  padding:20px;
+  border-radius:var(--radius);
+  margin-bottom:15px;
+  border:1.5px solid var(--border);
+}
+.mixte-row {
+  display:flex;
+  justify-content:space-between;
+  padding:10px 0;
+  font-weight:600;
+  color:var(--text2);
+}
+.mixte-row.total {
+  border-top:2px solid var(--border2);
+  margin-top:10px;
+  padding-top:15px;
+  font-size:1.3rem;
+  font-weight:800;
+  color:var(--blue3);
+}
+
+/* Boutons modales */
+.modal-buttons {
+  display:flex;
+  gap:15px;
+  margin-top:25px;
+}
+.btn-modal {
+  flex:1;
+  padding:16px 32px;
+  border:none;
+  border-radius:var(--radius);
+  font-weight:800;
+  font-size:1rem;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  position:relative; overflow:hidden;
+}
+.btn-modal::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+}
+.btn-modal.annuler {
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+  color:var(--text2);
+  border:1px solid var(--border);
+  box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+}
+.btn-modal.annuler:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); transform:translateY(-2px); }
+.btn-modal.valider {
+  background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+  color:white;
+  border:1px solid #2d6a1a;
+  box-shadow:0 4px 15px rgba(74,148,34,0.3);
+}
+.btn-modal.valider:hover { background:linear-gradient(180deg,#a4e474,#5aad2e,#3d8a18); transform:translateY(-2px); box-shadow:0 6px 20px rgba(46,204,113,0.4); }
+
+/* Success overlay */
+#paymentSuccessOverlay {
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(10,40,90,.8);
+  backdrop-filter:blur(10px);
+  z-index:10000;
+  justify-content:center;
+  align-items:center;
+}
+.success-content {
+  text-align:center;
+  color:white;
+}
+.checkmark {
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  background:linear-gradient(180deg,#84d47c,#4a9422);
+  margin:0 auto 30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:4rem;
+  animation:scaleIn 0.5s ease;
+  border:2px solid rgba(255,255,255,.3);
+}
+@keyframes scaleIn {
+  from { transform:scale(0); }
+  to { transform:scale(1); }
+}
+.success-content h2 { font-size:2.5rem; font-weight:900; margin-bottom:15px; }
+.success-content p { font-size:1.2rem; font-weight:600; opacity:0.9; }
+
+/* Stock Alert Modal */
+#stockAlertOverlay {
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(10,40,90,.7);
+  backdrop-filter:blur(8px);
+  z-index:10001;
+  justify-content:center;
+  align-items:center;
+}
+.stock-alert-modal {
+  background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:var(--radius-xl);
+  padding:35px;
+  max-width:600px;
+  width:90%;
+  max-height:80vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(20,60,180,.4);
+  position:relative;
+}
+.stock-alert-modal::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:25%;
+  background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+  pointer-events:none;
+}
+.stock-alert-modal > * { position:relative; z-index:2; }
+.stock-alert-header {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-bottom:25px;
+  padding-bottom:20px;
+  border-bottom:2px solid var(--border2);
+}
+.stock-alert-icon { font-size:3rem; color:var(--red); }
+.stock-alert-header h3 { font-size:1.8rem; font-weight:900; color:var(--red); margin:0; }
+.stock-section {
+  margin:20px 0;
+  padding:20px;
+  border-radius:var(--radius);
+  border:2px solid;
+}
+.stock-section.rupture { background:var(--red-pale); border-color:var(--red); }
+.stock-section.faible { background:var(--orange-pale); border-color:var(--orange); }
+.stock-section h4 { margin-bottom:15px; font-size:1.2rem; font-weight:800; }
+.stock-section.rupture h4 { color:var(--red); }
+.stock-section.faible h4 { color:var(--orange); }
+
+.stock-alert-buttons {
+  display:flex;
+  gap:15px;
+  margin-top:25px;
+}
+.btn-stock {
+  flex:1;
+  padding:16px 32px;
+  border:none;
+  border-radius:var(--radius);
+  font-weight:800;
+  font-size:1rem;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  position:relative; overflow:hidden;
+}
+.btn-stock::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+}
+.btn-stock.annuler {
+  background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+  color:white;
+  border:1px solid #882020;
+}
+.btn-stock.annuler:hover { background:linear-gradient(180deg,#f89898,#d44040,#a03030); transform:translateY(-2px); }
+.btn-stock.forcer {
+  background:linear-gradient(180deg,#ffc870,var(--orange),#b86200);
+  color:white;
+  border:1px solid #a05800;
+}
+.btn-stock.forcer:hover { background:linear-gradient(180deg,#ffd080,#e8962a,#c87000); transform:translateY(-2px); }
+
+/* Toast */
+#toast {
+  display:none;
+  position:fixed;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(210,245,185,.9));
+  color:var(--green2);
+  padding:18px 35px;
+  border-radius:50px;
+  font-weight:800;
+  font-size:1rem;
+  box-shadow:0 8px 25px rgba(0,0,0,0.2);
+  z-index:10002;
+  align-items:center;
+  gap:10px;
+  transition:all 0.3s ease;
+  border:1px solid rgba(255,255,255,.85);
+}
+#toast.error { background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,220,220,.9)); color:var(--red); border-left:4px solid var(--red); }
+
+/* Responsive */
+@media (max-width:768px) {
+  h1 { font-size:1.8rem; }
+  .container { gap:20px; }
+  .modes-grid { grid-template-columns:1fr; }
+  .modal-buttons { flex-direction:column; }
+  .modal-client-buttons { flex-direction:column; }
+}
+
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:rgba(200,220,240,.3); }
+::-webkit-scrollbar-thumb { background:var(--blue-light); border-radius:3px; }
+
+/* === MODALE RAPPEL IMPRESSION === */
+#modalRappelImpression {
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(10,40,90,.5);
+  backdrop-filter:blur(8px);
+  z-index:9999;
+  justify-content:center;
+  align-items:center;
+}
+.rappel-modal {
+  background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(255,248,220,.95));
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:var(--radius-xl);
+  padding:35px;
+  max-width:460px;
+  width:90%;
+  box-shadow:0 20px 60px rgba(20,60,180,.25),0 1px 0 rgba(255,255,255,.9) inset;
+  animation:modalSlideIn 0.3s ease;
+  position:relative;
+  text-align:center;
+}
+.rappel-modal::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:5px;
+  background:linear-gradient(90deg,var(--yellow-light),var(--orange),var(--yellow-light));
+  border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+}
+.rappel-modal::after {
+  content:''; position:absolute; top:5px; left:0; right:0; height:25%;
+  background:rgba(255,255,255,.45); border-radius:0 0 60% 60%;
+  pointer-events:none;
+}
+.rappel-modal > * { position:relative; z-index:2; }
+.rappel-icon-big {
+  font-size:4rem;
+  margin-bottom:15px;
+  display:block;
+  animation:pulse 1.8s infinite;
+}
+.rappel-modal h3 {
+  color:var(--orange);
+  font-size:1.5rem;
+  font-weight:900;
+  margin-bottom:10px;
+}
+.rappel-modal p {
+  color:var(--text2);
+  font-size:1rem;
+  font-weight:600;
+  margin-bottom:25px;
+  line-height:1.5;
+}
+.rappel-buttons {
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.btn-imprimer-rappel {
+  width:100%;
+  padding:16px;
+  background:linear-gradient(180deg,#ffc870,var(--orange),#b86200);
+  color:white;
+  border:1px solid #a05800;
+  border-radius:var(--radius-lg);
+  font-weight:800;
+  font-size:1.05rem;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 4px 15px rgba(200,120,0,0.3);
+  position:relative; overflow:hidden;
+}
+.btn-imprimer-rappel::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+}
+.btn-imprimer-rappel:hover { background:linear-gradient(180deg,#ffd080,#e8962a,#c87000); transform:translateY(-2px); box-shadow:0 6px 20px rgba(243,156,18,0.4); }
+.btn-oui-imprime {
+  width:100%;
+  padding:16px;
+  background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+  color:white;
+  border:1px solid #2d6a1a;
+  border-radius:var(--radius-lg);
+  font-weight:800;
+  font-size:1.05rem;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 4px 15px rgba(74,148,34,0.3);
+  position:relative; overflow:hidden;
+}
+.btn-oui-imprime::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+}
+.btn-oui-imprime:hover { background:linear-gradient(180deg,#a4e474,#5aad2e,#3d8a18); transform:translateY(-2px); }
+.btn-continuer-sans {
+  width:100%;
+  padding:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+  color:var(--text3);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  font-weight:700;
+  font-size:0.9rem;
+  cursor:pointer;
+  transition:all .2s;
+  position:relative; overflow:hidden;
+}
+.btn-continuer-sans::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.4); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+}
+.btn-continuer-sans:hover { color:var(--text2); transform:translateY(-1px); }
+</style>
+</head>
+<body>
+<!-- Header -->
+<div class="page-header">
+  <div style="width:150px;"></div>
+  <h1>💳 Paiement</h1>
+  <button class="btn-annuler-page" onclick="window.location.href='tables.html'">
+    <span>✖</span> Annuler
+  </button>
+</div>
+
+<!-- Container principal -->
+<div class="container">
+  <!-- Résumé du ticket -->
+  <div class="resume-card">
+    <div class="resume-header">
+      <h3>📄 Résumé</h3>
+      <div class="total-amount" id="totalDisplay">0.00 €</div>
+    </div>
+    <div class="items-list" id="itemsList"></div>
+  </div>
+
+  <!-- Modes de paiement -->
+  <div class="modes-container">
+    <h3>💰 Mode de paiement</h3>
+    <div class="modes-grid">
+      <button class="mode-btn especes" onclick="ouvrirSelectionClient('especes')">
+        <span class="mode-icon">💵</span>
+        Espèces
+      </button>
+      <button class="mode-btn banque" onclick="ouvrirSelectionClient('banque')">
+        <span class="mode-icon">💳</span>
+        Banque
+      </button>
+      <button class="mode-btn mixte" onclick="ouvrirSelectionClient('mixte')">
+        <span class="mode-icon">🔀</span>
+        Mixte
+      </button>
+    </div>
+    
+    <!-- Bouton Imprimer -->
+    <button class="print-btn" onclick="imprimerTicket()">
+      <span>🖨️</span> Imprimer mon ticket
+    </button>
+  </div>
+</div>
+
+<!-- === MODALE CONFIRMATION MEMBRE DÉTECTÉ === -->
+<div class="modal-overlay-client" id="modalConfirmMembre">
+  <div class="modal-client" style="max-width:460px;">
+    <h3 style="margin-bottom:10px;">👤 Qui paie ?</h3>
+    <p style="text-align:center; color:var(--text2); font-weight:600; font-size:0.95rem; margin-bottom:20px;">
+      La table est au nom de :
+    </p>
+    <div id="confirmerMembreCard" style="
+      background:linear-gradient(145deg,var(--blue-pale),#d0e8ff);
+      border:2px solid var(--blue-light);
+      border-radius:var(--radius-lg);
+      padding:20px 25px;
+      text-align:center;
+      margin-bottom:25px;
+      position:relative; overflow:hidden;
+    ">
+      <div style="position:absolute;top:0;left:0;right:0;height:40%;background:rgba(255,255,255,.4);border-radius:var(--radius-lg) var(--radius-lg) 60% 60%;pointer-events:none;"></div>
+      <div style="font-size:2.5rem; margin-bottom:8px; position:relative; z-index:2;">👤</div>
+      <div id="confirmerMembreNom" style="font-size:1.4rem; font-weight:900; color:var(--blue3); position:relative; z-index:2;"></div>
+    </div>
+    <div class="modal-client-buttons" style="flex-direction:column; gap:12px;">
+      <button class="btn-confirmer-client" onclick="validerMembreDetecte()" style="width:100%; font-size:1.05rem; padding:18px;">
+        <span>✅</span> Oui, c'est bien lui / elle
+      </button>
+      <button class="btn-passer" onclick="ouvrirListeMembres()" style="width:100%; font-size:0.95rem; padding:14px; color:var(--blue3);">
+        <span>🔄</span> Choisir un autre membre
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- === MODALE LISTE MEMBRES === -->
+<div class="modal-overlay-client" id="modalSelectionClient">
+  <div class="modal-client">
+    <h3>👤 Sélectionner un client</h3>
+    
+    <div class="search-container">
+      <span class="search-icon">🔍</span>
+      <div class="membre-search">
+        <input type="text" id="membreSearchModal" placeholder="Rechercher un membre...">
+      </div>
+    </div>
+
+    <div class="membre-select">
+      <select id="membreSelectModal" size="6">
+        <option value="">-- Aucun membre --</option>
+      </select>
+    </div>
+
+    <!-- Bouton affiché quand aucun résultat de recherche -->
+    <div id="btnAjouterMembreContainer" style="display:none; margin-bottom:10px;">
+      <button onclick="window.location.href='membres.html'" style="
+        width:100%; padding:14px;
+        background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+        color:white; border:1px solid #2d6a1a; border-radius:var(--radius);
+        font-weight:800; font-size:0.95rem; cursor:pointer;
+        display:flex; align-items:center; justify-content:center; gap:10px;
+        transition:all .2s; position:relative; overflow:hidden;
+      ">
+        <span style="position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.3);border-radius:var(--radius) var(--radius) 0 0;pointer-events:none;"></span>
+        <span style="position:relative;z-index:1;">➕ Encoder un nouveau membre</span>
+      </button>
+    </div>
+
+    <div class="modal-client-buttons">
+      <button class="btn-passer" onclick="passerSelectionClient()">
+        <span>⏭</span> Passer
+      </button>
+      <button class="btn-confirmer-client" onclick="confirmerSelectionClient()">
+        <span>✓</span> Confirmer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Espèces -->
+<div class="modal-overlay" id="modalEspeces">
+  <div class="modal">
+    <button class="close-modal" onclick="fermerModal()">×</button>
+    <h3>💵 Paiement en Espèces</h3>
+    
+    <div class="warning-box" id="warningBoxEspeces" style="display: none;">
+      <div class="warning-icon">⚠️</div>
+      <div class="warning-text">
+        <h4>N'avez-vous pas oublié de pointer ?</h4>
+        <p>Pensez à vérifier le pointage du membre avant de valider</p>
+      </div>
+    </div>
+
+    <div class="modal-content">
+      <div class="montant-display" id="montantRecuDisplay">0.00 €</div>
+      
+      <div class="numpad">
+        <button onclick="ajouterChiffre('1')">1</button>
+        <button onclick="ajouterChiffre('2')">2</button>
+        <button onclick="ajouterChiffre('3')">3</button>
+        <button onclick="ajouterChiffre('4')">4</button>
+        <button onclick="ajouterChiffre('5')">5</button>
+        <button onclick="ajouterChiffre('6')">6</button>
+        <button onclick="ajouterChiffre('7')">7</button>
+        <button onclick="ajouterChiffre('8')">8</button>
+        <button onclick="ajouterChiffre('9')">9</button>
+        <button onclick="effacerMontant()">⌫</button>
+        <button onclick="ajouterChiffre('0')">0</button>
+        <button onclick="ajouterChiffre('00')">00</button>
+      </div>
+      
+      <div class="rendu-info" id="renduDisplay">Rendu : 0.00 €</div>
+
+      <div class="modal-buttons">
+        <button class="btn-modal annuler" onclick="fermerModal()">
+          <span>✖</span> Annuler
+        </button>
+        <button class="btn-modal valider" onclick="validerModeEspeces()">
+          <span>✓</span> Valider
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Banque -->
+<div class="modal-overlay" id="modalBanque">
+  <div class="modal">
+    <button class="close-modal" onclick="fermerModal()">×</button>
+    <h3>💳 Paiement par QR Code</h3>
+
+    <div class="warning-box" id="warningBoxBanque" style="display: none;">
+      <div class="warning-icon">⚠️</div>
+      <div class="warning-text">
+        <h4>N'avez-vous pas oublié de pointer ?</h4>
+        <p>Pensez à vérifier le pointage du membre avant de valider</p>
+      </div>
+    </div>
+
+    <div class="modal-content">
+      <div style="margin-bottom:20px;">
+        <label style="display:block; margin-bottom:8px; font-weight:800; color:var(--text2);">
+          Type de paiement :
+        </label>
+        <select id="typePaiementBanque" onchange="updateQRCodeBanque()" style="width:100%; padding:12px; border:1.5px solid var(--border); border-radius:var(--radius); font-size:1rem; background:rgba(255,255,255,.85); font-family:'Nunito',sans-serif; font-weight:600; color:var(--text);">
+          <option value="conso+dons">Consommation + Dons</option>
+          <option value="conso">Consommation uniquement</option>
+          <option value="don">Don uniquement</option>
+        </select>
+      </div>
+
+      <div class="qr-container" id="qrContainer">
+        <p style="margin-bottom:15px; font-weight:800; color:var(--text2); text-align:center;">
+          Scanner pour payer <span id="qrMontant" style="color:var(--blue3);"></span>
+        </p>
+        <div id="qrcode" style="display:flex; justify-content:center;"></div>
+        <div class="qr-info-box">
+          <span>ℹ️</span>
+          <div>
+            <p>Virement bancaire standard</p>
+            <small>
+              Ce QR code effectue un <strong>virement SEPA classique</strong>, pas un paiement instantané.<br>
+              Si votre application bancaire affiche un message d'erreur, sélectionnez <strong>"Virement normal"</strong> ou <strong>"Virement standard"</strong> à la place du paiement instantané.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn-modal annuler" onclick="fermerModal()">
+          <span>✖</span> Annuler
+        </button>
+        <button class="btn-modal valider" onclick="validerModeBanque()">
+          <span>✓</span> Valider
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Mixte -->
+<div class="modal-overlay" id="modalMixte">
+  <div class="modal">
+    <button class="close-modal" onclick="fermerModal()">×</button>
+    <h3>🔀 Paiement Mixte</h3>
+
+    <div class="warning-box" id="warningBoxMixte" style="display: none;">
+      <div class="warning-icon">⚠️</div>
+      <div class="warning-text">
+        <h4>N'avez-vous pas oublié de pointer ?</h4>
+        <p>Pensez à vérifier le pointage du membre avant de valider</p>
+      </div>
+    </div>
+
+    <div class="mixte-content">
+      <div style="margin-bottom:20px;">
+        <label style="display:block; margin-bottom:8px; font-weight:800; color:var(--text2);">
+          Type de paiement (partie banque) :
+        </label>
+        <select id="typePaiementMixte" onchange="updateQRCodeMixte()" style="width:100%; padding:12px; border:1.5px solid var(--border); border-radius:var(--radius); font-size:1rem; background:rgba(255,255,255,.85); font-family:'Nunito',sans-serif; font-weight:600; color:var(--text);">
+          <option value="conso+dons">Consommation + Dons</option>
+          <option value="conso">Consommation uniquement</option>
+          <option value="don">Don uniquement</option>
+        </select>
+      </div>
+
+      <div class="mixte-display">
+        <div class="mixte-row">
+          <span>Total à payer :</span>
+          <span id="mixteTotal">0.00 €</span>
+        </div>
+        <div class="mixte-row">
+          <span>Espèces :</span>
+          <span id="mixteEspecesDisplay">0.00 €</span>
+        </div>
+        <div class="mixte-row total">
+          <span>Reste Banque :</span>
+          <span id="mixteBanqueDisplay">0.00 €</span>
+        </div>
+      </div>
+
+      <div class="numpad">
+        <button onclick="ajouterChiffreMixte('1')">1</button>
+        <button onclick="ajouterChiffreMixte('2')">2</button>
+        <button onclick="ajouterChiffreMixte('3')">3</button>
+        <button onclick="ajouterChiffreMixte('4')">4</button>
+        <button onclick="ajouterChiffreMixte('5')">5</button>
+        <button onclick="ajouterChiffreMixte('6')">6</button>
+        <button onclick="ajouterChiffreMixte('7')">7</button>
+        <button onclick="ajouterChiffreMixte('8')">8</button>
+        <button onclick="ajouterChiffreMixte('9')">9</button>
+        <button onclick="effacerMontantMixte()">⌫</button>
+        <button onclick="ajouterChiffreMixte('0')">0</button>
+        <button onclick="ajouterChiffreMixte('00')">00</button>
+      </div>
+
+      <div class="qr-container" id="qrContainerMixte" style="display:none; margin-top:20px;">
+        <p style="margin-bottom:15px; font-weight:800; color:var(--text2); text-align:center;">
+          Scanner pour payer le reste : <span id="qrMontantMixte" style="color:var(--blue3);"></span>
+        </p>
+        <div id="qrcodeMixte" style="display:flex; justify-content:center;"></div>
+        <div class="qr-info-box">
+          <span>ℹ️</span>
+          <div>
+            <p>Virement bancaire standard</p>
+            <small>
+              Ce QR code effectue un <strong>virement SEPA classique</strong>, pas un paiement instantané.<br>
+              Si votre application bancaire affiche un message d'erreur, sélectionnez <strong>"Virement normal"</strong> ou <strong>"Virement standard"</strong> à la place du paiement instantané.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn-modal annuler" onclick="fermerModal()">
+          <span>✖</span> Annuler
+        </button>
+        <button class="btn-modal valider" onclick="validerModeMixte()">
+          <span>✓</span> Valider
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Overlay -->
+<div id="paymentSuccessOverlay">
+  <div class="success-content">
+    <div class="checkmark">✓</div>
+    <h2>Paiement validé !</h2>
+    <p style="font-size:1.2rem; opacity:0.9;">Redirection en cours...</p>
+  </div>
+</div>
+
+<!-- Stock Alert Modal -->
+<div id="stockAlertOverlay">
+  <div class="stock-alert-modal">
+    <div class="stock-alert-header">
+      <div class="stock-alert-icon">⚠️</div>
+      <h3>Stock insuffisant</h3>
+    </div>
+
+    <div id="stockAlertRupture" class="stock-section rupture" style="display:none;">
+      <h4>❌ Articles en rupture de stock</h4>
+      <div id="stockAlertRuptureList"></div>
+    </div>
+
+    <div id="stockAlertFaible" class="stock-section faible" style="display:none;">
+      <h4>⚠️ Stock insuffisant pour les articles suivants</h4>
+      <div id="stockAlertFaibleList"></div>
+    </div>
+
+    <div class="stock-alert-buttons">
+      <button class="btn-stock annuler" onclick="annulerPaiementStock()">
+        <span>✖</span> Annuler
+      </button>
+      <button class="btn-stock forcer" onclick="forcerPaiementStock()">
+        <span>⚠️</span> Valider quand même
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- === MODALE RAPPEL IMPRESSION === -->
+<div id="modalRappelImpression">
+  <div class="rappel-modal">
+    <span class="rappel-icon-big">🖨️</span>
+    <h3>Paiement validé !</h3>
+    <p id="rappelClientLigne">Client : <strong id="rappelClientNom"></strong><br></p>
+    <p>Voulez-vous imprimer le ticket avant de continuer ?</p>
+    <div class="rappel-buttons">
+      <button class="btn-imprimer-rappel" onclick="imprimerDepuisRappel()">
+        <span>🖨️</span> Imprimer le ticket
+      </button>
+      <button class="btn-oui-imprime" onclick="fermerRappelEtRediriger()">
+        <span>✅</span> Terminer sans imprimer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Scripts externes -->
+<script src="qrcode.min.js"></script>
+<script src="jspdf.umd.min.js"></script>
+
+<script>
+
+// ── Sync serveur automatique ──────────────────────────────────────────────────
+const _IS_SERVER = window.location.protocol === "http:";
+const _API_BASE  = window.location.origin + "/api";
+async function syncToServer(...keys) {
+  if (!_IS_SERVER) return;
+  const body = {};
+  keys.forEach(k => {
+    try { body[k] = JSON.parse(localStorage.getItem(k) || "null"); } catch(e) {}
+  });
+  try {
+    await fetch(_API_BASE + "/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  } catch(e) { /* serveur injoignable */ }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+// === VARIABLES GLOBALES ===
+let tables = JSON.parse(localStorage.getItem("tables")) || [];
+let tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+let ticketsHistorique = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+let membres = JSON.parse(localStorage.getItem("membres")) || [];
+
+const params = new URLSearchParams(window.location.search);
+const ticketId = parseInt(params.get("ticketId"));
+
+let currentTicket = tickets.find(t => t.id === ticketId);
+let currentTable = tables.find(t => t.ticketId === ticketId);
+let total = 0;
+
+let modePaiement = null;
+let montantRecu = 0;
+let montantMixte = 0;
+let typeBanque = null;
+let membreWarningIgnored = false;
+let clientSelectionne = false;
+let modeEnCours = null; // Pour savoir quel mode de paiement on traite
+
+// === AFFICHAGE APERÇU TICKET ===
+function afficherApercuTicket() {
+  if (!currentTicket || !currentTicket.articles) {
+    console.error("Ticket introuvable:", currentTicket);
+    console.log("Tickets:", tickets);
+    console.log("Ticket ID recherché:", ticketId);
+    console.log("Table trouvée:", currentTable);
+    showMessage("Ticket introuvable", "error");
+    setTimeout(() => window.location.href = "tables.html", 2000);
+    return;
+  }
+
+  total = currentTicket.articles.reduce((sum, art) => sum + (art.prix * art.qte), 0);
+
+  document.getElementById("totalDisplay").textContent = total.toFixed(2) + " €";
+
+  const itemsList = document.getElementById("itemsList");
+  itemsList.innerHTML = currentTicket.articles.map(art => `
+    <div class="item-row">
+      <span class="item-name">${art.nom} x${art.qte}</span>
+      <span class="item-price">${(art.prix * art.qte).toFixed(2)} €</span>
+    </div>
+  `).join('');
+}
+
+// === REMPLIR LISTE MEMBRES (pour la modale) ===
+function remplirListeMembresModal() {
+  const select = document.getElementById("membreSelectModal");
+  select.innerHTML = '<option value="">-- Aucun membre --</option>';
+  
+  membres.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = `${m.prenom} ${m.nom}`;
+    select.appendChild(opt);
+  });
+}
+
+// Filtrage des membres dans la modale
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('membreSearchModal');
+  const select = document.getElementById('membreSelectModal');
+  
+  if (searchInput && select) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      const options = select.querySelectorAll('option');
+      
+      let visibleCount = 0;
+      options.forEach(option => {
+        if (option.value === '') {
+          option.style.display = '';
+          return;
+        }
+        
+        const text = option.textContent.toLowerCase();
+        const visible = text.includes(searchTerm);
+        option.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+      });
+
+      // Afficher le bouton "Encoder un membre" si aucun résultat
+      const btnContainer = document.getElementById('btnAjouterMembreContainer');
+      if (btnContainer) {
+        btnContainer.style.display = (searchTerm && visibleCount === 0) ? 'block' : 'none';
+      }
+    });
+  }
+});
+
+// === NOUVELLE FONCTION : OUVRIR SÉLECTION CLIENT (SMART) ===
+function ouvrirSelectionClient(mode) {
+  modeEnCours = mode;
+
+  // Détecter si la table a un membre associé (nom différent de "Table X" / "Libre" / générique)
+  const nomTable = currentTable ? currentTable.nom : "";
+  const estLibre = !nomTable || /^table\s*\d+$/i.test(nomTable.trim()) || /^libre$/i.test(nomTable.trim());
+
+  if (!estLibre) {
+    // Chercher si le nom correspond à un membre connu
+    const membreDetecte = membres.find(m => {
+      const nomComplet = `${m.prenom} ${m.nom}`.toUpperCase();
+      return nomComplet === nomTable.toUpperCase();
+    });
+
+    if (membreDetecte) {
+      // Pré-remplir le membre détecté
+      _membreDetecteTemp = membreDetecte;
+      document.getElementById("confirmerMembreNom").textContent = `${membreDetecte.prenom} ${membreDetecte.nom}`;
+      document.getElementById("modalConfirmMembre").style.display = "flex";
+      return;
+    } else {
+      // Nom libre mais pas un membre connu → afficher quand même la confirmation avec ce nom
+      _membreDetecteTemp = { id: null, prenom: nomTable, nom: "", _nomLibre: true };
+      document.getElementById("confirmerMembreNom").textContent = nomTable;
+      document.getElementById("modalConfirmMembre").style.display = "flex";
+      return;
+    }
+  }
+
+  // Table libre → ouvrir directement la liste
+  ouvrirListeMembres();
+}
+
+// Variable temporaire pour stocker le membre détecté
+let _membreDetecteTemp = null;
+
+// === VALIDER LE MEMBRE DÉTECTÉ ===
+function validerMembreDetecte() {
+  document.getElementById("modalConfirmMembre").style.display = "none";
+  if (_membreDetecteTemp && !_membreDetecteTemp._nomLibre) {
+    const m = _membreDetecteTemp;
+    currentTicket.membreId = m.id;
+    currentTicket.membreNom = m.nom;
+    currentTicket.membrePrenom = m.prenom;
+    clientSelectionne = true;
+    membreWarningIgnored = true;
+    showMessage(`✅ ${m.prenom} ${m.nom} confirmé(e)`, "success");
+  } else if (_membreDetecteTemp && _membreDetecteTemp._nomLibre) {
+    // Nom libre : pas de membre lié, mais on considère qu'on a identifié le client
+    clientSelectionne = true;
+    membreWarningIgnored = true;
+    showMessage(`✅ Client confirmé : ${_membreDetecteTemp.prenom}`, "success");
+  }
+  _membreDetecteTemp = null;
+  setTimeout(() => ouvrirModalePaiement(modeEnCours), 300);
+}
+
+// === OUVRIR LA LISTE DES MEMBRES ===
+function ouvrirListeMembres() {
+  document.getElementById("modalConfirmMembre").style.display = "none";
+  remplirListeMembresModal();
+  document.getElementById("modalSelectionClient").style.display = "flex";
+  document.getElementById("membreSearchModal").value = "";
+  document.getElementById("membreSelectModal").value = "";
+}
+
+// === PASSER LA SÉLECTION CLIENT ===
+function passerSelectionClient() {
+  document.getElementById("modalSelectionClient").style.display = "none";
+  clientSelectionne = false;
+  membreWarningIgnored = false;
+  
+  // Ouvrir directement la modale de paiement
+  ouvrirModalePaiement(modeEnCours);
+}
+
+// === CONFIRMER LA SÉLECTION CLIENT ===
+function confirmerSelectionClient() {
+  const select = document.getElementById("membreSelectModal");
+  
+  if (!select.value) {
+    showMessage("Veuillez sélectionner un membre ou cliquer sur Passer", "warning");
+    return;
+  }
+  
+  const m = membres.find(x => x.id == select.value);
+  currentTicket.membreId = m.id;
+  currentTicket.membreNom = m.nom;
+  currentTicket.membrePrenom = m.prenom;
+  
+  clientSelectionne = true;
+  membreWarningIgnored = true; // Pas besoin d'avertissement si sélectionné
+  
+  showMessage(`✅ Client ${m.prenom} ${m.nom} sélectionné`, "success");
+  
+  // Fermer la modale client
+  document.getElementById("modalSelectionClient").style.display = "none";
+  
+  // Ouvrir la modale de paiement
+  setTimeout(() => {
+    ouvrirModalePaiement(modeEnCours);
+  }, 300);
+}
+
+// === OUVRIR LA MODALE DE PAIEMENT APPROPRIÉE ===
+function ouvrirModalePaiement(mode) {
+  modePaiement = mode;
+  
+  if (mode === "especes") {
+    montantRecu = 0;
+    document.getElementById("montantRecuDisplay").textContent = "0.00 €";
+    document.getElementById("renduDisplay").textContent = "Rendu : 0.00 €";
+    document.getElementById("renduDisplay").classList.remove("rendu-negatif");
+    
+    // Afficher l'avertissement seulement si pas de client sélectionné
+    const warningBox = document.getElementById("warningBoxEspeces");
+    if (!clientSelectionne && !membreWarningIgnored) {
+      warningBox.style.display = "flex";
+    } else {
+      warningBox.style.display = "none";
+    }
+    
+    document.getElementById("modalEspeces").style.display = "flex";
+  } 
+  else if (mode === "banque") {
+    // Initialiser le sélecteur sur "conso+dons" par défaut
+    document.getElementById("typePaiementBanque").value = "conso+dons";
+    
+    // Générer directement le QR code
+    genererQR(total, "qrcode", "conso+dons");
+    document.getElementById("qrMontant").textContent = total.toFixed(2) + " €";
+    
+    // Afficher l'avertissement seulement si pas de client sélectionné
+    const warningBox = document.getElementById("warningBoxBanque");
+    if (!clientSelectionne && !membreWarningIgnored) {
+      warningBox.style.display = "flex";
+    } else {
+      warningBox.style.display = "none";
+    }
+    
+    document.getElementById("modalBanque").style.display = "flex";
+  } 
+  else if (mode === "mixte") {
+    montantMixte = 0;
+    
+    // Initialiser le sélecteur sur "conso+dons" par défaut
+    document.getElementById("typePaiementMixte").value = "conso+dons";
+    
+    document.getElementById("mixteTotal").textContent = total.toFixed(2) + " €";
+    document.getElementById("mixteEspecesDisplay").textContent = "0.00 €";
+    document.getElementById("mixteBanqueDisplay").textContent = total.toFixed(2) + " €";
+    document.getElementById("qrContainerMixte").style.display = "none";
+    
+    // Afficher l'avertissement seulement si pas de client sélectionné
+    const warningBox = document.getElementById("warningBoxMixte");
+    if (!clientSelectionne && !membreWarningIgnored) {
+      warningBox.style.display = "flex";
+    } else {
+      warningBox.style.display = "none";
+    }
+    
+    document.getElementById("modalMixte").style.display = "flex";
+  }
+}
+
+// === FERMER MODALES ===
+function fermerModal() {
+  document.getElementById("modalEspeces").style.display = "none";
+  document.getElementById("modalBanque").style.display = "none";
+  document.getElementById("modalMixte").style.display = "none";
+  document.getElementById("modalConfirmMembre").style.display = "none";
+  document.getElementById("modalSelectionClient").style.display = "none";
+  modePaiement = null;
+  clientSelectionne = false; // Réinitialiser pour la prochaine fois
+}
+
+// === ESPÈCES ===
+function ajouterChiffre(chiffre) {
+  montantRecu = montantRecu * 10 + parseInt(chiffre);
+  const montantEuro = montantRecu / 100;
+  document.getElementById("montantRecuDisplay").textContent = montantEuro.toFixed(2) + " €";
+  
+  const rendu = montantEuro === 0 ? 0 : (montantEuro - total);
+  const renduDisplay = document.getElementById("renduDisplay");
+  renduDisplay.textContent = `Rendu : ${rendu.toFixed(2)} €`;
+  
+  if (rendu < 0) {
+    renduDisplay.classList.add("rendu-negatif");
+  } else {
+    renduDisplay.classList.remove("rendu-negatif");
+  }
+}
+
+function effacerMontant() {
+  montantRecu = Math.floor(montantRecu / 10);
+  const montantEuro = montantRecu / 100;
+  document.getElementById("montantRecuDisplay").textContent = montantEuro.toFixed(2) + " €";
+  
+  const rendu = montantEuro === 0 ? 0 : (montantEuro - total);
+  const renduDisplay = document.getElementById("renduDisplay");
+  renduDisplay.textContent = `Rendu : ${rendu.toFixed(2)} €`;
+  
+  if (rendu < 0) {
+    renduDisplay.classList.add("rendu-negatif");
+  } else {
+    renduDisplay.classList.remove("rendu-negatif");
+  }
+}
+
+function validerModeEspeces() {
+  const montantEuro = montantRecu / 100;
+  if (montantEuro === 0) {
+    // Rien saisi → on considère que le montant reçu correspond exactement au total (rendu = 0)
+    montantRecu = Math.round(total * 100);
+  } else if (montantEuro < total) {
+    return showMessage("Montant insuffisant", "error");
+  }
+  finaliserPaiement();
+}
+
+// === BANQUE ===
+function genererQR(montant, elementId, typeCommunication = null) {
+  // Récupérer les données bancaires depuis les paramètres
+  const companySettings = JSON.parse(localStorage.getItem("companySettings")) || {};
+  
+  // Utiliser les données des paramètres ou valeurs par défaut
+  const iban = companySettings.bankIban || "";
+  const bic = companySettings.bankBic || "";
+  const nom = companySettings.companyName || "";
+  
+  // Déterminer la communication
+  let comm;
+  if (typeCommunication) {
+    if (typeCommunication === "conso") {
+      comm = "Conso";
+    } else if (typeCommunication === "don") {
+      comm = "Don";
+    } else {
+      comm = "Conso+Dons";
+    }
+  } else {
+    comm = companySettings.bankCommunication || "Conso+Dons";
+  }
+  
+  // Format EPC SEPA QR Code — version 002 (virement bancaire standard, NON instantané)
+  // Structure stricte sur 12 lignes :
+  // 1: BCD (Service Tag)
+  // 2: 002 (Version — v002 = BIC optionnel, compatible toutes banques)
+  // 3: 1 (UTF-8)
+  // 4: SCT (SEPA Credit Transfer)
+  // 5: BIC (peut être vide en v002)
+  // 6: Nom bénéficiaire
+  // 7: IBAN
+  // 8: Montant (EUR suivi du montant)
+  // 9: Purpose code (vide)
+  // 10: Référence structurée (vide)
+  // 11: Communication libre
+  // 12: Info/hint (vide)
+  const sepaString = [
+    "BCD",
+    "002",
+    "1",
+    "SCT",
+    bic,
+    nom,
+    iban,
+    "EUR" + montant.toFixed(2),
+    "",
+    "",
+    comm,
+    ""
+  ].join("\n");
+  
+  const container = document.getElementById(elementId);
+  container.innerHTML = "";
+  new QRCode(container, {
+    text: sepaString,
+    width: 200,
+    height: 200,
+    correctLevel: QRCode.CorrectLevel.M
+  });
+}
+
+function updateQRCodeBanque() {
+  const typePaiement = document.getElementById("typePaiementBanque").value;
+  genererQR(total, "qrcode", typePaiement);
+}
+
+function validerModeBanque() {
+  finaliserPaiement();
+}
+
+// === MIXTE ===
+function ajouterChiffreMixte(chiffre) {
+  montantMixte = montantMixte * 10 + parseInt(chiffre);
+  const montantEuro = montantMixte / 100;
+  
+  if (montantEuro > total) {
+    montantMixte = Math.floor(montantMixte / 10);
+    return showMessage("Le montant espèces ne peut pas dépasser le total", "warning");
+  }
+  
+  document.getElementById("mixteEspecesDisplay").textContent = montantEuro.toFixed(2) + " €";
+  const reste = total - montantEuro;
+  document.getElementById("mixteBanqueDisplay").textContent = reste.toFixed(2) + " €";
+  
+  // Générer le QR code pour le reste si montant > 0
+  if (montantEuro > 0 && reste > 0) {
+    document.getElementById("qrContainerMixte").style.display = "block";
+    document.getElementById("qrMontantMixte").textContent = reste.toFixed(2) + " €";
+    const typePaiement = document.getElementById("typePaiementMixte").value;
+    genererQR(reste, "qrcodeMixte", typePaiement);
+  } else {
+    document.getElementById("qrContainerMixte").style.display = "none";
+  }
+}
+
+function effacerMontantMixte() {
+  montantMixte = Math.floor(montantMixte / 10);
+  const montantEuro = montantMixte / 100;
+  document.getElementById("mixteEspecesDisplay").textContent = montantEuro.toFixed(2) + " €";
+  const reste = total - montantEuro;
+  document.getElementById("mixteBanqueDisplay").textContent = reste.toFixed(2) + " €";
+  
+  // Générer le QR code pour le reste si montant > 0
+  if (montantEuro > 0 && reste > 0) {
+    document.getElementById("qrContainerMixte").style.display = "block";
+    document.getElementById("qrMontantMixte").textContent = reste.toFixed(2) + " €";
+    const typePaiement = document.getElementById("typePaiementMixte").value;
+    genererQR(reste, "qrcodeMixte", typePaiement);
+  } else {
+    document.getElementById("qrContainerMixte").style.display = "none";
+  }
+}
+
+function updateQRCodeMixte() {
+  const montantEuro = montantMixte / 100;
+  const reste = total - montantEuro;
+  
+  if (montantEuro > 0 && reste > 0) {
+    const typePaiement = document.getElementById("typePaiementMixte").value;
+    genererQR(reste, "qrcodeMixte", typePaiement);
+  }
+}
+
+function validerModeMixte() {
+  const montantEuro = montantMixte / 100;
+  if (montantEuro === 0) {
+    return showMessage("Le montant espèces doit être supérieur à 0", "warning");
+  }
+  if (montantEuro >= total) {
+    return showMessage("Utilisez le mode Espèces pour un paiement total en espèces", "warning");
+  }
+  finaliserPaiement();
+}
+
+// === GESTION DU STOCK ===
+
+function getArticlesData() {
+  return JSON.parse(localStorage.getItem("articlesData")) || { articles: [] };
+}
+
+// Retourne la liste des "mouvements de stock réels" pour un article vendu
+// Si l'article a une composition, on décompte les ingrédients
+// Sinon, on décompte l'article lui-même
+function resoudreDecomptes(articlesTicket) {
+  const articlesDB = getArticlesData().articles;
+  const decomptes = {}; // { articleId: { nom, total } }
+
+  articlesTicket.forEach(function(art) {
+    const articleDB = articlesDB.find(function(a) { return a.id === art.id; });
+    const composition = articleDB && articleDB.composition && articleDB.composition.length > 0 ? articleDB.composition : null;
+
+    if (composition) {
+      // Décompter chaque ingrédient de la composition * qté vendue
+      composition.forEach(function(ingredient) {
+        const ingArticle = articlesDB.find(function(a) { return a.id === ingredient.articleId; });
+        if (!ingArticle) return;
+        const qteADecompter = ingredient.qty * art.qte;
+        if (decomptes[ingredient.articleId]) {
+          decomptes[ingredient.articleId].total += qteADecompter;
+        } else {
+          decomptes[ingredient.articleId] = { nom: ingArticle.nom, total: qteADecompter };
+        }
+      });
+    } else {
+      // Pas de composition : décompter l'article directement
+      if (decomptes[art.id]) {
+        decomptes[art.id].total += art.qte;
+      } else {
+        decomptes[art.id] = { nom: art.nom, total: art.qte };
+      }
+    }
+  });
+
+  return decomptes;
+}
+
+function verifierStockDisponible(articles) {
+  const stock = JSON.parse(localStorage.getItem("stockData")) || {};
+  const decomptes = resoudreDecomptes(articles);
+  let articlesEnRupture = [];
+  let articlesStockFaible = [];
+
+  Object.keys(decomptes).forEach(function(articleId) {
+    const d = decomptes[articleId];
+    const stockInfo = stock[articleId];
+
+    // Stock infini : on ignore
+    if (stockInfo && stockInfo.infini) return;
+
+    const disponible = stockInfo ? stockInfo.quantite : 0;
+
+    if (disponible === 0) {
+      articlesEnRupture.push({ nom: d.nom, demande: d.total, disponible: 0 });
+    } else if (disponible < d.total) {
+      articlesStockFaible.push({ nom: d.nom, demande: d.total, disponible: disponible });
+    }
+  });
+
+  return {
+    estOk: articlesEnRupture.length === 0 && articlesStockFaible.length === 0,
+    articlesEnRupture: articlesEnRupture,
+    articlesStockFaible: articlesStockFaible
+  };
+}
+
+function retirerStockPourPaiement(articles) {
+  const stock = JSON.parse(localStorage.getItem("stockData")) || {};
+  const stockHistory = JSON.parse(localStorage.getItem("stockHistory")) || [];
+  const decomptes = resoudreDecomptes(articles);
+
+  Object.keys(decomptes).forEach(function(articleId) {
+    const d = decomptes[articleId];
+    if (!stock[articleId]) return;
+
+    // Stock infini : on ne touche pas
+    if (stock[articleId].infini) return;
+
+    const oldQuantite = stock[articleId].quantite || 0;
+    const newQuantite = Math.max(0, oldQuantite - d.total);
+
+    stock[articleId].quantite = newQuantite;
+    stock[articleId].lastUpdate = new Date().toISOString();
+
+    stockHistory.push({
+      date: new Date().toLocaleString(),
+      articleId: articleId,
+      articleNom: d.nom,
+      type: "payment",
+      quantite: d.total,
+      motif: "Vente - Paiement effectué"
+    });
+  });
+
+  localStorage.setItem("stockData", JSON.stringify(stock));
+  localStorage.setItem("stockHistory", JSON.stringify(stockHistory));
+  syncToServer("tickets", "ticketsHistorique", "tables", "stockData", "stockHistory");
+}
+
+// === FINALISER
+function finaliserPaiement() {
+  if (!modePaiement) return showMessage("Veuillez choisir un mode de paiement", "error");
+  
+  const verificationStock = verifierStockDisponible(currentTicket.articles);
+  
+  if (!verificationStock.estOk) {
+    afficherModaleStock(verificationStock);
+    return;
+  }
+  
+  finaliserPaiementConfirme();
+}
+
+function afficherModaleStock(verificationStock) {
+  const overlay = document.getElementById("stockAlertOverlay");
+  const ruptureDiv = document.getElementById("stockAlertRupture");
+  const ruptureList = document.getElementById("stockAlertRuptureList");
+  const faibleDiv = document.getElementById("stockAlertFaible");
+  const faibleList = document.getElementById("stockAlertFaibleList");
+  
+  ruptureDiv.style.display = "none";
+  faibleDiv.style.display = "none";
+  ruptureList.innerHTML = "";
+  faibleList.innerHTML = "";
+  
+  if (verificationStock.articlesEnRupture.length > 0) {
+    ruptureDiv.style.display = "block";
+    verificationStock.articlesEnRupture.forEach(a => {
+      ruptureList.innerHTML += `
+        <div style="padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.1); display:flex; justify-content:space-between;">
+          <span><strong>${a.nom}</strong></span>
+          <span style="color:var(--red);">Demandé: ${a.demande} | Disponible: ${a.disponible}</span>
+        </div>
+      `;
+    });
+  }
+  
+  if (verificationStock.articlesStockFaible.length > 0) {
+    faibleDiv.style.display = "block";
+    verificationStock.articlesStockFaible.forEach(a => {
+      faibleList.innerHTML += `
+        <div style="padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.1); display:flex; justify-content:space-between;">
+          <span><strong>${a.nom}</strong></span>
+          <span style="color:var(--orange);">Demandé: ${a.demande} | Disponible: ${a.disponible}</span>
+        </div>
+      `;
+    });
+  }
+  
+  overlay.style.display = "flex";
+}
+
+function annulerPaiementStock() {
+  document.getElementById("stockAlertOverlay").style.display = "none";
+  showMessage("❌ Paiement annulé - Stock insuffisant", "warning");
+}
+
+function forcerPaiementStock() {
+  document.getElementById("stockAlertOverlay").style.display = "none";
+  showMessage("⚠️ Paiement validé malgré stock insuffisant", "warning");
+  finaliserPaiementConfirme();
+}
+
+function finaliserPaiementConfirme() {
+  currentTicket.total = total;
+  currentTicket.modePaiement = modePaiement;
+  currentTicket.datePaiement = new Date().toLocaleDateString();
+  currentTicket.heurePaiement = new Date().toLocaleTimeString();
+  
+  if (modePaiement === "especes") {
+    currentTicket.montantRecu = parseFloat(montantRecu / 100);
+    currentTicket.rendu = currentTicket.montantRecu - total;
+  }
+  
+  if (modePaiement === "mixte") {
+    currentTicket.montantEspeces = parseFloat(montantMixte / 100);
+    currentTicket.montantBanque = total - currentTicket.montantEspeces;
+  }
+  
+  retirerStockPourPaiement(currentTicket.articles);
+  
+  ticketsHistorique.push(currentTicket);
+  tickets = tickets.filter(t => t.id !== currentTicket.id);
+  currentTable.ticketId = null;
+  currentTable.nom = "Table " + currentTable.id;
+  
+  localStorage.setItem("tickets", JSON.stringify(tickets));
+  localStorage.setItem("tables", JSON.stringify(tables));
+  localStorage.setItem("ticketsHistorique", JSON.stringify(ticketsHistorique));
+  syncToServer("tickets", "ticketsHistorique", "tables", "stockData", "stockHistory");
+  
+  fermerModal();
+
+  // Afficher la modale de rappel impression
+  // Le ticket a maintenant toutes les infos (rendu, mode, etc.)
+  const clientNom = currentTicket.membrePrenom
+    ? `${currentTicket.membrePrenom} ${currentTicket.membreNom}`
+    : null;
+  const ligneClient = document.getElementById("rappelClientLigne");
+  document.getElementById("rappelClientNom").textContent = clientNom || "";
+  if (ligneClient) ligneClient.style.display = clientNom ? "" : "none";
+  document.getElementById("modalRappelImpression").style.display = "flex";
+}
+
+// === FONCTIONS MODALE RAPPEL IMPRESSION ===
+function imprimerDepuisRappel() {
+  imprimerTicket();
+  // On laisse la modale ouverte pour que l'utilisateur confirme après
+}
+
+function fermerRappelEtRediriger() {
+  document.getElementById("modalRappelImpression").style.display = "none";
+  const overlay = document.getElementById("paymentSuccessOverlay");
+  overlay.style.display = "flex";
+  setTimeout(() => {
+    window.location.href = "tables.html";
+  }, 1500);
+}
+
+// === AFFICHAGE MESSAGE ===
+function showMessage(text, type) {
+  const colors = {
+    success: '#2ecc71',
+    error: '#e74c3c',
+    warning: '#f39c12'
+  };
+  
+  const toast = document.getElementById('toast');
+  toast.textContent = text;
+  toast.style.background = `linear-gradient(135deg, ${colors[type]}, ${colors[type]}99)`;
+  toast.style.display = 'flex';
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+    }, 300);
+  }, 3000);
+}
+
+// === IMPRESSION THERMIQUE ===
+async function imprimerTicket() {
+  if (!currentTicket) return showMessage("Aucun ticket sélectionné", "error");
+
+  try {
+    const ticketTotal = currentTicket.total || currentTicket.articles.reduce((s,a)=>s+(a.prix*a.qte),0);
+
+    const ticketData = {
+      table: currentTable ? currentTable.nom : "Table inconnue",
+      date: currentTicket.date,
+      heure: currentTicket.heure,
+      articles: currentTicket.articles.map(art => ({
+        nom: art.nom,
+        qte: art.qte,
+        prix: art.prix
+      })),
+      total: ticketTotal,
+      modePaiement: currentTicket.modePaiement || null,
+      rendu: currentTicket.rendu || 0,
+      montantBanque: currentTicket.montantBanque || 0,
+      membreNom: currentTicket.membreNom ? `${currentTicket.membrePrenom} ${currentTicket.membreNom}` : null
+    };
+
+    const response = await fetch('http://localhost:8088/print', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(ticketData)
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showMessage('✓ Ticket imprimé avec succès !', 'success');
+    } else {
+      showMessage('✗ Erreur d\'impression', 'error');
+    }
+
+  } catch (error) {
+    console.error('Erreur:', error);
+    showMessage('✗ Serveur d\'impression non disponible', 'error');
+  }
+}
+
+// === EXPORT PDF ===
+function exportTicketPDF() {
+  if (!currentTicket) return showMessage("Aucun ticket sélectionné", "error");
+  
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF({ unit: "mm", format: [80, 200] });
+  doc.setFont("courier");
+  doc.setFontSize(10);
+  let y = 10;
+  doc.text(`Table: ${currentTable ? currentTable.nom : "Table inconnue"}`, 10, y); y+=6;
+  doc.text(`${currentTicket.date} ${currentTicket.heure}`, 10, y); y+=6;
+  currentTicket.articles.forEach(a => {
+    doc.text(`${a.nom} x${a.qte} -> ${(a.prix*a.qte).toFixed(2)} EUR`, 10, y); y+=6;
+  });
+  const total = currentTicket.total || currentTicket.articles.reduce((s,a)=>s+(a.prix*a.qte),0);
+  doc.text(`Total: ${total.toFixed(2)} EUR`, 10, y); y+=6;
+  doc.text(`Rendu: ${currentTicket.rendu !== undefined ? currentTicket.rendu.toFixed(2) : 0} EUR`, 10, y); y+=6;
+  doc.text(`Banque: ${currentTicket.montantBanque !== undefined ? currentTicket.montantBanque.toFixed(2) : 0} EUR`, 10, y);
+  doc.save(`Ticket_${currentTicket.id}.pdf`);
+  showMessage('✓ PDF exporté avec succès', 'success');
+}
+
+// === INIT ===
+document.addEventListener('DOMContentLoaded', function() {
+  afficherApercuTicket();
+});
+
+/* === SYNCHRO ÉCRAN CLIENT ROBUSTE === */
+function majEcranClient(data = {}) {
+  try {
+    const payload = {
+      ts: Date.now(), // pour forcer un changement même si contenu identique
+      ticketLabel: currentTicket ? `Ticket #${currentTicket.id}` : 'Ticket en cours',
+      clientName: currentTicket?.membrePrenom ? `${currentTicket.membrePrenom} ${currentTicket.membreNom}` : 'Client',
+      total: total || 0,
+      articles: currentTicket?.articles || [],
+      mode: modePaiement || data.mode || null,
+      rendu: (typeof data.rendu !== 'undefined') ? data.rendu : ((montantRecu / 100) - total),
+      especes: (typeof data.especes !== 'undefined') ? data.especes : (montantMixte / 100) || 0,
+      banque: (typeof data.banque !== 'undefined') ? data.banque : (total - (montantMixte / 100)) || 0,
+      qrText: data.qrText || null,
+      paymentSuccess: !!data.paymentSuccess
+    };
+    // stringifier proprement
+    setClientDisplay(payload);
+  } catch (err) {
+    console.error('majEcranClient error', err);
+  }
+}
+
+/* ── Écran client : localStorage + serveur local ── */
+function setClientDisplay(payload) {
+  const json = JSON.stringify(payload);
+  localStorage.setItem('clientDisplayData', json);
+  // Envoi silencieux au serveur (ne bloque pas si hors ligne)
+  fetch('http://localhost:8000/api/client-display', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    credentials: 'include',
+    body: json
+  }).catch(() => {}); // silencieux si serveur absent
+}
+
+
+function buildSepaString(montant, comm){
+  const companySettings = JSON.parse(localStorage.getItem("companySettings")||'{}');
+  const iban = companySettings.bankIban || "";
+  const bic = companySettings.bankBic || "";
+  const nom = companySettings.companyName || "";
+  return ["BCD","002","1","SCT",bic,nom,iban,"EUR"+(montant).toFixed(2),"","","",comm,""].join("\n");
+}
+
+function updateClientDisplay() {
+  // determine communication text from select(s) if present
+  let comm = "Conso+Dons";
+  const sel = document.querySelector('#typePaiementBanque, #typePaiementMixte, select[name*="typePaiement"]');
+  if(sel && sel.selectedIndex>=0){
+    // prefer the option text so it's human readable
+    comm = sel.options[sel.selectedIndex].textContent.trim() || sel.value || comm;
+  }
+
+  let qrText = null;
+  if(modePaiement === 'banque'){
+    qrText = buildSepaString(total, comm);
+  } else if(modePaiement === 'mixte'){
+    const reste = total - (montantMixte / 100);
+    qrText = buildSepaString(reste, comm);
+  }
+
+  majEcranClient({ qrText });
+}
+
+/* --- Hooker les fonctions connues (safe wrapping) --- */
+function safeWrap(name, after){
+  try{
+    const orig = window[name];
+    if(typeof orig === 'function'){
+      window[name] = function(...args){
+        const res = orig.apply(this, args);
+        try{ after(); }catch(e){ console.warn('after hook err', e); }
+        return res;
+      };
+    }
+  }catch(e){ console.warn('safeWrap', name, e); }
+}
+
+// wrap known functions (if elles existent)
+['ouvrirModalePaiement','ajouterChiffre','effacerMontant','ajouterChiffreMixte','effacerMontantMixte','fermerModal'].forEach(fn => safeWrap(fn, updateClientDisplay));
+
+/* --- Gestion de la finalisation : envoi success puis reset --- */
+// Essayer de wrapper les fonctions de finalisation connues
+const finalizers = ['finaliserPaiementConfirme','validerModeEspeces','validerModeBanque','validerModeMixte','validerPaiement','finaliserPaiement'];
+finalizers.forEach(fn => {
+  try{
+    if(typeof window[fn] === 'function'){
+      const orig = window[fn];
+      window[fn] = function(...a){
+        const r = orig.apply(this,a);
+        try{
+          // envoyer signal paymentSuccess tout de suite (avec ticket en cours)
+          majEcranClient({ qrText: null, paymentSuccess: true });
+          // après 1.9s on reset l'écran client
+          setTimeout(()=> {
+            setClientDisplay({
+              ts: Date.now(),
+              mode: null,
+              total: 0,
+              articles: [],
+              clientName: "Prochain client",
+              ticketLabel: "En attente...",
+              qrText: null,
+              paymentSuccess: false
+            });
+          }, 1900);
+        }catch(e){ console.warn('finalizer hook err', e); }
+        return r;
+      };
+    }
+  }catch(e){ console.warn('wrap finalizer',fn,e); }
+});
+
+/* --- aussi écouter changements directs de selects/inputs pour être réactif --- */
+document.addEventListener('change', e => {
+  // si select de type paiement changé => maj QR
+  if(e.target && (e.target.id === 'typePaiementBanque' || e.target.id === 'typePaiementMixte' || (e.target.tagName==='SELECT' && /typePaiement/i.test(e.target.name||e.target.id||'')))){
+    updateClientDisplay();
+  } else {
+    // général : on renvoie l'état (utile si montant changé)
+    majEcranClient({});
+  }
+});
+document.addEventListener('input', e => {
+  // input de montant ou autre -> update
+  majEcranClient({});
+});
+
+/* --- initial update on load --- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  try{
+    afficherApercuTicket && afficherApercuTicket();
+  }catch(e){}
+  updateClientDisplay();
+});
+</script>
+<!-- === SCRIPT DE SYNCHRONISATION ÉCRAN CLIENT AMÉLIORÉ === -->
+<script>
+// === FORCER LA MISE À JOUR DE L'ÉCRAN CLIENT ===
+function forceClientUpdate() {
+    try {
+        // Construire les données à afficher sur l'écran client
+        const montantRecuEuro = (montantRecu || 0) / 100;
+        const montantMixteEuro = (montantMixte || 0) / 100;
+        const resteBanque = total - montantMixteEuro;
+
+        // Déterminer le mode de paiement actuel
+        let mode = modePaiement;
+        let rendu = 0;
+        let especes = 0;
+        let banque = 0;
+        let qrText = null;
+
+        if (mode === 'especes') {
+            rendu = montantRecuEuro - total;
+            especes = montantRecuEuro;
+        } else if (mode === 'mixte') {
+            especes = montantMixteEuro;
+            banque = resteBanque;
+            if (resteBanque > 0.01) { // Seuil pour éviter les erreurs d'arrondi
+                // Générer le QR pour le reste
+                const typePaiement = document.getElementById("typePaiementMixte")?.value || "conso+dons";
+                qrText = genererTexteQR(resteBanque, typePaiement);
+            }
+        } else if (mode === 'banque') {
+            banque = total;
+            const typePaiement = document.getElementById("typePaiementBanque")?.value || "conso+dons";
+            qrText = genererTexteQR(total, typePaiement);
+        }
+
+        // Construire le payload complet
+        const payload = {
+            ts: Date.now(),
+            ticketLabel: currentTicket ? `Ticket #${currentTicket.id}` : 'Ticket en cours',
+            clientName: currentTicket?.membrePrenom ?
+                `${currentTicket.membrePrenom} ${currentTicket.membreNom}` : 'Client',
+            total: total || 0,
+            articles: currentTicket?.articles || [],
+            mode: mode,
+            rendu: rendu > 0 ? rendu : 0,
+            especes: especes,
+            banque: banque,
+            qrText: qrText,
+            paymentSuccess: false
+        };
+
+        // Sauvegarder dans localStorage
+        setClientDisplay(payload);
+
+        // DÉCLENCHER MANUELLEMENT L'ÉVÉNEMENT storage
+        const event = new StorageEvent('storage', {
+            key: 'clientDisplayData',
+            newValue: JSON.stringify(payload),
+            oldValue: localStorage.getItem('clientDisplayData'),
+            storageArea: localStorage,
+            url: window.location.href
+        });
+        window.dispatchEvent(event);
+
+        console.log('🔄 Écran client mis à jour - mode:', mode);
+    } catch (err) {
+        console.error('Erreur forceClientUpdate:', err);
+    }
+}
+
+// Fonction utilitaire pour générer le texte du QR
+function genererTexteQR(montant, typeComm) {
+    const companySettings = JSON.parse(localStorage.getItem("companySettings") || '{}');
+    const iban = companySettings.bankIban || "";
+    const bic = companySettings.bankBic || "";
+    const nom = companySettings.companyName || "";
+
+    let comm = typeComm;
+    if (typeComm === "conso") comm = "Conso";
+    else if (typeComm === "don") comm = "Don";
+    else comm = "Conso+Dons";
+
+    return ["BCD", "002", "1", "SCT", bic, nom, iban, "EUR" + montant.toFixed(2), "", "", comm, ""].join("\n");
+}
+
+// Hooker toutes les fonctions importantes
+function hookFunction(obj, funcName) {
+    if (typeof obj[funcName] !== 'function') return;
+    const original = obj[funcName];
+    obj[funcName] = function(...args) {
+        const result = original.apply(this, args);
+        setTimeout(() => forceClientUpdate(), 5);
+        return result;
+    };
+}
+
+// Hooker les fonctions clés
+const fonctionsAHooker = [
+    'ajouterChiffre', 'effacerMontant', 'ajouterChiffreMixte', 'effacerMontantMixte',
+    'ouvrirModalePaiement', 'fermerModal', 'updateQRCodeBanque', 'updateQRCodeMixte'
+];
+
+fonctionsAHooker.forEach(fn => hookFunction(window, fn));
+
+// Hooker la fonction de génération de QR
+const originalGenererQR = window.genererQR;
+if (originalGenererQR) {
+    window.genererQR = function(montant, elementId, typeCommunication) {
+        originalGenererQR(montant, elementId, typeCommunication);
+        setTimeout(forceClientUpdate, 10);
+    };
+}
+
+// Surcharger les fonctions de validation pour l'animation de succès
+const fonctionsValidation = [
+    'validerModeEspeces', 'validerModeBanque', 'validerModeMixte'
+];
+
+fonctionsValidation.forEach(fn => {
+    if (typeof window[fn] !== 'function') return;
+    const original = window[fn];
+    window[fn] = function(...args) {
+        // Vérifier d'abord les conditions (copie de la logique originale)
+        if (fn === 'validerModeEspeces') {
+            const montantEuro = montantRecu / 100;
+            if (montantEuro === 0) {
+                montantRecu = Math.round(total * 100);
+            } else if (montantEuro < total) {
+                showMessage("Montant insuffisant", "error");
+                return;
+            }
+        } else if (fn === 'validerModeMixte') {
+            const montantEuro = montantMixte / 100;
+            if (montantEuro === 0) {
+                showMessage("Le montant espèces doit être supérieur à 0", "warning");
+                return;
+            }
+            if (montantEuro >= total) {
+                showMessage("Utilisez le mode Espèces pour un paiement total en espèces", "warning");
+                return;
+            }
+        }
+
+        // Appeler la fonction originale (qui va appeler finaliserPaiement)
+        const result = original.apply(this, args);
+        return result;
+    };
+});
+
+// Hooker finaliserPaiement pour l'animation
+const originalFinaliserPaiement = window.finaliserPaiement;
+if (originalFinaliserPaiement) {
+    window.finaliserPaiement = function(...args) {
+        const result = originalFinaliserPaiement.apply(this, args);
+
+        // Si pas de problème de stock, on va avoir l'animation
+        setTimeout(() => {
+            try {
+                // Vérifier si le stock overlay est visible
+                const stockOverlay = document.getElementById('stockAlertOverlay');
+                if (stockOverlay && stockOverlay.style.display === 'flex') {
+                    return; // Ne pas faire l'animation si l'overlay stock est visible
+                }
+
+                // Envoyer le signal de succès
+                const payload = {
+                    ts: Date.now(),
+                    ticketLabel: currentTicket ? `Ticket #${currentTicket.id}` : 'Ticket validé',
+                    clientName: currentTicket?.membrePrenom ?
+                        `${currentTicket.membrePrenom} ${currentTicket.membreNom}` : 'Client',
+                    total: total || 0,
+                    articles: currentTicket?.articles || [],
+                    mode: modePaiement,
+                    paymentSuccess: true,
+                    qrText: null
+                };
+
+                setClientDisplay(payload);
+                const event = new StorageEvent('storage', {
+                    key: 'clientDisplayData',
+                    newValue: JSON.stringify(payload),
+                    oldValue: localStorage.getItem('clientDisplayData'),
+                    storageArea: localStorage,
+                    url: window.location.href
+                });
+                window.dispatchEvent(event);
+
+                // Reset après 2 secondes
+                setTimeout(() => {
+                    const resetPayload = {
+                        ts: Date.now(),
+                        ticketLabel: 'En attente...',
+                        clientName: 'Prochain client',
+                        total: 0,
+                        articles: [],
+                        mode: null,
+                        paymentSuccess: false,
+                        qrText: null
+                    };
+                    setClientDisplay(resetPayload);
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: 'clientDisplayData',
+                        newValue: JSON.stringify(resetPayload),
+                        oldValue: localStorage.getItem('clientDisplayData'),
+                        storageArea: localStorage,
+                        url: window.location.href
+                    }));
+                }, 2000);
+            } catch (e) {
+                console.error('Erreur animation succès:', e);
+            }
+        }, 10);
+
+        return result;
+    };
+}
+
+// Hooker finaliserPaiementConfirme (appelé après validation stock)
+const originalFinaliserPaiementConfirme = window.finaliserPaiementConfirme;
+if (originalFinaliserPaiementConfirme) {
+    window.finaliserPaiementConfirme = function(...args) {
+        const result = originalFinaliserPaiementConfirme.apply(this, args);
+
+        // Animation de succès (mais la redirection va avoir lieu rapidement)
+        setTimeout(() => {
+            try {
+                const payload = {
+                    ts: Date.now(),
+                    ticketLabel: currentTicket ? `Ticket #${currentTicket.id}` : 'Ticket validé',
+                    clientName: currentTicket?.membrePrenom ?
+                        `${currentTicket.membrePrenom} ${currentTicket.membreNom}` : 'Client',
+                    total: total || 0,
+                    articles: currentTicket?.articles || [],
+                    mode: modePaiement,
+                    paymentSuccess: true,
+                    qrText: null
+                };
+
+                setClientDisplay(payload);
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'clientDisplayData',
+                    newValue: JSON.stringify(payload),
+                    oldValue: localStorage.getItem('clientDisplayData'),
+                    storageArea: localStorage,
+                    url: window.location.href
+                }));
+            } catch (e) {}
+        }, 10);
+
+        return result;
+    };
+}
+
+// Forcer une mise à jour initiale et écouter les changements
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(forceClientUpdate, 500);
+
+    // Écouter les changements de sélection pour les QR
+    document.addEventListener('change', function(e) {
+        if (e.target.id === 'typePaiementBanque' || e.target.id === 'typePaiementMixte' ||
+            (e.target.tagName === 'SELECT' && /typePaiement/i.test(e.target.id))) {
+            setTimeout(forceClientUpdate, 10);
+        }
+    });
+
+    // Écouter les inputs (pour les montants)
+    document.addEventListener('input', function() {
+        setTimeout(forceClientUpdate, 10);
+    });
+});
+
+// Hooker aussi la fonction qui ouvre les modales après sélection client
+const originalOuvrirModalePaiement = window.ouvrirModalePaiement;
+if (originalOuvrirModalePaiement) {
+    window.ouvrirModalePaiement = function(mode) {
+        const result = originalOuvrirModalePaiement(mode);
+        setTimeout(forceClientUpdate, 50);
+        return result;
+    };
+}
+
+// Mise à jour lors de la confirmation/sélection client
+const originalConfirmerSelectionClient = window.confirmerSelectionClient;
+if (originalConfirmerSelectionClient) {
+    window.confirmerSelectionClient = function() {
+        const result = originalConfirmerSelectionClient();
+        setTimeout(forceClientUpdate, 50);
+        return result;
+    };
+}
+
+console.log('✅ Synchronisation écran client améliorée activée');
+</script>
+</body>
+</html>

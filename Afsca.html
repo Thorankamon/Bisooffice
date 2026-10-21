@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Nettoyage</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .export-buttons {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .export-buttons button {
+            margin-left: 10px;
+            background-color: #2196F3;
+        }
+        
+        .export-buttons button:hover {
+            background-color: #0b7dda;
+        }
+        
+        .export-buttons button:last-child {
+            background-color: #FF9800;
+        }
+        
+        .export-buttons button:last-child:hover {
+            background-color: #e68900;
+        }
+        
+        .form-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+            padding: 5px 15px;
+            font-size: 14px;
+        }
+        
+        .delete-btn:hover {
+            background-color: #da190b;
+        }
+        
+        .table-header {
+            margin: 30px 0 20px 0;
+        }
+        
+        .table-header input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            text-align: center;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+        }
+        
+        .table-wrapper {
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            white-space: nowrap;
+            font-size: 11px;
+        }
+        
+        .task-col {
+            text-align: left;
+            font-weight: bold;
+            background-color: #f0f0f0;
+            width: 15%;
+        }
+        
+        .frequency-col {
+            background-color: #f9f9f9;
+            font-size: 11px;
+            width: 12%;
+        }
+        
+        .day-col {
+            width: 2%;
+        }
+        
+        .checkbox-cell input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .action-col {
+            width: 8%;
+        }
+        
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-style: italic;
+        }
+        
+        @media print {
+            .form-section, .export-buttons {
+                display: none !important;
+            }
+            
+            .delete-btn {
+                display: none !important;
+            }
+            
+            .action-col {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+     <button onclick="location.href='index.html'">⬅ Retour</button>
+        <h1>🧹 Plan de Nettoyage</h1>
+        
+        <div class="export-buttons">
+            <button onclick="exportToPDF()">📄 Exporter en PDF</button>
+            <button onclick="exportToPNG()">🖼️ Exporter en PNG</button>
+        </div>
+        
+        <div class="form-section">
+            <h2>➕ Ajouter une tâche</h2>
+            <div class="form-group">
+                <label for="taskName">Nom de la tâche :</label>
+                <input type="text" id="taskName" placeholder="Ex: Nettoyer le four">
+            </div>
+            <div class="form-group">
+                <label for="frequency">Fréquence :</label>
+                <select id="frequency">
+                    <option value="⏰ Après service">⏰ Après service</option>
+                    <option value="🔄 Pendant service">🔄 Pendant service</option>
+                    <option value="📅 1 fois par semaine">📅 1 fois par semaine</option>
+                    <option value="📆 Toutes les 2 semaines">📆 Toutes les 2 semaines</option>
+                    <option value="📌 1 fois par mois">📌 1 fois par mois</option>
+                </select>
+            </div>
+            <button onclick="addTask()">✅ Ajouter la tâche</button>
+        </div>
+        
+        <div class="table-header">
+            <input type="text" id="tableTitle" placeholder="Titre du tableau (ex: Plan de nettoyage - Janvier 2024)" onchange="saveTableTitle()">
+        </div>
+        
+        <div class="table-wrapper" id="tableWrapper">
+            <p class="no-data">Aucune tâche ajoutée. Utilisez le formulaire ci-dessus pour commencer.</p>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'cleaningSchedulePlan_v2';
+        let tasks = [];
+        let tableTitle = '';
+        let checkboxStates = {};
+
+        function loadData() {
+            const stored = sessionStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                const data = JSON.parse(stored);
+                tasks = data.tasks || [];
+                tableTitle = data.tableTitle || '';
+                checkboxStates = data.checkboxStates || {};
+            }
+            
+            document.getElementById('tableTitle').value = tableTitle;
+            renderTable();
+        }
+
+        function saveData() {
+            const data = {
+                tasks: tasks,
+                tableTitle: tableTitle,
+                checkboxStates: checkboxStates
+            };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function addTask() {
+            const taskName = document.getElementById('taskName').value.trim();
+            const frequency = document.getElementById('frequency').value;
+            
+            if (!taskName) {
+                alert('Veuillez entrer un nom de tâche');
+                return;
+            }
+            
+            const task = {
+                id: Date.now(),
+                name: taskName,
+                frequency: frequency
+            };
+            
+            tasks.push(task);
+            document.getElementById('taskName').value = '';
+            
+            saveData();
+            renderTable();
+        }
+
+        function deleteTask(taskId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+                tasks = tasks.filter(t => t.id !== taskId);
+                
+                for (let key in checkboxStates) {
+                    if (key.startsWith(taskId + '_')) {
+                        delete checkboxStates[key];
+                    }
+                }
+                
+                saveData();
+                renderTable();
+            }
+        }
+
+        function saveTableTitle() {
+            tableTitle = document.getElementById('tableTitle').value;
+            saveData();
+        }
+
+        function toggleCheckbox(taskId, day) {
+            const key = taskId + '_' + day;
+            checkboxStates[key] = !checkboxStates[key];
+            saveData();
+        }
+
+        function renderTable() {
+            const wrapper = document.getElementById('tableWrapper');
+            
+            if (tasks.length === 0) {
+                wrapper.innerHTML = '<p class="no-data">Aucune tâche ajoutée. Utilisez le formulaire ci-dessus pour commencer.</p>';
+                return;
+            }
+            
+            let html = '<table><thead><tr>';
+            html += '<th class="task-col">Tâche</th>';
+            html += '<th class="frequency-col">Fréquence</th>';
+            
+            for (let i = 1; i <= 31; i++) {
+                html += '<th class="day-col">' + i + '</th>';
+            }
+            
+            html += '<th class="action-col">Action</th>';
+            html += '</tr></thead><tbody>';
+            
+            tasks.forEach(task => {
+                html += '<tr>';
+                html += '<td class="task-col">' + task.name + '</td>';
+                html += '<td class="frequency-col">' + task.frequency + '</td>';
+                
+                for (let day = 1; day <= 31; day++) {
+                    const key = task.id + '_' + day;
+                    const checked = checkboxStates[key] ? 'checked' : '';
+                    html += '<td class="checkbox-cell">';
+                    html += '<input type="checkbox" ' + checked + ' onchange="toggleCheckbox(' + task.id + ',' + day + ')">';
+                    html += '</td>';
+                }
+                
+                html += '<td class="action-col">';
+                html += '<button class="delete-btn" onclick="deleteTask(' + task.id + ')">🗑️ Supprimer</button>';
+                html += '</td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            wrapper.innerHTML = html;
+        }
+        
+        async function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            
+            // Masquer temporairement les éléments non nécessaires
+            const hideElements = document.querySelectorAll('.form-section, .export-buttons, .delete-btn, .action-col');
+            hideElements.forEach(el => el.style.display = 'none');
+            
+            try {
+                const canvas = await html2canvas(document.querySelector('.container'), {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const imgWidth = 297; // A4 landscape width
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.save('plan-nettoyage.pdf');
+            } catch (error) {
+                console.error('Erreur lors de l\'export PDF:', error);
+                alert('Erreur lors de l\'export PDF');
+            } finally {
+                // Réafficher les éléments
+                hideElements.forEach(el => el.style.display = '');
+            }
+        }
+        
+        async function exportToPNG() {
+            // Masquer temporairement les éléments non nécessaires
+            const hideElements = document.querySelectorAll('.form-section, .export-buttons, .delete-btn, .action-col');
+            hideElements.forEach(el => el.style.display = 'none');
+            
+            try {
+                const canvas = await html2canvas(document.querySelector('.container'), {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+                
+                // Créer un lien de téléchargement
+                const link = document.createElement('a');
+                link.download = 'plan-nettoyage.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error('Erreur lors de l\'export PNG:', error);
+                alert('Erreur lors de l\'export PNG');
+            } finally {
+                // Réafficher les éléments
+                hideElements.forEach(el => el.style.display = '');
+            }
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>

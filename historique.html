@@ -1,0 +1,2382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Historique Tickets</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#7c3aed; --purple-pale:#f5f3ff;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --cyan:#0891b2; --cyan-pale:#ecfeff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --glass:rgba(255,255,255,0.82);
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      font-size:14px;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      padding:24px;
+      color:var(--text);
+    }
+    body::before {
+      content:''; position:fixed; top:-150px; left:-150px;
+      width:550px; height:550px;
+      background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+    body::after {
+      content:''; position:fixed; bottom:-100px; right:5%;
+      width:450px; height:450px;
+      background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+
+    /* ── Bouton retour ── */
+    .back-btn {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(200,228,252,.85));
+      border:1px solid rgba(255,255,255,.9);
+      color:var(--blue2);
+      padding:9px 20px;
+      border-radius:50px;
+      cursor:pointer;
+      font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:.9rem;
+      margin-bottom:20px;
+      display:inline-flex; align-items:center; gap:8px;
+      transition:all .2s;
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .back-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .back-btn:hover { background:linear-gradient(180deg,#fff,#d0e8ff); transform:translateX(-3px); box-shadow:0 4px 14px var(--shadow); }
+
+    /* ── En-tête entreprise ── */
+    .company-header {
+      background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(180,220,250,.88),rgba(120,185,240,.92));
+      border:1px solid rgba(255,255,255,.95);
+      color:var(--blue3);
+      padding:20px 28px;
+      border-radius:var(--radius-xl);
+      margin-bottom:20px;
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .company-header::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .company-header strong { font-size:1.3em; font-weight:900; display:block; margin-bottom:6px; }
+
+    /* ── Titre ── */
+    h1 {
+      margin-bottom:20px; color:var(--blue3);
+      text-align:center; font-size:2rem; font-weight:900;
+      font-family:'Nunito',sans-serif; letter-spacing:-.5px;
+      position:relative; z-index:1;
+    }
+
+    /* ── Filtres ── */
+    .filters {
+      margin-bottom:22px; padding:18px 22px;
+      background:var(--glass); backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-xl);
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .filters::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:40%;
+      background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .filters label { font-weight:800; color:var(--text2); font-size:.88rem; text-transform:uppercase; letter-spacing:.04em; }
+    .filters input {
+      padding:9px 12px; border:1px solid var(--border);
+      border-radius:var(--radius); font-size:.9rem; font-family:'Nunito',sans-serif; font-weight:600;
+      background:rgba(255,255,255,.85); color:var(--text); transition:all .2s;
+      box-shadow:0 1px 4px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    }
+    .filters input:focus { border-color:var(--blue-light); outline:none; box-shadow:0 0 0 3px rgba(42,127,212,.15); }
+    .filters select {
+      padding:9px 12px; border:1px solid var(--border);
+      border-radius:var(--radius); font-size:.9rem; font-family:'Nunito',sans-serif; font-weight:600;
+      background:rgba(255,255,255,.85); color:var(--text); transition:all .2s;
+      box-shadow:0 1px 4px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      cursor:pointer;
+    }
+    .filters select:focus { border-color:var(--blue-light); outline:none; box-shadow:0 0 0 3px rgba(42,127,212,.15); }
+
+    /* ── Boutons filtres Vista ── */
+    .filters button {
+      padding:9px 18px; border:none; border-radius:var(--radius);
+      cursor:pointer; font-weight:800; font-size:.88rem; font-family:'Nunito',sans-serif;
+      transition:all .2s; position:relative; overflow:hidden;
+    }
+    .filters button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.35); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .filters button:nth-child(3) {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      color:var(--text2); border:1px solid var(--border);
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    }
+    .filters button:nth-child(3):hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); }
+    .filters button:hover { transform:translateY(-2px); }
+
+    .trash-btn {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85)) !important;
+      color:var(--text2) !important; border:1px solid var(--border) !important;
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      display:flex; align-items:center; gap:8px;
+    }
+    .trash-btn:hover { background:linear-gradient(180deg,#fff,#d0e4f8) !important; color:var(--blue3) !important; }
+
+    .refund-zone-btn {
+      background:linear-gradient(180deg,#ffc870,var(--orange),#b86200) !important;
+      color:white !important; border:1px solid #a05800 !important;
+      box-shadow:0 2px 8px rgba(200,120,0,.3),0 1px 0 rgba(255,255,255,.4) inset;
+      display:flex; align-items:center; gap:8px;
+    }
+    .refund-zone-btn:hover { background:linear-gradient(180deg,#ffd080,#e8962a,#c87000) !important; }
+
+    .zlist-btn {
+      background:linear-gradient(180deg,#7ce0f0,var(--cyan),#066a80) !important;
+      color:white !important; border:1px solid #055666 !important;
+      box-shadow:0 2px 8px rgba(8,145,178,.3),0 1px 0 rgba(255,255,255,.4) inset;
+      display:flex; align-items:center; gap:8px;
+    }
+    .zlist-btn:hover { background:linear-gradient(180deg,#9ce8f8,#18a8c8,#0a7a90) !important; }
+
+    /* ── Liste des clôtures Z (modal) ── */
+    .z-list-row {
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;
+      padding:13px 16px; margin-bottom:9px;
+      background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(215,238,255,.7));
+      border:1px solid var(--border2); border-radius:var(--radius-lg);
+      cursor:pointer; transition:all .2s;
+    }
+    .z-list-row:hover { background:linear-gradient(145deg,#fff,#d0ecff); transform:translateX(3px); box-shadow:0 3px 12px var(--shadow2); }
+    .z-list-title { color:var(--blue3); font-weight:900; }
+    .z-list-meta { color:var(--text2); font-size:.88em; font-weight:700; }
+
+    .z-detail-toolbar {
+      display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;
+      margin:14px 0; padding:12px 16px;
+      background:rgba(230,245,255,.6); border-radius:var(--radius-lg); border:1px solid var(--border2);
+    }
+    .z-detail-toolbar label { font-weight:800; color:var(--text2); font-size:.85rem; display:flex; align-items:center; gap:6px; }
+    .z-select-all-label { display:flex; align-items:center; gap:6px; font-weight:800; color:var(--blue3); cursor:pointer; }
+    .z-detail-toolbar select {
+      padding:7px 10px; border:1px solid var(--border); border-radius:var(--radius);
+      font-family:'Nunito',sans-serif; font-weight:600; background:rgba(255,255,255,.9); cursor:pointer;
+    }
+
+    .z-ticket-row {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; margin-bottom:6px;
+      background:rgba(255,255,255,.75); border:1px solid var(--border2);
+      border-radius:var(--radius); transition:all .15s;
+    }
+    .z-ticket-row:hover { background:rgba(220,240,255,.75); }
+    .z-ticket-check input { width:18px; height:18px; cursor:pointer; accent-color:var(--blue); }
+    .z-ticket-info { flex:1; cursor:pointer; font-size:.9em; color:var(--text2); }
+    .z-ticket-info strong { color:var(--blue3); }
+    .z-ticket-mode { color:var(--text3); font-style:italic; }
+
+    .z-selection-bar {
+      display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;
+      margin-top:14px; padding:12px 16px;
+      background:rgba(255,240,225,.75); border:1px solid #f0d0a0; border-radius:var(--radius-lg);
+      font-weight:800; color:#a05800;
+    }
+    #zBulkDeleteBtn:disabled { opacity:.4; cursor:not-allowed; transform:none !important; }
+
+    /* ── Grille tickets ── */
+    .tickets-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:18px; margin-bottom:28px; position:relative; z-index:1;
+    }
+
+    .ticket-card {
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-xl);
+      padding:18px 20px;
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      backdrop-filter:blur(10px);
+      box-shadow:0 4px 16px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      cursor:pointer; transition:all .3s ease;
+      position:relative; overflow:hidden;
+    }
+    .ticket-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:5px;
+      background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));
+    }
+    .ticket-card::after {
+      content:''; position:absolute; top:5px; left:0; right:0; height:38%;
+      background:rgba(255,255,255,.42); border-radius:0 0 60% 60%;
+      pointer-events:none;
+    }
+    .ticket-card:hover { transform:translateY(-5px); box-shadow:0 12px 32px var(--shadow); }
+    .ticket-card h3 { margin:0 0 10px 0; color:var(--blue3); font-size:1.3em; font-weight:900; }
+
+    /* ── Bandeau de regroupement par clôture Z ── */
+    .z-group-header {
+      grid-column: 1 / -1;
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+      background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(180,220,250,.82));
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-lg);
+      padding:11px 20px;
+      margin:8px 0 -4px 0;
+      box-shadow:0 3px 12px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; z-index:1;
+    }
+    .z-group-header.non-cloture {
+      background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(255,240,180,.75));
+    }
+    .z-group-title { font-weight:900; color:var(--blue3); font-size:1.05rem; }
+    .z-group-meta { font-weight:700; color:var(--text2); font-size:.85rem; }
+    .ticket-card p { margin:5px 0; font-size:.9em; color:var(--text2); font-weight:600; }
+    .ticket-card p b { color:var(--blue2); }
+
+    /* ── Popups / Modales ── */
+    .popup-overlay {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(10,40,90,.45); display:none;
+      justify-content:center; align-items:center; z-index:1000;
+      backdrop-filter:blur(8px);
+    }
+    .popup {
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+      border:1px solid rgba(255,255,255,.95);
+      padding:28px; border-radius:var(--radius-xl);
+      width:450px; max-height:85%; overflow-y:auto;
+      box-shadow:0 20px 60px rgba(20,60,180,.25),0 1px 0 rgba(255,255,255,.9) inset;
+      animation:popupFadeIn .3s ease-out;
+      position:relative;
+    }
+    .popup::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:25%;
+      background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    @keyframes popupFadeIn { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:scale(1)} }
+
+    .popup h2 {
+      margin-top:0; color:var(--blue3); font-weight:900; font-size:1.25rem;
+      border-bottom:3px solid var(--blue-light); padding-bottom:10px;
+      font-family:'Nunito',sans-serif;
+    }
+    .popup table { width:100%; border-collapse:collapse; margin-top:14px; border-radius:var(--radius); overflow:hidden; }
+    .popup thead { background:linear-gradient(180deg,#4a9fd8,#2a7fd4,#1a5fb0); color:white; }
+    .popup th,.popup td { border-bottom:1px solid var(--border2); padding:10px 8px; font-size:.9em; text-align:left; }
+    .popup th { font-weight:800; }
+    .popup tr:hover { background:rgba(220,240,255,.5); }
+
+    .popup-buttons {
+      text-align:right; margin-top:22px;
+      display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end;
+    }
+    .popup-buttons button {
+      padding:8px 14px; border:none; border-radius:var(--radius);
+      cursor:pointer; font-weight:800; font-size:.82rem; font-family:'Nunito',sans-serif;
+      transition:all .2s; display:flex; align-items:center; gap:5px; white-space:nowrap;
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white;
+      border:1px solid #1050a0;
+      box-shadow:0 2px 8px rgba(30,80,180,.25),0 1px 0 rgba(255,255,255,.4) inset;
+      position:relative; overflow:hidden;
+    }
+    .popup-buttons button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .popup-buttons button:hover { background:linear-gradient(180deg,#90d4ff,#3a90e4,#1a6cc0); transform:translateY(-2px); box-shadow:0 4px 14px rgba(30,80,180,.4); }
+
+    .popup-buttons button.delete-btn {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      border-color:#882020;
+      box-shadow:0 2px 8px rgba(180,40,30,.3),0 1px 0 rgba(255,255,255,.4) inset;
+    }
+    .popup-buttons button.delete-btn:hover { background:linear-gradient(180deg,#f89898,#d44040,#a03030); }
+
+    .refund-btn-popup {
+      background:linear-gradient(180deg,#ffc870,var(--orange),#b86200) !important;
+      border:1px solid #a05800 !important;
+      box-shadow:0 2px 8px rgba(200,120,0,.3),0 1px 0 rgba(255,255,255,.4) inset !important;
+    }
+    .refund-btn-popup:hover { background:linear-gradient(180deg,#ffd080,#e8962a,#c87000) !important; }
+
+    .edit-input {
+      width:100%; padding:6px 8px; border:1px solid var(--border);
+      border-radius:var(--radius); font-family:'Nunito',sans-serif; font-weight:600;
+      background:rgba(255,255,255,.85); box-sizing:border-box;
+    }
+
+    /* ── Bloc Pointages (qui a pointé quoi) ── */
+    .pointages-block {
+      margin-top:16px; padding:14px 16px;
+      background:var(--green-pale); border:1px solid #cbe8b0;
+      border-radius:var(--radius-lg);
+    }
+    .pointages-block .pointages-title {
+      font-weight:900; color:var(--green2); font-size:.92em;
+      margin-bottom:8px; display:flex; align-items:center; gap:6px;
+    }
+    .pointages-block .pointage-line {
+      font-size:.86em; color:var(--text2); font-weight:600;
+      padding:4px 0; border-bottom:1px dashed #cbe8b0;
+    }
+    .pointages-block .pointage-line:last-child { border-bottom:none; }
+    .pointages-block .pointage-line strong { color:var(--green2); }
+
+    /* ── Messages statut ── */
+    .status-message {
+      position:fixed; top:20px; right:20px;
+      padding:13px 22px; border-radius:var(--radius-lg);
+      font-weight:800; font-family:'Nunito',sans-serif;
+      z-index:9999; animation:slideIn .3s ease-out;
+      box-shadow:0 6px 24px var(--shadow),0 1px 0 rgba(255,255,255,.9) inset;
+      display:flex; align-items:center; gap:10px;
+      border:1px solid rgba(255,255,255,.85);
+      position:relative; overflow:hidden;
+    }
+    .status-message::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:45%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 60% 60%;
+      pointer-events:none;
+    }
+    .status-success { background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(210,245,185,.9)); color:var(--green2); border-left:4px solid var(--green); }
+    .status-error   { background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,220,220,.9)); color:var(--red);   border-left:4px solid var(--red); }
+    @keyframes slideIn { from{transform:translateX(400px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+    /* ── Pagination ── */
+    .pagination {
+      margin-top:28px; text-align:center;
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(210,235,255,.78));
+      border:1px solid rgba(255,255,255,.95);
+      padding:16px 20px; border-radius:var(--radius-xl);
+      box-shadow:0 2px 12px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .pagination::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:45%;
+      background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .pagination button {
+      padding:9px 16px; margin:0 4px;
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white;
+      border:1px solid #1050a0; border-radius:var(--radius);
+      cursor:pointer; font-size:.88rem; font-weight:800; font-family:'Nunito',sans-serif;
+      transition:all .2s;
+      box-shadow:0 2px 8px rgba(30,80,180,.25),0 1px 0 rgba(255,255,255,.4) inset;
+      position:relative; overflow:hidden;
+    }
+    .pagination button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .pagination button:hover:not(:disabled) { background:linear-gradient(180deg,#90d4ff,#3a90e4,#1a6cc0); transform:translateY(-2px); box-shadow:0 4px 12px rgba(30,80,180,.4); }
+    .pagination button:disabled { opacity:.45; cursor:not-allowed; background:linear-gradient(180deg,#c0d8f0,#8ab0d0,#6090b0); }
+
+    #pageInfo {
+      margin:0 16px; font-weight:800; display:inline-block;
+      color:var(--blue2); font-size:.95em;
+      padding:7px 14px; background:rgba(255,255,255,.85);
+      border-radius:var(--radius); border:1px solid var(--border);
+      font-family:'Nunito',sans-serif;
+    }
+
+    /* ── Dialog confirmation ── */
+    .confirm-overlay {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(10,40,90,.5); display:none;
+      justify-content:center; align-items:center; z-index:2000;
+      backdrop-filter:blur(8px);
+    }
+    .confirm-dialog {
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(255,225,225,.92));
+      border:1px solid rgba(255,255,255,.95);
+      padding:28px; border-radius:var(--radius-xl); width:420px;
+      box-shadow:0 20px 60px rgba(180,30,20,.2),0 1px 0 rgba(255,255,255,.9) inset;
+      animation:popupFadeIn .3s ease-out; position:relative;
+    }
+    .confirm-dialog::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:25%;
+      background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .confirm-dialog h3 {
+      margin-top:0; color:var(--red); font-weight:900; font-family:'Nunito',sans-serif;
+      border-bottom:2px solid var(--red-pale); padding-bottom:10px;
+    }
+    .confirm-dialog p { color:var(--text2); font-weight:600; line-height:1.6; margin:8px 0; }
+
+    .confirm-buttons { margin-top:22px; text-align:right; display:flex; gap:10px; justify-content:flex-end; }
+    .confirm-buttons button {
+      padding:10px 20px; border:none; border-radius:var(--radius);
+      cursor:pointer; font-size:.88rem; font-weight:800; font-family:'Nunito',sans-serif;
+      transition:all .2s; position:relative; overflow:hidden;
+    }
+    .confirm-buttons button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.35); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .confirm-buttons .btn-cancel {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      color:var(--text2); border:1px solid var(--border);
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    }
+    .confirm-buttons .btn-cancel:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); }
+    .confirm-buttons .btn-confirm {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      color:white; border:1px solid #882020;
+      box-shadow:0 2px 8px rgba(180,40,30,.3),0 1px 0 rgba(255,255,255,.4) inset;
+    }
+    .confirm-buttons .btn-confirm:hover { background:linear-gradient(180deg,#f89898,#d44040,#a03030); transform:translateY(-2px); }
+
+    /* ── Trash cards ── */
+    .trash-card {
+      border:1px solid rgba(255,255,255,.95); padding:18px;
+      margin-bottom:12px; border-radius:var(--radius-lg);
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      box-shadow:0 2px 10px var(--shadow2); transition:all .2s;
+    }
+    .trash-card:hover { box-shadow:0 6px 20px var(--shadow); }
+    .trash-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; }
+    .trash-card button {
+      padding:8px 14px; border:none; border-radius:var(--radius);
+      cursor:pointer; margin-left:6px; font-weight:800; font-size:.82rem; font-family:'Nunito',sans-serif;
+      transition:all .2s; display:flex; align-items:center; gap:6px;
+      position:relative; overflow:hidden;
+    }
+    .trash-card button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.35); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .trash-card button:hover { transform:translateY(-2px); }
+
+    .restore-btn {
+      background:linear-gradient(180deg,#a4e474,#5aad2e,#3d8a18); color:white;
+      border:1px solid #3a8018; box-shadow:0 2px 8px rgba(60,140,20,.25),0 1px 0 rgba(255,255,255,.4) inset;
+    }
+    .restore-btn:hover { background:linear-gradient(180deg,#b8f084,#6ac03a,#4a9a20); }
+
+    .permanent-delete-btn {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white;
+      border:1px solid #882020; box-shadow:0 2px 8px rgba(180,40,30,.3),0 1px 0 rgba(255,255,255,.4) inset;
+    }
+    .permanent-delete-btn:hover { background:linear-gradient(180deg,#f89898,#d44040,#a03030); }
+
+    /* ── Refund cards ── */
+    .refund-card {
+      border:none; padding:18px; margin-bottom:12px;
+      border-radius:var(--radius-lg);
+      background:linear-gradient(145deg,rgba(255,248,240,.92),rgba(255,235,200,.78));
+      border-left:4px solid var(--orange);
+      box-shadow:0 2px 10px rgba(200,120,0,.15); transition:all .2s;
+    }
+    .refund-card:hover { box-shadow:0 6px 20px rgba(200,120,0,.25); }
+    .refund-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; }
+
+    .cancel-refund-btn {
+      background:linear-gradient(180deg,#a4e474,#5aad2e,#3d8a18); color:white;
+      padding:8px 14px; border:1px solid #3a8018; border-radius:var(--radius);
+      cursor:pointer; font-weight:800; font-size:.82rem; font-family:'Nunito',sans-serif;
+      transition:all .2s; display:flex; align-items:center; gap:6px;
+      box-shadow:0 2px 8px rgba(60,140,20,.25),0 1px 0 rgba(255,255,255,.4) inset;
+      position:relative; overflow:hidden;
+    }
+    .cancel-refund-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.35); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .cancel-refund-btn:hover { background:linear-gradient(180deg,#b8f084,#6ac03a,#4a9a20); transform:translateY(-2px); }
+
+    /* ── Export/Import ── */
+    .export-import {
+      margin-top:28px; padding:18px 22px;
+      background:var(--glass); backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-xl); text-align:center;
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .export-import::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:45%;
+      background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .export-import button {
+      padding:11px 22px; margin:0 8px;
+      background:linear-gradient(180deg,#c9a0f8,#7c3aed,#5c22cd); color:white;
+      border:1px solid #5020b8; border-radius:var(--radius);
+      cursor:pointer; font-weight:800; font-size:.9rem; font-family:'Nunito',sans-serif;
+      transition:all .2s; display:inline-flex; align-items:center; gap:8px;
+      box-shadow:0 2px 8px rgba(124,58,237,.3),0 1px 0 rgba(255,255,255,.4) inset;
+      position:relative; overflow:hidden;
+    }
+    .export-import button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .export-import button:hover { background:linear-gradient(180deg,#dab8ff,#9050f8,#6c30e0); transform:translateY(-2px); box-shadow:0 4px 14px rgba(124,58,237,.45); }
+
+    /* ── Modale mot de passe superuser ── */
+    .superuser-overlay {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(10,30,80,.55); display:none;
+      justify-content:center; align-items:center; z-index:3000;
+      backdrop-filter:blur(10px);
+    }
+    .superuser-dialog {
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,230,255,.95));
+      border:1px solid rgba(255,255,255,.95);
+      padding:32px 36px; border-radius:var(--radius-xl); width:380px;
+      box-shadow:0 24px 64px rgba(20,60,180,.3),0 1px 0 rgba(255,255,255,.9) inset;
+      animation:popupFadeIn .25s ease-out; position:relative;
+    }
+    .superuser-dialog::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:25%;
+      background:rgba(255,255,255,.5); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .superuser-dialog h3 {
+      margin-top:0; color:var(--blue3); font-weight:900; font-family:'Nunito',sans-serif;
+      font-size:1.15rem; text-align:center; margin-bottom:6px;
+    }
+    .superuser-dialog .su-icon {
+      font-size:2.5rem; text-align:center; display:block; margin-bottom:12px;
+    }
+    .superuser-dialog p {
+      color:var(--text2); font-weight:600; text-align:center;
+      font-size:.9rem; margin-bottom:18px; line-height:1.5;
+    }
+    .superuser-dialog input[type="password"] {
+      width:100%; padding:12px 16px; border:1px solid var(--border);
+      border-radius:var(--radius); font-family:'Nunito',sans-serif;
+      font-size:1.1rem; font-weight:700; text-align:center; letter-spacing:.25em;
+      background:rgba(255,255,255,.9); color:var(--text);
+      box-shadow:0 1px 4px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      transition:all .2s; margin-bottom:8px;
+    }
+    .superuser-dialog input[type="password"]:focus {
+      border-color:var(--blue-light); outline:none;
+      box-shadow:0 0 0 3px rgba(42,127,212,.15);
+    }
+    .superuser-error {
+      color:var(--red); font-size:.82rem; font-weight:800;
+      text-align:center; min-height:18px; margin-bottom:14px;
+    }
+    .superuser-btns { display:flex; gap:10px; justify-content:center; }
+    .su-btn-confirm {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white;
+      border:1px solid #882020; padding:10px 24px; border-radius:var(--radius);
+      font-family:'Nunito',sans-serif; font-weight:800; font-size:.9rem;
+      cursor:pointer; transition:all .2s; flex:1;
+      box-shadow:0 2px 8px rgba(180,40,30,.3),0 1px 0 rgba(255,255,255,.4) inset;
+      position:relative; overflow:hidden;
+    }
+    .su-btn-confirm::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .su-btn-confirm:hover { background:linear-gradient(180deg,#f89898,#d44040,#a03030); transform:translateY(-2px); }
+    .su-btn-cancel {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      color:var(--text2); border:1px solid var(--border); padding:10px 20px;
+      border-radius:var(--radius); font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:.9rem; cursor:pointer; transition:all .2s;
+      box-shadow:0 2px 6px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden;
+    }
+    .su-btn-cancel::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .su-btn-cancel:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); }
+
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:rgba(200,220,240,.3); }
+    ::-webkit-scrollbar-thumb { background:var(--blue-light); border-radius:3px; }
+
+    @media(max-width:768px) {
+      body { padding:12px; }
+      .tickets-grid { grid-template-columns:1fr; }
+      .filters { flex-direction:column; align-items:stretch; }
+      .popup { width:95vw !important; }
+      .confirm-dialog { width:90vw; }
+      .superuser-dialog { width:90vw; }
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.history.back()">← Retour</button>
+
+  <div id="companyHeader" class="company-header"></div>
+  
+  <h1>Historique des Tickets</h1>
+
+  <div class="filters">
+    <label>Date : <input type="date" id="filterDate"></label>
+    <label>Mois : <input type="month" id="filterMonth"></label>
+    <label>Paiement :
+      <select id="filterPaiement" onchange="currentPage=1; renderTickets();">
+        <option value="">Tous</option>
+        <option value="banque">🏦 Banque</option>
+        <option value="especes">💵 Espèces</option>
+        <option value="mixte">🔀 Mixte</option>
+      </select>
+    </label>
+    <label>Clôture :
+      <select id="filterZ" onchange="currentPage=1; renderTickets();">
+        <option value="">Toutes les clôtures</option>
+        <option value="non-cloture">🕐 Non clôturé</option>
+      </select>
+    </label>
+    <button onclick="resetFilter()">Réinitialiser</button>
+    <button class="trash-btn" onclick="openTrashModal()">
+      🗑️ Corbeille (<span id="trashCount">0</span>)
+    </button>
+    <button class="refund-zone-btn" onclick="openRefundModal()">
+      💰 Remboursements (<span id="refundCount">0</span>)
+    </button>
+    <button class="zlist-btn" onclick="openZListModal()">
+      ➕ Liste des Z
+    </button>
+  </div>
+
+  <div class="tickets-grid" id="ticketsGrid"></div>
+
+  <div class="pagination" id="pagination">
+    <button onclick="goToFirstPage()" id="firstBtn">«« Début</button>
+    <button onclick="changePage(-1)" id="prevBtn">« Précédent</button>
+    <span id="pageInfo"></span>
+    <button onclick="changePage(1)" id="nextBtn">Suivant »</button>
+    <button onclick="goToLastPage()" id="lastBtn">Fin »»</button>
+  </div>
+
+  <div class="popup-overlay" id="popup">
+    <div class="popup" id="popupContent">
+      <h2 id="popupTitle"></h2>
+      <p id="popupInfo"></p>
+      <table>
+        <thead>
+          <tr><th>Article</th><th>Qté</th><th>Prix</th><th>Total</th></tr>
+        </thead>
+        <tbody id="popupArticles"></tbody>
+      </table>
+      <p id="popupTotal" style="font-weight:bold; text-align:right;"></p>
+      <p id="popupPaiement"></p>
+      <div id="popupPointages"></div>
+      <div class="popup-buttons">
+        <button onclick="enableEditMode()">🖊 Modifier</button>
+        <button onclick="printThermalTicket(selectedTicket)">🖨 Thermique</button>
+        <button class="refund-btn-popup" onclick="confirmRefundTicket()">💰 Rembourser</button>
+        <button class="delete-btn" onclick="confirmDeleteTicket()">🗑 Supprimer</button>
+        <button onclick="closePopup()">✖ Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="confirm-overlay" id="confirmDialog">
+    <div class="confirm-dialog">
+      <h3>⚠ Confirmation de suppression</h3>
+      <p>Êtes-vous sûr de vouloir supprimer ce ticket ?</p>
+      <p><strong id="confirmTicketInfo"></strong></p>
+      <p style="color: #e74c3c; font-size: 0.9em;">Le ticket sera déplacé dans la corbeille.</p>
+      <div class="confirm-buttons">
+        <button class="btn-cancel" onclick="cancelDelete()">Annuler</button>
+        <button class="btn-confirm" onclick="deleteTicket()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="trashModal">
+    <div class="popup" style="width: 600px; max-height: 90%;">
+      <h2>🗑️ Corbeille - Tickets Supprimés</h2>
+      <div style="margin-bottom: 15px;">
+        <button onclick="clearAllTrash()" style="background:linear-gradient(135deg, #e74c3c, #c0392b); color:white; padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:600;">
+          🗑️ Vider la corbeille
+        </button>
+      </div>
+      <div id="trashGrid" style="max-height: 400px; overflow-y: auto;"></div>
+      <div class="pagination" id="trashPagination" style="margin-top: 15px;">
+        <button onclick="changeTrashPage(-1)" id="trashPrevBtn">« Précédent</button>
+        <span id="trashPageInfo"></span>
+        <button onclick="changeTrashPage(1)" id="trashNextBtn">Suivant »</button>
+      </div>
+      <div class="popup-buttons">
+        <button onclick="closeTrashModal()">✖ Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Remboursements -->
+  <div class="popup-overlay" id="refundModal">
+    <div class="popup" style="width: 620px; max-height: 90%;">
+      <h2 style="color: #e67e22; border-bottom: 3px solid #e67e22;">💰 Zone de Remboursements</h2>
+      <div style="margin-bottom: 15px;">
+        <button onclick="clearAllRefunds()" style="background:linear-gradient(135deg, #e74c3c, #c0392b); color:white; padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:600;">
+          🗑️ Effacer tous les remboursements
+        </button>
+      </div>
+      <div id="refundGrid" style="max-height: 400px; overflow-y: auto;"></div>
+      <div class="pagination" id="refundPagination" style="margin-top: 15px;">
+        <button onclick="changeRefundPage(-1)" id="refundPrevBtn">« Précédent</button>
+        <span id="refundPageInfo"></span>
+        <button onclick="changeRefundPage(1)" id="refundNextBtn">Suivant »</button>
+      </div>
+      <div class="popup-buttons">
+        <button onclick="closeRefundModal()">✖ Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog confirmation remboursement -->
+  <div class="confirm-overlay" id="confirmRefundDialog">
+    <div class="confirm-dialog" style="border-top: 4px solid #e67e22;">
+      <h3 style="color: #e67e22; border-bottom: 2px solid #e67e22;">💰 Confirmer le remboursement</h3>
+      <p>Êtes-vous sûr de vouloir rembourser ce ticket ?</p>
+      <p><strong id="confirmRefundInfo"></strong></p>
+      <p style="color: #e67e22; font-size: 0.9em;">Le ticket sera déplacé dans la zone de remboursements et les rapports recalculés.</p>
+      <div class="confirm-buttons">
+        <button class="btn-cancel" onclick="cancelRefund()">Annuler</button>
+        <button class="btn-confirm" style="background: linear-gradient(135deg, #e67e22, #d35400);" onclick="refundTicket()">💰 Rembourser</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Liste des Z -->
+  <div class="popup-overlay" id="zListModal">
+    <div class="popup" style="width: 560px; max-height: 90%;">
+      <h2 style="color:var(--cyan); border-bottom:3px solid var(--cyan);">🧾 Liste des Clôtures Z</h2>
+      <div id="zListGrid" style="max-height:450px; overflow-y:auto; margin-top:14px;"></div>
+      <div class="popup-buttons">
+        <button onclick="closeZListModal()">✖ Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Détail d'une clôture Z -->
+  <div class="popup-overlay" id="zDetailModal">
+    <div class="popup" style="width: 640px; max-height: 90%;">
+      <h2 id="zDetailTitle" style="color:var(--cyan); border-bottom:3px solid var(--cyan);">🧾 Détail</h2>
+      <div class="z-detail-toolbar">
+        <label class="z-select-all-label">
+          <input type="checkbox" id="zSelectAllCheckbox" onchange="toggleSelectAllZTickets()">
+          Tout sélectionner
+        </label>
+        <label>Trier / filtrer par paiement :
+          <select id="zDetailPaiementFilter" onchange="renderZDetailTickets()">
+            <option value="">Tous</option>
+            <option value="banque">🏦 Banque</option>
+            <option value="especes">💵 Espèces (Cash)</option>
+            <option value="mixte">🔀 Mixte</option>
+          </select>
+        </label>
+      </div>
+      <div id="zDetailGrid" style="max-height:380px; overflow-y:auto;"></div>
+      <div class="z-selection-bar">
+        <span id="zSelectionSummary">Aucun ticket sélectionné</span>
+        <button id="zBulkDeleteBtn" class="permanent-delete-btn" disabled onclick="confirmBulkDeleteZTickets()">🗑 Supprimer la sélection</button>
+      </div>
+      <div class="popup-buttons">
+        <button onclick="closeZDetailModal(); openZListModal();">← Retour à la liste</button>
+        <button onclick="closeZDetailModal()">✖ Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog confirmation suppression groupée -->
+  <div class="confirm-overlay" id="confirmBulkDeleteDialog">
+    <div class="confirm-dialog">
+      <h3>⚠ Confirmation de suppression groupée</h3>
+      <p id="confirmBulkDeleteInfo"></p>
+      <p style="color:#e74c3c; font-size:.9em;">Les tickets sélectionnés seront déplacés dans la corbeille.</p>
+      <div class="confirm-buttons">
+        <button class="btn-cancel" onclick="cancelBulkDelete()">Annuler</button>
+        <button class="btn-confirm" onclick="bulkDeleteZTickets()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="export-import">
+    <button onclick="exportTickets()">📤 Exporter JSON</button>
+    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importTickets(event)">
+    <button onclick="document.getElementById('importFile').click()">📥 Importer JSON</button>
+    <input type="file" id="importExcelTicketsFile" accept=".xlsx" style="display:none;" onchange="importExcelTickets(event)">
+    <button onclick="exportExcelTickets()" style="background:linear-gradient(180deg,#6ec46e,#3a9a3a,#1e7a1e);">📊 Export Excel</button>
+    <button onclick="document.getElementById('importExcelTicketsFile').click()" style="background:linear-gradient(180deg,#6ec46e,#3a9a3a,#1e7a1e);">📂 Import Excel</button>
+  </div>
+
+
+  <!-- Modale superuser mot de passe -->
+  <div class="superuser-overlay" id="superuserOverlay">
+    <div class="superuser-dialog">
+      <span class="su-icon">🔐</span>
+      <h3>Accès restreint</h3>
+      <p id="suMessage">Cette action nécessite le mot de passe superutilisateur.</p>
+      <input type="password" id="suPasswordInput" placeholder="••••" maxlength="20"
+             onkeydown="if(event.key==='Enter') superuserConfirm()">
+      <div class="superuser-error" id="suError"></div>
+      <div class="superuser-btns">
+        <button class="su-btn-cancel" onclick="superuserCancel()">Annuler</button>
+        <button class="su-btn-confirm" onclick="superuserConfirm()">🗑 Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+// ── Sync serveur automatique ──────────────────────────────────────────────────
+const _IS_SERVER = window.location.protocol === "http:";
+const _API_BASE  = window.location.origin + "/api";
+async function syncToServer(...keys) {
+  if (!_IS_SERVER) return;
+  const body = {};
+  keys.forEach(k => {
+    try { body[k] = JSON.parse(localStorage.getItem(k) || "null"); } catch(e) {}
+  });
+  try {
+    await fetch(_API_BASE + "/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  } catch(e) {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+
+    // ===========================
+    // 🔐 SUPERUSER PASSWORD SYSTEM
+    // ===========================
+    const SUPERUSER_PASSWORD = "1111";
+    let suPendingAction = null; // fonction à exécuter après validation
+
+    function requireSuperuser(actionFn, message) {
+      suPendingAction = actionFn;
+      document.getElementById("suMessage").textContent = message || "Cette action nécessite le mot de passe superutilisateur.";
+      document.getElementById("suPasswordInput").value = "";
+      document.getElementById("suError").textContent = "";
+      document.getElementById("superuserOverlay").style.display = "flex";
+      setTimeout(() => document.getElementById("suPasswordInput").focus(), 100);
+    }
+
+    function superuserConfirm() {
+      const val = document.getElementById("suPasswordInput").value;
+      if (val === SUPERUSER_PASSWORD) {
+        document.getElementById("superuserOverlay").style.display = "none";
+        if (suPendingAction) { suPendingAction(); suPendingAction = null; }
+      } else {
+        document.getElementById("suError").textContent = "❌ Mot de passe incorrect";
+        document.getElementById("suPasswordInput").value = "";
+        document.getElementById("suPasswordInput").focus();
+      }
+    }
+
+    function superuserCancel() {
+      document.getElementById("superuserOverlay").style.display = "none";
+      suPendingAction = null;
+      document.getElementById("suError").textContent = "";
+    }
+
+    const companySettings = JSON.parse(localStorage.getItem("companySettings")) || {};
+    let ticketsHistorique = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+    let deletedTickets = JSON.parse(localStorage.getItem("deletedTickets")) || [];
+    let refundedTickets = JSON.parse(localStorage.getItem("refundedTickets")) || [];
+    
+    // Migration : ajouter le champ 'numero' aux tickets existants qui n'en ont pas
+    let needsMigration = false;
+    ticketsHistorique.forEach(ticket => {
+      if (ticket.numero === undefined) {
+        ticket.numero = ticket.id; // Utiliser l'ID comme numéro pour les anciens tickets
+        needsMigration = true;
+      }
+    });
+    deletedTickets.forEach(ticket => {
+      if (ticket.numero === undefined) {
+        ticket.numero = ticket.id;
+        needsMigration = true;
+      }
+    });
+    if (needsMigration) {
+      localStorage.setItem("ticketsHistorique", JSON.stringify(ticketsHistorique));
+      localStorage.setItem("deletedTickets", JSON.stringify(deletedTickets));
+      syncToServer("ticketsHistorique", "deletedTickets", "rapports");
+      console.log("Migration des tickets effectuée : ajout du champ 'numero'");
+    }
+    
+    // CORRECTION : Charger les articles depuis la bonne source
+    function loadArticles() {
+      // Essayer d'abord depuis articlesData (stockage de articles.html)
+      const articlesData = JSON.parse(localStorage.getItem("articlesData"));
+      if (articlesData && articlesData.articles) {
+        return articlesData.articles;
+      }
+      
+      // Sinon essayer depuis la clé articles (ancienne méthode)
+      const oldArticles = JSON.parse(localStorage.getItem("articles"));
+      if (oldArticles) {
+        return oldArticles;
+      }
+      
+      // Retourner tableau vide par défaut
+      return [];
+    }
+    
+    let articles = loadArticles();
+    let selectedTicket = null;
+    let editMode = false;
+    let currentPage = 1;
+    let currentTrashPage = 1;
+    let currentRefundPage = 1;
+    const ticketsPerPage = 24;
+    const trashPerPage = 10;
+
+    // ===========================
+    // 🧾 REGROUPEMENT DES TICKETS PAR CLÔTURE Z
+    // ===========================
+
+    // Parse la date/heure de paiement d'un ticket (même logique que le recalcul de rapports)
+    function parseFRDate(ticket) {
+      if (!ticket) return new Date(0);
+      if (ticket.isoPaiement) return new Date(ticket.isoPaiement);
+      if (ticket.datePaiement) {
+        const parts = ticket.datePaiement.split('/');
+        if (parts.length === 3) {
+          const day = parts[0].padStart(2, '0');
+          const month = parts[1].padStart(2, '0');
+          const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+          return new Date(`${year}-${month}-${day}T${ticket.heurePaiement || '00:00:00'}`);
+        }
+      }
+      return new Date(0);
+    }
+
+    // Récupère les clôtures Z existantes (bornes de période), triées de la plus ancienne à la plus récente
+    function getZPeriods() {
+      const rapports = JSON.parse(localStorage.getItem("rapports")) || [];
+      return rapports
+        .filter(r => r.type === "Z")
+        .map(r => ({
+          numero: r.numero,
+          start: r.isoOuverture ? new Date(r.isoOuverture) : new Date(0),
+          end: r.isoCloture ? new Date(r.isoCloture) : new Date(),
+          dateCloture: r.dateCloture || "",
+          heureCloture: r.heureCloture || ""
+        }))
+        .sort((a, b) => a.numero - b.numero);
+    }
+
+    // Détermine à quelle clôture Z appartient un ticket (ou "Non clôturé" s'il est postérieur à la dernière Z)
+    function getZLabelInfo(ticket, zPeriods) {
+      const d = parseFRDate(ticket);
+      for (const z of zPeriods) {
+        if (d <= z.end) {
+          return {
+            key: "z-" + z.numero,
+            label: `🧾 Clôture Z-${z.numero}${z.dateCloture ? " — " + z.dateCloture : ""}${z.heureCloture ? " " + z.heureCloture : ""}`
+          };
+        }
+      }
+      return {
+        key: "non-cloture",
+        label: zPeriods.length ? "🕐 Non clôturé (depuis la dernière Z)" : "🕐 Aucune clôture Z enregistrée pour l'instant"
+      };
+    }
+
+    // Remplit dynamiquement la liste déroulante des clôtures Z disponibles
+    function populateFilterZOptions() {
+      const select = document.getElementById("filterZ");
+      if (!select) return;
+      const currentValue = select.value;
+      const zPeriods = getZPeriods();
+      let html = '<option value="">Toutes les clôtures</option>';
+      html += '<option value="non-cloture">🕐 Non clôturé</option>';
+      zPeriods.slice().sort((a, b) => b.numero - a.numero).forEach(z => {
+        html += `<option value="z-${z.numero}">🧾 Z-${z.numero}${z.dateCloture ? " (" + z.dateCloture + ")" : ""}</option>`;
+      });
+      select.innerHTML = html;
+      const stillValid = Array.from(select.options).some(o => o.value === currentValue);
+      select.value = stillValid ? currentValue : "";
+    }
+
+    // ===========================
+    // ➕ LISTE DES Z — vue liste + sélection multiple + suppression groupée vers la corbeille
+    // ===========================
+
+    let currentZKey = null;
+    let zSelectedIds = new Set();
+
+    // Regroupe tous les tickets actifs par clôture Z (ou "Non clôturé"), triés du plus récent au plus ancien
+    function getZGroupsSummary() {
+      const zPeriods = getZPeriods();
+      const groups = {};
+      ticketsHistorique.forEach(t => {
+        const info = getZLabelInfo(t, zPeriods);
+        if (!groups[info.key]) groups[info.key] = { key: info.key, label: info.label, count: 0, total: 0 };
+        groups[info.key].count++;
+        groups[info.key].total += parseFloat(t.total) || 0;
+      });
+      const ordered = [];
+      if (groups["non-cloture"]) ordered.push(groups["non-cloture"]);
+      zPeriods.slice().sort((a, b) => b.numero - a.numero).forEach(z => {
+        const key = "z-" + z.numero;
+        if (groups[key]) ordered.push(groups[key]);
+      });
+      return ordered;
+    }
+
+    function openZListModal() {
+      renderZList();
+      document.getElementById("zListModal").style.display = "flex";
+    }
+
+    function closeZListModal() {
+      document.getElementById("zListModal").style.display = "none";
+    }
+
+    function renderZList() {
+      const container = document.getElementById("zListGrid");
+      const groups = getZGroupsSummary();
+      if (!groups.length) {
+        container.innerHTML = "<p style='text-align:center;color:#7f8c8d;padding:20px;'>Aucun ticket enregistré pour le moment.</p>";
+        return;
+      }
+      container.innerHTML = groups.map(g => `
+        <div class="z-list-row" onclick="openZDetailModal('${g.key}')">
+          <span class="z-list-title">${g.label}</span>
+          <span class="z-list-meta">${g.count} ticket${g.count > 1 ? "s" : ""} · ${g.total.toFixed(2)} €</span>
+        </div>
+      `).join("");
+    }
+
+    function openZDetailModal(key) {
+      currentZKey = key;
+      zSelectedIds = new Set();
+      const filterEl = document.getElementById("zDetailPaiementFilter");
+      if (filterEl) filterEl.value = "";
+      closeZListModal();
+      renderZDetailTickets();
+      document.getElementById("zDetailModal").style.display = "flex";
+    }
+
+    function closeZDetailModal() {
+      document.getElementById("zDetailModal").style.display = "none";
+      currentZKey = null;
+      zSelectedIds = new Set();
+    }
+
+    // Renvoie les tickets de la clôture Z courante, filtrés par mode de paiement, triés du plus récent au plus ancien
+    function getZDetailTickets() {
+      const zPeriods = getZPeriods();
+      let list = ticketsHistorique.filter(t => getZLabelInfo(t, zPeriods).key === currentZKey);
+      const filterEl = document.getElementById("zDetailPaiementFilter");
+      const filterPaiement = filterEl ? filterEl.value : "";
+      if (filterPaiement) list = list.filter(t => normaliserModePaiement(t.modePaiement) === filterPaiement);
+      return list.slice().sort((a, b) => parseFRDate(b) - parseFRDate(a));
+    }
+
+    function renderZDetailTickets() {
+      const container = document.getElementById("zDetailGrid");
+      const titleEl = document.getElementById("zDetailTitle");
+      const groups = getZGroupsSummary();
+      const g = groups.find(g => g.key === currentZKey);
+      titleEl.textContent = g ? g.label : "🧾 Détail";
+
+      const list = getZDetailTickets();
+      if (!list.length) {
+        container.innerHTML = "<p style='text-align:center;color:#7f8c8d;padding:20px;'>Aucun ticket pour ce filtre.</p>";
+      } else {
+        container.innerHTML = list.map(t => `
+          <div class="z-ticket-row">
+            <label class="z-ticket-check">
+              <input type="checkbox" ${zSelectedIds.has(t.id) ? "checked" : ""} onchange="toggleZTicketSelection(${t.id})">
+            </label>
+            <div class="z-ticket-info" onclick="toggleZTicketSelection(${t.id})">
+              <strong>Ticket #${t.numero || t.id}</strong> — ${t.datePaiement} ${t.heurePaiement || ""} —
+              <span class="z-ticket-mode">${t.modePaiement}</span> — <b>${(parseFloat(t.total) || 0).toFixed(2)} €</b>
+            </div>
+          </div>
+        `).join("");
+      }
+      updateZSelectionSummary(list);
+    }
+
+    function toggleZTicketSelection(id) {
+      if (zSelectedIds.has(id)) zSelectedIds.delete(id); else zSelectedIds.add(id);
+      renderZDetailTickets();
+    }
+
+    function toggleSelectAllZTickets() {
+      const list = getZDetailTickets();
+      const allSelected = list.length > 0 && list.every(t => zSelectedIds.has(t.id));
+      if (allSelected) {
+        list.forEach(t => zSelectedIds.delete(t.id));
+      } else {
+        list.forEach(t => zSelectedIds.add(t.id));
+      }
+      renderZDetailTickets();
+    }
+
+    function updateZSelectionSummary(list) {
+      const summary = document.getElementById("zSelectionSummary");
+      const selectAllCheckbox = document.getElementById("zSelectAllCheckbox");
+      const deleteBtn = document.getElementById("zBulkDeleteBtn");
+      const selectedTickets = list.filter(t => zSelectedIds.has(t.id));
+      const total = selectedTickets.reduce((s, t) => s + (parseFloat(t.total) || 0), 0);
+
+      if (summary) {
+        summary.textContent = selectedTickets.length
+          ? `${selectedTickets.length} ticket${selectedTickets.length > 1 ? "s" : ""} sélectionné${selectedTickets.length > 1 ? "s" : ""} · ${total.toFixed(2)} €`
+          : "Aucun ticket sélectionné";
+      }
+      if (selectAllCheckbox) {
+        selectAllCheckbox.checked = list.length > 0 && list.every(t => zSelectedIds.has(t.id));
+      }
+      if (deleteBtn) deleteBtn.disabled = selectedTickets.length === 0;
+    }
+
+    function confirmBulkDeleteZTickets() {
+      if (zSelectedIds.size === 0) return;
+      requireSuperuser(function() {
+        document.getElementById("confirmBulkDeleteInfo").textContent =
+          `${zSelectedIds.size} ticket(s) sélectionné(s) seront déplacés dans la corbeille.`;
+        document.getElementById("confirmBulkDeleteDialog").style.display = "flex";
+      }, "🗑 Suppression groupée — mot de passe requis.");
+    }
+
+    function cancelBulkDelete() {
+      document.getElementById("confirmBulkDeleteDialog").style.display = "none";
+    }
+
+    function bulkDeleteZTickets() {
+      const idsToDelete = Array.from(zSelectedIds);
+      const justDeleted = [];
+
+      idsToDelete.forEach(id => {
+        const index = ticketsHistorique.findIndex(t => t.id === id);
+        if (index !== -1) {
+          const deletedTicket = {...ticketsHistorique[index], deletedAt: new Date().toISOString()};
+          deletedTickets.push(deletedTicket);
+          ticketsHistorique.splice(index, 1);
+          justDeleted.push(deletedTicket);
+        }
+      });
+
+      if (justDeleted.length > 0) {
+        localStorage.setItem('ticketsHistorique', JSON.stringify(ticketsHistorique));
+        declencherSauvegardeAutoTickets();
+        localStorage.setItem('deletedTickets', JSON.stringify(deletedTickets));
+
+        // ⚡ Recalculer les rapports concernés par chaque ticket supprimé
+        justDeleted.forEach(t => recalculerRapportsConcernes(t));
+
+        syncToServer("ticketsHistorique", "deletedTickets", "rapports");
+
+        updateTrashCount();
+        populateFilterZOptions();
+      }
+
+      document.getElementById("confirmBulkDeleteDialog").style.display = "none";
+      zSelectedIds = new Set();
+      renderZDetailTickets();
+      renderTickets();
+
+      showMessage(
+        justDeleted.length
+          ? `✔ ${justDeleted.length} ticket(s) déplacé(s) dans la corbeille ! Les rapports ont été recalculés.`
+          : '✗ Aucun ticket supprimé',
+        justDeleted.length ? 'success' : 'error'
+      );
+    }
+
+    // ===========================
+    // 🔥 FONCTION DE RECALCUL AUTOMATIQUE DES RAPPORTS
+    // ===========================
+    
+    function recalculerRapportsConcernes(ticketModifie) {
+      // Charger les rapports existants
+      let rapports = JSON.parse(localStorage.getItem("rapports")) || [];
+      if (rapports.length === 0) return; // Pas de rapports à recalculer
+      
+      // Récupérer toutes les données nécessaires
+      const ticketsHistorique = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+      const tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+      const tables = JSON.parse(localStorage.getItem("tables")) || [];
+      const articlesData = JSON.parse(localStorage.getItem("articlesData")) || {};
+      const articlesArray = articlesData.articles || [];
+      
+      // Fonction utilitaire pour parser les dates des tickets
+      function parseTicketDate(ticket) {
+        if (!ticket) return new Date(0);
+        if (ticket.isoPaiement) return new Date(ticket.isoPaiement);
+        if (ticket.datePaiement) {
+          const parts = ticket.datePaiement.split('/');
+          if (parts.length === 3) {
+            const day = parts[0].padStart(2, '0');
+            const month = parts[1].padStart(2, '0');
+            const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+            return new Date(`${year}-${month}-${day}T${ticket.heurePaiement || '00:00:00'}`);
+          }
+        }
+        return new Date(0);
+      }
+      
+      // Fonction pour obtenir la catégorie d'un article
+      function getArticleCategorie(nomArticle) {
+        const art = articlesArray.find(a => a.nom === nomArticle);
+        return art ? art.categorie : "Sans catégorie";
+      }
+      
+      // Fonction pour détecter si un article est un don
+      function estUnDon(nomArticle) {
+        return nomArticle.toLowerCase().includes('don');
+      }
+      
+      // Fonction pour traiter un article dans le rapport
+      function traiterArticle(article, categoriesRapport) {
+        const cat = getArticleCategorie(article.nom);
+        if (!categoriesRapport[cat]) {
+          categoriesRapport[cat] = {};
+        }
+        if (!categoriesRapport[cat][article.nom]) {
+          categoriesRapport[cat][article.nom] = { qte: 0, total: 0 };
+        }
+        const qte = parseFloat(article.qte) || 0;
+        const prix = parseFloat(article.prix) || 0;
+        categoriesRapport[cat][article.nom].qte += qte;
+        categoriesRapport[cat][article.nom].total += qte * prix;
+      }
+      
+      // Fonction pour enregistrer un membre banque
+      function enregistrerMembreBanque(ticket, montant, membresBanque) {
+        const membreKey = (ticket.membreId && ticket.membreNom && ticket.membrePrenom) 
+          ? `${ticket.membrePrenom} ${ticket.membreNom}` 
+          : `Ticket #${ticket.numero || ticket.id}`; // Utiliser numero pour l'affichage
+        if (!membresBanque[membreKey]) {
+          membresBanque[membreKey] = 0;
+        }
+        membresBanque[membreKey] += montant;
+      }
+      
+      // Parcourir tous les rapports et recalculer ceux qui incluent ce ticket
+      let rapportsModifies = false;
+      
+      rapports.forEach(rapport => {
+        // Créer la plage temporelle du rapport
+        let startTime, endTime;
+        
+        if (rapport.isoOuverture) {
+          startTime = new Date(rapport.isoOuverture);
+        } else {
+          startTime = new Date(0);
+        }
+        
+        if (rapport.isoCloture) {
+          endTime = new Date(rapport.isoCloture);
+        } else {
+          endTime = new Date();
+        }
+        
+        // Vérifier si le ticket modifié est dans cette période
+        const ticketDate = parseTicketDate(ticketModifie);
+        if (ticketDate < startTime || ticketDate > endTime) {
+          return; // Ce rapport n'est pas concerné
+        }
+        
+        // ⚡ RECALCULER CE RAPPORT
+        console.log(`🔄 Recalcul du rapport ${rapport.type}-${rapport.numero}...`);
+        
+        // Réinitialiser les totaux
+        let totalEspeces = 0;
+        let totalBanque = 0;
+        let totalOfferts = 0;
+        let totalArticles = 0;
+        let totalDons = 0;
+        let donsEspeces = 0;
+        let donsBanque = 0;
+        let categoriesRapport = {};
+        let membresBanque = {};
+        
+        // Récupérer les options du rapport
+        const inclureMembresBanque = rapport.inclureMembresBanque !== undefined ? rapport.inclureMembresBanque : true;
+        const afficherDons = rapport.afficherDons !== undefined ? rapport.afficherDons : true;
+        
+        // Filtrer les tickets dans la période
+        const ticketsInclus = ticketsHistorique.filter(t => {
+          const paiementDate = parseTicketDate(t);
+          return paiementDate >= startTime && paiementDate <= endTime;
+        });
+        
+        // Traiter tous les tickets payés
+        ticketsInclus.forEach(ticket => {
+          const total = parseFloat(ticket.total) || 0;
+          
+          // Calculer les dons dans ce ticket
+          let donsTicket = 0;
+          if (afficherDons && Array.isArray(ticket.articles)) {
+            ticket.articles.forEach(article => {
+              if (estUnDon(article.nom)) {
+                const qte = parseFloat(article.qte) || 0;
+                const prix = parseFloat(article.prix) || 0;
+                donsTicket += qte * prix;
+              }
+            });
+          }
+          
+          if (ticket.modePaiement === "especes" || ticket.modePaiement === "Espèces") {
+            totalEspeces += total;
+            donsEspeces += donsTicket;
+          }
+          
+          if (ticket.modePaiement === "banque" || ticket.modePaiement === "Banque") {
+            totalBanque += total;
+            donsBanque += donsTicket;
+            if (inclureMembresBanque) {
+              enregistrerMembreBanque(ticket, total, membresBanque);
+            }
+          }
+          
+          if (ticket.modePaiement === "mixte" || ticket.modePaiement === "Mixte" || ticket.modePaiement === "Membre") {
+            const montantEspecesMixte = parseFloat(ticket.montantEspeces) || 0;
+            const montantBanqueMixte = parseFloat(ticket.montantBanque) || 0;
+            totalEspeces += montantEspecesMixte;
+            totalBanque += montantBanqueMixte;
+            
+            // Répartir les dons au prorata pour le mode mixte
+            if (donsTicket > 0 && total > 0) {
+              const proportionEspeces = montantEspecesMixte / total;
+              const proportionBanque = montantBanqueMixte / total;
+              donsEspeces += donsTicket * proportionEspeces;
+              donsBanque += donsTicket * proportionBanque;
+            }
+            
+            if (montantBanqueMixte > 0 && inclureMembresBanque) {
+              enregistrerMembreBanque(ticket, montantBanqueMixte, membresBanque);
+            }
+          }
+          
+          if (Array.isArray(ticket.articles)) {
+            ticket.articles.forEach(article => {
+              traiterArticle(article, categoriesRapport);
+              const qte = parseFloat(article.qte) || 0;
+              const prix = parseFloat(article.prix) || 0;
+              totalArticles += qte;
+              
+              if (article.offert) {
+                totalOfferts += qte * prix;
+              }
+              
+              if (afficherDons && estUnDon(article.nom)) {
+                totalDons += qte * prix;
+              }
+            });
+          }
+        });
+        
+        // Traiter les tickets actifs (uniquement pour les rapports X, pas Z)
+        let ticketsActifs = [];
+        if (rapport.type === "X") {
+          const tablesOccupees = tables.filter(t => t.ticketId !== null).map(t => t.ticketId);
+          ticketsActifs = tickets.filter(t => 
+            tablesOccupees.includes(t.id) && 
+            Array.isArray(t.articles) && 
+            t.articles.length > 0
+          );
+          
+          ticketsActifs.forEach(ticket => {
+            if (Array.isArray(ticket.articles)) {
+              ticket.articles.forEach(article => {
+                traiterArticle(article, categoriesRapport);
+                const qte = parseFloat(article.qte) || 0;
+                const prix = parseFloat(article.prix) || 0;
+                totalArticles += qte;
+                
+                if (article.offert) {
+                  totalOfferts += qte * prix;
+                }
+                
+                if (afficherDons && estUnDon(article.nom)) {
+                  totalDons += qte * prix;
+                }
+              });
+            }
+          });
+        }
+        
+        // Calculer le CA
+        const caGlobal = totalEspeces + totalBanque;
+        let caNet = caGlobal;
+        if (afficherDons) {
+          caNet -= totalDons;
+        }
+        
+        // Mettre à jour le rapport
+        rapport.totalEspeces = totalEspeces;
+        rapport.totalBanque = totalBanque;
+        rapport.totalGlobal = 250 + totalEspeces + totalBanque;
+        rapport.caGlobal = caGlobal;
+        rapport.ca = caNet;
+        rapport.totalArticles = totalArticles;
+        rapport.totalOfferts = totalOfferts;
+        rapport.totalDons = afficherDons ? totalDons : 0;
+        rapport.donsEspeces = afficherDons ? donsEspeces : 0;
+        rapport.donsBanque = afficherDons ? donsBanque : 0;
+        rapport.categories = categoriesRapport;
+        rapport.nbTickets = ticketsInclus.length;
+        rapport.nbTicketsActifs = ticketsActifs.length;
+        rapport.membresBanque = inclureMembresBanque ? membresBanque : {};
+        
+        rapportsModifies = true;
+        console.log(`✅ Rapport ${rapport.type}-${rapport.numero} recalculé !`);
+      });
+      
+      // Sauvegarder les rapports mis à jour
+      if (rapportsModifies) {
+        localStorage.setItem("rapports", JSON.stringify(rapports));
+        syncToServer("ticketsHistorique", "deletedTickets", "rapports");
+        console.log("💾 Rapports sauvegardés avec succès !");
+      }
+    }
+
+    function renderCompanyHeader() {
+      const header = document.getElementById("companyHeader");
+      if (!header) return;
+      header.innerHTML = `
+        <strong>${companySettings.companyName || "Mon Entreprise"}</strong><br>
+        ${companySettings.companyAddress || ""} ${companySettings.companyLocality || ""}<br>
+        N° Entreprise : ${companySettings.companyNumber || ""}
+      `;
+    }
+
+    // Regroupe une valeur de modePaiement (quelle que soit sa casse/variante) en 3 catégories : banque, especes, mixte
+    function normaliserModePaiement(mode) {
+      if (mode === "banque" || mode === "Banque") return "banque";
+      if (mode === "especes" || mode === "Espèces") return "especes";
+      if (mode === "mixte" || mode === "Mixte" || mode === "Membre") return "mixte";
+      return "";
+    }
+
+    // Applique les filtres Date / Mois / Mode de paiement sur la liste des tickets
+    function getTicketsFiltres() {
+      const filterDate = document.getElementById("filterDate").value;
+      const filterMonth = document.getElementById("filterMonth").value;
+      const filterPaiement = document.getElementById("filterPaiement").value;
+      const filterZEl = document.getElementById("filterZ");
+      const filterZ = filterZEl ? filterZEl.value : "";
+      let filtered = ticketsHistorique;
+      if (filterDate) filtered = filtered.filter(t => t.datePaiement === filterDate);
+      if (filterMonth) filtered = filtered.filter(t => t.datePaiement.startsWith(filterMonth));
+      if (filterPaiement) filtered = filtered.filter(t => normaliserModePaiement(t.modePaiement) === filterPaiement);
+      if (filterZ) {
+        const zPeriods = getZPeriods();
+        filtered = filtered.filter(t => getZLabelInfo(t, zPeriods).key === filterZ);
+      }
+      return filtered;
+    }
+
+    function renderTickets() {
+      const grid = document.getElementById("ticketsGrid");
+      grid.innerHTML = "";
+      let filtered = getTicketsFiltres();
+      
+      if (!filtered.length) { 
+        grid.innerHTML = "<p style='text-align:center; color:#7f8c8d; font-size:1.2em; grid-column:1/-1;'>Aucun ticket trouvé</p>"; 
+        document.getElementById("pagination").style.display = "none";
+        return; 
+      }
+
+      // Tri du plus récent au plus ancien, pour que la dernière clôture Z apparaisse en premier
+      filtered = filtered.slice().sort((a, b) => parseFRDate(b) - parseFRDate(a));
+
+      // Calcul du groupe Z de chaque ticket + totaux par groupe (sur l'ensemble filtré, pas juste la page affichée)
+      const zPeriods = getZPeriods();
+      const zInfoByTicket = new Map();
+      const groupStats = {};
+      filtered.forEach(t => {
+        const info = getZLabelInfo(t, zPeriods);
+        zInfoByTicket.set(t, info);
+        if (!groupStats[info.key]) groupStats[info.key] = { label: info.label, count: 0, total: 0 };
+        groupStats[info.key].count++;
+        groupStats[info.key].total += parseFloat(t.total) || 0;
+      });
+
+      const totalPages = Math.ceil(filtered.length / ticketsPerPage);
+      const startIndex = (currentPage - 1) * ticketsPerPage;
+      const endIndex = startIndex + ticketsPerPage;
+      const ticketsToShow = filtered.slice(startIndex, endIndex);
+
+      let lastKey = null;
+      ticketsToShow.forEach(ticket => {
+        const info = zInfoByTicket.get(ticket);
+        if (info.key !== lastKey) {
+          const stats = groupStats[info.key];
+          const header = document.createElement("div");
+          header.className = "z-group-header" + (info.key === "non-cloture" ? " non-cloture" : "");
+          header.innerHTML = `
+            <span class="z-group-title">${info.label}</span>
+            <span class="z-group-meta">${stats.count} ticket${stats.count > 1 ? "s" : ""} · ${stats.total.toFixed(2)} €</span>
+          `;
+          grid.appendChild(header);
+          lastKey = info.key;
+        }
+
+        const card = document.createElement("div");
+        card.className = "ticket-card";
+        card.onclick = () => openPopup(ticket);
+        card.innerHTML = `
+          <h3>Ticket #${ticket.numero || ticket.id}</h3>
+          <p><b>Table :</b> ${ticket.tableId}</p>
+          <p><b>Date :</b> ${ticket.datePaiement} ${ticket.heurePaiement}</p>
+          <p><b>Total :</b> ${ticket.total.toFixed(2)} €</p>
+          <p><b>Paiement :</b> ${ticket.modePaiement}</p>
+          ${ticket.membreNom ? `<p><b>Membre :</b> ${ticket.membrePrenom} ${ticket.membreNom}</p>` : ""}
+        `;
+        grid.appendChild(card);
+      });
+
+      updatePaginationControls(totalPages, filtered.length);
+    }
+
+    function updatePaginationControls(totalPages, totalTickets) {
+      const pagination = document.getElementById("pagination");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const firstBtn = document.getElementById("firstBtn");
+      const lastBtn = document.getElementById("lastBtn");
+      const pageInfo = document.getElementById("pageInfo");
+
+      if (totalPages <= 1) {
+        pagination.style.display = "none";
+        return;
+      }
+
+      pagination.style.display = "block";
+      pageInfo.textContent = `Page ${currentPage} / ${totalPages} (${totalTickets} tickets)`;
+      
+      // Désactiver les boutons selon la position
+      firstBtn.disabled = currentPage === 1;
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages;
+      lastBtn.disabled = currentPage === totalPages;
+      
+      // Style des boutons désactivés
+      [firstBtn, prevBtn, nextBtn, lastBtn].forEach(btn => {
+        btn.style.opacity = btn.disabled ? "0.5" : "1";
+        btn.style.cursor = btn.disabled ? "not-allowed" : "pointer";
+      });
+    }
+
+    function goToFirstPage() {
+      if (currentPage === 1) return;
+      currentPage = 1;
+      renderTickets();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToLastPage() {
+      let filtered = getTicketsFiltres();
+      
+      const totalPages = Math.ceil(filtered.length / ticketsPerPage);
+      if (currentPage === totalPages) return;
+      
+      currentPage = totalPages;
+      renderTickets();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function changePage(direction) {
+      let filtered = getTicketsFiltres();
+      
+      const totalPages = Math.ceil(filtered.length / ticketsPerPage);
+      currentPage += direction;
+      
+      if (currentPage < 1) currentPage = 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      
+      renderTickets();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetFilter() {
+      document.getElementById("filterDate").value = "";
+      document.getElementById("filterMonth").value = "";
+      document.getElementById("filterPaiement").value = "";
+      if (document.getElementById("filterZ")) document.getElementById("filterZ").value = "";
+      currentPage = 1;
+      renderTickets();
+    }
+
+    function openPopup(ticket) {
+      selectedTicket = ticket;
+      editMode = false;
+      document.getElementById("popupTitle").textContent = `Ticket #${ticket.numero || ticket.id}`;
+      let info = `Table ${ticket.tableId} | ${ticket.datePaiement} ${ticket.heurePaiement}`;
+      if (ticket.membreNom) info += ` | Membre: ${ticket.membrePrenom} ${ticket.membreNom}`;
+      document.getElementById("popupInfo").textContent = info;
+      updatePopupContent(ticket);
+      renderPointagesForTicket(ticket);
+      document.getElementById("popup").style.display = "flex";
+    }
+
+    /* -----------------------
+       Pointages (qui a pointé quoi sur ce ticket)
+       ----------------------- */
+    function loadCtrlLogHistorique() {
+      try { return JSON.parse(localStorage.getItem("ctrl_log")) || []; } catch (e) { return []; }
+    }
+    function parsePointageDelta(deltaStr) {
+      if (typeof deltaStr !== "string") return 0;
+      const m = deltaStr.match(/-?\d+/);
+      return m ? parseInt(m[0], 10) : 0;
+    }
+    function getPointagesForTicket(ticketId) {
+      const log = loadCtrlLogHistorique().filter(l =>
+        l.ticketId === ticketId && ["AJOUT", "QTE", "SUPPR"].includes(l.type)
+      );
+      const parUser = {}; // { username: { article: qte } }
+      log.forEach(l => {
+        const user = l.user || "Non renseigné";
+        if (!parUser[user]) parUser[user] = {};
+        if (!parUser[user][l.article]) parUser[user][l.article] = 0;
+        parUser[user][l.article] += parsePointageDelta(l.delta);
+      });
+      return parUser;
+    }
+    function renderPointagesForTicket(ticket) {
+      const box = document.getElementById("popupPointages");
+      const parUser = getPointagesForTicket(ticket.id);
+      const lignes = [];
+      Object.keys(parUser).forEach(user => {
+        const items = Object.entries(parUser[user])
+          .filter(([nom, qte]) => qte > 0)
+          .map(([nom, qte]) => `${qte}× ${nom}`);
+        if (items.length) lignes.push(`<div class="pointage-line">👤 <strong>${user}</strong> a pointé : ${items.join(", ")}</div>`);
+      });
+      if (!lignes.length) {
+        box.innerHTML = "";
+        return;
+      }
+      box.innerHTML = `
+        <div class="pointages-block">
+          <div class="pointages-title">📋 Pointages sur ce ticket</div>
+          ${lignes.join("")}
+        </div>
+      `;
+    }
+
+    function updatePopupContent(ticket) {
+      // CORRECTION : Recharger les articles à chaque ouverture du modal
+      articles = loadArticles();
+      
+      const tbody = document.getElementById("popupArticles");
+      tbody.innerHTML = "";
+
+      ticket.articles.forEach((a, index) => {
+        const tr = document.createElement("tr");
+        if (editMode) {
+          tr.innerHTML = `
+            <td><input class='edit-input' value='${a.nom}'></td>
+            <td><input class='edit-input' type='number' value='${a.qte}'></td>
+            <td><input class='edit-input' type='number' step='0.01' value='${a.prix}'></td>
+            <td>${(a.qte * a.prix).toFixed(2)} € <button onclick='deleteArticle(${index})'>🗑</button></td>`;
+        } else {
+          const sousTotal = a.prix * a.qte;
+          tr.innerHTML = `<td>${a.nom}</td><td>${a.qte}</td><td>${a.prix.toFixed(2)} €</td><td>${sousTotal.toFixed(2)} €</td>`;
+        }
+        tbody.appendChild(tr);
+      });
+
+      if (editMode) {
+        const addRow = document.createElement('tr');
+        let selectHtml = `<select id='newArticleSelect' style='padding:6px; border-radius:4px; border:1px solid #ddd;'><option value=''>-- Choisir un article --</option>`;
+        
+        // CORRECTION : Afficher correctement les articles
+        articles.forEach(a => {
+          // Vérifier que l'article a bien un nom et un prix
+          if (a.nom) {
+            const prix = parseFloat(a.prixTVAC) || parseFloat(a.prix) || 0;
+            selectHtml += `<option value='${a.nom}' data-prix='${prix}'>${a.nom} (${prix.toFixed(2)}€)</option>`;
+          }
+        });
+        
+        selectHtml += `</select>`;
+        addRow.innerHTML = `<td colspan='4'>${selectHtml} <button style='padding:6px 12px; background:#3498db; color:white; border:none; border-radius:4px; cursor:pointer;' onclick='addSelectedArticle()'>➕ Ajouter</button></td>`;
+        tbody.appendChild(addRow);
+      }
+
+      document.getElementById("popupTotal").textContent = `Total payé : ${ticket.total.toFixed(2)} €`;
+
+      const paiementElement = document.getElementById("popupPaiement");
+      if (editMode) {
+        paiementElement.innerHTML = `Mode : <select id='editModePaiement' style='padding:6px; border-radius:4px; border:1px solid #ddd;'>
+          <option value='especes' ${ticket.modePaiement === 'especes' || ticket.modePaiement === 'Espèces' ? 'selected' : ''}>Espèces</option>
+          <option value='banque' ${ticket.modePaiement === 'banque' || ticket.modePaiement === 'Banque' ? 'selected' : ''}>Banque</option>
+          <option value='mixte' ${ticket.modePaiement === 'mixte' || ticket.modePaiement === 'Mixte' || ticket.modePaiement === 'Membre' ? 'selected' : ''}>Mixte</option>
+        </select>`;
+      } else {
+        paiementElement.textContent = `Mode : ${ticket.modePaiement}`;
+      }
+
+      const buttons = document.querySelector('.popup-buttons');
+      if (editMode) {
+        buttons.innerHTML = `
+          <button onclick='saveEdit()'>💾 Enregistrer</button>
+          <button onclick='cancelEdit()'>✖ Annuler</button>`;
+      } else {
+        buttons.innerHTML = `
+          <button onclick="enableEditMode()">🖊 Modifier</button>
+          <button onclick="printThermalTicket(selectedTicket)">🖨 Thermique</button>
+          <button class="refund-btn-popup" onclick="confirmRefundTicket()">💰 Rembourser</button>
+          <button class="delete-btn" onclick="confirmDeleteTicket()">🗑 Supprimer</button>
+          <button onclick="closePopup()">✖ Fermer</button>`;
+      }
+    }
+
+    function enableEditMode() { 
+      editMode = true; 
+      updatePopupContent(selectedTicket); 
+    }
+    
+    function cancelEdit() { 
+      editMode = false; 
+      updatePopupContent(selectedTicket); 
+    }
+
+    function deleteArticle(index) {
+      selectedTicket.articles.splice(index, 1);
+      recalcTotal();
+      updatePopupContent(selectedTicket);
+    }
+
+    function addSelectedArticle() {
+      const select = document.getElementById('newArticleSelect');
+      const nom = select.value;
+      if (!nom) return;
+      
+      // CORRECTION : Récupérer le prix depuis l'attribut data-prix
+      const selectedOption = select.selectedOptions[0];
+      const prix = parseFloat(selectedOption.dataset.prix) || 0;
+      
+      selectedTicket.articles.push({ nom, qte: 1, prix });
+      recalcTotal();
+      updatePopupContent(selectedTicket);
+    }
+
+    function saveEdit() {
+      const rows = document.querySelectorAll('#popupArticles tr');
+      const newArticles = [];
+      rows.forEach((r) => {
+        const inputs = r.querySelectorAll('input');
+        if (inputs.length === 3) {
+          const nom = inputs[0].value;
+          const qte = parseFloat(inputs[1].value) || 0;
+          const prix = parseFloat(inputs[2].value) || 0;
+          if (nom.trim()) newArticles.push({ nom, qte, prix });
+        }
+      });
+      selectedTicket.articles = newArticles;
+
+      // Mettre à jour le mode de paiement
+      const newModePaiement = document.getElementById('editModePaiement').value;
+      selectedTicket.modePaiement = newModePaiement;
+
+      recalcTotal();
+      localStorage.setItem('ticketsHistorique', JSON.stringify(ticketsHistorique));
+      declencherSauvegardeAutoTickets();
+      
+      // ⚡ NOUVEAU : Recalculer automatiquement les rapports concernés
+      recalculerRapportsConcernes(selectedTicket);
+      
+      editMode = false;
+      renderTickets();
+      showMessage('✓ Ticket modifié avec succès ! Les rapports ont été recalculés.', 'success');
+      updatePopupContent(selectedTicket);
+    }
+
+    function recalcTotal() {
+      selectedTicket.total = selectedTicket.articles.reduce((sum, a) => sum + (a.prix * a.qte), 0);
+    }
+
+    function closePopup() { 
+      document.getElementById("popup").style.display = "none"; 
+    }
+
+    function confirmDeleteTicket() {
+      if (!selectedTicket) return;
+      requireSuperuser(function() {
+        document.getElementById("confirmTicketInfo").textContent =
+          `Ticket #${selectedTicket.numero || selectedTicket.id} - ${selectedTicket.datePaiement} - ${selectedTicket.total.toFixed(2)} €`;
+        document.getElementById("confirmDialog").style.display = "flex";
+      }, "🗑 Supprimer ce ticket — mot de passe requis.");
+    }
+
+    function cancelDelete() {
+      document.getElementById("confirmDialog").style.display = "none";
+    }
+
+    function deleteTicket() {
+      if (!selectedTicket) return;
+      
+      const index = ticketsHistorique.findIndex(t => t.id === selectedTicket.id);
+      if (index !== -1) {
+        const deletedTicket = {...ticketsHistorique[index], deletedAt: new Date().toISOString()};
+        deletedTickets.push(deletedTicket);
+        
+        ticketsHistorique.splice(index, 1);
+        localStorage.setItem('ticketsHistorique', JSON.stringify(ticketsHistorique));
+        declencherSauvegardeAutoTickets();
+        localStorage.setItem('deletedTickets', JSON.stringify(deletedTickets));
+        
+        // ⚡ Recalculer les rapports APRÈS la suppression (le localStorage doit déjà être à jour,
+        // sinon le ticket supprimé reste compté dans le total du Z recalculé)
+        recalculerRapportsConcernes(deletedTicket);
+        
+        // ⚡ Synchroniser avec le serveur (manquait avant → les suppressions n'étaient pas persistées)
+        syncToServer("ticketsHistorique", "deletedTickets", "rapports");
+        
+        updateTrashCount();
+        document.getElementById("confirmDialog").style.display = "none";
+        closePopup();
+        renderTickets();
+        
+        showMessage('✔ Ticket déplacé dans la corbeille ! Les rapports ont été recalculés.', 'success');
+      } else {
+        showMessage('✗ Erreur lors de la suppression', 'error');
+      }
+    }
+
+    async function printThermalTicket(ticket) {
+      if (!ticket) return alert("Aucun ticket sélectionné");
+
+      try {
+        const ticketTotal = ticket.total || ticket.articles.reduce((s,a)=>s+(a.prix*a.qte),0);
+
+        const ticketData = {
+          table: `Table ${ticket.tableId}`,
+          date: ticket.datePaiement,
+          heure: ticket.heurePaiement,
+          articles: ticket.articles.map(art => ({
+            nom: art.nom,
+            qte: art.qte,
+            prix: art.prix
+          })),
+          total: ticketTotal,
+          modePaiement: ticket.modePaiement,
+          rendu: ticket.rendu || 0,
+          montantBanque: ticket.montantBanque || 0,
+          membreNom: ticket.membreNom ? `${ticket.membrePrenom} ${ticket.membreNom}` : null
+        };
+
+        const response = await fetch('http://localhost:8088/print', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(ticketData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showMessage('✔ Ticket imprimé avec succès !', 'success');
+        } else {
+          showMessage('✗ Erreur d\'impression', 'error');
+        }
+
+      } catch (error) {
+        console.error('Erreur:', error);
+        showMessage('✗ Serveur d\'impression non disponible', 'error');
+      }
+    }
+
+    function showMessage(text, type) {
+      const msg = document.createElement('div');
+      msg.className = `status-message status-${type}`;
+      msg.textContent = text;
+      document.body.appendChild(msg);
+
+      setTimeout(() => {
+        msg.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => msg.remove(), 300);
+      }, 3000);
+    }
+
+    function exportTickets() {
+      const dataStr = JSON.stringify(ticketsHistorique, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ticketsHistorique.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importTickets(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) throw new Error("Format JSON invalide");
+          
+          // Demander à l'utilisateur ce qu'il veut faire
+          const choice = confirm(
+            "Comment voulez-vous importer les tickets ?\n\n" +
+            "OK = REMPLACER tous les tickets actuels\n" +
+            "Annuler = FUSIONNER (éviter les doublons)"
+          );
+          
+          if (choice) {
+            // Remplacer complètement
+            ticketsHistorique = imported;
+          } else {
+            // Fusionner en évitant les doublons
+            const existingIds = new Set(ticketsHistorique.map(t => t.id));
+            const newTickets = imported.filter(t => !existingIds.has(t.id));
+            ticketsHistorique = [...ticketsHistorique, ...newTickets];
+            
+            const duplicatesCount = imported.length - newTickets.length;
+            if (duplicatesCount > 0) {
+              showMessage(`⚠️ ${duplicatesCount} ticket(s) déjà existant(s) ignoré(s)`, 'warning');
+            }
+          }
+          
+          localStorage.setItem("ticketsHistorique", JSON.stringify(ticketsHistorique));
+          declencherSauvegardeAutoTickets();
+          syncToServer("ticketsHistorique", "deletedTickets", "rapports");
+          renderTickets();
+          showMessage('✔ Importation réussie !', 'success');
+        } catch (err) {
+          showMessage('✗ Erreur lors de l\'import : ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ===========================
+    // 💰 FONCTIONS DE REMBOURSEMENT
+    // ===========================
+
+    function updateRefundCount() {
+      document.getElementById('refundCount').textContent = refundedTickets.length;
+    }
+
+    function confirmRefundTicket() {
+      if (!selectedTicket) return;
+      document.getElementById("confirmRefundInfo").textContent = 
+        `Ticket #${selectedTicket.numero || selectedTicket.id} - ${selectedTicket.datePaiement} - ${selectedTicket.total.toFixed(2)} €`;
+      document.getElementById("confirmRefundDialog").style.display = "flex";
+    }
+
+    function cancelRefund() {
+      document.getElementById("confirmRefundDialog").style.display = "none";
+    }
+
+    function refundTicket() {
+      if (!selectedTicket) return;
+
+      const index = ticketsHistorique.findIndex(t => t.id === selectedTicket.id);
+      if (index !== -1) {
+        const refundedTicket = {...ticketsHistorique[index], refundedAt: new Date().toISOString()};
+        refundedTickets.push(refundedTicket);
+
+        ticketsHistorique.splice(index, 1);
+        localStorage.setItem('ticketsHistorique', JSON.stringify(ticketsHistorique));
+        declencherSauvegardeAutoTickets();
+        localStorage.setItem('refundedTickets', JSON.stringify(refundedTickets));
+
+        // ⚡ Recalculer les rapports APRÈS le retrait (le localStorage doit déjà être à jour,
+        // sinon le ticket remboursé reste compté dans le total du Z recalculé)
+        recalculerRapportsConcernes(refundedTicket);
+
+        updateRefundCount();
+        document.getElementById("confirmRefundDialog").style.display = "none";
+        closePopup();
+        renderTickets();
+
+        showMessage('💰 Ticket remboursé ! Les rapports ont été recalculés.', 'success');
+      } else {
+        showMessage('✗ Erreur lors du remboursement', 'error');
+      }
+    }
+
+    function openRefundModal() {
+      currentRefundPage = 1;
+      renderRefundTickets();
+      document.getElementById("refundModal").style.display = "flex";
+    }
+
+    function closeRefundModal() {
+      document.getElementById("refundModal").style.display = "none";
+    }
+
+    function renderRefundTickets() {
+      const grid = document.getElementById("refundGrid");
+      grid.innerHTML = "";
+
+      if (!refundedTickets.length) {
+        grid.innerHTML = "<p style='text-align:center; color:#999; padding:40px 0;'>Aucun remboursement enregistré</p>";
+        document.getElementById("refundPagination").style.display = "none";
+        return;
+      }
+
+      const totalPages = Math.ceil(refundedTickets.length / trashPerPage);
+      const startIndex = (currentRefundPage - 1) * trashPerPage;
+      const endIndex = startIndex + trashPerPage;
+      const ticketsToShow = refundedTickets.slice(startIndex, endIndex);
+
+      ticketsToShow.forEach((ticket, idx) => {
+        const actualIndex = startIndex + idx;
+        const refundDate = new Date(ticket.refundedAt);
+        const card = document.createElement("div");
+        card.className = "refund-card";
+        card.innerHTML = `
+          <div class="refund-card-header">
+            <div>
+              <strong>💰 Ticket #${ticket.numero || ticket.id}</strong> - Table ${ticket.tableId}<br>
+              <small>Date ticket : ${ticket.datePaiement} ${ticket.heurePaiement}</small><br>
+              <small>Total remboursé : <strong style="color:#e67e22;">${ticket.total.toFixed(2)} €</strong></small><br>
+              <small>Mode paiement : ${ticket.modePaiement}</small><br>
+              <small style="color:#999;">Remboursé le : ${refundDate.toLocaleDateString()} à ${refundDate.toLocaleTimeString()}</small>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button class="cancel-refund-btn" onclick="cancelRefundTicket(${actualIndex})">↩️ Annuler remboursement</button>
+              <button class="permanent-delete-btn" onclick="permanentDeleteRefund(${actualIndex})">🗑️ Supprimer</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      updateRefundPaginationControls(totalPages);
+    }
+
+    function updateRefundPaginationControls(totalPages) {
+      const pagination = document.getElementById("refundPagination");
+      const prevBtn = document.getElementById("refundPrevBtn");
+      const nextBtn = document.getElementById("refundNextBtn");
+      const pageInfo = document.getElementById("refundPageInfo");
+
+      if (totalPages <= 1) {
+        pagination.style.display = "none";
+        return;
+      }
+
+      pagination.style.display = "block";
+      pageInfo.textContent = `Page ${currentRefundPage} / ${totalPages}`;
+      prevBtn.disabled = currentRefundPage === 1;
+      nextBtn.disabled = currentRefundPage === totalPages;
+    }
+
+    function changeRefundPage(direction) {
+      const totalPages = Math.ceil(refundedTickets.length / trashPerPage);
+      currentRefundPage += direction;
+      if (currentRefundPage < 1) currentRefundPage = 1;
+      if (currentRefundPage > totalPages) currentRefundPage = totalPages;
+      renderRefundTickets();
+    }
+
+    function cancelRefundTicket(index) {
+      const ticket = refundedTickets[index];
+      delete ticket.refundedAt;
+
+      ticketsHistorique.push(ticket);
+      refundedTickets.splice(index, 1);
+
+      localStorage.setItem('ticketsHistorique', JSON.stringify(ticketsHistorique));
+      declencherSauvegardeAutoTickets();
+      localStorage.setItem('refundedTickets', JSON.stringify(refundedTickets));
+
+      // Recalculer les rapports après annulation du remboursement
+      recalculerRapportsConcernes(ticket);
+
+      updateRefundCount();
+      renderRefundTickets();
+      renderTickets();
+
+      showMessage('✔ Remboursement annulé ! Ticket restauré dans l\'historique.', 'success');
+    }
+
+    function permanentDeleteRefund(index) {
+      requireSuperuser(function() {
+        refundedTickets.splice(index, 1);
+        localStorage.setItem('refundedTickets', JSON.stringify(refundedTickets));
+        updateRefundCount();
+        renderRefundTickets();
+        showMessage('✔ Remboursement supprimé définitivement.', 'success');
+      }, "🗑 Supprimer ce remboursement — mot de passe requis.");
+    }
+
+    function clearAllRefunds() {
+      requireSuperuser(function() {
+        refundedTickets = [];
+        localStorage.setItem('refundedTickets', JSON.stringify(refundedTickets));
+        updateRefundCount();
+        renderRefundTickets();
+        showMessage('✔ Zone de remboursements vidée.', 'success');
+      }, "🗑 Effacer tous les remboursements — mot de passe requis.");
+    }
+
+    // Fonctions de la corbeille
+    function updateTrashCount() {
+      document.getElementById('trashCount').textContent = deletedTickets.length;
+    }
+
+    function openTrashModal() {
+      currentTrashPage = 1;
+      renderTrashTickets();
+      document.getElementById("trashModal").style.display = "flex";
+    }
+
+    function closeTrashModal() {
+      document.getElementById("trashModal").style.display = "none";
+    }
+
+    function renderTrashTickets() {
+      const grid = document.getElementById("trashGrid");
+      grid.innerHTML = "";
+      
+      if (!deletedTickets.length) {
+        grid.innerHTML = "<p style='text-align:center; color:#999; padding:40px 0;'>La corbeille est vide</p>";
+        document.getElementById("trashPagination").style.display = "none";
+        return;
+      }
+
+      const totalPages = Math.ceil(deletedTickets.length / trashPerPage);
+      const startIndex = (currentTrashPage - 1) * trashPerPage;
+      const endIndex = startIndex + trashPerPage;
+      const ticketsToShow = deletedTickets.slice(startIndex, endIndex);
+
+      ticketsToShow.forEach((ticket, idx) => {
+        const actualIndex = startIndex + idx;
+        const deletedDate = new Date(ticket.deletedAt);
+        const card = document.createElement("div");
+        card.className = "trash-card";
+        card.innerHTML = `
+          <div class="trash-card-header">
+            <div>
+              <strong>Ticket #${ticket.numero || ticket.id}</strong> - Table ${ticket.tableId}<br>
+              <small>Date: ${ticket.datePaiement} ${ticket.heurePaiement}</small><br>
+              <small>Total: ${ticket.total.toFixed(2)} €</small><br>
+              <small style="color:#999;">Supprimé le: ${deletedDate.toLocaleDateString()} ${deletedDate.toLocaleTimeString()}</small>
+            </div>
+            <div>
+              <button class="restore-btn" onclick="restoreTicket(${actualIndex})">↩️ Restaurer</button>
+              <button class="permanent-delete-btn" onclick="permanentDelete(${actualIndex})">🗑️ Supp. définitivement</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      updateTrashPaginationControls(totalPages);
+    }
+
+    function updateTrashPaginationControls(totalPages) {
+      const pagination = document.getElementById("trashPagination");
+      const prevBtn = document.getElementById("trashPrevBtn");
+      const nextBtn = document.getElementById("trashNextBtn");
+      const pageInfo = document.getElementById("trashPageInfo");
+
+      if (totalPages <= 1) {
+        pagination.style.display = "none";
+        return;
+      }
+
+      pagination.style.display = "block";
+      pageInfo.textContent = `Page ${currentTrashPage} / ${totalPages}`;
+      
+      prevBtn.disabled = currentTrashPage === 1;
+      nextBtn.disabled = currentTrashPage === totalPages;
+    }
+
+    function changeTrashPage(direction) {
+      const totalPages = Math.ceil(deletedTickets.length / trashPerPage);
+      currentTrashPage += direction;
+      
+      if (currentTrashPage < 1) currentTrashPage = 1;
+      if (currentTrashPage > totalPages) currentTrashPage = totalPages;
+      
+      renderTrashTickets();
+    }
+
+    function restoreTicket(index) {
+      const ticket = deletedTickets[index];
+      delete ticket.deletedAt;
+      
+      ticketsHistorique.push(ticket);
+      deletedTickets.splice(index, 1);
+      
+      localStorage.setItem('ticketsHistorique', JSON.stringify(ticketsHistorique));
+      declencherSauvegardeAutoTickets();
+      localStorage.setItem('deletedTickets', JSON.stringify(deletedTickets));
+      
+      // ⚡ Recalculer les rapports après restauration
+      recalculerRapportsConcernes(ticket);
+      
+      updateTrashCount();
+      renderTrashTickets();
+      renderTickets();
+      
+      showMessage('✔ Ticket restauré avec succès ! Les rapports ont été recalculés.', 'success');
+    }
+
+    function permanentDelete(index) {
+      requireSuperuser(function() {
+        const ticket = deletedTickets[index];
+        let availableIds = JSON.parse(localStorage.getItem('availableTicketIds')) || [];
+        availableIds.push(ticket.id);
+        availableIds.sort((a, b) => a - b);
+        localStorage.setItem('availableTicketIds', JSON.stringify(availableIds));
+        deletedTickets.splice(index, 1);
+        localStorage.setItem('deletedTickets', JSON.stringify(deletedTickets));
+        updateTrashCount();
+        renderTrashTickets();
+        showMessage('✔ Ticket supprimé définitivement (ID interne #' + ticket.id + ' réutilisable)', 'success');
+      }, "🗑 Suppression définitive — mot de passe requis.");
+    }
+
+    function clearAllTrash() {
+      requireSuperuser(function() {
+        let availableIds = JSON.parse(localStorage.getItem('availableTicketIds')) || [];
+        deletedTickets.forEach(ticket => { availableIds.push(ticket.id); });
+        availableIds.sort((a, b) => a - b);
+        localStorage.setItem('availableTicketIds', JSON.stringify(availableIds));
+        deletedTickets = [];
+        localStorage.setItem('deletedTickets', JSON.stringify(deletedTickets));
+        updateTrashCount();
+        renderTrashTickets();
+        showMessage('✔ Corbeille vidée - IDs internes réutilisables', 'success');
+      }, "🗑 Vider la corbeille — mot de passe requis.");
+    }
+
+    // Initialisation
+    updateTrashCount();
+    updateRefundCount();
+    renderCompanyHeader();
+    populateFilterZOptions();
+    renderTickets();
+  </script>
+</body>
+</html>
+<script>
+// ============================================================
+// EXCEL — EXPORT / IMPORT / SAUVEGARDE AUTO (tickets historique)
+// Sans patch global localStorage — appels ciblés uniquement
+// ============================================================
+const _EXCEL_TICKETS_SRV = window.location.origin;
+let _excelTicketsOk = null;
+let _excelTicketsTimer = null;
+
+async function _pingTicketsServeur() {
+  if (_excelTicketsOk !== null) return _excelTicketsOk;
+  try {
+    await fetch(`${_EXCEL_TICKETS_SRV}/api/export-excel-tickets`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tickets: [] }), signal: AbortSignal.timeout(2000)
+    });
+    _excelTicketsOk = true;
+  } catch(e) { _excelTicketsOk = false; }
+  return _excelTicketsOk;
+}
+
+function declencherSauvegardeAutoTickets() {
+  clearTimeout(_excelTicketsTimer);
+  _excelTicketsTimer = setTimeout(async () => {
+    try {
+      const tickets = JSON.parse(localStorage.getItem('ticketsHistorique') || '[]');
+      if (!tickets.length) return;
+      const res = await fetch(`${_EXCEL_TICKETS_SRV}/api/export-excel-tickets?auto=1`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tickets }), signal: AbortSignal.timeout(10000)
+      });
+      if (res.ok) {
+        _excelTicketsOk = true;
+        console.log(`💾 [AUTO] ${tickets.length} ticket(s) sauvegardés en Excel`);
+      }
+    } catch(e) {
+      _excelTicketsOk = false;
+      console.warn('⚠️ [AUTO] Sauvegarde tickets Excel échouée :', e.message);
+    }
+  }, 5000);
+}
+
+async function exportExcelTickets() {
+  const tickets = JSON.parse(localStorage.getItem('ticketsHistorique') || '[]');
+  if (!tickets.length) { alert('Aucun ticket à exporter.'); return; }
+  if (!(await _pingTicketsServeur())) {
+    return alert("⚠️ Le serveur Excel n'est pas disponible.\nLance node server.js puis réessaie.");
+  }
+  try {
+    const res = await fetch(`${_EXCEL_TICKETS_SRV}/api/export-excel-tickets`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tickets })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error); }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Historique_Tickets_${new Date().toLocaleDateString('fr-BE').replace(/\//g,'-')}.xlsx`;
+    a.click();
+    alert(`✅ ${tickets.length} ticket(s) exporté(s).\n📁 Copie dans "sauvegarde données" sur le serveur.`);
+  } catch(err) { alert(`❌ Erreur export : ${err.message}`); }
+}
+
+async function importExcelTickets(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+  if (!(await _pingTicketsServeur())) {
+    return alert("⚠️ Le serveur Excel n'est pas disponible.\nLance node server.js puis réessaie.");
+  }
+  try {
+    const buf = await file.arrayBuffer();
+    const res = await fetch(`${_EXCEL_TICKETS_SRV}/api/import-excel-tickets`, {
+      method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: buf
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error); }
+    const data = await res.json();
+    const fusionner = confirm(`${data.count} ticket(s) trouvé(s).\n\nOK = Fusionner\nAnnuler = Remplacer tout`);
+    let ticketsHistorique = JSON.parse(localStorage.getItem('ticketsHistorique') || '[]');
+    if (fusionner) {
+      const existingIds = new Set(ticketsHistorique.map(t => t.id));
+      const nouveaux = data.tickets.filter(t => !existingIds.has(t.id));
+      ticketsHistorique = [...ticketsHistorique, ...nouveaux];
+      alert(`✅ ${nouveaux.length} nouveau(x) ticket(s) ajouté(s).`);
+    } else {
+      ticketsHistorique = data.tickets;
+      alert(`✅ ${data.count} ticket(s) importé(s) (remplacement complet).`);
+    }
+    localStorage.setItem('ticketsHistorique', JSON.stringify(ticketsHistorique));
+    location.reload();
+  } catch(err) { alert(`❌ Erreur import : ${err.message}`); }
+}
+
+// Sauvegarde auto au chargement si données présentes
+if (localStorage.getItem('ticketsHistorique')) declencherSauvegardeAutoTickets();
+</script>

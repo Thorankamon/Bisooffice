@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paramètres - Entreprise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#7c3aed; --purple-pale:#f5f3ff;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --cyan:#0891b2; --cyan-pale:#ecfeff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --glass:rgba(255,255,255,0.82);
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      font-size:14px;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      padding:24px;
+      color:var(--text);
+      position:relative;
+    }
+    body::before {
+      content:''; position:fixed; top:-150px; left:-150px;
+      width:550px; height:550px;
+      background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+    body::after {
+      content:''; position:fixed; bottom:-100px; right:5%;
+      width:450px; height:450px;
+      background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+
+    .container {
+      max-width:900px;
+      margin:0 auto;
+      position:relative;
+      z-index:2;
+    }
+
+    /* ── Bouton retour et en-tête ── */
+    .back-btn {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(200,228,252,.85));
+      border:1px solid rgba(255,255,255,.9);
+      color:var(--blue2);
+      padding:9px 20px;
+      border-radius:50px;
+      cursor:pointer;
+      font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:.9rem;
+      margin-bottom:20px;
+      display:inline-flex; align-items:center; gap:8px;
+      transition:all .2s;
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .back-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .back-btn:hover { background:linear-gradient(180deg,#fff,#d0e8ff); transform:translateX(-3px); box-shadow:0 4px 14px var(--shadow); }
+
+    .company-header {
+      background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(180,220,250,.88),rgba(120,185,240,.92));
+      border:1px solid rgba(255,255,255,.95);
+      color:var(--blue3);
+      padding:20px 28px;
+      border-radius:var(--radius-xl);
+      margin-bottom:20px;
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .company-header::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .company-header strong { font-size:1.3em; font-weight:900; display:block; margin-bottom:6px; }
+
+    h1 {
+      margin-bottom:25px; color:var(--blue3);
+      text-align:center; font-size:2rem; font-weight:900;
+      font-family:'Nunito',sans-serif; letter-spacing:-.5px;
+      position:relative; z-index:1;
+    }
+
+    .card {
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-xl);
+      padding:35px;
+      box-shadow:0 4px 16px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      backdrop-filter:blur(10px);
+      margin-bottom:25px;
+      position:relative; overflow:hidden;
+      animation:slideIn 0.3s ease;
+    }
+    .card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:5px;
+      background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));
+    }
+    .card::after {
+      content:''; position:absolute; top:5px; left:0; right:0; height:25%;
+      background:rgba(255,255,255,.42); border-radius:0 0 60% 60%;
+      pointer-events:none;
+    }
+    .card > * { position:relative; z-index:2; }
+
+    @keyframes slideIn {
+      from { opacity:0; transform:translateY(20px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    .card h2 {
+      color:var(--blue3);
+      margin-bottom:25px;
+      font-size:1.5em;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .form-grid {
+      display:grid;
+      gap:20px;
+    }
+
+    .form-group {
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .form-group label {
+      font-weight:800;
+      color:var(--text2);
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding:14px;
+      border:1.5px solid var(--border);
+      border-radius:var(--radius);
+      font-size:15px;
+      font-family:'Nunito',sans-serif;
+      font-weight:600;
+      transition:all 0.3s ease;
+      background:rgba(255,255,255,.85);
+      color:var(--text);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline:none;
+      border-color:var(--blue-light);
+      box-shadow:0 0 0 3px rgba(42,127,212,.15);
+      background:white;
+    }
+
+    .form-group textarea {
+      resize:vertical;
+      min-height:80px;
+    }
+
+    .two-columns {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+      gap:20px;
+    }
+
+    /* ── Upload logo ── */
+    .logo-upload-area {
+      border:3px dashed var(--border);
+      border-radius:var(--radius-lg);
+      padding:30px;
+      text-align:center;
+      transition:all 0.3s ease;
+      cursor:pointer;
+      background:rgba(250,250,250,.7);
+      backdrop-filter:blur(4px);
+    }
+    .logo-upload-area:hover {
+      border-color:var(--blue);
+      background:var(--blue-pale);
+      transform:translateY(-2px);
+      box-shadow:0 6px 16px var(--shadow);
+    }
+    .logo-upload-area.has-image {
+      border-style:solid;
+      border-color:var(--green);
+      background:var(--green-pale);
+    }
+
+    #companyLogo { display:none; }
+
+    .upload-icon {
+      font-size:48px;
+      color:var(--blue3);
+      margin-bottom:10px;
+    }
+
+    .upload-placeholder {
+      color:var(--text3);
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .logo-preview-container {
+      margin-top:15px;
+      display:none;
+    }
+    .logo-preview-container.active { display:block; }
+
+    #logoPreview {
+      max-width:100%;
+      max-height:200px;
+      border-radius:var(--radius);
+      box-shadow:0 4px 12px var(--shadow);
+      border:1px solid var(--border);
+    }
+
+    .info-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 12px;
+      background:var(--green-pale);
+      color:var(--green2);
+      border-radius:8px;
+      font-size:13px;
+      font-weight:700;
+      margin-top:8px;
+      border:1px solid var(--green);
+    }
+
+    /* ── Boutons ── */
+    .btn {
+      border:none;
+      border-radius:var(--radius);
+      padding:12px 24px;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      transition:all .2s;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-family:'Nunito',sans-serif;
+      position:relative; overflow:hidden;
+    }
+    .btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+
+    .btn-primary {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white;
+      border:1px solid #1050a0;
+      box-shadow:0 2px 8px rgba(30,80,180,.25),0 1px 0 rgba(255,255,255,.4) inset;
+      width:100%;
+      justify-content:center;
+      font-size:16px;
+      padding:16px;
+    }
+    .btn-primary:hover { background:linear-gradient(180deg,#90d4ff,#3a90e4,#1a6cc0); transform:translateY(-2px); box-shadow:0 4px 14px rgba(30,80,180,.4); }
+
+    .btn-secondary {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      color:var(--text2);
+      border:1px solid var(--border);
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    }
+    .btn-secondary:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); transform:translateY(-2px); }
+
+    .header {
+      background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(180,220,250,.88),rgba(120,185,240,.92));
+      border:1px solid rgba(255,255,255,.95);
+      color:var(--blue3);
+      padding:25px 35px;
+      border-radius:var(--radius-xl);
+      margin-bottom:25px;
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      position:relative; overflow:hidden;
+    }
+    .header::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .header > * { position:relative; z-index:2; }
+
+    .header h1 {
+      margin:0;
+      font-size:1.8rem;
+    }
+
+    /* ── Success message ── */
+    .success-message {
+      position:fixed;
+      top:20px;
+      right:20px;
+      background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(210,245,185,.9));
+      color:var(--green2);
+      padding:20px 30px;
+      border-radius:var(--radius-lg);
+      box-shadow:0 6px 24px var(--shadow),0 1px 0 rgba(255,255,255,.9) inset;
+      display:none;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      animation:slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s;
+      z-index:1000;
+      border:1px solid rgba(255,255,255,.85);
+      overflow:hidden;
+    }
+    .success-message::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:45%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 60% 60%;
+      pointer-events:none;
+    }
+    .success-message.show { display:flex; }
+
+    @keyframes slideInRight {
+      from { opacity:0; transform:translateX(100px); }
+      to { opacity:1; transform:translateX(0); }
+    }
+    @keyframes fadeOut {
+      to { opacity:0; transform:translateX(100px); }
+    }
+
+
+    /* ====================================================
+       BOUTON CLAVIER VIRTUEL
+       ==================================================== */
+    .btn-keyboard {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      border:1px solid var(--border);
+      color:var(--blue2);
+      border-radius:var(--radius);
+      padding:12px 20px;
+      cursor:pointer;
+      font-family:'Nunito',sans-serif;
+      font-size:15px;
+      font-weight:800;
+      display:inline-flex; align-items:center; gap:8px;
+      transition:all .2s;
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden;
+    }
+    .btn-keyboard::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .btn-keyboard:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); transform:translateY(-2px); }
+    .btn-keyboard.active {
+      background:linear-gradient(180deg,#5bb0f0,#2a7fd4,#1558b0);
+      color:white; border-color:#1050a0;
+      box-shadow:0 3px 12px rgba(30,80,180,.35);
+    }
+
+    /* ====================================================
+       CLAVIER VIRTUEL
+       ==================================================== */
+    #vKeyboard {
+      display:none; position:fixed; bottom:0; left:0; right:0;
+      background:linear-gradient(180deg,#e8f2fc,#d0e6f8);
+      border-top:2px solid var(--border); border-radius:18px 18px 0 0;
+      padding:10px 10px 16px; z-index:9999;
+      box-shadow:0 -6px 30px rgba(20,60,180,.2); user-select:none;
+    }
+    #vKeyboard.active { display:block; }
+    .vkb-topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding:0 4px; }
+    .vkb-label { font-size:12px; font-weight:800; color:var(--text2); font-family:'Nunito',sans-serif; }
+    .vkb-close { background:linear-gradient(180deg,#f08080,#c0392b); color:white; border:none; border-radius:50px; padding:5px 13px; font-family:'Nunito',sans-serif; font-size:12px; font-weight:800; cursor:pointer; }
+    .vkb-preview { background:rgba(255,255,255,.9); border:1px solid var(--border); border-radius:var(--radius); padding:7px 12px; margin-bottom:8px; font-size:15px; font-weight:700; color:var(--text); min-height:36px; display:flex; align-items:center; gap:2px; }
+    .vkb-preview-text { flex:1; }
+    .vkb-cursor { width:2px; height:18px; background:var(--blue); animation:vkbBlink .8s infinite; flex-shrink:0; }
+    @keyframes vkbBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .vkb-rows { display:flex; flex-direction:column; gap:5px; }
+    .vkb-row  { display:flex; gap:4px; justify-content:center; }
+    .vkb-key { background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(220,235,255,.85)); border:1px solid var(--border); border-bottom:3px solid #a0bcd8; border-radius:8px; min-width:30px; height:42px; font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0 5px; transition:all 0.08s; flex:1; max-width:46px; }
+    .vkb-key:active { transform:scale(0.9); background:var(--blue-pale); border-color:var(--blue); }
+    .vkb-key.wide   { flex:1.6; max-width:70px; font-size:13px; }
+    .vkb-key.wider  { flex:3; max-width:none; font-size:13px; }
+    .vkb-key.action { background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white; border-color:#0d4f9a; border-bottom-color:#0a3570; font-size:13px; }
+    .vkb-key.delete { background:linear-gradient(180deg,#faa,#e74c3c); color:white; border-color:#c0392b; border-bottom-color:#922b21; }
+    .vkb-key.shift-active { background:linear-gradient(180deg,#fff8dc,#e8a800); color:var(--text); border-color:var(--yellow); }
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:rgba(200,220,240,.3); }
+    ::-webkit-scrollbar-thumb { background:var(--blue-light); border-radius:3px; }
+
+    @media (max-width:768px) {
+      body { padding:12px; }
+      .header { flex-direction:column; gap:15px; }
+      .two-columns { grid-template-columns:1fr; }
+      .card { padding:25px; }
+    }
+
+    /* ── TVA Toggle ── */
+    .tva-toggle { position:relative; display:inline-block; width:56px; height:30px; cursor:pointer; }
+    .tva-toggle input { opacity:0; width:0; height:0; }
+    .tva-slider { position:absolute; top:0; left:0; right:0; bottom:0; background:#ccc; border-radius:30px; transition:.3s; }
+    .tva-slider::before { content:''; position:absolute; height:22px; width:22px; left:4px; bottom:4px; background:white; border-radius:50%; transition:.3s; box-shadow:0 1px 4px rgba(0,0,0,.2); }
+    .tva-toggle input:checked + .tva-slider { background:linear-gradient(180deg,#5aad2e,#3d8a18); }
+    .tva-toggle input:checked + .tva-slider::before { transform:translateX(26px); }
+    .tva-badge { display:inline-flex; align-items:center; padding:5px 12px; border-radius:50px; font-size:13px; font-weight:800; }
+    .tva-on { background:var(--green-pale); color:var(--green2); border:1px solid var(--green); }
+    .tva-off { background:var(--red-pale); color:var(--red2); border:1px solid rgba(192,57,43,.3); }
+
+    /* ── TVA rate row in modal ── */
+    .tva-rate-row { display:flex; align-items:center; gap:12px; background:rgba(255,255,255,.7); border:1px solid var(--border); border-radius:var(--radius); padding:12px 16px; }
+    .tva-rate-label { font-weight:800; color:var(--text2); font-size:14px; min-width:70px; }
+    .tva-rate-row input[type=number] { flex:1; padding:10px 12px; border:1.5px solid var(--border); border-radius:var(--radius); font-size:15px; font-family:'Nunito',sans-serif; font-weight:700; background:rgba(255,255,255,.9); color:var(--text); }
+    .tva-rate-row input[type=number]:focus { outline:none; border-color:var(--blue-light); box-shadow:0 0 0 3px rgba(42,127,212,.15); }
+    .tva-rate-row input[disabled] { background:rgba(230,230,230,.8); color:var(--text3); cursor:not-allowed; }
+    .tva-rate-suffix { font-weight:800; color:var(--text2); font-size:16px; }
+    .tva-chip { background:var(--blue-pale); border:1px solid var(--blue-light); color:var(--blue3); border-radius:50px; padding:6px 14px; font-size:13px; font-weight:800; }
+
+    /* ── Modales superuser / confirmation (zone dangereuse) ── */
+    .superuser-overlay {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(10,30,80,.55); display:none;
+      justify-content:center; align-items:center; z-index:3000;
+      backdrop-filter:blur(10px);
+    }
+    .superuser-dialog {
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,230,255,.95));
+      border:1px solid rgba(255,255,255,.95);
+      padding:32px 36px; border-radius:var(--radius-xl); width:380px;
+      box-shadow:0 24px 64px rgba(20,60,180,.3),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative;
+    }
+    .superuser-dialog h3 {
+      margin-top:0; color:var(--blue3); font-weight:900; font-family:'Nunito',sans-serif;
+      font-size:1.15rem; text-align:center; margin-bottom:6px;
+    }
+    .superuser-dialog .su-icon { font-size:2.5rem; text-align:center; display:block; margin-bottom:12px; }
+    .superuser-dialog p { color:var(--text2); font-weight:600; text-align:center; font-size:.9rem; margin-bottom:18px; line-height:1.5; }
+    .superuser-dialog input {
+      width:100%; padding:12px 16px; border:1px solid var(--border);
+      border-radius:var(--radius); font-family:'Nunito',sans-serif;
+      font-size:1.1rem; font-weight:700; text-align:center; letter-spacing:.15em;
+      background:rgba(255,255,255,.9); color:var(--text);
+      box-shadow:0 1px 4px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      margin-bottom:8px;
+    }
+    .superuser-dialog input:focus { border-color:var(--blue-light); outline:none; box-shadow:0 0 0 3px rgba(42,127,212,.15); }
+    .superuser-error { color:var(--red); font-size:.82rem; font-weight:800; text-align:center; min-height:18px; margin-bottom:14px; }
+    .superuser-btns { display:flex; gap:10px; justify-content:center; }
+    .su-btn-confirm {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white;
+      border:1px solid #882020; padding:10px 24px; border-radius:var(--radius);
+      font-family:'Nunito',sans-serif; font-weight:800; font-size:.9rem;
+      cursor:pointer; transition:all .2s; flex:1;
+    }
+    .su-btn-confirm:hover { background:linear-gradient(180deg,#f89898,#d44040,#a03030); transform:translateY(-2px); }
+    .su-btn-cancel {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      color:var(--text2); border:1px solid var(--border); padding:10px 20px;
+      border-radius:var(--radius); font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:.9rem; cursor:pointer; transition:all .2s;
+    }
+    .su-btn-cancel:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); }
+
+    /* ── Imprimante de tickets ── */
+    .imp-etat { display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-radius:var(--radius);
+      border:1px solid var(--border); background:var(--blue-pale); font-weight:700; color:var(--text2); line-height:1.55; }
+    .imp-etat.ok   { background:var(--green-pale);  border-color:var(--green);  color:#2f6a12; }
+    .imp-etat.warn { background:var(--yellow-pale); border-color:var(--yellow); color:#7a5a00; }
+    .imp-etat.ko   { background:var(--red-pale);    border-color:var(--red);    color:var(--red2); }
+    .imp-etat .imp-ico { font-size:22px; line-height:1.2; flex:none; }
+    .imp-etat code, .imp-check code { background:rgba(255,255,255,.7); padding:1px 6px; border-radius:5px; font-family:monospace; }
+    .imp-liste { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+    .imp-item { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--border);
+      border-radius:var(--radius); background:rgba(255,255,255,.85); cursor:pointer; }
+    .imp-item:has(input:checked) { border-color:var(--blue); box-shadow:0 0 0 3px rgba(42,127,212,.15); }
+    .imp-item input[type=radio] { width:18px; height:18px; flex:none; }
+    .imp-corps { flex:1; min-width:0; }
+    .imp-nom { font-weight:900; color:var(--text); }
+    .imp-sous { font-size:12.5px; color:var(--text3); font-weight:700; margin-top:2px; word-break:break-all; }
+    .imp-pill { display:inline-block; background:var(--blue-pale); color:var(--blue3); border-radius:50px;
+      padding:2px 10px; font-size:12px; font-weight:800; font-family:monospace; margin-left:8px; }
+    .imp-check { display:flex; gap:10px; padding:4px 0; font-weight:700; color:var(--text2); font-size:13.5px; line-height:1.5; }
+    .imp-btn-sm { padding:8px 14px; font-size:13px; }
+    .imp-btn-ok { background:linear-gradient(180deg,#a6e070,#5aad2e,#4a9422); color:white; border:1px solid #3d7f1c;
+      padding:10px 24px; border-radius:var(--radius); font-family:'Nunito',sans-serif; font-weight:800; font-size:.9rem;
+      cursor:pointer; transition:all .2s; flex:1; }
+    .imp-btn-ok:hover { background:linear-gradient(180deg,#b6ec82,#6cbf3a,#559f28); transform:translateY(-2px); }
+    .imp-btn-ok[disabled] { opacity:.6; cursor:wait; transform:none; }
+    .superuser-dialog .imp-cb { display:flex; align-items:center; gap:10px; justify-content:center; font-size:.85rem;
+      font-weight:700; color:var(--text2); margin:4px 0 14px; cursor:pointer; }
+    .superuser-dialog .imp-cb input { width:18px; height:18px; padding:0; margin:0; letter-spacing:0; box-shadow:none; }
+    .superuser-dialog ul.imp-liste-modal { text-align:left; font-size:.85rem; font-weight:600; color:var(--text2);
+      margin:0 0 16px 20px; line-height:1.55; }
+
+    /* ====================================================
+       ONGLETS
+       ==================================================== */
+    .tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:22px; position:relative; z-index:2; }
+    .tab-btn {
+      flex:1 1 auto; min-height:48px; padding:10px 12px; isolation:isolate;
+      background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(205,228,250,.85));
+      border:1px solid var(--border); border-radius:50px; color:var(--text2);
+      font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer;
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      transition:all .2s; position:relative; overflow:hidden; white-space:nowrap;
+    }
+    .tab-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.35); border-radius:50px 50px 0 0; pointer-events:none; z-index:-1;
+    }
+    .tab-btn:hover { color:var(--blue3); transform:translateY(-2px); background:linear-gradient(180deg,#fff,#d0e4f8); }
+    .tab-btn.active {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:#fff; border-color:#1050a0; transform:none;
+      box-shadow:0 3px 12px rgba(30,80,180,.35),0 1px 0 rgba(255,255,255,.4) inset;
+    }
+    .tab-btn.tab-danger { color:var(--red2); border-color:rgba(192,57,43,.45); }
+    .tab-btn.tab-danger:hover { background:linear-gradient(180deg,#fff,var(--red-pale)); color:var(--red2); }
+    .tab-btn.tab-danger.active {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      color:#fff; border-color:#882020;
+      box-shadow:0 3px 12px rgba(146,43,33,.4),0 1px 0 rgba(255,255,255,.35) inset;
+    }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+    @media (max-width:768px) {
+      .tab-btn { font-size:13px; padding:10px 12px; white-space:normal; }
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.history.back()">← Retour</button>
+
+  <div class="container">
+    <div class="company-header" id="companyHeader">
+      <strong>Mon Entreprise</strong><br>
+      Paramètres de l'organisation
+    </div>
+
+    <div class="header">
+      <h1>⚙️ Paramètres de l'entreprise</h1>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn-keyboard" id="btnToggleKeyboard" onclick="vkbToggleMode()">⌨️ <span id="keyboardBtnLabel">Clavier virtuel</span></button>
+        <button class="btn btn-secondary" onclick="window.history.back()">← Retour</button>
+      </div>
+    </div>
+
+    <!-- ===== ONGLETS ===== -->
+    <nav class="tabs" id="settingsTabs" role="tablist" aria-label="Sections des paramètres">
+      <button type="button" class="tab-btn active" role="tab" data-tab="info">🏢 Informations entreprise</button>
+      <button type="button" class="tab-btn" role="tab" data-tab="bank">🏦 Données bancaires</button>
+      <button type="button" class="tab-btn" role="tab" data-tab="serveur">📧 Serveur</button>
+      <button type="button" class="tab-btn" role="tab" data-tab="impression">🖨️ Impression</button>
+      <button type="button" class="tab-btn" role="tab" data-tab="ordinateur">🖥️ Ordinateur</button>
+      <button type="button" class="tab-btn" role="tab" data-tab="superuser">🔐 Droits superutilisateur</button>
+      <button type="button" class="tab-btn tab-danger" role="tab" data-tab="reset">🧨 Remise à zéro</button>
+    </nav>
+
+    <form id="settingsForm">
+      <!-- ONGLET : Informations entreprise (infos générales + logo) -->
+      <div class="tab-panel active" id="tab-info" role="tabpanel">
+      <div class="card">
+        <h2>🏢 Informations générales</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="companyName">Nom de l'entreprise *</label>
+            <input type="text" id="companyName" required placeholder="Ex: Ma Super Entreprise SPRL">
+          </div>
+
+          <div class="two-columns">
+            <div class="form-group">
+              <label for="companyType">Type d'entreprise</label>
+              <select id="companyType">
+                <option value="ASBL">ASBL</option>
+                <option value="SRL">SRL</option>
+                <option value="SA">SA</option>
+                <option value="Indépendant">Indépendant</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="companyNumber">Numéro d'entreprise</label>
+              <input type="text" id="companyNumber" placeholder="Ex: BE 0123.456.789">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="companyAddress">Adresse</label>
+            <textarea id="companyAddress" placeholder="Ex: Rue de l'Exemple, 123"></textarea>
+          </div>
+
+          <div class="two-columns">
+            <div class="form-group">
+              <label for="companyLocality">Localité</label>
+              <input type="text" id="companyLocality" placeholder="Ex: 4000 Liège">
+            </div>
+
+            <div class="form-group">
+              <label for="companyPhone">Téléphone</label>
+              <input type="tel" id="companyPhone" placeholder="Ex: +32 4 123 45 67">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🎨 Logo de l'entreprise</h2>
+        <div class="logo-upload-area" id="logoUploadArea" onclick="document.getElementById('companyLogo').click()">
+          <div class="upload-icon">📸</div>
+          <div style="font-weight: 800; color: var(--blue3); margin-bottom: 8px;">
+            Cliquez pour télécharger votre logo
+          </div>
+          <div class="upload-placeholder">
+            Formats acceptés: JPG, PNG, SVG (max 5MB)
+          </div>
+          <input type="file" id="companyLogo" accept="image/*">
+        </div>
+        <div class="logo-preview-container" id="logoPreviewContainer">
+          <img id="logoPreview" src="" alt="Aperçu du logo">
+          <div class="info-badge">
+            ✓ Logo chargé avec succès
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- ONGLET : Données bancaires (banque + TVA) -->
+      <div class="tab-panel" id="tab-bank" role="tabpanel">
+      <div class="card">
+        <h2>🏦 Données bancaires</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="bankName">Nom de la banque</label>
+            <input type="text" id="bankName" placeholder="Ex: BNP Paribas Fortis">
+          </div>
+
+          <div class="two-columns">
+            <div class="form-group">
+              <label for="bankIban">Numéro de compte (IBAN)</label>
+              <input type="text" id="bankIban" placeholder="Ex: BE68 5390 0754 7034">
+            </div>
+
+            <div class="form-group">
+              <label for="bankBic">Code BIC</label>
+              <input type="text" id="bankBic" placeholder="Ex: GKCCBEBB">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bankCommunication">Communication libre</label>
+            <input type="text" id="bankCommunication" placeholder="Ex: Paiement facture">
+          </div>
+        </div>
+      </div>
+
+      <!-- TVA Card -->
+      <div class="card">
+        <h2>🧾 TVA</h2>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div>
+            <div style="font-weight:800;color:var(--text);font-size:15px;margin-bottom:4px;">Activer la TVA</div>
+            <div style="font-size:13px;color:var(--text3);font-weight:600;">Permet d'appliquer des taux de TVA sur vos articles</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <label class="tva-toggle" id="tvaToggleLabel">
+              <input type="checkbox" id="tvaEnabled" onchange="onTvaToggle(this.checked)">
+              <span class="tva-slider"></span>
+            </label>
+            <span id="tvaStatusBadge" class="tva-badge tva-off">Désactivée</span>
+          </div>
+        </div>
+        <div id="tvaConfigure" style="margin-top:20px;display:none;">
+          <button type="button" class="btn btn-secondary" onclick="openTvaModal()" style="gap:10px;">
+            ⚙️ Configurer les taux de TVA
+          </button>
+          <div id="tvaSummary" style="margin-top:14px;display:flex;flex-wrap:wrap;gap:10px;"></div>
+        </div>
+      </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="btnSaveSettings">💾 Enregistrer les paramètres</button>
+    </form>
+
+    <!-- ONGLET : Serveur -->
+    <div class="tab-panel" id="tab-serveur" role="tabpanel">
+    <div class="card">
+      <h2>🖥️ Configuration du serveur mail</h2>
+      <p style="font-size:13px;color:var(--text3);font-weight:600;margin-bottom:20px;">
+        Renseignez vos identifiants SMTP et cliquez sur <strong>Télécharger config.json</strong> — placez ensuite ce fichier dans le même dossier que <code style="background:var(--blue-pale);color:var(--blue3);padding:2px 8px;border-radius:6px;font-family:monospace;">server.js</code>.
+      </p>
+      <div class="form-grid">
+        <div class="two-columns">
+          <div class="form-group">
+            <label for="srv_user">Adresse Gmail (expéditeur)</label>
+            <input type="email" id="srv_user" placeholder="Ex: monmail@gmail.com">
+          </div>
+          <div class="form-group">
+            <label for="srv_pass">Mot de passe d'application Google</label>
+            <input type="password" id="srv_pass" placeholder="Ex: xxxx xxxx xxxx xxxx">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="srv_dossier">Dossier des cartes membres</label>
+          <input type="text" id="srv_dossier" placeholder="Ex: ./cartes_membre" value="./cartes_membre">
+        </div>
+
+        <div class="form-group">
+          <label for="srv_url">URL du serveur mail</label>
+          <input type="text" id="srv_url" placeholder="Ex: http://localhost:3000 ou https://monapp.railway.app" value="http://localhost:3000">
+          <div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:5px;">
+            Laissez <code style="background:var(--blue-pale);color:var(--blue3);padding:1px 6px;border-radius:5px;">http://localhost:3000</code> si vous utilisez le serveur local.
+          </div>
+        </div>
+        <div style="background:var(--blue-pale);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--text2);font-weight:600;line-height:1.7;">
+          💡 Le <strong>nom d'entreprise</strong> sera automatiquement repris depuis le champ "Nom de l'entreprise" renseigné plus haut.
+        </div>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <button type="button" class="btn btn-primary" onclick="telechargerConfig()" style="width:auto;font-size:14px;padding:13px 24px;">
+          ⬇️ Télécharger config.json
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="afficherApercu()" style="font-size:14px;">
+          👁️ Aperçu
+        </button>
+      </div>
+      <pre id="configApercu" style="display:none;margin-top:16px;background:#1a2b4a;color:#a8d8f0;padding:18px;border-radius:var(--radius);font-size:13px;line-height:1.6;overflow-x:auto;border:1px solid var(--border);"></pre>
+    </div>
+    </div>
+
+    <!-- ONGLET : Impression -->
+    <div class="tab-panel" id="tab-impression" role="tabpanel">
+    <div class="card" id="cardImprimante">
+      <h2>🖨️ Imprimante de tickets</h2>
+      <p style="font-size:13px;color:var(--text3);font-weight:600;margin-bottom:18px;line-height:1.6;">
+        Détecte l'imprimante thermique branchée en USB et l'enregistre par son identifiant : elle est retrouvée
+        même si son numéro change (<code style="background:var(--blue-pale);color:var(--blue3);padding:1px 6px;border-radius:5px;">lp0</code>,
+        <code style="background:var(--blue-pale);color:var(--blue3);padding:1px 6px;border-radius:5px;">lp1</code>…),
+        après un rebranchement ou un changement d'ordinateur.
+      </p>
+
+      <div class="imp-etat" id="impEtat"><span class="imp-ico">⏳</span><div>Vérification de l'imprimante…</div></div>
+
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <button type="button" class="btn btn-primary" onclick="impDetecter()" style="width:auto;font-size:14px;padding:13px 24px;">
+          🔍 Détecter l'imprimante
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="impTester()" style="font-size:14px;">
+          🧾 Ticket de test
+        </button>
+      </div>
+
+      <div id="impResultats"></div>
+      <div id="impDiagnostic"></div>
+
+      <div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div style="font-weight:800;color:var(--text);font-size:15px;margin-bottom:4px;">💰 Ouverture automatique du tiroir-caisse</div>
+          <div style="font-size:13px;color:var(--text3);font-weight:600;">Ouvre le tiroir branché sur l'imprimante quand un ticket est imprimé</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <label class="tva-toggle">
+            <input type="checkbox" id="tiroirAuto" onchange="onTiroirToggle(this.checked)">
+            <span class="tva-slider"></span>
+          </label>
+          <span id="tiroirBadge" class="tva-badge tva-off">Désactivée</span>
+        </div>
+      </div>
+
+      <details style="margin-top:18px;">
+        <summary style="cursor:pointer;font-weight:800;color:var(--text2);">Réglage manuel</summary>
+        <div class="form-group" style="margin-top:12px;">
+          <label for="impCheminManuel">Chemin du périphérique</label>
+          <input type="text" id="impCheminManuel" placeholder="/dev/usb/lp0">
+          <div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:5px;">
+            À utiliser seulement si la détection ne trouve rien. Le chemin doit commencer par <code style="background:var(--blue-pale);color:var(--blue3);padding:1px 6px;border-radius:5px;">/dev/</code>.
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-secondary" onclick="impEnregistrerManuel()" style="font-size:14px;">💾 Utiliser ce chemin</button>
+          <button type="button" class="btn btn-secondary" onclick="impRepasserAuto()" style="font-size:14px;">↩️ Repasser en automatique</button>
+        </div>
+      </details>
+    </div>
+    </div>
+
+    <!-- ONGLET : Ordinateur (raccourci Linux) -->
+    <div class="tab-panel" id="tab-ordinateur" role="tabpanel">
+    <div class="card">
+      <h2>🖥️ Raccourci Linux</h2>
+      <p style="font-size:13px;color:var(--text3);font-weight:600;margin-bottom:20px;line-height:1.6;">
+        Créez un raccourci <code style="background:var(--blue-pale);color:var(--blue3);padding:2px 8px;border-radius:6px;font-family:monospace;">.desktop</code>
+        pour lancer <strong>lance_caisse.sh</strong> depuis votre bureau Linux.
+        Le terminal restera ouvert pendant l'exécution.
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="linuxScriptPath">Chemin complet de lance_caisse.sh</label>
+          <input type="text" id="linuxScriptPath"
+                 placeholder="/home/votre-nom/chemin/vers/lance_caisse.sh"
+                 value="">
+          <div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:5px;">
+            Exemple : <code style="background:var(--blue-pale);color:var(--blue3);padding:1px 6px;border-radius:5px;">/home/Thorakankamon/ma-caisse/lance_caisse.sh</code>
+          </div>
+        </div>
+
+        <div class="two-columns">
+          <div class="form-group">
+            <label for="linuxDesktopName">Nom du raccourci</label>
+            <input type="text" id="linuxDesktopName" value="Caisse" placeholder="Ex: Caisse">
+          </div>
+          <div class="form-group">
+            <label for="linuxDesktopIcon">Icône</label>
+            <select id="linuxDesktopIcon">
+              <option value="utilities-terminal">🖥️ Terminal</option>
+              <option value="applications-office">💼 Bureau</option>
+              <option value="application-x-executable">⚙️ Exécutable</option>
+              <option value="system-run">▶️ Exécution</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <button type="button" class="btn btn-primary" onclick="telechargerDesktopLinux()" style="width:auto;font-size:14px;padding:13px 24px;">
+          ⬇️ Télécharger le raccourci .desktop
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="afficherApercuDesktop()" style="font-size:14px;">
+          👁️ Aperçu
+        </button>
+      </div>
+
+      <pre id="desktopApercu" style="display:none;margin-top:16px;background:#1a2b4a;color:#a8d8f0;padding:18px;border-radius:var(--radius);font-size:13px;line-height:1.6;overflow-x:auto;border:1px solid var(--border);"></pre>
+    </div>
+    </div>
+
+    <!-- ONGLET : Droits superutilisateur -->
+    <div class="tab-panel" id="tab-superuser" role="tabpanel">
+      <div class="card">
+        <h2>🔐 Droits superutilisateur</h2>
+        <p style="font-size:13px;color:var(--text3);font-weight:600;margin-bottom:20px;line-height:1.6;">
+          Le mot de passe superutilisateur protège les actions sensibles, comme la <strong>remise à zéro</strong>.
+          Il est enregistré sur cet appareil. Pour le changer, saisissez d'abord l'actuel.
+        </p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="su_current">Mot de passe actuel</label>
+            <input type="password" id="su_current" maxlength="20" autocomplete="off" placeholder="••••">
+          </div>
+          <div class="two-columns">
+            <div class="form-group">
+              <label for="su_new">Nouveau mot de passe</label>
+              <input type="password" id="su_new" maxlength="20" autocomplete="off" placeholder="4 caractères minimum">
+            </div>
+            <div class="form-group">
+              <label for="su_confirm">Confirmer le nouveau mot de passe</label>
+              <input type="password" id="su_confirm" maxlength="20" autocomplete="off" placeholder="Retapez-le"
+                     onkeydown="if(event.key==='Enter') changerMotDePasseSU()">
+            </div>
+          </div>
+          <div id="suChangeMsg" style="min-height:20px;font-weight:800;font-size:13px;"></div>
+        </div>
+        <div style="margin-top:8px;">
+          <button type="button" class="btn btn-primary" onclick="changerMotDePasseSU()" style="width:auto;font-size:14px;padding:13px 24px;">
+            🔑 Changer le mot de passe
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONGLET : Remise à zéro (zone dangereuse) -->
+    <div class="tab-panel" id="tab-reset" role="tabpanel">
+    <div class="card" style="border:2px solid var(--red);">
+      <h2 style="color:var(--red);">🧨 Zone dangereuse</h2>
+      <p style="font-size:13px;color:var(--text3);font-weight:600;margin-bottom:20px;line-height:1.6;">
+        Ce bouton efface <strong>définitivement</strong> toutes les données : tables, tickets (ouverts, historique, corbeille,
+        remboursements), membres, stock, articles, rapports, réglages, <strong>et les sauvegardes Excel auto-générées</strong>
+        (dossier « sauvegarde données »). Sur le serveur ET sur cet appareil.
+        À utiliser uniquement pour repartir d'une caisse totalement vierge (nouvelle saison, tests terminés, etc.).
+        <strong>Aucune sauvegarde n'est faite avant — vos exports Excel déjà téléchargés (dans vos Téléchargements) ne sont pas touchés.</strong>
+      </p>
+      <button type="button" class="btn" style="background:linear-gradient(180deg,#f08080,#c0392b,#922b21);color:white;border:1px solid #882020;width:auto;padding:13px 24px;font-size:14px;"
+              onclick="lancerResetTotal()">
+        🗑️ Réinitialiser TOUT (remise à zéro)
+      </button>
+    </div>
+    </div>
+
+
+  </div>
+
+  <!-- Modale superuser mot de passe -->
+  <div class="superuser-overlay" id="superuserOverlay">
+    <div class="superuser-dialog">
+      <span class="su-icon">🔐</span>
+      <h3>Accès restreint</h3>
+      <p id="suMessage">Cette action nécessite le mot de passe superutilisateur.</p>
+      <input type="password" id="suPasswordInput" placeholder="••••" maxlength="20"
+             onkeydown="if(event.key==='Enter') superuserConfirm()">
+      <div class="superuser-error" id="suError"></div>
+      <div class="superuser-btns">
+        <button class="su-btn-cancel" onclick="superuserCancel()">Annuler</button>
+        <button class="su-btn-confirm" onclick="superuserConfirm()">🗑 Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale autorisation imprimante (mot de passe Linux, une seule fois) -->
+  <div class="superuser-overlay" id="impSudoOverlay">
+    <div class="superuser-dialog" style="width:440px;max-width:92vw;">
+      <span class="su-icon">🔓</span>
+      <h3>Autoriser l'imprimante</h3>
+      <p>Mot de passe de la session Linux de <strong id="impSudoUser">votre session</strong>
+         (celui demandé au lancement de la caisse). Il n'est pas enregistré.</p>
+      <ul class="imp-liste-modal">
+        <li>règle d'accès permanente pour cette imprimante</li>
+        <li>chargement du pilote <code>usblp</code></li>
+      </ul>
+      <input type="password" id="impSudoPass" placeholder="Mot de passe Linux" autocomplete="off"
+             onkeydown="if(event.key==='Enter') impLancerAutorisation()">
+      <label class="imp-cb"><input type="checkbox" id="impSudoLp" checked> Ajouter aussi l'utilisateur au groupe « lp »</label>
+      <div class="superuser-error" id="impSudoErr"></div>
+      <div class="superuser-btns">
+        <button type="button" class="su-btn-cancel" onclick="impFermerAutorisation()">Annuler</button>
+        <button type="button" class="imp-btn-ok" id="impSudoGo" onclick="impLancerAutorisation()">Autoriser</button>
+      </div>
+      <details id="impSudoManuel" style="margin-top:14px;">
+        <summary style="cursor:pointer;font-weight:800;color:var(--text2);font-size:.85rem;">Ou faites-le vous-même dans un terminal</summary>
+        <pre id="impSudoCmd" style="margin-top:10px;background:#1a2b4a;color:#a8d8f0;padding:12px;border-radius:var(--radius);font-size:11.5px;line-height:1.55;overflow-x:auto;white-space:pre-wrap;word-break:break-all;"></pre>
+      </details>
+    </div>
+  </div>
+
+  <!-- Modale confirmation texte (2e verrou, action irréversible) -->
+  <div class="superuser-overlay" id="resetConfirmOverlay">
+    <div class="superuser-dialog">
+      <span class="su-icon">⚠️</span>
+      <h3>Dernière confirmation</h3>
+      <p>Cette action est <strong>irréversible</strong>. Tapez <strong>RESET</strong> ci-dessous pour tout remettre à zéro.</p>
+      <input type="text" id="resetConfirmInput" placeholder="RESET" maxlength="20"
+             onkeydown="if(event.key==='Enter') confirmerResetTotal()">
+      <div class="superuser-error" id="resetConfirmError"></div>
+      <div class="superuser-btns">
+        <button class="su-btn-cancel" onclick="document.getElementById('resetConfirmOverlay').style.display='none'">Annuler</button>
+        <button class="su-btn-confirm" onclick="confirmerResetTotal()">🧨 Tout remettre à zéro</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL TVA ===== -->
+  <div id="tvaModal" style="display:none;position:fixed;z-index:2000;left:0;top:0;width:100%;height:100%;background:rgba(10,40,90,.45);backdrop-filter:blur(8px);">
+    <div style="background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));border:1px solid rgba(255,255,255,.95);margin:5% auto;border-radius:var(--radius-xl);width:90%;max-width:480px;box-shadow:0 20px 60px rgba(20,60,180,.25);overflow:hidden;position:relative;">
+      <div style="position:absolute;top:0;left:0;right:0;height:25%;background:rgba(255,255,255,.45);border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;pointer-events:none;z-index:0;"></div>
+      <!-- Header -->
+      <div style="padding:20px 25px;background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);color:white;border-radius:var(--radius-xl) var(--radius-xl) 0 0;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:2;">
+        <h3 style="font-size:20px;font-weight:900;">⚙️ Configurer les taux de TVA</h3>
+        <span onclick="closeTvaModal()" style="color:white;font-size:28px;font-weight:bold;cursor:pointer;transition:transform .2s;" onmouseover="this.style.transform='rotate(90deg)'" onmouseout="this.style.transform=''">×</span>
+      </div>
+      <!-- Body -->
+      <div style="padding:25px;position:relative;z-index:2;">
+        <p style="font-size:13px;color:var(--text3);font-weight:600;margin-bottom:20px;">Définissez jusqu'à 4 taux de TVA. Le taux 1 est toujours à 0% (exonéré).</p>
+        <div id="tvaTauxList" style="display:flex;flex-direction:column;gap:14px;"></div>
+      </div>
+      <!-- Footer -->
+      <div style="padding:20px 25px;background:rgba(255,255,255,.7);border-radius:0 0 var(--radius-xl) var(--radius-xl);display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border);position:relative;z-index:2;">
+        <button type="button" class="btn btn-secondary" onclick="closeTvaModal()">Annuler</button>
+        <button type="button" class="btn btn-primary" onclick="saveTvaTaux()">💾 Enregistrer les taux</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-message" id="successMessage">
+    <span style="font-size: 24px;">✅</span>
+    <span>Paramètres enregistrés avec succès !</span>
+  </div>
+
+  <script>
+// ── Sync serveur automatique ──────────────────────────────────────────────────
+const _IS_SERVER = window.location.protocol === "http:";
+const _API_BASE  = window.location.origin + "/api";
+
+// ===========================
+// 🔐 SUPERUSER PASSWORD SYSTEM (même mot de passe que historique.html)
+// ===========================
+const SUPERUSER_PASSWORD_DEFAUT = "1111";   // valeur par défaut tant qu'il n'a pas été changé (onglet « Droits superutilisateur »)
+function getSuperuserPassword() {
+  const brut = localStorage.getItem("superuserPassword");
+  if (!brut) return SUPERUSER_PASSWORD_DEFAUT;
+  try { const v = JSON.parse(brut); return (typeof v === "string" && v) ? v : SUPERUSER_PASSWORD_DEFAUT; }
+  catch (e) { return brut; }
+}
+let suPendingAction = null;
+
+function requireSuperuser(actionFn, message) {
+  suPendingAction = actionFn;
+  document.getElementById("suMessage").textContent = message || "Cette action nécessite le mot de passe superutilisateur.";
+  document.getElementById("suPasswordInput").value = "";
+  document.getElementById("suError").textContent = "";
+  document.getElementById("superuserOverlay").style.display = "flex";
+  setTimeout(() => document.getElementById("suPasswordInput").focus(), 100);
+}
+function superuserConfirm() {
+  const val = document.getElementById("suPasswordInput").value;
+  if (val === getSuperuserPassword()) {
+    document.getElementById("superuserOverlay").style.display = "none";
+    if (suPendingAction) { suPendingAction(); suPendingAction = null; }
+  } else {
+    document.getElementById("suError").textContent = "❌ Mot de passe incorrect";
+    document.getElementById("suPasswordInput").value = "";
+    document.getElementById("suPasswordInput").focus();
+  }
+}
+function superuserCancel() {
+  document.getElementById("superuserOverlay").style.display = "none";
+  suPendingAction = null;
+  document.getElementById("suError").textContent = "";
+}
+
+// ===========================
+// 🧨 RESET TOTAL (zone dangereuse)
+// ===========================
+// Toutes les clés localStorage utilisées par la caisse (mêmes clés que côté serveur
+// + quelques clés 100% locales comme pointeurTickets qui ne passent jamais par /api/sync)
+const TOUTES_LES_CLES_CAISSE = [
+  "tables","tickets","ticketsHistorique","deletedTickets","refundedTickets","availableTicketIds",
+  "lastTicketId","lastTicketNumero","reservations","membres","lastMembreId","memberPins",
+  "membresLogoOverride","articlesData","articles","tvaSettings","lastArticleId","lastCategorieId",
+  "rapports","corbeilleRapports","numX","numZ","lastZCloture","ctrl_log","ctrl_rapports",
+  "stock","stockData","stockHistory","companySettings","displayOptions","users","loginHistory",
+  "lastLoginISO","serverConfig","emailSubject","emailBody","adminPassword","pendingOrders",
+  "asbl_gestion_v1","mailSubject","mailBody","historiqueEmails","historiqueFactures",
+  "pointeurTickets","printerSettings","commandeSession","acceptedOrderIds","refusedOrderIds","ordersHistory"
+];
+
+function lancerResetTotal() {
+  requireSuperuser(function() {
+    document.getElementById("resetConfirmInput").value = "";
+    document.getElementById("resetConfirmError").textContent = "";
+    document.getElementById("resetConfirmOverlay").style.display = "flex";
+    setTimeout(() => document.getElementById("resetConfirmInput").focus(), 100);
+  }, "🧨 Remise à zéro complète — mot de passe requis.");
+}
+
+async function confirmerResetTotal() {
+  const val = document.getElementById("resetConfirmInput").value.trim().toUpperCase();
+  if (val !== "RESET") {
+    document.getElementById("resetConfirmError").textContent = "❌ Tapez RESET pour confirmer";
+    return;
+  }
+  document.getElementById("resetConfirmOverlay").style.display = "none";
+
+  if (_IS_SERVER) {
+    try {
+      await fetch(_API_BASE + "/reset-all", { method: "POST" });
+    } catch (e) {
+      alert("⚠️ Impossible de contacter le serveur pour la remise à zéro — vérifiez que serveur.py tourne bien. Les données locales de cet appareil vont quand même être effacées.");
+    }
+  }
+
+  TOUTES_LES_CLES_CAISSE.forEach(k => localStorage.removeItem(k));
+
+  alert("✅ Remise à zéro effectuée. La page va se recharger.");
+  window.location.href = "tables.html";
+}
+async function syncToServer(...keys) {
+  if (!_IS_SERVER) return;
+  const body = {};
+  keys.forEach(k => {
+    try { body[k] = JSON.parse(localStorage.getItem(k) || "null"); } catch(e) {}
+  });
+  try {
+    await fetch(_API_BASE + "/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  } catch(e) {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+    const form = document.getElementById("settingsForm");
+    const logoInput = document.getElementById("companyLogo");
+    const logoPreview = document.getElementById("logoPreview");
+    const logoUploadArea = document.getElementById("logoUploadArea");
+    const logoPreviewContainer = document.getElementById("logoPreviewContainer");
+    const successMessage = document.getElementById("successMessage");
+    const companyHeader = document.getElementById("companyHeader");
+
+    // Mettre à jour l'en-tête avec les données
+    function updateCompanyHeader() {
+      const data = JSON.parse(localStorage.getItem("companySettings")) || {};
+      const name = data.companyName || "Mon Entreprise";
+      const address = data.companyAddress || "";
+      const locality = data.companyLocality || "";
+      const number = data.companyNumber || "";
+      
+      companyHeader.innerHTML = `
+        <strong>${name}</strong><br>
+        ${address} ${locality}<br>
+        N° Entreprise : ${number}
+      `;
+    }
+
+    // Charger les données au démarrage
+    window.onload = () => {
+      updateCompanyHeader();
+      const data = JSON.parse(localStorage.getItem("companySettings")) || {};
+      for (let key in data) {
+        if (key === "companyLogo" && data[key]) {
+          logoPreview.src = data[key];
+          logoPreviewContainer.classList.add('active');
+          logoUploadArea.classList.add('has-image');
+        } else if (document.getElementById(key)) {
+          document.getElementById(key).value = data[key];
+        }
+      }
+      loadTvaSettings();
+      // Charger la configuration du raccourci Linux
+      const linuxShortcut = JSON.parse(localStorage.getItem("linuxShortcut") || "{}");
+      if (linuxShortcut.scriptPath) document.getElementById("linuxScriptPath").value = linuxShortcut.scriptPath;
+      if (linuxShortcut.name) document.getElementById("linuxDesktopName").value = linuxShortcut.name;
+      if (linuxShortcut.icon) document.getElementById("linuxDesktopIcon").value = linuxShortcut.icon;
+
+      // Charger config serveur sauvegardée
+      const srv = JSON.parse(localStorage.getItem("serverConfig")) || {};
+      if (srv.user)    document.getElementById("srv_user").value    = srv.user;
+      if (srv.pass)    document.getElementById("srv_pass").value    = srv.pass;
+      if (srv.dossier) document.getElementById("srv_dossier").value = srv.dossier;
+      if (srv.serverUrl) document.getElementById("srv_url").value  = srv.serverUrl;
+    };
+
+    // ===== CONFIG SERVEUR =====
+    function buildConfig() {
+      const companySettings = JSON.parse(localStorage.getItem("companySettings")) || {};
+      return {
+        nomEntreprise: companySettings.companyName || "",
+        smtp: {
+          auth: {
+            user: document.getElementById("srv_user").value.trim(),
+            pass: document.getElementById("srv_pass").value.trim()
+          }
+        },
+        dossierCartes: document.getElementById("srv_dossier").value.trim() || "./cartes_membre",
+        serverUrl: document.getElementById("srv_url").value.trim() || "http://localhost:3000"
+      };
+    }
+
+    function telechargerConfig() {
+      const user = document.getElementById("srv_user").value.trim();
+      const pass = document.getElementById("srv_pass").value.trim();
+      if (!user || !pass) {
+        alert("⚠️ Veuillez renseigner l'adresse Gmail et le mot de passe d'application.");
+        return;
+      }
+      // Sauvegarder localement (hors mot de passe)
+      const serverUrl = document.getElementById("srv_url").value.trim() || "http://localhost:3000";
+      localStorage.setItem("serverConfig", JSON.stringify({ user, dossier: document.getElementById("srv_dossier").value.trim(), serverUrl }));
+      syncToServer("companySettings", "tvaSettings", "serverConfig");
+
+      const cfg = buildConfig();
+      const blob = new Blob([JSON.stringify(cfg, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "config.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+
+      // Toast succès
+      successMessage.querySelector('span:last-child').textContent = "config.json téléchargé !";
+      successMessage.classList.add('show');
+      setTimeout(() => {
+        successMessage.classList.remove('show');
+        successMessage.querySelector('span:last-child').textContent = "Paramètres enregistrés avec succès !";
+      }, 3000);
+    }
+
+    function afficherApercu() {
+      const pre = document.getElementById("configApercu");
+      if (pre.style.display !== "none") { pre.style.display = "none"; return; }
+      const cfg = buildConfig();
+      // Masquer le mot de passe dans l'aperçu
+      const display = JSON.parse(JSON.stringify(cfg));
+      if (display.smtp.auth.pass) display.smtp.auth.pass = "••••••••••••••••";
+      pre.textContent = JSON.stringify(display, null, 2);
+      pre.style.display = "block";
+    }
+
+    // ===== RACCOURCI LINUX (.desktop) =====
+    function buildDesktopLinux() {
+      const scriptPath = document.getElementById("linuxScriptPath").value.trim();
+      const name = document.getElementById("linuxDesktopName").value.trim() || "Caisse";
+      const icon = document.getElementById("linuxDesktopIcon").value || "utilities-terminal";
+
+      if (!scriptPath) {
+        alert("⚠️ Indiquez le chemin complet vers lance_caisse.sh.");
+        return null;
+      }
+
+      if (!scriptPath.endsWith("/lance_caisse.sh")) {
+        const ok = confirm("⚠️ Le chemin indiqué ne se termine pas par /lance_caisse.sh.\\n\\nVoulez-vous quand même créer le raccourci ?");
+        if (!ok) return null;
+      }
+
+      // Le script sera lancé avec son dossier comme répertoire de travail.
+      // Terminal=true demande à l'environnement de bureau d'ouvrir un terminal.
+      const desktop = `[Desktop Entry]
+Version=1.0
+Type=Application
+Name=${name.replace(/[\r\n]/g, " ")}
+Comment=Lancer la caisse
+Exec=/bin/bash -c 'cd -- "$(dirname -- "${scriptPath.replace(/'/g, "'\\\\''")}")" && exec bash -- "${scriptPath.replace(/'/g, "'\\\\''")}"'
+Icon=${icon}
+Terminal=true
+Categories=Utility;
+StartupNotify=true
+`;
+
+      return { desktop, scriptPath, name, icon };
+    }
+
+    function telechargerDesktopLinux() {
+      const result = buildDesktopLinux();
+      if (!result) return;
+
+      localStorage.setItem("linuxShortcut", JSON.stringify({
+        scriptPath: result.scriptPath,
+        name: result.name,
+        icon: result.icon
+      }));
+
+      const blob = new Blob([result.desktop], { type: "application/x-desktop" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "caisse.desktop";
+      a.click();
+      URL.revokeObjectURL(a.href);
+
+      successMessage.querySelector('span:last-child').textContent = "Raccourci caisse.desktop téléchargé !";
+      successMessage.classList.add('show');
+      setTimeout(() => {
+        successMessage.classList.remove('show');
+        successMessage.querySelector('span:last-child').textContent = "Paramètres enregistrés avec succès !";
+      }, 3000);
+    }
+
+    function afficherApercuDesktop() {
+      const pre = document.getElementById("desktopApercu");
+      if (pre.style.display !== "none") {
+        pre.style.display = "none";
+        return;
+      }
+
+      const result = buildDesktopLinux();
+      if (!result) return;
+
+      pre.textContent = result.desktop;
+      pre.style.display = "block";
+    }
+
+    document.getElementById("linuxScriptPath").addEventListener("input", () => {
+      localStorage.setItem("linuxShortcut", JSON.stringify({
+        scriptPath: document.getElementById("linuxScriptPath").value.trim(),
+        name: document.getElementById("linuxDesktopName").value.trim() || "Caisse",
+        icon: document.getElementById("linuxDesktopIcon").value
+      }));
+    });
+    document.getElementById("linuxDesktopName").addEventListener("input", () => {
+      localStorage.setItem("linuxShortcut", JSON.stringify({
+        scriptPath: document.getElementById("linuxScriptPath").value.trim(),
+        name: document.getElementById("linuxDesktopName").value.trim() || "Caisse",
+        icon: document.getElementById("linuxDesktopIcon").value
+      }));
+    });
+    document.getElementById("linuxDesktopIcon").addEventListener("change", () => {
+      localStorage.setItem("linuxShortcut", JSON.stringify({
+        scriptPath: document.getElementById("linuxScriptPath").value.trim(),
+        name: document.getElementById("linuxDesktopName").value.trim() || "Caisse",
+        icon: document.getElementById("linuxDesktopIcon").value
+      }));
+    });
+
+    // Prévisualisation logo
+    logoInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        // Vérifier la taille du fichier (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+          alert("❌ Le fichier est trop volumineux. Taille maximale: 5MB");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          logoPreview.src = ev.target.result;
+          logoPreviewContainer.classList.add('active');
+          logoUploadArea.classList.add('has-image');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Sauvegarde
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      
+      const data = {};
+      ["companyName","companyType","companyNumber","companyAddress","companyLocality","companyPhone","bankName","bankIban","bankBic","bankCommunication"].forEach(id => {
+        data[id] = document.getElementById(id).value;
+      });
+      
+      if (logoPreview.src && logoPreview.src !== window.location.href) {
+        data["companyLogo"] = logoPreview.src;
+      }
+      
+      localStorage.setItem("companySettings", JSON.stringify(data));
+      syncToServer("companySettings", "tvaSettings", "serverConfig");
+      
+      // Mettre à jour l'en-tête
+      updateCompanyHeader();
+      
+      // Afficher le message de succès
+      successMessage.classList.add('show');
+      setTimeout(() => {
+        successMessage.classList.remove('show');
+      }, 3000);
+
+      // Scroll vers le haut pour voir la confirmation
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ===== TVA =====
+    const TVA_DEFAULT = [
+      { label: "Taux 1 (exonéré)", value: 0, locked: true },
+      { label: "Taux 2", value: 6, locked: false },
+      { label: "Taux 3", value: 12, locked: false },
+      { label: "Taux 4", value: 21, locked: false },
+    ];
+
+    function loadTvaSettings() {
+      const saved = JSON.parse(localStorage.getItem("tvaSettings") || "null");
+      const enabled = saved ? saved.enabled : false;
+      const taux = (saved && saved.taux) ? saved.taux : JSON.parse(JSON.stringify(TVA_DEFAULT));
+      document.getElementById("tvaEnabled").checked = enabled;
+      updateTvaUI(enabled);
+      updateTvaSummary(taux);
+    }
+
+    function onTvaToggle(enabled) {
+      updateTvaUI(enabled);
+      const saved = JSON.parse(localStorage.getItem("tvaSettings") || "null");
+      const taux = (saved && saved.taux) ? saved.taux : JSON.parse(JSON.stringify(TVA_DEFAULT));
+      localStorage.setItem("tvaSettings", JSON.stringify({ enabled, taux }));
+      syncToServer("companySettings", "tvaSettings", "serverConfig");
+      updateTvaSummary(taux);
+    }
+
+    function updateTvaUI(enabled) {
+      const badge = document.getElementById("tvaStatusBadge");
+      const configure = document.getElementById("tvaConfigure");
+      badge.textContent = enabled ? "Activée" : "Désactivée";
+      badge.className = "tva-badge " + (enabled ? "tva-on" : "tva-off");
+      configure.style.display = enabled ? "block" : "none";
+    }
+
+    function updateTvaSummary(taux) {
+      const summary = document.getElementById("tvaSummary");
+      const enabled = document.getElementById("tvaEnabled").checked;
+      if (!enabled) { summary.innerHTML = ""; return; }
+      summary.innerHTML = taux.map(t => `<span class="tva-chip">${t.value}%</span>`).join("");
+    }
+
+    function openTvaModal() {
+      const saved = JSON.parse(localStorage.getItem("tvaSettings") || "null");
+      const taux = (saved && saved.taux) ? saved.taux : JSON.parse(JSON.stringify(TVA_DEFAULT));
+      const list = document.getElementById("tvaTauxList");
+      list.innerHTML = "";
+      taux.forEach((t, i) => {
+        const row = document.createElement("div");
+        row.className = "tva-rate-row";
+        row.innerHTML = `
+          <span class="tva-rate-label">${t.label || "Taux " + (i+1)}</span>
+          <input type="number" id="tvaTaux${i}" value="${t.value}" min="0" max="100" step="0.1" ${t.locked ? "disabled" : ""} placeholder="ex: 21">
+          <span class="tva-rate-suffix">%</span>
+          ${t.locked ? '<span style="font-size:12px;color:var(--text3);font-weight:700;">fixe</span>' : ''}
+        `;
+        list.appendChild(row);
+      });
+      document.getElementById("tvaModal").style.display = "block";
+    }
+
+    function closeTvaModal() {
+      document.getElementById("tvaModal").style.display = "none";
+    }
+
+    function saveTvaTaux() {
+      const saved = JSON.parse(localStorage.getItem("tvaSettings") || "null");
+      const taux = (saved && saved.taux) ? saved.taux : JSON.parse(JSON.stringify(TVA_DEFAULT));
+      taux.forEach((t, i) => {
+        if (!t.locked) {
+          const input = document.getElementById("tvaTaux" + i);
+          if (input) {
+            const v = parseFloat(input.value);
+            t.value = isNaN(v) ? 0 : Math.min(100, Math.max(0, v));
+          }
+        }
+      });
+      const enabled = document.getElementById("tvaEnabled").checked;
+      localStorage.setItem("tvaSettings", JSON.stringify({ enabled, taux }));
+      syncToServer("companySettings", "tvaSettings", "serverConfig");
+      updateTvaSummary(taux);
+      closeTvaModal();
+      successMessage.classList.add('show');
+      successMessage.querySelector('span:last-child').textContent = "Taux de TVA enregistrés !";
+      setTimeout(() => successMessage.classList.remove('show'), 2500);
+    }
+
+    // Close tva modal on outside click
+    document.getElementById("tvaModal").addEventListener("click", function(e) {
+      if (e.target === this) closeTvaModal();
+    });
+
+    // Drag & drop pour le logo (bonus)
+    logoUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      logoUploadArea.style.borderColor = 'var(--blue)';
+      logoUploadArea.style.background = 'var(--blue-pale)';
+    });
+
+    logoUploadArea.addEventListener('dragleave', () => {
+      if (!logoUploadArea.classList.contains('has-image')) {
+        logoUploadArea.style.borderColor = 'var(--border)';
+        logoUploadArea.style.background = 'rgba(250,250,250,.7)';
+      }
+    });
+
+    logoUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        logoInput.files = e.dataTransfer.files;
+        logoInput.dispatchEvent(new Event('change'));
+      }
+    });
+  </script>
+
+<!-- ===== CLAVIER VIRTUEL ===== -->
+<div id="vKeyboard">
+  <div class="vkb-topbar">
+    <span class="vkb-label" id="vkbLabel">⌨️ Clavier</span>
+    <button class="vkb-close" onclick="vkbClose()">✕ Fermer</button>
+  </div>
+  <div class="vkb-preview">
+    <span class="vkb-preview-text" id="vkbPreview"></span>
+    <span class="vkb-cursor"></span>
+  </div>
+  <div class="vkb-rows" id="vkbRows"></div>
+</div>
+
+<script>
+(function(){
+  const LAYOUTS = {
+    text: {
+      normal: [
+        ['a','z','e','r','t','y','u','i','o','p'],
+        ['q','s','d','f','g','h','j','k','l','m'],
+        ['SHIFT','w','x','c','v','b','n','⌫'],
+        ['123','@','.','ESPACE','_','-','OK']
+      ],
+      shifted: [
+        ['A','Z','E','R','T','Y','U','I','O','P'],
+        ['Q','S','D','F','G','H','J','K','L','M'],
+        ['SHIFT','W','X','C','V','B','N','⌫'],
+        ['123','@','.','ESPACE','_','-','OK']
+      ],
+      num: [
+        ['1','2','3','4','5','6','7','8','9','0'],
+        ['-','_','.','/','+','(',')',  '⌫'],
+        ['ABC','BE','EUR','@','com','.be','OK']
+      ]
+    },
+    tel: {
+      normal: [
+        ['1','2','3'],
+        ['4','5','6'],
+        ['7','8','9'],
+        ['+','0','⌫'],
+        ['ESPACE','(',')','-'],
+        ['OK']
+      ]
+    },
+    iban: {
+      normal: [
+        ['B','E','F','R','N','L','D','E','G','B'],
+        ['1','2','3','4','5','6','7','8','9','0'],
+        ['ESPACE','-','⌫','OK']
+      ]
+    }
+  };
+
+  let activeInput=null, currentLayout='text', currentLayer='normal', shiftOn=false, vkbEnabled=false;
+
+  // Champs et leur layout spécifique
+  const FIELDS = [
+    {id:'companyName',    layout:'text'},
+    {id:'companyNumber',  layout:'text'},
+    {id:'companyAddress', layout:'text'},
+    {id:'companyLocality',layout:'text'},
+    {id:'companyPhone',   layout:'tel'},
+    {id:'bankName',       layout:'text'},
+    {id:'bankIban',       layout:'iban'},
+    {id:'bankBic',        layout:'text'},
+    {id:'bankCommunication', layout:'text'},
+    {id:'su_current',    layout:'text'},
+    {id:'su_new',        layout:'text'},
+    {id:'su_confirm',    layout:'text'},
+  ];
+
+  function getRows(){ const l=LAYOUTS[currentLayout]||LAYOUTS.text; return l[currentLayer]||l['normal']; }
+
+  function render(){
+    const rows=getRows(), container=document.getElementById('vkbRows');
+    container.innerHTML='';
+    rows.forEach(row=>{
+      const rowEl=document.createElement('div'); rowEl.className='vkb-row';
+      row.forEach(key=>{
+        const btn=document.createElement('button'); btn.className='vkb-key'; btn.type='button';
+        if(key==='ESPACE'){btn.className+=' wider';btn.textContent='␣ espace';}
+        else if(key==='OK'){btn.className+=' wide action';btn.textContent='✓ OK';}
+        else if(key==='⌫'){btn.className+=' wide delete';btn.textContent='⌫';}
+        else if(key==='SHIFT'){btn.className+=' wide'+(shiftOn?' shift-active':'');btn.textContent='⇧';}
+        else if(key==='123'||key==='ABC'){btn.className+=' wide action';btn.textContent=key;}
+        else if(['BE','FR','NL','DE','GB','EUR','com','.be'].includes(key)){btn.className+=' wide action';btn.textContent=key;}
+        else{btn.textContent=key;}
+        btn.addEventListener('mousedown',e=>{e.preventDefault();handleKey(key);});
+        btn.addEventListener('touchstart',e=>{e.preventDefault();handleKey(key);},{passive:false});
+        rowEl.appendChild(btn);
+      });
+      container.appendChild(rowEl);
+    });
+    updatePreview();
+  }
+
+  function handleKey(key){
+    if(!activeInput)return;
+    if(key==='OK'){vkbClose();return;}
+    if(key==='⌫'){
+      const v=activeInput.value, s=activeInput.selectionStart;
+      if(s>0){activeInput.value=v.slice(0,s-1)+v.slice(s);activeInput.selectionStart=activeInput.selectionEnd=s-1;}
+      activeInput.dispatchEvent(new Event('input'));updatePreview();return;
+    }
+    if(key==='ESPACE'){insert(' ');return;}
+    if(key==='SHIFT'){shiftOn=!shiftOn;currentLayer=shiftOn?'shifted':'normal';render();return;}
+    if(key==='123'){currentLayer='num';render();return;}
+    if(key==='ABC'){currentLayer='normal';render();return;}
+    insert(key);
+    if(shiftOn){shiftOn=false;currentLayer='normal';render();return;}
+    updatePreview();
+  }
+
+  function insert(str){
+    if(!activeInput)return;
+    const s=activeInput.selectionStart||activeInput.value.length, v=activeInput.value;
+    activeInput.value=v.slice(0,s)+str+v.slice(s);
+    activeInput.selectionStart=activeInput.selectionEnd=s+str.length;
+    activeInput.dispatchEvent(new Event('input'));
+    updatePreview();
+  }
+
+  function updatePreview(){
+    const el=document.getElementById('vkbPreview');
+    if(el&&activeInput){
+      const v=activeInput.value||'';
+      if(activeInput.type==='password'){el.textContent='•'.repeat(v.length);return;}
+      el.textContent=v.length>60?'…'+v.slice(-60):v;
+    }
+  }
+
+  function vkbOpen(input, layout){
+    if(!vkbEnabled)return;
+    activeInput=input; shiftOn=false; currentLayer='normal';
+    currentLayout=layout||'text';
+    const label=input.closest('.form-group')?.querySelector('label')?.textContent||'Clavier';
+    document.getElementById('vkbLabel').textContent='⌨️ '+label.trim().replace(/\s+/g,' ');
+    render();
+    document.getElementById('vKeyboard').classList.add('active');
+    setTimeout(()=>input.scrollIntoView({behavior:'smooth',block:'center'}),150);
+  }
+
+  window.vkbClose=function(){
+    document.getElementById('vKeyboard').classList.remove('active');
+    if(activeInput){activeInput.blur();activeInput=null;}
+  };
+
+  window.vkbToggleMode=function(){
+    vkbEnabled=!vkbEnabled;
+    const btn=document.getElementById('btnToggleKeyboard');
+    const lbl=document.getElementById('keyboardBtnLabel');
+    FIELDS.forEach(({id,layout})=>{
+      const el=document.getElementById(id);
+      if(!el)return;
+      if(vkbEnabled){
+        el.setAttribute('readonly','readonly');
+        if(!el._vkbHandler){
+          el._vkbHandler=e=>{e.preventDefault();vkbOpen(el,layout);};
+          el.addEventListener('click',el._vkbHandler);
+          el.addEventListener('focus',el._vkbHandler);
+        }
+      } else {
+        el.removeAttribute('readonly');
+        if(el._vkbHandler){
+          el.removeEventListener('click',el._vkbHandler);
+          el.removeEventListener('focus',el._vkbHandler);
+          el._vkbHandler=null;
+        }
+        vkbClose();
+      }
+    });
+    if(vkbEnabled){btn.classList.add('active');lbl.textContent='Clavier actif';}
+    else{btn.classList.remove('active');lbl.textContent='Clavier virtuel';}
+  };
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  🖨️ IMPRIMANTE DE TICKETS — détection, test et autorisations Linux
+//  Parle au serveur d'impression (serveur_impression.py, port 8088).
+// ═══════════════════════════════════════════════════════════════════════════
+(function () {
+  const API = "http://localhost:8088";
+  let dernier = null;        // dernier résultat de /printer/detect
+  let cfgCourante = null;    // configuration enregistrée (de /printer/status ou /printer/detect)
+  let utilisateur = "";
+  let idChoisi = "";         // imprimante cochée (pour la garder après un rafraîchissement)
+  let cible = null;          // imprimante visée par l'autorisation
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g,
+    c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const cleImp = p => [p.vendorId, p.productId, p.serial].join(":");
+  const nomImp = p => ((p.manufacturer || "") + " " + (p.product || "")).trim() || "Imprimante USB";
+
+  async function appel(chemin, options, delaiMs) {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), delaiMs || 10000);
+    try {
+      const r = await fetch(API + chemin, Object.assign({ signal: ctl.signal }, options || {}));
+      let data = {};
+      try { data = await r.json(); } catch (e) {}
+      return { ok: r.ok, data };
+    } finally { clearTimeout(t); }
+  }
+  const post = (chemin, corps, delai) => appel(chemin, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps || {})
+  }, delai);
+
+  function etat(type, icone, html) {
+    const el = $("impEtat");
+    el.className = "imp-etat" + (type ? " " + type : "");
+    el.innerHTML = '<span class="imp-ico">' + icone + '</span><div>' + html + '</div>';
+  }
+
+  function toast(msg) {
+    const m = $("successMessage"); if (!m) return;
+    const span = m.querySelector("span:last-child");
+    const ancien = span.textContent;
+    span.textContent = msg; m.classList.add("show");
+    setTimeout(() => { m.classList.remove("show"); span.textContent = ancien; }, 2500);
+  }
+
+  const BTN_AUTORISER = ' <button type="button" class="btn btn-secondary imp-btn-sm" onclick="impOuvrirAutorisation()">🔓 Autoriser l\'accès</button>';
+
+  function serveurInjoignable() {
+    let h = "<strong>Serveur d'impression injoignable</strong> (port 8088). Il démarre avec <code>lance_caisse.sh</code>.";
+    if (typeof _IS_SERVER !== "undefined" && _IS_SERVER) {
+      h += ' <button type="button" class="btn btn-secondary imp-btn-sm" onclick="impRedemarrerServeur()">🔄 Redémarrer le serveur d\'impression</button>';
+    }
+    etat("ko", "❌", h);
+  }
+
+  function bandeau(path, raison, existe, accessible, nom) {
+    if (path && accessible && /^plusieurs/.test(raison || "")) {
+      etat("warn", "⚠️", "<strong>Plusieurs imprimantes USB détectées</strong> — aucune n'est encore enregistrée." +
+        "<br>Cliquez sur « Détecter l'imprimante », choisissez la bonne (bouton « Tester »), puis « Utiliser cette imprimante ».");
+    } else if (path && accessible) {
+      etat("ok", "✅", "<strong>Imprimante prête</strong>" + (nom ? " — " + esc(nom) : "") +
+        "<br><code>" + esc(path) + "</code> · " + esc(raison));
+    } else if (path && existe) {
+      etat("warn", "🔒", "<strong>Imprimante trouvée, mais accès refusé</strong><br><code>" + esc(path) + "</code>" +
+        "<div style=\"margin-top:8px;\">" + BTN_AUTORISER + "</div>");
+    } else if (path) {
+      etat("ko", "🔌", "<strong>Périphérique introuvable</strong> : <code>" + esc(path) +
+        "</code><br>Imprimante éteinte ou débranchée ? Sinon, relancez la détection.");
+    } else {
+      etat("warn", "🔍", "<strong>Aucune imprimante configurée</strong><br>" + esc(raison || "") +
+        "<br>Cliquez sur « Détecter l'imprimante ».");
+    }
+  }
+
+  // ── État au chargement de la page ──────────────────────────────────────────
+  async function statut() {
+    try {
+      const { data } = await appel("/printer/status");
+      cfgCourante = data.config || null;
+      utilisateur = data.utilisateur || utilisateur;
+      if (data.plateforme && data.plateforme !== "Linux") {
+        etat("warn", "ℹ️", "La détection automatique n'est disponible que sous Linux.");
+        return;
+      }
+      if (cfgCourante && cfgCourante.mode === "manual" && cfgCourante.path) $("impCheminManuel").value = cfgCourante.path;
+      bandeau(data.path, data.raison, data.exists, data.writable, cfgCourante && cfgCourante.name);
+    } catch (e) { serveurInjoignable(); }
+  }
+
+  // ── Détection ──────────────────────────────────────────────────────────────
+  function choisie() {
+    if (!dernier || !dernier.imprimantes) return null;
+    const r = document.querySelector('input[name="impChoix"]:checked');
+    return r ? dernier.imprimantes[parseInt(r.value, 10)] : null;
+  }
+
+  window.impMemoriser = function () { const p = choisie(); if (p) idChoisi = cleImp(p); };
+
+  function afficherResultats(data) {
+    const liste = data.imprimantes || [];
+    let h = "";
+    if (liste.length) {
+      h += '<div class="imp-liste">';
+      liste.forEach((p, i) => {
+        const id = p.vendorId ? '<span class="imp-pill">' + esc(p.vendorId + ":" + p.productId) + "</span>" : "";
+        const acces = p.writable ? "✅ accès autorisé" : "🔒 accès refusé (autorisation nécessaire)";
+        const coche = (idChoisi ? idChoisi === cleImp(p) : p.selectionne) ? " checked" : "";
+        h += '<label class="imp-item"><input type="radio" name="impChoix" value="' + i + '"' + coche + ' onchange="impMemoriser()">' +
+          '<div class="imp-corps"><div class="imp-nom">' + esc(nomImp(p)) + id + "</div>" +
+          '<div class="imp-sous">' + esc(p.path) + " · " + acces + (p.serial ? " · n° " + esc(p.serial) : "") + "</div></div>" +
+          '<button type="button" class="btn btn-secondary imp-btn-sm" onclick="event.preventDefault();event.stopPropagation();impTesterIndex(' + i + ')">🧾 Tester</button></label>';
+      });
+      h += "</div>";
+      h += '<div style="margin-top:14px;"><button type="button" class="btn btn-primary" onclick="impUtiliser()" style="width:auto;font-size:14px;padding:13px 24px;">✅ Utiliser cette imprimante</button></div>';
+    } else {
+      h += '<div class="imp-etat warn" style="margin-top:14px;"><span class="imp-ico">🔌</span><div>Aucune imprimante USB détectée.<br>' +
+        "Vérifiez qu'elle est <strong>allumée</strong>, branchée en <strong>USB</strong> (câble de données) et qu'elle a du papier, " +
+        "puis relancez la détection.</div></div>";
+    }
+    const autres = data.autresUsb || [];
+    if (autres.length) {
+      h += '<div style="margin-top:16px;font-size:13px;font-weight:800;color:var(--text2);">Autres périphériques USB qui pourraient être une imprimante</div><div class="imp-liste">';
+      autres.forEach(p => {
+        h += '<div class="imp-item" style="cursor:default;"><div class="imp-corps"><div class="imp-nom">' + esc(nomImp(p)) +
+          '<span class="imp-pill">' + esc(p.vendorId + ":" + p.productId) + "</span></div>" +
+          '<div class="imp-sous">' + esc(p.raison) + "</div></div></div>";
+      });
+      h += "</div>";
+    }
+    const zone = $("impResultats");
+    zone.innerHTML = h;
+    if (liste.length && !zone.querySelector('input[name="impChoix"]:checked')) {
+      zone.querySelector('input[name="impChoix"]').checked = true;
+    }
+    impMemoriser();
+  }
+
+  function afficherDiagnostic(data) {
+    const s = data.systeme || {}, u = data.utilise || {}, a = data.imprimantes || [];
+    const ligne = (ico, txt) => '<div class="imp-check"><span>' + ico + "</span><span>" + txt + "</span></div>";
+    let h = '<div style="margin-top:18px;font-weight:900;color:var(--text2);">Diagnostic</div>';
+    h += ligne(a.length ? "✅" : "❌", a.length ? "Imprimante USB détectée" : "Aucune imprimante USB détectée");
+    h += ligne(s.moduleUsblp ? "✅" : "⚠️", "Pilote noyau <code>usblp</code> " + (s.moduleUsblp ? "chargé" : "non chargé (il sera chargé à l'autorisation)"));
+    h += ligne(a.length ? (u.accessible ? "✅" : "❌") : "➖", "Droit d'écriture sur l'imprimante");
+    h += ligne(s.regleUdev ? "✅" : "⚠️", "Règle d'accès permanente (udev) " + (s.regleUdev ? "installée" : "non installée : les droits sont perdus au redémarrage ou au rebranchement"));
+    h += ligne(s.dansGroupeLp ? "✅" : "⚠️", "Utilisateur <strong>" + esc(s.utilisateur) + "</strong> dans le groupe <code>lp</code>" + (s.dansGroupeLp ? "" : " (facultatif quand la règle udev est installée)"));
+    const sudoOk = s.sudoInstalle && s.peutUtiliserSudo;
+    h += ligne(sudoOk ? "✅" : "⚠️", "Droits administrateur (<code>sudo</code>) " + (sudoOk ? "disponibles" : "non détectés pour cet utilisateur (nécessaires une seule fois pour l'autorisation)"));
+    const besoin = (a.length && (!u.accessible || !s.regleUdev)) || (data.autresUsb || []).some(x => /^Classe/.test(x.raison || ""));
+    if (besoin) {
+      h += '<div style="margin-top:12px;"><button type="button" class="btn btn-secondary" onclick="impOuvrirAutorisation()" style="font-size:14px;">🔓 Autoriser l\'accès (une seule fois)</button></div>';
+    }
+    $("impDiagnostic").innerHTML = h;
+  }
+
+  function rendreDetection(data) {
+    dernier = data;
+    cfgCourante = data.config || cfgCourante;
+    utilisateur = (data.systeme && data.systeme.utilisateur) || utilisateur;
+    if (!data.supporte) {
+      etat("warn", "ℹ️", esc(data.message || "Non disponible sur ce système."));
+      $("impResultats").innerHTML = ""; $("impDiagnostic").innerHTML = "";
+      return;
+    }
+    afficherResultats(data);
+    afficherDiagnostic(data);
+    const u = data.utilise || {};
+    bandeau(u.path, u.raison, u.existe, u.accessible, cfgCourante && cfgCourante.name);
+  }
+
+  window.impDetecter = async function () {
+    etat("", "🔍", "Recherche de l'imprimante…");
+    try {
+      const { data } = await appel("/printer/detect");
+      rendreDetection(data);
+    } catch (e) { serveurInjoignable(); }
+  };
+
+  // ── Enregistrer / tester ───────────────────────────────────────────────────
+  async function enregistrer(p) {
+    const corps = p.vendorId
+      ? { mode: "auto", vendorId: p.vendorId, productId: p.productId, serial: p.serial || "", name: nomImp(p), path: "" }
+      : { mode: "manual", path: p.path, name: nomImp(p) };      // nœud sans identifiant USB lisible
+    return post("/printer/config", corps);
+  }
+
+  window.impUtiliser = async function () {
+    const p = choisie(); if (!p) return;
+    try {
+      const { ok, data } = await enregistrer(p);
+      if (!ok) { etat("ko", "❌", esc(data.error || "Enregistrement impossible")); return; }
+      toast("Imprimante enregistrée !");
+      await window.impDetecter();
+      if (dernier && dernier.utilise && !dernier.utilise.accessible) window.impOuvrirAutorisation();
+    } catch (e) { serveurInjoignable(); }
+  };
+
+  async function tester(chemin) {
+    etat("", "🧾", "Envoi du ticket de test…");
+    try {
+      const { ok, data } = await post("/printer/test", chemin ? { path: chemin } : {});
+      if (ok) etat("ok", "✅", "Ticket de test envoyé sur <code>" + esc(data.path) + "</code>. Il doit sortir de l'imprimante.");
+      else etat("ko", "❌", esc(data.error || "Échec du test") + (/Permission/i.test(data.error || "") ? "<div style=\"margin-top:8px;\">" + BTN_AUTORISER + "</div>" : ""));
+    } catch (e) { serveurInjoignable(); }
+  }
+  window.impTester = function () { return tester(null); };
+  window.impTesterIndex = function (i) { return tester(dernier && dernier.imprimantes[i] ? dernier.imprimantes[i].path : null); };
+
+  window.impEnregistrerManuel = async function () {
+    const chemin = $("impCheminManuel").value.trim();
+    if (!chemin) { etat("warn", "⚠️", "Saisissez un chemin, par exemple <code>/dev/usb/lp0</code>."); return; }
+    try {
+      const { ok, data } = await post("/printer/config", { mode: "manual", path: chemin, name: "" });
+      if (!ok) { etat("ko", "❌", esc(data.error || "Chemin refusé")); return; }
+      toast("Chemin enregistré !"); await statut();
+    } catch (e) { serveurInjoignable(); }
+  };
+
+  window.impRepasserAuto = async function () {
+    try {
+      const { ok, data } = await post("/printer/config", { mode: "auto", path: "" });
+      if (!ok) { etat("ko", "❌", esc(data.error || "Erreur")); return; }
+      toast("Mode automatique activé !"); await window.impDetecter();
+    } catch (e) { serveurInjoignable(); }
+  };
+
+  window.impRedemarrerServeur = async function () {
+    etat("", "🔄", "Redémarrage du serveur d'impression…");
+    try { await fetch(_API_BASE + "/restart-impression", { method: "POST" }); } catch (e) {}
+    setTimeout(statut, 2500);
+  };
+
+  // ── Autorisations Linux (sudo, une seule fois) ─────────────────────────────
+  function commandeManuelle(p, user) {
+    const regle = 'SUBSYSTEM=="usbmisc", KERNEL=="lp[0-9]*", ATTRS{idVendor}=="' + p.vendorId +
+      '", ATTRS{idProduct}=="' + p.productId + '", MODE="0666", SYMLINK+="caisse_imprimante"';
+    return "echo '" + regle + "' | sudo tee /etc/udev/rules.d/99-caisse-imprimante.rules\n" +
+      "sudo modprobe usblp\n" +
+      "sudo usermod -aG lp " + (user || "$USER") + "\n" +
+      "sudo udevadm control --reload-rules\n" +
+      "sudo udevadm trigger --subsystem-match=usbmisc --action=add";
+  }
+
+  window.impOuvrirAutorisation = function () {
+    let p = choisie();
+    if (!p && dernier && dernier.autresUsb) p = dernier.autresUsb.find(x => /^Classe/.test(x.raison || "")) || null;
+    if (!p && cfgCourante && cfgCourante.vendorId) p = { vendorId: cfgCourante.vendorId, productId: cfgCourante.productId, serial: cfgCourante.serial || "", product: cfgCourante.name || "" };
+    if (!p || !p.vendorId) {
+      etat("warn", "🔍", "Lancez d'abord la détection pour choisir l'imprimante à autoriser.");
+      return;
+    }
+    cible = p;
+    $("impSudoUser").textContent = utilisateur || "votre session";
+    $("impSudoPass").value = ""; $("impSudoErr").textContent = "";
+    $("impSudoCmd").textContent = commandeManuelle(p, utilisateur);
+    $("impSudoManuel").open = false;
+    $("impSudoGo").disabled = false; $("impSudoGo").textContent = "Autoriser";
+    $("impSudoOverlay").style.display = "flex";
+    setTimeout(() => $("impSudoPass").focus(), 100);
+  };
+
+  window.impFermerAutorisation = function () {
+    $("impSudoPass").value = "";
+    $("impSudoOverlay").style.display = "none";
+  };
+
+  window.impLancerAutorisation = async function () {
+    const mdp = $("impSudoPass").value;
+    if (!mdp) { $("impSudoErr").textContent = "Entrez le mot de passe."; return; }
+    if (!cible) return;
+    const bouton = $("impSudoGo");
+    bouton.disabled = true; bouton.textContent = "Configuration…"; $("impSudoErr").textContent = "";
+    try {
+      const { ok, data } = await post("/printer/setup-permissions", {
+        password: mdp, vendorId: cible.vendorId, productId: cible.productId, addToLp: $("impSudoLp").checked
+      }, 90000);
+      $("impSudoPass").value = "";
+      if (ok && data.success) {
+        window.impFermerAutorisation();
+        await enregistrer(cible);                       // autoriser = utiliser cette imprimante
+        idChoisi = cleImp(cible);
+        const { data: det } = await appel("/printer/detect");
+        rendreDetection(det);
+        const items = (data.journal || []).map(x => "<li>" + esc(x) + "</li>").join("");
+        etat("ok", "✅", "<strong>Autorisations configurées</strong><ul style=\"margin:6px 0 0 18px;\">" + items +
+          "</ul><div style=\"margin-top:8px;\">Lancez un ticket de test pour vérifier.</div>");
+        toast("Autorisations configurées !");
+      } else {
+        $("impSudoErr").textContent = data.error || "Échec de la configuration.";
+        bouton.disabled = false; bouton.textContent = "Autoriser";
+        if (data.manuel) $("impSudoManuel").open = true;
+        $("impSudoPass").focus();
+      }
+    } catch (e) {
+      $("impSudoErr").textContent = "Serveur d'impression injoignable.";
+      bouton.disabled = false; bouton.textContent = "Autoriser";
+    }
+  };
+
+  window.addEventListener("load", statut);
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  📑 ONGLETS DES PARAMÈTRES
+// ═══════════════════════════════════════════════════════════════════════════
+(function () {
+  const btns   = Array.from(document.querySelectorAll('#settingsTabs .tab-btn'));
+  const panels = Array.from(document.querySelectorAll('.tab-panel'));
+  const saveBtn = document.getElementById('btnSaveSettings');
+  const FORM_TABS = ['info', 'bank'];   // onglets couverts par le bouton « Enregistrer »
+
+  function show(name) {
+    if (!panels.some(p => p.id === 'tab-' + name)) name = 'info';
+    panels.forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+    btns.forEach(b => {
+      const on = b.dataset.tab === name;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    if (saveBtn) saveBtn.style.display = FORM_TABS.includes(name) ? '' : 'none';
+    try { history.replaceState(null, '', '#' + name); } catch (e) {}
+    return name;
+  }
+
+  btns.forEach(b => b.addEventListener('click', () => {
+    show(b.dataset.tab);
+    if (typeof window.vkbClose === 'function') window.vkbClose();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }));
+
+  // Champ obligatoire vide dans un onglet caché : on revient sur l'onglet concerné
+  document.getElementById('settingsForm').addEventListener('invalid', function (e) {
+    const panel = e.target.closest('.tab-panel');
+    if (panel && !panel.classList.contains('active')) {
+      show(panel.id.replace('tab-', ''));
+      setTimeout(() => { try { e.target.reportValidity(); } catch (err) {} }, 50);
+    }
+  }, true);
+
+  show(location.hash.slice(1) || 'info');
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  🔐 Changement du mot de passe superutilisateur  +  💰 Tiroir-caisse
+// ═══════════════════════════════════════════════════════════════════════════
+(function () {
+  function toast(msg) {
+    const m = document.getElementById("successMessage"); if (!m) return;
+    const span = m.querySelector("span:last-child");
+    const ancien = span.textContent;
+    span.textContent = msg; m.classList.add("show");
+    setTimeout(() => { m.classList.remove("show"); span.textContent = ancien; }, 2500);
+  }
+
+  // ── Mot de passe superutilisateur ──
+  function suMsg(texte, ok) {
+    const el = document.getElementById("suChangeMsg");
+    el.textContent = texte;
+    el.style.color = ok ? "var(--green2)" : "var(--red)";
+  }
+
+  window.changerMotDePasseSU = function () {
+    const cur = document.getElementById("su_current");
+    const nv  = document.getElementById("su_new");
+    const cf  = document.getElementById("su_confirm");
+
+    if (cur.value !== getSuperuserPassword()) { suMsg("❌ Mot de passe actuel incorrect", false); cur.value = ""; return; }
+    if (nv.value.length < 4)                  { suMsg("❌ Le nouveau mot de passe doit faire au moins 4 caractères", false); return; }
+    if (nv.value === cur.value)               { suMsg("❌ Le nouveau mot de passe est identique à l'actuel", false); return; }
+    if (nv.value !== cf.value)                { suMsg("❌ La confirmation ne correspond pas", false); cf.value = ""; return; }
+
+    localStorage.setItem("superuserPassword", JSON.stringify(nv.value));
+    syncToServer("superuserPassword");
+    cur.value = nv.value = cf.value = "";
+    suMsg("✅ Mot de passe modifié", true);
+    toast("Mot de passe superutilisateur modifié !");
+  };
+
+  // ── Tiroir-caisse ──
+  function lireImprimante() {
+    try { return JSON.parse(localStorage.getItem("printerSettings") || "{}") || {}; } catch (e) { return {}; }
+  }
+  function majTiroirUI(on) {
+    const b = document.getElementById("tiroirBadge");
+    b.textContent = on ? "Activée" : "Désactivée";
+    b.className = "tva-badge " + (on ? "tva-on" : "tva-off");
+  }
+  window.onTiroirToggle = function (on) {
+    const cfg = lireImprimante();
+    cfg.openDrawer = !!on;
+    localStorage.setItem("printerSettings", JSON.stringify(cfg));
+    syncToServer("printerSettings");
+    majTiroirUI(on);
+    toast(on ? "Tiroir-caisse : ouverture automatique activée" : "Tiroir-caisse : ouverture automatique désactivée");
+  };
+  const on = !!lireImprimante().openDrawer;
+  document.getElementById("tiroirAuto").checked = on;
+  majTiroirUI(on);
+})();
+</script>
+</body>
+</html>

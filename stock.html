@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion du Stock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#7c3aed; --purple-pale:#f5f3ff;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --cyan:#0891b2; --cyan-pale:#ecfeff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --glass:rgba(255,255,255,0.82);
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      font-size:14px;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      padding:20px;
+      color:var(--text);
+      position:relative;
+    }
+
+    body::before {
+      content:''; position:fixed; top:-150px; left:-150px;
+      width:550px; height:550px;
+      background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+    body::after {
+      content:''; position:fixed; bottom:-100px; right:5%;
+      width:450px; height:450px;
+      background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .header {
+      background: linear-gradient(145deg, rgba(255,255,255,.88), rgba(215,238,255,.75));
+      border: 1px solid rgba(255,255,255,.95);
+      border-radius: var(--radius-xl);
+      padding: 25px 30px;
+      box-shadow: 0 4px 16px var(--shadow2);
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg, var(--blue-light), var(--green), var(--yellow));
+    }
+    .header::after {
+      content: ''; position: absolute; top: 5px; left: 0; right: 0; height: 25%;
+      background: rgba(255,255,255,.42); border-radius: 0 0 60% 60%;
+      pointer-events: none;
+    }
+    .header > * { position: relative; z-index: 2; }
+
+    .header h1 {
+      color: var(--blue3);
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Nunito', sans-serif;
+    }
+    .btn::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,.3); border-radius: var(--radius) var(--radius) 0 0; pointer-events: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #7cc4f8, #2a7fd4, #1558b0);
+      color: white;
+      border: 1px solid #1050a0;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(210,228,248,.85));
+      color: var(--text2);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: linear-gradient(180deg, #fff, #d0e4f8);
+      color: var(--blue3);
+      transform: translateY(-2px);
+    }
+
+    .btn-success {
+      background: linear-gradient(180deg, #84d47c, #4a9422, #2d6a1a);
+      color: white;
+      border: 1px solid #2d6a1a;
+    }
+    .btn-success:hover {
+      background: linear-gradient(180deg, #a4e474, #5aad2e, #3d8a18);
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(180deg, #f08080, #c0392b, #922b21);
+      color: white;
+      border: 1px solid #882020;
+    }
+    .btn-danger:hover {
+      background: linear-gradient(180deg, #f89898, #d44040, #a03030);
+      transform: translateY(-2px);
+    }
+
+    .btn-warning {
+      background: linear-gradient(180deg, #ffc870, var(--orange), #b86200);
+      color: white;
+      border: 1px solid #a05800;
+    }
+    .btn-warning:hover {
+      background: linear-gradient(180deg, #ffd080, #e8962a, #c87000);
+      transform: translateY(-2px);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(145deg, rgba(255,255,255,.88), rgba(215,238,255,.75));
+      border: 1px solid rgba(255,255,255,.95);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: 0 4px 16px var(--shadow2);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg, var(--blue-light), var(--green), var(--yellow));
+    }
+    .stat-card::after {
+      content: ''; position: absolute; top: 5px; left: 0; right: 0; height: 25%;
+      background: rgba(255,255,255,.42); border-radius: 0 0 60% 60%;
+      pointer-events: none;
+    }
+    .stat-card > * { position: relative; z-index: 2; }
+
+    .stat-card h3 {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--blue3);
+    }
+
+    .stat-card.success .value { color: var(--green2); }
+    .stat-card.warning .value { color: var(--orange); }
+    .stat-card.danger .value { color: var(--red2); }
+
+    .section {
+      background: linear-gradient(145deg, rgba(255,255,255,.88), rgba(215,238,255,.75));
+      border: 1px solid rgba(255,255,255,.95);
+      border-radius: var(--radius-xl);
+      padding: 25px 30px;
+      box-shadow: 0 4px 16px var(--shadow2);
+      margin-bottom: 25px;
+      position: relative;
+      overflow: hidden;
+    }
+    .section::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg, var(--blue-light), var(--green), var(--yellow));
+    }
+    .section::after {
+      content: ''; position: absolute; top: 5px; left: 0; right: 0; height: 25%;
+      background: rgba(255,255,255,.42); border-radius: 0 0 60% 60%;
+      pointer-events: none;
+    }
+    .section > * { position: relative; z-index: 2; }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--border2);
+    }
+
+    .section-header h2 {
+      color: var(--blue3);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(10,40,90,.45);
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      background: linear-gradient(160deg, rgba(255,255,255,.97), rgba(215,238,255,.95));
+      border: 1px solid rgba(255,255,255,.95);
+      margin: 5% auto;
+      padding: 0;
+      border-radius: var(--radius-xl);
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(20,60,180,.25);
+      animation: slideDown 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-content::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 25%;
+      background: rgba(255,255,255,.45); border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events: none;
+    }
+    .modal-content > * { position: relative; z-index: 2; }
+
+    .modal-header {
+      padding: 20px 25px;
+      background: linear-gradient(180deg, #7cc4f8, #2a7fd4, #1558b0);
+      color: white;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1050a0;
+    }
+
+    .modal-header h3 {
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .close {
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .close:hover {
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text2);
+      font-weight: 800;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 600;
+      background: rgba(255,255,255,.85);
+      color: var(--text);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px rgba(42,127,212,.15);
+    }
+
+    .modal-footer {
+      padding: 20px 25px;
+      background: rgba(255,255,255,.7);
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.5);
+      backdrop-filter: blur(4px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    thead {
+      background: linear-gradient(180deg, #4a9fd8, #2a7fd4, #1a5fb0);
+      color: white;
+    }
+
+    th {
+      padding: 15px;
+      text-align: left;
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    th:first-child { border-radius: var(--radius-lg) 0 0 0; }
+    th:last-child { border-radius: 0 var(--radius-lg) 0 0; }
+
+    tbody tr {
+      background: rgba(255,255,255,.7);
+      transition: all 0.2s ease;
+    }
+    tbody tr:nth-child(even) { background: rgba(250,250,250,.8); }
+    tbody tr:hover {
+      background: var(--blue-pale);
+      transform: scale(1.01);
+    }
+
+    td {
+      padding: 15px;
+      border-bottom: 1px solid var(--border2);
+      font-weight: 600;
+      color: var(--text2);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .stock-low {
+      color: var(--red);
+      font-weight: 800;
+    }
+    .stock-ok {
+      color: var(--green2);
+      font-weight: 800;
+    }
+    .stock-medium {
+      color: var(--orange);
+      font-weight: 800;
+    }
+    .stock-infini {
+      color: var(--blue);
+      font-weight: 800;
+      font-size: 22px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text3);
+      font-weight: 600;
+    }
+    .empty-state div { font-size: 64px; margin-bottom: 20px; }
+
+    .alert {
+      padding: 15px 20px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid;
+    }
+    .alert::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,.3); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      pointer-events: none;
+    }
+    .alert-warning {
+      background: var(--yellow-pale);
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+    .alert-danger {
+      background: var(--red-pale);
+      border-color: var(--red);
+      color: var(--red2);
+    }
+
+    .history-item {
+      padding: 12px;
+      background: rgba(255,255,255,.7);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      border-left: 4px solid;
+      font-weight: 600;
+    }
+    .history-item.add { border-left-color: var(--green); }
+    .history-item.remove { border-left-color: var(--red); }
+    .history-item.payment { border-left-color: var(--blue); }
+
+    .toggle-infini {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+    }
+    .toggle-infini input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--blue);
+    }
+    .toggle-infini label {
+      margin: 0;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--blue3);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(200,220,240,.3); }
+    ::-webkit-scrollbar-thumb { background: var(--blue-light); border-radius: 3px; }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .stats-grid { grid-template-columns: 1fr; }
+      .action-buttons { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📦 Gestion du Stock</h1>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="window.history.back()">⬅ Retour</button>
+        <button class="btn btn-primary" onclick="openStockModal()">➕ Ajuster Stock</button>
+        <button class="btn btn-warning" onclick="toutMettrInfini()" title="Passer tous les articles en stock infini">♾️ Tout infini</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Articles totaux</h3>
+        <div class="value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card success">
+        <h3>Stock disponible</h3>
+        <div class="value" id="statDisponible">0</div>
+      </div>
+      <div class="stat-card warning">
+        <h3>Stock faible</h3>
+        <div class="value" id="statFaible">0</div>
+      </div>
+      <div class="stat-card danger">
+        <h3>Stock épuisé</h3>
+        <div class="value" id="statEpuise">0</div>
+      </div>
+    </div>
+
+    <div id="alertesContainer"></div>
+
+    <div class="section">
+      <div class="section-header">
+        <h2>📊 État du Stock</h2>
+        <button class="btn btn-success" onclick="exportStockCSV()">📥 Exporter CSV</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Article</th>
+              <th>Catégorie</th>
+              <th>Stock Actuel</th>
+              <th>Seuil Minimum</th>
+              <th>État</th>
+              <th>Dernière MAJ</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="stockTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <h2>📜 Historique des Mouvements</h2>
+        <button class="btn btn-warning" onclick="clearHistory()">🗑️ Effacer Historique</button>
+      </div>
+      <div id="historyContainer"></div>
+    </div>
+  </div>
+
+  <div id="stockModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Ajuster le Stock</h3>
+        <span class="close" onclick="closeStockModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="stockForm">
+          <div class="form-group">
+            <label for="articleSelect">Article *</label>
+            <select id="articleSelect" required></select>
+          </div>
+          
+          <div class="form-group">
+            <label>Stock actuel: <strong id="currentStock">0</strong></label>
+          </div>
+          
+          <div class="form-group">
+            <label for="mouvement">Type de mouvement *</label>
+            <select id="mouvement" required>
+              <option value="add">➕ Ajouter au stock</option>
+              <option value="remove">➖ Retirer du stock</option>
+              <option value="set">📝 Définir le stock</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="quantite">Quantité *</label>
+            <input type="number" id="quantite" min="0" step="1" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="seuilMin">Seuil minimum d'alerte</label>
+            <input type="number" id="seuilMin" min="0" step="1" value="5">
+          </div>
+
+          <div class="form-group">
+            <div class="toggle-infini">
+              <input type="checkbox" id="stockInfini" onchange="toggleInfini()">
+              <label for="stockInfini">♾️ Stock infini (jamais épuisé, pas d'alerte)</label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="motif">Motif</label>
+            <input type="text" id="motif" placeholder="Raison de l'ajustement">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeStockModal()">Annuler</button>
+        <button class="btn btn-success" onclick="saveStock()">✓ Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+// ── Sync serveur automatique ──────────────────────────────────────────────────
+const _IS_SERVER = window.location.protocol === "http:";
+const _API_BASE  = window.location.origin + "/api";
+async function syncToServer(...keys) {
+  if (!_IS_SERVER) return;
+  const body = {};
+  keys.forEach(k => {
+    try { body[k] = JSON.parse(localStorage.getItem(k) || "null"); } catch(e) {}
+  });
+  try {
+    await fetch(_API_BASE + "/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  } catch(e) {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+    let articles = [];
+    let stock = {};
+    let stockHistory = [];
+
+    function loadData() {
+      const articlesData = JSON.parse(localStorage.getItem("articlesData")) || {};
+      articles = articlesData.articles || [];
+      stock = JSON.parse(localStorage.getItem("stockData")) || {};
+      stockHistory = JSON.parse(localStorage.getItem("stockHistory")) || [];
+      
+      articles.forEach(article => {
+        if (!stock[article.id]) {
+          stock[article.id] = {
+            quantite: 0,
+            seuilMin: 5,
+            lastUpdate: new Date().toISOString()
+          };
+        }
+      });
+      
+      saveData();
+    }
+
+    function saveData() {
+      localStorage.setItem("stockData", JSON.stringify(stock));
+      localStorage.setItem("stockHistory", JSON.stringify(stockHistory));
+      syncToServer("stockData", "stockHistory");
+    }
+
+    function renderStock() {
+      const tbody = document.getElementById("stockTableBody");
+      tbody.innerHTML = "";
+      
+      if (articles.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty-state">
+              <div>📦</div>
+              <p>Aucun article dans la base</p>
+              <p style="font-size:14px; margin-top:10px;">Ajoutez des articles dans la section "Articles" d'abord</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      articles.forEach(article => {
+        const stockInfo = stock[article.id] || { quantite: 0, seuilMin: 5, lastUpdate: new Date().toISOString() };
+        const quantite = stockInfo.quantite;
+        const seuilMin = stockInfo.seuilMin;
+        const infini = stockInfo.infini || false;
+        
+        let etatClass = "stock-ok";
+        let etatText = "✓ Disponible";
+        
+        if (infini) {
+          etatClass = "stock-infini";
+          etatText = "♾️ Infini";
+        } else if (quantite === 0) {
+          etatClass = "stock-low";
+          etatText = "✗ Épuisé";
+        } else if (quantite <= seuilMin) {
+          etatClass = "stock-medium";
+          etatText = "⚠ Faible";
+        }
+        
+        const stockDisplay = infini ? '<span class="stock-infini">∞</span>' : quantite;
+        
+        const lastUpdate = new Date(stockInfo.lastUpdate);
+        const dateStr = lastUpdate.toLocaleDateString() + " " + lastUpdate.toLocaleTimeString();
+        
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>#${article.id}</td>
+          <td><span class="badge" style="background:${article.couleur || '#2a7fd4'};">${article.nom}</span></td>
+          <td>${article.categorie || "Sans catégorie"}</td>
+          <td class="${etatClass}" style="font-size:18px; font-weight:700;">${stockDisplay}</td>
+          <td>${seuilMin}</td>
+          <td class="${etatClass}">${etatText}</td>
+          <td style="font-size:12px;">${dateStr}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn btn-success btn-sm" onclick="quickAdd('${article.id}')">+1</button>
+              <button class="btn btn-warning btn-sm" onclick="openStockModalForArticle('${article.id}')">✏️</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+      
+      updateStats();
+      updateAlertes();
+      renderHistory();
+    }
+
+    function updateStats() {
+      const total = articles.length;
+      let disponible = 0;
+      let faible = 0;
+      let epuise = 0;
+      
+      articles.forEach(article => {
+        const stockInfo = stock[article.id] || { quantite: 0, seuilMin: 5 };
+        if (stockInfo.infini) {
+          disponible++;
+        } else if (stockInfo.quantite === 0) {
+          epuise++;
+        } else if (stockInfo.quantite <= stockInfo.seuilMin) {
+          faible++;
+        } else {
+          disponible++;
+        }
+      });
+      
+      document.getElementById("statTotal").textContent = total;
+      document.getElementById("statDisponible").textContent = disponible;
+      document.getElementById("statFaible").textContent = faible;
+      document.getElementById("statEpuise").textContent = epuise;
+    }
+
+    function updateAlertes() {
+      const container = document.getElementById("alertesContainer");
+      container.innerHTML = "";
+      
+      const articlesEpuises = articles.filter(a => !stock[a.id]?.infini && stock[a.id]?.quantite === 0);
+      const articlesFaibles = articles.filter(a => {
+        const s = stock[a.id];
+        return s && !s.infini && s.quantite > 0 && s.quantite <= s.seuilMin;
+      });
+      
+      if (articlesEpuises.length > 0) {
+        const alert = document.createElement("div");
+        alert.className = "alert alert-danger";
+        alert.innerHTML = `
+          <span>🚨</span>
+          <div>
+            <strong>${articlesEpuises.length} article(s) épuisé(s):</strong>
+            ${articlesEpuises.map(a => a.nom).join(", ")}
+          </div>
+        `;
+        container.appendChild(alert);
+      }
+      
+      if (articlesFaibles.length > 0) {
+        const alert = document.createElement("div");
+        alert.className = "alert alert-warning";
+        alert.innerHTML = `
+          <span>⚠️</span>
+          <div>
+            <strong>${articlesFaibles.length} article(s) en stock faible:</strong>
+            ${articlesFaibles.map(a => `${a.nom} (${stock[a.id].quantite})`).join(", ")}
+          </div>
+        `;
+        container.appendChild(alert);
+      }
+    }
+
+    function renderHistory() {
+      const container = document.getElementById("historyContainer");
+      
+      if (stockHistory.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div>📜</div>
+            <p>Aucun mouvement enregistré</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const recentHistory = stockHistory.slice(-20).reverse();
+      
+      container.innerHTML = recentHistory.map(h => {
+        const typeClass = h.type === "add" ? "add" : h.type === "payment" ? "payment" : "remove";
+        const typeIcon = h.type === "add" ? "➕" : h.type === "payment" ? "💳" : "➖";
+        
+        return `
+          <div class="history-item ${typeClass}">
+            <div>
+              <strong>${typeIcon} ${h.articleNom}</strong>
+              <div style="font-size:12px; color:var(--text3); margin-top:4px;">
+                ${h.date} - ${h.motif || "Aucun motif"}
+              </div>
+            </div>
+            <div style="font-weight:800; font-size:16px;">
+              ${h.type === "add" ? "+" : "-"}${h.quantite}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function openStockModal() {
+      const modal = document.getElementById("stockModal");
+      const select = document.getElementById("articleSelect");
+      
+      select.innerHTML = '<option value="">-- Sélectionner un article --</option>';
+      articles.forEach(a => {
+        const option = document.createElement("option");
+        option.value = a.id;
+        option.textContent = `${a.nom} (${a.categorie || "Sans catégorie"})`;
+        select.appendChild(option);
+      });
+      
+      document.getElementById("stockForm").reset();
+      document.getElementById("currentStock").textContent = "0";
+      document.getElementById("stockInfini").checked = false;
+      toggleInfini();
+      modal.style.display = "block";
+    }
+
+    function openStockModalForArticle(articleId) {
+      openStockModal();
+      document.getElementById("articleSelect").value = articleId;
+      updateCurrentStock();
+    }
+
+    function closeStockModal() {
+      document.getElementById("stockModal").style.display = "none";
+      document.getElementById("stockForm").reset();
+    }
+
+    document.getElementById("articleSelect").addEventListener("change", updateCurrentStock);
+
+    function updateCurrentStock() {
+      const articleId = document.getElementById("articleSelect").value;
+      if (articleId && stock[articleId]) {
+        const s = stock[articleId];
+        document.getElementById("currentStock").textContent = s.infini ? "∞" : s.quantite;
+        document.getElementById("seuilMin").value = s.seuilMin;
+        document.getElementById("stockInfini").checked = s.infini || false;
+        toggleInfini();
+      } else {
+        document.getElementById("currentStock").textContent = "0";
+        document.getElementById("stockInfini").checked = false;
+        toggleInfini();
+      }
+    }
+
+    function toggleInfini() {
+      const infini = document.getElementById("stockInfini").checked;
+      document.getElementById("quantite").disabled = infini;
+      document.getElementById("mouvement").disabled = infini;
+      document.getElementById("seuilMin").disabled = infini;
+      if (infini) {
+        document.getElementById("quantite").value = "";
+      }
+    }
+
+    function saveStock() {
+      const articleId = document.getElementById("articleSelect").value;
+      const mouvement = document.getElementById("mouvement").value;
+      const quantite = parseInt(document.getElementById("quantite").value) || 0;
+      const seuilMin = parseInt(document.getElementById("seuilMin").value) || 5;
+      const motif = document.getElementById("motif").value || "Ajustement manuel";
+      const infini = document.getElementById("stockInfini").checked;
+      
+      if (!articleId) {
+        alert("Veuillez sélectionner un article");
+        return;
+      }
+      
+      const article = articles.find(a => a.id === articleId);
+      if (!article) return;
+      
+      if (!stock[articleId]) {
+        stock[articleId] = { quantite: 0, seuilMin: 5, lastUpdate: new Date().toISOString() };
+      }
+
+      if (infini) {
+        stock[articleId].infini = true;
+        stock[articleId].lastUpdate = new Date().toISOString();
+        stockHistory.push({
+          date: new Date().toLocaleString(),
+          articleId: articleId,
+          articleNom: article.nom,
+          type: "add",
+          quantite: "∞",
+          motif: "Stock défini comme infini"
+        });
+        saveData();
+        renderStock();
+        closeStockModal();
+        return;
+      }
+      
+      stock[articleId].infini = false;
+      const oldQuantite = stock[articleId].quantite;
+      let newQuantite = oldQuantite;
+      
+      if (mouvement === "add") {
+        newQuantite = oldQuantite + quantite;
+      } else if (mouvement === "remove") {
+        newQuantite = Math.max(0, oldQuantite - quantite);
+      } else if (mouvement === "set") {
+        newQuantite = quantite;
+      }
+      
+      stock[articleId].quantite = newQuantite;
+      stock[articleId].seuilMin = seuilMin;
+      stock[articleId].lastUpdate = new Date().toISOString();
+      
+      stockHistory.push({
+        date: new Date().toLocaleString(),
+        articleId: articleId,
+        articleNom: article.nom,
+        type: mouvement === "add" ? "add" : "remove",
+        quantite: Math.abs(newQuantite - oldQuantite),
+        motif: motif
+      });
+      
+      saveData();
+      renderStock();
+      closeStockModal();
+    }
+
+    function quickAdd(articleId) {
+      const article = articles.find(a => a.id === articleId);
+      if (!article) return;
+      
+      if (!stock[articleId]) {
+        stock[articleId] = { quantite: 0, seuilMin: 5, lastUpdate: new Date().toISOString() };
+      }
+      
+      stock[articleId].quantite++;
+      stock[articleId].lastUpdate = new Date().toISOString();
+      
+      stockHistory.push({
+        date: new Date().toLocaleString(),
+        articleId: articleId,
+        articleNom: article.nom,
+        type: "add",
+        quantite: 1,
+        motif: "Ajout rapide +1"
+      });
+      
+      saveData();
+      renderStock();
+    }
+
+    function exportStockCSV() {
+      let csv = "ID;Article;Catégorie;Stock Actuel;Seuil Minimum;Prix TVAC;Dernière MAJ\n";
+      
+      articles.forEach(article => {
+        const stockInfo = stock[article.id] || { quantite: 0, seuilMin: 5, lastUpdate: new Date().toISOString() };
+        const lastUpdate = new Date(stockInfo.lastUpdate).toLocaleDateString();
+        csv += `${article.id};${article.nom};${article.categorie || "Sans catégorie"};${stockInfo.quantite};${stockInfo.seuilMin};${article.prixTVAC};${lastUpdate}\n`;
+      });
+      
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `stock_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function clearHistory() {
+      if (confirm("Êtes-vous sûr de vouloir effacer tout l'historique ?")) {
+        stockHistory = [];
+        saveData();
+        renderHistory();
+      }
+    }
+
+    function toutMettrInfini() {
+      if (!confirm("Passer TOUS les articles en stock infini ?")) return;
+      articles.forEach(function(a) {
+        if (!stock[a.id]) stock[a.id] = { quantite: 0, seuilMin: 5, lastUpdate: new Date().toISOString() };
+        stock[a.id].infini = true;
+        stock[a.id].lastUpdate = new Date().toISOString();
+      });
+      saveData();
+      renderStock();
+    }
+
+    // Initialize
+    window.addEventListener("DOMContentLoaded", function() {
+      loadData();
+      renderStock();
+    });
+
+    window.addEventListener("storage", function(e) {
+      if (e.key === "stockData" || e.key === "articlesData") {
+        loadData();
+        renderStock();
+      }
+    });
+  </script>
+</body>
+</html>

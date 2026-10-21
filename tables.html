@@ -1,0 +1,4445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestion des Tables</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#7c3aed; --purple-pale:#f5f3ff;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --cyan:#0891b2; --cyan-pale:#ecfeff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --glass:rgba(255,255,255,0.82);
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      font-size:14px;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      padding:20px;
+      color:var(--text);
+      transition:background 0.3s ease;
+      background-size:cover;
+      background-position:center;
+      background-attachment:fixed;
+      position:relative;
+    }
+
+    body::before {
+      content:''; position:fixed; top:-150px; left:-150px;
+      width:550px; height:550px;
+      background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+    body::after {
+      content:''; position:fixed; bottom:-100px; right:5%;
+      width:450px; height:450px;
+      background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+
+    h1 {
+      margin-bottom:10px;
+      color:var(--blue3);
+      font-size:2rem;
+      font-weight:900;
+    }
+
+    /* Bannière principale */
+    .action-banner {
+      position: relative;
+      z-index: 2;
+      margin: 0 0 18px 0;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.72) 0%, rgba(214,238,255,0.68) 50%, rgba(220,255,230,0.65) 100%);
+      border: 1.5px solid rgba(255,255,255,0.9);
+      border-radius: var(--radius-xl);
+      box-shadow:
+        0 4px 24px rgba(30,80,160,0.10),
+        0 1px 0 rgba(255,255,255,0.95) inset,
+        0 -1px 0 rgba(180,210,240,0.3) inset;
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .action-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 45%;
+      background: rgba(255,255,255,0.45);
+      border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events: none;
+    }
+    .action-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, transparent 60%, rgba(180,220,255,0.08));
+      pointer-events: none;
+    }
+    .action-banner-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Bouton + (Plus d'actions) */
+    .btn-plus-actions {
+      background: linear-gradient(180deg,#a0f4b4,#16a34a,#15803d) !important;
+      border: 1px solid #15803d !important;
+      color: white !important;
+      padding: 10px 16px !important;
+      gap: 6px !important;
+    }
+    .btn-plus-icon {
+      font-size: 17px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .btn-plus-label {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    /* Boutons d'action */
+    .action-buttons {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:15px 0;
+      position:relative;
+      z-index:2;
+    }
+
+    .btn-action {
+      padding:12px 20px;
+      border:none;
+      border-radius:50px;
+      font-weight:800;
+      font-size:14px;
+      cursor:pointer;
+      transition:all 0.2s;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 4px 15px var(--shadow);
+      position:relative; overflow:hidden;
+    }
+    .btn-action::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 6px 20px var(--shadow); }
+
+    .btn-action.primary { background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white; border:1px solid #1050a0; }
+    .btn-action.success { background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); color:white; border:1px solid #2d6a1a; }
+    .btn-action.warning { background:linear-gradient(180deg,#ffc870,var(--orange),#b86200); color:white; border:1px solid #a05800; }
+    .btn-action.purple { background:linear-gradient(180deg,#b486f0,#7c3aed,#5c22cd); color:white; border:1px solid #5c22cd; }
+    .btn-action.danger { background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border:1px solid #882020; }
+    .btn-action.secondary { background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85)); color:var(--text2); border:1px solid var(--border); }
+
+    /* Bouton Mode Édition (dans la barre de boutons) */
+    .edit-mode-btn {
+      padding:12px 20px;
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white;
+      border:1px solid #1050a0;
+      border-radius:50px;
+      font-weight:800;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:0 4px 15px var(--shadow);
+      transition:all 0.2s;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      position:relative;
+      overflow:hidden;
+    }
+    .edit-mode-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .edit-mode-btn:hover {
+      transform:translateY(-2px);
+      box-shadow:0 6px 20px var(--shadow);
+    }
+    .edit-mode-btn.active {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      border-color:#882020;
+      animation:pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { box-shadow:0 4px 15px rgba(180,40,30,0.3); }
+      50% { box-shadow:0 4px 25px rgba(245,87,108,0.6); }
+    }
+
+    /* Quick Action Modal Buttons */
+    .quick-action-btn {
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:14px 16px;
+      border-radius:var(--radius-lg);
+      border:1px solid transparent;
+      color:white;
+      cursor:pointer;
+      font-family:'Nunito',sans-serif;
+      transition:all 0.2s;
+      margin-bottom:8px;
+      box-shadow:0 4px 12px var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .quick-action-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.25); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+    }
+    .quick-action-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px var(--shadow); }
+    .quick-action-icon { font-size:1.5em; flex-shrink:0; }
+    .quick-action-text { flex:1; text-align:left; }
+    .quick-action-title { font-weight:800; font-size:14px; }
+    .quick-action-desc { font-size:11px; opacity:0.85; font-weight:600; margin-top:2px; }
+    .quick-action-arrow { font-size:1.4em; opacity:0.7; font-weight:900; }
+
+    .quick-action-btn-small {
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:12px 10px;
+      border-radius:var(--radius);
+      border:1px solid transparent;
+      color:white;
+      cursor:pointer;
+      font-family:'Nunito',sans-serif;
+      font-weight:800;
+      font-size:13px;
+      transition:all 0.2s;
+      box-shadow:0 3px 10px var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .quick-action-btn-small::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.25); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .quick-action-btn-small:hover { transform:translateY(-2px); }
+
+    /* Bouton Réinitialiser Grille */
+    .reset-grid-btn {
+      position:fixed;
+      top:80px;
+      right:20px;
+      padding:12px 20px;
+      background:linear-gradient(180deg,#ffc870,var(--orange),#b86200);
+      color:white;
+      border:1px solid #a05800;
+      border-radius:50px;
+      font-weight:800;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:0 4px 15px var(--shadow);
+      transition:all 0.2s;
+      z-index:100;
+      display:none;
+      position:relative; overflow:hidden;
+    }
+    .reset-grid-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .reset-grid-btn:hover {
+      background:linear-gradient(180deg,#ffd080,#e8962a,#c87000);
+      transform:translateY(-2px);
+      box-shadow:0 6px 20px rgba(200,120,0,0.4);
+    }
+
+    /* Horloge */
+    .horloge-container {
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 20px;
+      margin:10px 0;
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      border-radius:50px;
+      color:white;
+      border:1px solid #1050a0;
+      box-shadow:0 4px 15px var(--shadow);
+      transition:transform 0.3s ease;
+      position:relative; overflow:hidden;
+    }
+    .horloge-container::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .horloge-container:hover {
+      transform:translateY(-2px);
+      box-shadow:0 6px 20px var(--shadow);
+    }
+    .horloge-date {
+      font-weight:600;
+      font-size:0.9em;
+      padding:4px 8px;
+      background:rgba(255,255,255,0.15);
+      border-radius:8px;
+      letter-spacing:0.5px;
+    }
+    .horloge-heure {
+      font-weight:700;
+      font-size:1.1em;
+      padding:5px 10px;
+      background:rgba(255,255,255,0.2);
+      border-radius:10px;
+      min-width:85px;
+      text-align:center;
+      font-family:'Courier New',monospace;
+    }
+    .horloge-emoji {
+      font-size:1.4em;
+      animation:pulseEmoji 2s infinite;
+    }
+    .btn-cocktails {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin:10px 0 0 10px;
+      padding:9px 18px;
+      font-family:'Nunito', sans-serif;
+      font-weight:700;
+      font-size:0.9em;
+      color:white;
+      background:linear-gradient(180deg,#ff8fb3,#e0457a,#a8285a);
+      border:1px solid #a8285a;
+      border-radius:50px;
+      box-shadow:0 4px 15px rgba(224,69,122,0.35);
+      cursor:pointer;
+      position:relative; overflow:hidden;
+      transition:transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-cocktails::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .btn-cocktails:hover {
+      transform:translateY(-2px);
+      box-shadow:0 6px 20px rgba(224,69,122,0.45);
+    }
+    @keyframes pulseEmoji {
+      0% { transform:scale(1); }
+      50% { transform:scale(1.1); }
+      100% { transform:scale(1); }
+    }
+
+    /* Grille des tables */
+    .tables-grid {
+      display:block;
+      position:relative;
+      min-height:600px;
+      height: auto;
+      margin:20px 0;
+      padding:10px;
+      background:rgba(255,255,255,0.1);
+      border-radius:var(--radius-xl);
+      border:1px solid rgba(255,255,255,0.2);
+    }
+
+    /* Mode édition */
+    .tables-grid.edit-mode {
+      border:2px dashed var(--blue-light);
+      background:rgba(255,255,255,0.05);
+    }
+
+    .table-btn {
+      position:absolute;
+      padding:10px 8px;
+      border:none;
+      border-radius:var(--radius-lg);
+      color:white;
+      font-weight:800;
+      cursor:pointer;
+      transition:all 0.2s;
+      box-shadow:0 4px 15px var(--shadow);
+      min-width:70px;
+      min-height:50px;
+      text-align:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      width:85px;
+      height:65px;
+      overflow:hidden;
+      word-break:break-word;
+      text-overflow:ellipsis;
+      line-height:1.2;
+      position:absolute;
+    }
+    .table-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:40%;
+      background:rgba(255,255,255,.2); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+    }
+    .table-btn:hover {
+      transform:scale(1.05);
+      box-shadow:0 6px 20px var(--shadow);
+      z-index:5;
+    }
+
+    .table-btn.draggable {
+      cursor:move;
+      z-index:1;
+    }
+    .table-btn.draggable:hover {
+      transform:scale(1.08);
+      box-shadow:0 8px 25px var(--shadow);
+    }
+    .table-btn.dragging {
+      opacity:0.7;
+      transform:scale(1.1);
+      z-index:10;
+    }
+
+    /* Point de réservation */
+    .resa-dot {
+      position:absolute;
+      top:-7px;
+      right:-7px;
+      width:15px;
+      height:15px;
+      background:linear-gradient(135deg, var(--yellow), var(--orange));
+      border:2px solid var(--orange);
+      border-radius:50%;
+      box-shadow:0 0 7px rgba(255,200,0,0.9);
+      animation:resaDotPulse 1.8s infinite;
+      z-index:6;
+      cursor:pointer;
+    }
+    @keyframes resaDotPulse {
+      0%,100% { transform:scale(1); box-shadow:0 0 5px rgba(255,200,0,0.7); }
+      50% { transform:scale(1.3); box-shadow:0 0 12px rgba(255,160,0,1); }
+    }
+
+    /* Tooltip réservation */
+    #resaTooltip {
+      position:fixed;
+      background:linear-gradient(145deg,rgba(30,40,60,0.97),rgba(20,30,50,0.98));
+      color:white;
+      padding:11px 15px;
+      border-radius:var(--radius-lg);
+      font-size:13px;
+      z-index:9999;
+      pointer-events:none;
+      box-shadow:0 6px 20px rgba(0,0,0,0.5);
+      border:1px solid rgba(255,215,0,0.35);
+      min-width:210px;
+      line-height:1.7;
+      opacity:0;
+      transition:opacity 0.15s;
+      backdrop-filter:blur(10px);
+    }
+    #resaTooltip .tt-title {
+      font-weight:bold;
+      font-size:14px;
+      color:var(--yellow);
+      border-bottom:1px solid rgba(255,215,0,0.25);
+      padding-bottom:5px;
+      margin-bottom:6px;
+    }
+    #resaTooltip .tt-row { display:flex; gap:8px; align-items:center; }
+
+    /* Popup overlay */
+    .popup-overlay {
+      position:fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(10,40,90,.45);
+      backdrop-filter:blur(8px);
+      display:none;
+      justify-content:center;
+      align-items:center;
+      z-index:1000;
+    }
+    .popup-content {
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+      border:1px solid rgba(255,255,255,.95);
+      padding:20px;
+      border-radius:var(--radius-xl);
+      width:90%;
+      max-width:500px;
+      max-height:90vh;
+      overflow-y:auto;
+      text-align:center;
+      box-shadow:0 20px 60px rgba(20,60,180,.25),0 1px 0 rgba(255,255,255,.9) inset;
+      animation:popupFadeIn 0.3s ease;
+      position:relative;
+    }
+    .popup-content::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:25%;
+      background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .popup-content > * { position:relative; z-index:2; }
+    @keyframes popupFadeIn {
+      from { opacity:0; transform:scale(0.9); }
+      to { opacity:1; transform:scale(1); }
+    }
+
+    .popup-content h3 {
+      color:var(--blue3);
+      margin-bottom:15px;
+      font-weight:900;
+    }
+
+    .popup-buttons {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:5px;
+    }
+    .popup-buttons button {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      width:100%;
+      margin:0;
+      padding:14px 8px;
+      border:none;
+      border-radius:var(--radius);
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+      transition:0.2s;
+      position:relative; overflow:hidden;
+      min-height:70px;
+      line-height:1.3;
+      text-align:center;
+    }
+    .popup-buttons button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .popup-buttons button:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.18); }
+
+    .popup-buttons button:nth-child(1) { background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); color:white; border:1px solid #2d6a1a; }
+    .popup-buttons button:nth-child(2) { background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white; border:1px solid #1558b0; }
+    .popup-buttons button:nth-child(3) { background:linear-gradient(180deg,#ffc870,var(--orange),#b86200); color:white; border:1px solid #b86200; }
+    .popup-buttons button:nth-child(4) { background:linear-gradient(180deg,#b486f0,#7c3aed,#5c22cd); color:white; border:1px solid #5c22cd; }
+    .popup-buttons button:nth-child(5) { background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border:1px solid #922b21; }
+    .popup-buttons button:nth-child(6) { background:linear-gradient(180deg,#a78bfa,#7c3aed,#5b21b6); color:white; border:1px solid #5b21b6; }
+    .popup-buttons button:nth-child(7) { background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border:1px solid #922b21; }
+
+    /* Bouton fermer (croix) */
+    .popup-close-btn {
+      position:absolute;
+      top:12px;
+      right:14px;
+      width:32px;
+      height:32px;
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      color:white;
+      border:1px solid #882020;
+      border-radius:50%;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:0.2s;
+      z-index:10;
+      box-shadow:0 2px 8px rgba(180,40,30,0.4);
+      line-height:1;
+    }
+    .popup-close-btn:hover { transform:scale(1.12); box-shadow:0 4px 14px rgba(180,40,30,0.6); }
+
+    /* Liste de tables */
+    .tables-list {
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:5px;
+      margin-top:10px;
+    }
+    .tables-list button {
+      padding:8px;
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.7);
+      cursor:pointer;
+      font-weight:600;
+      transition:0.2s;
+    }
+    .tables-list button:hover { background:var(--blue-pale); transform:translateY(-2px); }
+
+    /* Clavier virtuel */
+    .keypad {
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:6px;
+      margin-top:12px;
+    }
+    .key {
+      padding:10px 0;
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--border);
+      cursor:pointer;
+      font-size:16px;
+      font-weight:700;
+      user-select:none;
+      transition:0.2s;
+      color:var(--text2);
+    }
+    .key:hover { background:var(--blue-pale); transform:translateY(-2px); }
+    .key:active { transform:translateY(1px); }
+
+    .controls {
+      display:flex;
+      gap:8px;
+      margin-top:10px;
+    }
+    .controls button {
+      flex:1;
+      padding:10px;
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.7);
+      cursor:pointer;
+      font-weight:700;
+      transition:0.2s;
+    }
+    .controls button:hover { background:var(--blue-pale); transform:translateY(-2px); }
+
+    .input-display {
+      font-size:18px;
+      letter-spacing:1px;
+      padding:8px 10px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      text-align:center;
+      background:rgba(255,255,255,.85);
+      margin-top:6px;
+      font-weight:700;
+      color:var(--text);
+    }
+    .error { color:var(--red); font-weight:800; margin-top:8px; min-height:20px; }
+
+    /* Recherche membre */
+    .membre-search-container {
+      margin:10px 0;
+      padding:10px;
+      background:rgba(255,255,255,.7);
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+    }
+    .membre-search-input {
+      width:100%;
+      padding:8px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      font-size:14px;
+      margin-bottom:8px;
+      font-family:'Nunito',sans-serif;
+    }
+    .membre-list {
+      max-height:200px;
+      overflow-y:auto;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:white;
+    }
+    .membre-item {
+      padding:8px 12px;
+      cursor:pointer;
+      border-bottom:1px solid var(--border2);
+      transition:background 0.2s;
+    }
+    .membre-item:hover { background:var(--blue-pale); }
+    .btn-recherche-membre {
+      padding:8px 16px;
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.7);
+      color:var(--text2);
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      transition:0.2s;
+    }
+    .btn-recherche-membre:hover { background:var(--blue-pale); transform:translateY(-2px); }
+
+    /* Options */
+    .options-section {
+      margin:15px 0;
+      padding:15px;
+      background:rgba(255,255,255,.7);
+      border-radius:var(--radius);
+      text-align:left;
+      border:1px solid var(--border);
+    }
+    .options-section h4 {
+      margin-top:0;
+      margin-bottom:10px;
+      color:var(--blue3);
+      font-weight:900;
+    }
+    .option-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin:10px 0;
+      gap:10px;
+    }
+    .option-row label { flex:1; font-size:14px; font-weight:600; color:var(--text2); }
+    .option-row input[type="color"] {
+      width:60px;
+      height:35px;
+      border:none;
+      border-radius:var(--radius);
+      cursor:pointer;
+    }
+    .option-row select {
+      padding:5px 10px;
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      font-size:14px;
+      font-family:'Nunito',sans-serif;
+      font-weight:600;
+    }
+    .btn-save-options {
+      width:100%;
+      padding:12px;
+      background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+      color:white;
+      border:1px solid #2d6a1a;
+      border-radius:var(--radius);
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+      transition:0.2s;
+      margin-top:10px;
+    }
+    .btn-save-options:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,148,34,0.4); }
+    .btn-remove-bg {
+      width:100%;
+      padding:10px;
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      color:white;
+      border:1px solid #882020;
+      border-radius:var(--radius);
+      font-weight:800;
+      cursor:pointer;
+      margin-top:5px;
+    }
+    .btn-remove-bg:hover { transform:translateY(-2px); }
+
+    /* Toast notification */
+    .toast-notification {
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+      color:var(--text);
+      padding:14px 20px;
+      border-radius:var(--radius-lg);
+      font-size:14px;
+      font-weight:800;
+      text-align:left;
+      z-index:2000;
+      box-shadow:0 8px 30px rgba(20,60,180,.25);
+      animation:toastSlideIn 4s forwards;
+      max-width:320px;
+      min-width:220px;
+      border:1px solid rgba(255,255,255,.95);
+      border-left:4px solid;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .toast-notification.success { border-left-color:var(--green); }
+    .toast-notification.info { border-left-color:var(--blue); }
+    .toast-notification.warning { border-left-color:var(--orange); }
+    .toast-notification.error { border-left-color:var(--red); }
+    @keyframes toastSlideIn {
+      0% { opacity:0; transform:translateX(40px); }
+      10% { opacity:1; transform:translateX(0); }
+      80% { opacity:1; transform:translateX(0); }
+      100% { opacity:0; transform:translateX(40px); }
+    }
+
+    /* Indicateur de connexion serveur (LED) */
+    #syncStatusLed {
+      position:fixed;
+      bottom:20px;
+      left:20px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      background:rgba(255,255,255,0.85);
+      border-radius:50px;
+      border:1px solid rgba(180,220,180,0.6);
+      box-shadow:0 3px 12px rgba(0,0,0,0.1);
+      font-size:12px;
+      font-weight:700;
+      color:var(--text2);
+      z-index:500;
+      opacity:0;
+      transition:opacity 0.4s;
+      pointer-events:none;
+    }
+    #syncStatusLed.visible { opacity:1; }
+    #syncStatusLed .led {
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#ccc;
+      flex-shrink:0;
+    }
+    #syncStatusLed.syncing .led {
+      background:var(--yellow);
+      animation:ledBlink 0.6s infinite;
+    }
+    #syncStatusLed.connected .led {
+      background:var(--green);
+      animation:ledPulse 2.5s infinite;
+    }
+    #syncStatusLed.error .led {
+      background:var(--red);
+    }
+    @keyframes ledBlink {
+      0%,100% { opacity:1; }
+      50% { opacity:0.2; }
+    }
+    @keyframes ledPulse {
+      0%,100% { box-shadow:0 0 0 0 rgba(90,173,46,0.5); }
+      50% { box-shadow:0 0 0 5px rgba(90,173,46,0); }
+    }
+
+    /* ====== MODAL SÉPARER TICKET ====== */
+    .sep-step { display:none; }
+    .sep-step.active { display:block; }
+
+    .sep-step-indicator {
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      margin-bottom:18px;
+    }
+    .sep-step-dot {
+      width:10px; height:10px;
+      border-radius:50%;
+      background:var(--border2);
+      transition:background 0.3s;
+    }
+    .sep-step-dot.active { background:var(--purple); }
+    .sep-step-dot.done { background:var(--green); }
+
+    .sep-table-grid {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      margin:10px 0 16px;
+      max-height:260px;
+      overflow-y:auto;
+    }
+    .sep-table-card {
+      padding:10px 6px;
+      border-radius:var(--radius);
+      border:2px solid var(--border);
+      background:rgba(255,255,255,.75);
+      cursor:pointer;
+      font-weight:700;
+      font-size:13px;
+      text-align:center;
+      transition:all 0.2s;
+      color:var(--text);
+    }
+    .sep-table-card:hover { border-color:var(--purple); background:var(--purple-pale); transform:translateY(-2px); }
+    .sep-table-card.occupied { background:var(--red-pale); border-color:var(--red); color:var(--red2); cursor:not-allowed; opacity:.6; }
+    .sep-table-card.selected { border-color:var(--purple); background:var(--purple-pale); box-shadow:0 0 0 3px rgba(124,58,237,0.2); }
+    .sep-table-card .sep-table-status { font-size:10px; font-weight:600; margin-top:3px; color:var(--text3); }
+
+    .sep-articles-list {
+      max-height:300px;
+      overflow-y:auto;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.6);
+      margin:10px 0 14px;
+    }
+    .sep-article-row {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-bottom:1px solid var(--border2);
+      cursor:pointer;
+      transition:background 0.15s;
+    }
+    .sep-article-row:last-child { border-bottom:none; }
+    .sep-article-row:hover { background:var(--purple-pale); }
+    .sep-article-row.selected { background:var(--purple-pale); }
+    .sep-article-check {
+      width:22px; height:22px;
+      border:2px solid var(--border);
+      border-radius:6px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px;
+      flex-shrink:0;
+      transition:all 0.2s;
+    }
+    .sep-article-row.selected .sep-article-check {
+      background:var(--purple);
+      border-color:var(--purple);
+      color:white;
+    }
+    .sep-article-name { flex:1; font-weight:700; font-size:14px; text-align:left; }
+    .sep-article-qte-ctrl {
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .sep-qte-btn {
+      width:26px; height:26px;
+      border-radius:50%;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.8);
+      cursor:pointer;
+      font-size:16px;
+      font-weight:800;
+      display:flex; align-items:center; justify-content:center;
+      transition:0.15s;
+      color:var(--text2);
+    }
+    .sep-qte-btn:hover { background:var(--purple-pale); border-color:var(--purple); color:var(--purple); }
+    .sep-qte-val {
+      min-width:30px;
+      text-align:center;
+      font-weight:800;
+      font-size:14px;
+      color:var(--purple);
+    }
+    .sep-qte-max { font-size:11px; color:var(--text3); margin-left:2px; }
+
+    .sep-member-section { margin:10px 0 14px; text-align:left; }
+    .sep-member-section label { font-weight:800; font-size:13px; color:var(--text2); display:block; margin-bottom:6px; }
+    .sep-member-list {
+      max-height:160px;
+      overflow-y:auto;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:white;
+      margin-bottom:10px;
+    }
+    .sep-member-item {
+      padding:9px 12px;
+      cursor:pointer;
+      border-bottom:1px solid var(--border2);
+      font-size:14px;
+      font-weight:600;
+      transition:background 0.15s;
+      display:flex; align-items:center; gap:8px;
+    }
+    .sep-member-item:last-child { border-bottom:none; }
+    .sep-member-item:hover { background:var(--purple-pale); }
+    .sep-member-item.selected { background:var(--purple-pale); font-weight:800; color:var(--purple); }
+    .sep-name-input {
+      width:100%;
+      padding:9px 12px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      font-size:14px;
+      font-family:'Nunito',sans-serif;
+      font-weight:600;
+      background:rgba(255,255,255,.85);
+    }
+    .sep-name-input:focus { border-color:var(--purple); outline:none; box-shadow:0 0 0 3px rgba(124,58,237,0.15); }
+
+    .sep-nav-btns {
+      display:flex; gap:10px; margin-top:14px;
+    }
+    .sep-btn-back {
+      flex:1; padding:11px;
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      color:var(--text2); border:1px solid var(--border);
+      border-radius:var(--radius); font-weight:800; cursor:pointer; transition:0.2s;
+    }
+    .sep-btn-back:hover { transform:translateY(-2px); }
+    .sep-btn-next {
+      flex:2; padding:11px;
+      background:linear-gradient(180deg,#a78bfa,#7c3aed,#5b21b6);
+      color:white; border:1px solid #5b21b6;
+      border-radius:var(--radius); font-weight:800; cursor:pointer; transition:0.2s;
+    }
+    .sep-btn-next:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(124,58,237,0.4); }
+    .sep-btn-confirm {
+      flex:2; padding:11px;
+      background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+      color:white; border:1px solid #2d6a1a;
+      border-radius:var(--radius); font-weight:800; cursor:pointer; transition:0.2s;
+    }
+    .sep-btn-confirm:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,148,34,0.4); }
+    .sep-summary {
+      background:var(--purple-pale);
+      border:1px solid rgba(124,58,237,0.25);
+      border-radius:var(--radius);
+      padding:12px 14px;
+      margin-bottom:14px;
+      font-size:13px;
+      font-weight:600;
+      color:var(--text);
+      text-align:left;
+      line-height:1.7;
+    }
+    .sep-summary strong { color:var(--purple); }
+    .sep-search-input {
+      width:100%;
+      padding:8px 12px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      font-size:14px;
+      font-family:'Nunito',sans-serif;
+      margin-bottom:8px;
+    }
+    .sep-search-input:focus { border-color:var(--purple); outline:none; }
+    /* ====== FIN MODAL SÉPARER ====== */
+    .resa-modal-nav {
+      display:flex;
+      gap:8px;
+      margin-bottom:16px;
+    }
+    .resa-nav-btn {
+      flex:1;
+      padding:10px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.7);
+      color:var(--text2);
+      font-weight:700;
+      cursor:pointer;
+      transition:0.2s;
+    }
+    .resa-nav-btn.active {
+      background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+      color:white;
+      border-color:#2d6a1a;
+    }
+    .resa-nav-btn:hover:not(.active) { background:var(--green-pale); transform:translateY(-2px); }
+
+    .resa-form-group {
+      margin-bottom:14px;
+      text-align:left;
+    }
+    .resa-form-group label {
+      display:block;
+      font-weight:800;
+      font-size:13px;
+      color:var(--text2);
+      margin-bottom:5px;
+    }
+    .resa-form-group input, .resa-form-group select {
+      width:100%;
+      padding:9px 12px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      font-size:14px;
+      font-family:'Nunito',sans-serif;
+      font-weight:600;
+      background:rgba(255,255,255,.85);
+    }
+    .resa-form-group input:focus, .resa-form-group select:focus {
+      border-color:var(--green);
+      outline:none;
+      box-shadow:0 0 0 3px rgba(90,173,46,0.15);
+    }
+
+    #resaTableAlreadyWarning {
+      background:var(--yellow-pale);
+      border:1px solid var(--orange);
+      border-radius:var(--radius);
+      padding:12px;
+      margin-bottom:12px;
+      color:var(--orange);
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .resa-membre-select {
+      max-height:180px;
+      overflow-y:auto;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:white;
+    }
+    .resa-membre-item {
+      padding:9px 12px;
+      cursor:pointer;
+      border-bottom:1px solid var(--border2);
+      font-size:14px;
+      transition:background 0.15s;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .resa-membre-item:hover { background:var(--green-pale); }
+    .resa-membre-item.selected {
+      background:var(--green-pale);
+      font-weight:800;
+      color:var(--green2);
+    }
+    .resa-membre-item .check { color:var(--green); font-size:16px; }
+    .resa-submit-btn {
+      width:100%;
+      padding:13px;
+      background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+      color:white;
+      border:1px solid #2d6a1a;
+      border-radius:var(--radius);
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      margin-top:10px;
+    }
+    .resa-submit-btn:hover { transform:translateY(-2px); }
+
+    .resa-card {
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:12px 15px;
+      margin-bottom:10px;
+      cursor:pointer;
+      transition:all 0.2s;
+      border-left:4px solid var(--green);
+    }
+    .resa-card:hover {
+      background:var(--green-pale);
+      transform:translateX(3px);
+      box-shadow:0 4px 15px var(--shadow);
+    }
+    .resa-card-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:4px;
+    }
+    .resa-card-date {
+      font-weight:800;
+      color:var(--green2);
+      font-size:14px;
+    }
+    .resa-card-count {
+      background:linear-gradient(180deg,#84d47c,#4a9422);
+      color:white;
+      border-radius:20px;
+      padding:2px 10px;
+      font-size:12px;
+      font-weight:800;
+    }
+    .resa-card-membre { color:var(--text); font-size:14px; font-weight:600; }
+    .resa-card-nb { color:var(--text3); font-size:13px; margin-top:2px; }
+
+    .resa-pagination {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .resa-page-btn {
+      padding:7px 14px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:white;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:600;
+      transition:0.2s;
+    }
+    .resa-page-btn:hover:not(:disabled) { background:var(--green-pale); border-color:var(--green); color:var(--green2); }
+    .resa-page-btn:disabled { opacity:0.4; cursor:default; }
+    .resa-page-btn.current { background:var(--green); color:white; border-color:var(--green2); font-weight:800; }
+
+    .resa-detail-back {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      color:var(--green2);
+      cursor:pointer;
+      font-weight:800;
+      font-size:14px;
+      margin-bottom:14px;
+      padding:8px 12px;
+      background:var(--green-pale);
+      border-radius:var(--radius);
+      border:none;
+      width:fit-content;
+    }
+    .resa-detail-back:hover { background:var(--green-pale); transform:translateY(-2px); }
+
+    .resa-detail-info {
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--green);
+      border-radius:var(--radius);
+      padding:14px;
+      margin-bottom:12px;
+    }
+    .resa-detail-row {
+      display:flex;
+      justify-content:space-between;
+      padding:6px 0;
+      border-bottom:1px solid var(--border2);
+      font-size:14px;
+    }
+    .resa-detail-label { color:var(--text2); font-weight:600; }
+    .resa-detail-value { font-weight:800; color:var(--text); }
+    .resa-delete-btn {
+      width:100%;
+      padding:11px;
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      color:white;
+      border:1px solid #882020;
+      border-radius:var(--radius);
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      margin-top:8px;
+    }
+    .resa-delete-btn:hover { transform:translateY(-2px); }
+
+    .resa-empty {
+      text-align:center;
+      color:var(--text3);
+      padding:30px 0;
+      font-size:15px;
+      font-weight:600;
+    }
+
+    /* Panneau Notifications */
+    .notif-card {
+      background:rgba(255,255,255,.85);
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:15px;
+      margin-bottom:12px;
+      border-left:4px solid var(--orange);
+      box-shadow:0 3px 10px var(--shadow2);
+    }
+    .notif-card-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:8px;
+    }
+    .notif-card-title {
+      font-weight:900;
+      color:var(--orange);
+      font-size:15px;
+    }
+    .notif-card-time {
+      font-size:11px;
+      color:var(--text3);
+      font-weight:600;
+    }
+    .notif-card-articles {
+      font-size:13px;
+      color:var(--text2);
+      margin-bottom:10px;
+      line-height:1.6;
+    }
+    .notif-card-actions {
+      display:flex;
+      gap:8px;
+    }
+    .notif-btn-accept {
+      flex:1;
+      padding:10px;
+      background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+      color:white;
+      border:1px solid #2d6a1a;
+      border-radius:var(--radius);
+      font-weight:800;
+      font-size:13px;
+      cursor:pointer;
+    }
+    .notif-btn-accept:hover { transform:translateY(-2px); }
+    .notif-btn-refuse {
+      flex:1;
+      padding:10px;
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      color:white;
+      border:1px solid #922b21;
+      border-radius:var(--radius);
+      font-weight:800;
+      font-size:13px;
+      cursor:pointer;
+    }
+    .notif-btn-refuse:hover { transform:translateY(-2px); }
+
+    @keyframes notifPulse {
+      0%,100% { box-shadow:0 4px 15px rgba(230,126,34,0.3); }
+      50% { box-shadow:0 4px 25px rgba(245,166,35,0.7); }
+    }
+    #notifBtn.has-notif { animation:notifPulse 2s infinite; }
+
+    /* Onglets panneau notifications */
+    .notif-tabs {
+      display:flex;
+      gap:8px;
+      margin-bottom:15px;
+    }
+    .notif-tab-btn {
+      flex:1;
+      padding:9px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.7);
+      color:var(--text2);
+      font-weight:700;
+      font-size:13px;
+      cursor:pointer;
+      transition:0.2s;
+    }
+    .notif-tab-btn.active {
+      background:linear-gradient(180deg,#f5a623,#e67e22,#c96a12);
+      color:white;
+      border-color:#c96a12;
+    }
+    .notif-tab-btn:hover:not(.active) { background:var(--orange-pale); transform:translateY(-2px); }
+
+    /* Carte historique */
+    .history-card {
+      background:rgba(255,255,255,.75);
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:12px 15px;
+      margin-bottom:10px;
+      border-left:4px solid var(--text3);
+      box-shadow:0 2px 8px var(--shadow2);
+      opacity:0.85;
+    }
+    .history-card.accepted { border-left-color:var(--green); }
+    .history-card.refused  { border-left-color:var(--red); }
+    .history-card-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:6px;
+    }
+    .history-card-title { font-weight:900; font-size:14px; color:var(--text); }
+    .history-card-time  { font-size:11px; color:var(--text3); font-weight:600; }
+    .history-badge-accepted {
+      display:inline-block;
+      background:var(--green-pale);
+      color:var(--green2);
+      border:1px solid var(--green);
+      border-radius:20px;
+      padding:2px 10px;
+      font-size:12px;
+      font-weight:800;
+      margin-top:6px;
+    }
+    .history-badge-refused {
+      display:inline-block;
+      background:var(--red-pale);
+      color:var(--red2);
+      border:1px solid var(--red);
+      border-radius:20px;
+      padding:2px 10px;
+      font-size:12px;
+      font-weight:800;
+      margin-top:6px;
+    }
+    .btn-clear-history {
+      width:100%;
+      padding:11px;
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      color:white;
+      border:1px solid #882020;
+      border-radius:var(--radius);
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+      margin-bottom:12px;
+      transition:0.2s;
+    }
+    .btn-clear-history:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(192,57,43,0.4); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:rgba(200,220,240,.3); }
+    ::-webkit-scrollbar-thumb { background:var(--blue-light); border-radius:3px; }
+
+    /* Responsive */
+    @media (max-width:768px) {
+      .edit-mode-btn { top:10px; right:10px; padding:10px 15px; font-size:14px; }
+      .reset-grid-btn { top:60px; right:10px; padding:8px 12px; font-size:12px; }
+      .table-btn { min-width:55px; min-height:45px; width:70px; height:55px; padding:6px 5px; font-size:10px; }
+      .horloge-container { flex-direction:column; gap:5px; padding:8px 12px; margin:5px; }
+      .popup-buttons button { padding:10px; font-size:14px; }
+      .action-buttons { flex-wrap:wrap; }
+      .btn-cloturer-caisse { margin-left:0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Bandeau connexion en cours (visible seulement pendant la sync) -->
+  <div id="syncBanner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:9999;
+    background:linear-gradient(90deg,#1558b0,#2a7fd4,#1558b0);
+    background-size:200% 100%;
+    animation:syncSlide 2s linear infinite;
+    color:white; text-align:center; padding:10px 20px;
+    font-weight:800; font-size:14px; font-family:'Nunito',sans-serif;
+    box-shadow:0 3px 15px rgba(20,60,180,0.4);">
+    ⏳ Connexion au serveur en cours... Les tables seront disponibles dans quelques secondes.
+  </div>
+  <style>
+    @keyframes syncSlide {
+      0%   { background-position: 0% 0; }
+      100% { background-position: 200% 0; }
+    }
+  </style>
+
+  <!-- Bannière principale -->
+  <div class="action-banner">
+    <div class="action-banner-inner">
+      <div class="action-buttons">
+        <button class="btn-action secondary" onclick="showBackWarning()">
+          ⬅️ Retour
+        </button>
+        
+        <button class="btn-action success" onclick="window.location.href='membres.html'">
+          ➕ Ajouter un membre
+        </button>
+        
+        <button class="btn-action warning" onclick="window.location.href='rapports.html'">
+          💰 Clôturer la caisse
+        </button>
+        
+        <button class="btn-action success" onclick="openResaModal()">
+          📅 Réservations
+        </button>
+
+        <button class="btn-action purple" onclick="window.location.href='espacemembres.html'">
+          🏛️ Espace Membres
+        </button>
+
+        <button class="btn-action" id="notifBtn" onclick="toggleNotifPanel()" style="background:linear-gradient(180deg,#f5a623,#e67e22,#c96a12); color:white; border:1px solid #b05a0a; position:relative;">
+          🔔 Notifications
+          <span id="notifBadge" style="position:absolute; top:-8px; right:-8px; background:linear-gradient(135deg,#ff4444,#c0392b); color:white; border-radius:50%; min-width:22px; height:22px; font-size:11px; font-weight:900; display:none; align-items:center; justify-content:center; border:2px solid white; box-shadow:0 2px 6px rgba(192,57,43,0.6); padding:0 4px;">0</span>
+        </button>
+
+        <!-- Bouton "+" pour accès rapide -->
+        <button class="btn-action btn-plus-actions" onclick="openQuickModal()" title="Plus d'actions">
+          <span class="btn-plus-icon">＋</span>
+          <span class="btn-plus-label">Plus</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Notifications GSM (flottant centré) -->
+  <div id="notifOverlay" onclick="toggleNotifPanel()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,40,90,.45); z-index:499; backdrop-filter:blur(6px);"></div>
+  <div id="notifPanel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.92); opacity:0; width:92%; max-width:520px; max-height:85vh; background:linear-gradient(160deg,rgba(255,255,255,.98),rgba(215,238,255,.96)); box-shadow:0 24px 70px rgba(20,60,180,.30), 0 1px 0 rgba(255,255,255,.9) inset; z-index:500; overflow:hidden; border-radius:var(--radius-xl); border:1.5px solid rgba(255,255,255,.95); transition:transform 0.28s cubic-bezier(.34,1.56,.64,1), opacity 0.22s ease;">
+    <!-- Reflet haut -->
+    <div style="position:absolute; top:0; left:0; right:0; height:30%; background:rgba(255,255,255,.4); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%; pointer-events:none;"></div>
+    <!-- Header fixe -->
+    <div style="position:sticky; top:0; z-index:10; background:linear-gradient(135deg,rgba(245,166,35,.18),rgba(230,126,34,.12)); backdrop-filter:blur(10px); border-bottom:1px solid rgba(230,126,34,.18); padding:16px 20px 12px 20px; display:flex; justify-content:space-between; align-items:center; border-radius:var(--radius-xl) var(--radius-xl) 0 0;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:38px; height:38px; background:linear-gradient(180deg,#f5a623,#e67e22,#c96a12); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 3px 10px rgba(230,126,34,.4); flex-shrink:0;">🔔</div>
+        <div>
+          <div style="font-weight:900; font-size:1.1em; color:var(--blue3); line-height:1.1;">Commandes GSM</div>
+          <div style="font-size:11px; color:var(--text3); font-weight:600;">Interface mobile → caisse</div>
+        </div>
+      </div>
+      <button onclick="toggleNotifPanel()" style="width:34px; height:34px; background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border:1px solid #882020; border-radius:50%; font-size:15px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(192,57,43,.4); transition:0.2s; flex-shrink:0;" onmouseover="this.style.transform='scale(1.12)'" onmouseout="this.style.transform=''">✕</button>
+    </div>
+    <!-- Onglets -->
+    <div style="padding:12px 20px 0 20px; position:relative; z-index:5;">
+      <div class="notif-tabs">
+        <button class="notif-tab-btn active" id="notifTabBtnPending" onclick="switchNotifTab('pending')">⏳ En attente <span id="notifTabCount" style="background:rgba(255,255,255,0.3);border-radius:20px;padding:1px 7px;font-size:11px;margin-left:4px;">0</span></button>
+        <button class="notif-tab-btn" id="notifTabBtnHistory" onclick="switchNotifTab('history')">📋 Historique</button>
+      </div>
+    </div>
+    <!-- Contenu scrollable -->
+    <div style="overflow-y:auto; max-height:calc(85vh - 130px); padding:0 20px 20px 20px; position:relative; z-index:5;">
+      <div id="notifList">
+        <div style="text-align:center; color:#aaa; padding:40px 0; font-size:15px; font-weight:600;">📭 Aucune commande en attente</div>
+      </div>
+      <div id="notifHistoryList" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- Modal Actions Rapides (bouton +) -->
+  <div class="popup-overlay" id="quickModal" style="display:none;" onclick="if(event.target===this)closeQuickModal()">
+    <div class="popup-content" style="max-width:400px; text-align:left;">
+      <button class="popup-close-btn" onclick="closeQuickModal()" title="Fermer">✕</button>
+      <h3 style="text-align:center; margin-bottom:4px;">⚡ Plus d'actions</h3>
+      <p style="text-align:center; color:var(--text3); font-size:13px; margin-bottom:20px; font-weight:600;">Outils & paramètres avancés</p>
+
+      <!-- Apparence -->
+      <button onclick="openOptionsModal(); closeQuickModal();" class="quick-action-btn" style="background:linear-gradient(180deg,#c084fc,#9333ea,#7e22ce); border-color:#7e22ce;">
+        <span class="quick-action-icon">🎨</span>
+        <div class="quick-action-text">
+          <div class="quick-action-title">Apparence</div>
+          <div class="quick-action-desc">Personnaliser couleurs et fond</div>
+        </div>
+        <span class="quick-action-arrow">›</span>
+      </button>
+
+      <!-- Mode Édition -->
+      <button id="editModeBtn" onclick="toggleEditMode(); closeQuickModal();" class="quick-action-btn" style="background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); border-color:#1050a0;">
+        <span class="quick-action-icon">📐</span>
+        <div class="quick-action-text">
+          <div class="quick-action-title">Mode Édition</div>
+          <div class="quick-action-desc">Déplacer et repositionner les tables</div>
+        </div>
+        <span class="quick-action-arrow">›</span>
+      </button>
+
+      <!-- Réinitialiser numérotation -->
+      <button onclick="resetNumeroTickets(); closeQuickModal();" class="quick-action-btn" style="background:linear-gradient(180deg,#fb923c,#ea580c,#c2410c); border-color:#c2410c;">
+        <span class="quick-action-icon">🔄</span>
+        <div class="quick-action-text">
+          <div class="quick-action-title">Réinitialiser numérotation</div>
+          <div class="quick-action-desc">Remet les numéros de tickets à zéro</div>
+        </div>
+        <span class="quick-action-arrow">›</span>
+      </button>
+
+      <!-- Réinitialiser serveur d'impression -->
+      <button id="restartImpressionBtn" onclick="restartServeurImpression()" class="quick-action-btn" style="background:linear-gradient(180deg,#f08080,#c0392b,#922b21); border-color:#882020;">
+        <span class="quick-action-icon">🖨️</span>
+        <div class="quick-action-text">
+          <div class="quick-action-title">Réinitialiser serveur d'impression</div>
+          <div class="quick-action-desc">Si l'imprimante devient injoignable</div>
+        </div>
+        <span class="quick-action-arrow">›</span>
+      </button>
+
+      <!-- Commander GSM -->
+      <button onclick="window.location.href='commande.html'" class="quick-action-btn" style="background:linear-gradient(180deg,#6ee7f7,#0891b2,#0e6d8a); border-color:#0e6d8a;">
+        <span class="quick-action-icon">📱</span>
+        <div class="quick-action-text">
+          <div class="quick-action-title">Commander (GSM)</div>
+          <div class="quick-action-desc">Interface de commande mobile</div>
+        </div>
+        <span class="quick-action-arrow">›</span>
+      </button>
+
+      <!-- Rapport pointages -->
+      <button onclick="window.location.href='rapport-pointages.html'" class="quick-action-btn" style="background:linear-gradient(180deg,#86e0b0,#10b981,#0a7a57); border-color:#0a7a57;">
+        <span class="quick-action-icon">📋</span>
+        <div class="quick-action-text">
+          <div class="quick-action-title">Rapport pointages</div>
+          <div class="quick-action-desc">Qui a pointé quoi, par ticket</div>
+        </div>
+        <span class="quick-action-arrow">›</span>
+      </button>
+
+      <!-- Sync données -->
+      <div style="margin-top:14px;">
+        <div style="font-size:11px; font-weight:800; color:var(--text3); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; padding:0 2px;">🔄 Sync données</div>
+        <div style="display:flex; gap:8px;">
+          <button onclick="exportLocalStorage(); closeQuickModal();" class="quick-action-btn-small" style="background:linear-gradient(180deg,#b486f0,#7c3aed,#5c22cd); border-color:#5c22cd;">
+            💾 Exporter
+          </button>
+          <label class="quick-action-btn-small" style="background:linear-gradient(180deg,#a78bfa,#6d28d9,#4c1d95); border-color:#4c1d95; cursor:pointer;">
+            📂 Importer
+            <input type="file" accept=".json" onchange="importLocalStorage(this); closeQuickModal();" style="display:none;">
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h1>Gestion des Tables 🍽️</h1>
+
+  <!-- Horloge -->
+  <div class="horloge-container">
+    <span class="horloge-emoji">🌅</span>
+    <span class="horloge-date" id="horloge-date">...</span>
+    <span class="horloge-heure" id="horloge-heure">00:00:00</span>
+  </div>
+
+  <!-- Bouton Cocktails -->
+  <button class="btn-cocktails" onclick="window.open('cocktails.html', '_blank')" title="Ouvrir le recueil de recettes cocktails">
+    🍹 Cocktails
+  </button>
+
+  <!-- Bouton Réinitialiser Grille (visible seulement en mode édition) -->
+  <button id="resetGridBtn" class="reset-grid-btn" onclick="resetToGrid()" style="display:none;">
+    🔄 Remettre en grille
+  </button>
+
+  <div class="tables-grid" id="tablesGrid"></div>
+
+  <!-- Popup principal (clic sur table) -->
+  <div class="popup-overlay" id="popupMain">
+    <div class="popup-content">
+      <button class="popup-close-btn" onclick="closePopup()" title="Fermer">✕</button>
+      <h3 id="popupTitle">Table</h3>
+      <div class="popup-buttons">
+        <button onclick="actionOuvrir()">📝<span>Ouvrir Ticket</span></button>
+        <button onclick="actionReserverTable()">📅<span>Réserver</span></button>
+        <button onclick="actionRenommer()">✏️<span>Renommer</span></button>
+        <button onclick="showFusionList()">🔀<span>Fusionner</span></button>
+        <button onclick="showEchangeList()">🔄<span>Échanger</span></button>
+        <button onclick="showSeparerModal()" style="background:linear-gradient(180deg,#a78bfa,#7c3aed,#5b21b6) !important; border-color:#5b21b6 !important;">✂️<span>Séparer ticket</span></button>
+        <button onclick="actionLiberer()">🆓<span>Libérer Table</span></button>
+        <button onclick="actionPaiement()" style="background:linear-gradient(180deg,#6ee7b7,#059669,#065f46) !important; border-color:#065f46 !important;">💳<span>Paiement</span></button>
+        <button onclick="actionAperçuImpression()" style="background:linear-gradient(180deg,#fcd34d,#f59e0b,#b45309) !important; border-color:#b45309 !important;">🖨️<span>Imprimer</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup sélection utilisateur qui pointe (avant ouverture du ticket) -->
+  <div class="popup-overlay" id="pointeurModal" style="display:none;" onclick="if(event.target===this)closePointeurModal()">
+    <div class="popup-content" style="max-width:480px;">
+      <button class="popup-close-btn" onclick="closePointeurModal()" title="Fermer">✕</button>
+      <h3>🧑‍💼 Qui pointe sur ce ticket ?</h3>
+      <p style="color:var(--text3); font-size:13px; font-weight:600; margin:-8px 0 16px;">Sélectionnez l'utilisateur qui prend la commande (utile si ce n'est pas l'utilisateur principal).</p>
+      <div id="pointeurUserList" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;"></div>
+    </div>
+  </div>
+
+  <!-- Popup liste tables (fusion/échange) -->
+  <div class="popup-overlay" id="popupList" style="display:none;">
+    <div class="popup-content">
+      <h3 id="popupListTitle">Choisir table</h3>
+      <div class="tables-list" id="tablesList"></div>
+      <button onclick="closePopup()" style="margin-top:10px; padding:10px; width:100%; border:none; background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border-radius:var(--radius); font-weight:800;">Annuler</button>
+    </div>
+  </div>
+
+  <!-- Modal Aperçu Impression -->
+  <div class="popup-overlay" id="printPreviewModal" style="display:none;">
+    <div class="popup-content" style="max-width:420px;">
+      <button class="popup-close-btn" onclick="closePrintPreview()" title="Fermer">✕</button>
+      <h3>🖨️ Aperçu impression</h3>
+
+      <!-- Ticket stylisé -->
+      <div id="printTicketPreview" style="
+        background:white;
+        border:1px solid var(--border);
+        border-radius:var(--radius);
+        padding:18px;
+        margin:12px 0;
+        font-family:'Courier New', monospace;
+        font-size:13px;
+        color:#111;
+        text-align:left;
+        max-height:55vh;
+        overflow-y:auto;
+      "></div>
+
+      <!-- Statut impression -->
+      <div id="printStatus" style="min-height:24px; font-weight:700; font-size:13px; text-align:center; margin-bottom:8px;"></div>
+
+      <!-- Boutons -->
+      <div style="display:flex; gap:10px; margin-top:4px;">
+        <button onclick="closePrintPreview()" style="
+          flex:1; padding:12px; border:1px solid var(--border);
+          background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+          color:var(--text2); border-radius:var(--radius); font-weight:800; cursor:pointer; font-size:14px;">
+          ⬅️ Retour
+        </button>
+        <button onclick="confirmerImpression()" id="btnConfirmerImpression" style="
+          flex:2; padding:12px; border:1px solid #b45309;
+          background:linear-gradient(180deg,#fcd34d,#f59e0b,#b45309);
+          color:white; border-radius:var(--radius); font-weight:800; cursor:pointer; font-size:14px;">
+          🖨️ Imprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal renommage (clavier virtuel / PC) -->
+  <div class="popup-overlay" id="renameModal" style="display:none;">
+    <div class="popup-content">
+      <h3>Renommer la table</h3>
+
+      <!-- Toggle clavier -->
+      <div style="display:flex; gap:8px; margin-bottom:12px; justify-content:center;">
+        <button id="btnModePC" onclick="setRenameMode('pc')"
+          style="flex:1; padding:10px 14px; border-radius:50px; border:2px solid #1558b0;
+                 background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white;
+                 font-weight:800; font-size:13px; cursor:pointer; transition:0.2s;
+                 box-shadow:0 3px 10px rgba(30,80,160,0.3);">
+          ⌨️ Clavier PC
+        </button>
+        <button id="btnModeVirtuel" onclick="setRenameMode('virtuel')"
+          style="flex:1; padding:10px 14px; border-radius:50px; border:2px solid var(--border);
+                 background:rgba(255,255,255,0.7); color:var(--text2);
+                 font-weight:800; font-size:13px; cursor:pointer; transition:0.2s;">
+          🖱️ Clavier Virtuel
+        </button>
+      </div>
+
+      <div class="input-display" id="renameDisplay">Tapez...</div>
+      <div class="error" id="renameError"></div>
+
+      <!-- Champ texte natif (mode PC) -->
+      <div id="renamePCInput" style="margin-top:10px;">
+        <input type="text" id="renameNativeInput"
+          style="width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius);
+                 font-size:16px; font-family:'Nunito',sans-serif; font-weight:600; background:rgba(255,255,255,.85);"
+          placeholder="Tapez le nom ici..."
+          oninput="currentName = this.value.toUpperCase(); updateRenameDisplay();" />
+      </div>
+
+      <button class="btn-recherche-membre" onclick="toggleMembreSearch()" style="margin-top:10px;">
+        🔍 Rechercher un membre
+      </button>
+
+      <div class="membre-search-container" id="membreSearchContainer" style="display:none;">
+        <input type="text" class="membre-search-input" id="membreSearchInput" placeholder="Rechercher par prénom ou nom..." oninput="filterMembres()" />
+        <div class="membre-list" id="membreList"></div>
+      </div>
+
+      <!-- Clavier virtuel (mode Virtuel) -->
+      <div id="renameVirtualKeyboard" style="display:none;">
+        <div class="keypad" id="renameKeypad"></div>
+        <div class="controls">
+          <button id="renameClear">❌ Effacer</button>
+          <button id="renameBack">⬅️ Retour</button>
+        </div>
+      </div>
+
+      <button id="renameOk" style="margin-top:10px; width:100%; padding:10px; border:1px solid #2d6a1a; background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); color:white; border-radius:var(--radius); font-weight:800; cursor:pointer; font-size:15px;">✅ OK</button>
+      <button onclick="closeRename()" style="margin-top:8px; padding:10px; width:100%; border:none; background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border-radius:var(--radius); cursor:pointer; font-weight:800;">Annuler</button>
+    </div>
+  </div>
+
+  <!-- Modal Avertissement de clôture -->
+  <div class="popup-overlay" id="backWarningModal" style="display:none;">
+    <div class="popup-content">
+      <div style="font-size:3em; margin-bottom:15px;">⚠️</div>
+      <h3>Avertissement de Clôture</h3>
+      <div style="font-size:1.1em; margin-bottom:20px; color:var(--text2); font-weight:600;">
+        <p><strong>N'oubliez pas de clôturer la caisse !</strong></p>
+        <p>Avant de quitter, assurez-vous d'avoir généré le rapport de caisse pour la journée.</p>
+        <p>Souhaitez-vous clôturer maintenant ou quitter sans clôturer ?</p>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button onclick="goToRapports()" style="flex:1; padding:12px; background:linear-gradient(180deg,#ffc870,var(--orange),#b86200); color:white; border:1px solid #a05800; border-radius:var(--radius); font-weight:800; cursor:pointer;">💰 Clôturer maintenant</button>
+        <button onclick="closeBackWarning()" style="flex:1; padding:12px; background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85)); color:var(--text2); border:1px solid var(--border); border-radius:var(--radius); font-weight:800; cursor:pointer;">⬅️ Quitter quand même</button>
+      </div>
+      <button onclick="stayOnPage()" style="width:100%; padding:10px; border:none; background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white; border-radius:var(--radius); margin-top:10px; cursor:pointer; font-weight:800;">📊 Rester sur la page</button>
+    </div>
+  </div>
+
+  <!-- Modal Options -->
+  <div class="popup-overlay" id="optionsModal" style="display:none;">
+    <div class="popup-content">
+      <h3>⚙️ Options de Personnalisation</h3>
+      
+      <div class="options-section">
+        <h4>🎨 Arrière-plan</h4>
+        
+        <div class="option-row">
+          <label>Type de fond :</label>
+          <select id="bgType" onchange="updateBgTypeVisibility()">
+            <option value="color">Couleur unie</option>
+            <option value="gradient">Dégradé</option>
+            <option value="image">Image</option>
+          </select>
+        </div>
+        
+        <div id="colorOptions">
+          <div class="option-row">
+            <label>Couleur de fond :</label>
+            <input type="color" id="bgColor" value="#1a1a2e">
+          </div>
+        </div>
+        
+        <div id="gradientOptions" style="display:none;">
+          <div class="option-row">
+            <label>Couleur 1 :</label>
+            <input type="color" id="gradColor1" value="#1a1a2e">
+          </div>
+          <div class="option-row">
+            <label>Couleur 2 :</label>
+            <input type="color" id="gradColor2" value="#16213e">
+          </div>
+          <div class="option-row">
+            <label>Direction :</label>
+            <select id="gradDirection">
+              <option value="to right">Gauche → Droite</option>
+              <option value="to bottom">Haut → Bas</option>
+              <option value="135deg">Diagonale ↘</option>
+              <option value="to bottom right">Coin ↘</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="imageOptions" style="display:none;">
+          <div class="option-row">
+            <label>Image de fond :</label>
+            <input type="file" id="bgImage" accept="image/*" onchange="handleImageUpload(event)">
+          </div>
+          <button class="btn-remove-bg" onclick="removeBackgroundImage()">🗑️ Supprimer l'image</button>
+        </div>
+      </div>
+
+      <div class="options-section">
+        <h4>🟢 Tables Libres</h4>
+        <div class="option-row">
+          <label>Couleur :</label>
+          <input type="color" id="freeColor" value="#4CAF50">
+        </div>
+      </div>
+
+      <div class="options-section">
+        <h4>🔴 Tables Occupées</h4>
+        <div class="option-row">
+          <label>Couleur :</label>
+          <input type="color" id="occupiedColor" value="#f44336">
+        </div>
+      </div>
+
+      <button class="btn-save-options" onclick="saveOptions()">💾 Enregistrer</button>
+      <button onclick="document.getElementById('optionsModal').style.display='none'" style="width:100%; padding:10px; border:none; background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border-radius:var(--radius); margin-top:10px; cursor:pointer; font-weight:800;">Annuler</button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL RÉSERVATIONS ===== -->
+  <div class="popup-overlay" id="resaModal" style="display:none;">
+    <div class="popup-content" style="max-width:520px;">
+      <h3 style="margin-bottom:12px;">📅 Réservations</h3>
+
+      <div class="resa-modal-nav">
+        <button class="resa-nav-btn active" id="resaNavNouvelle" onclick="showResaTab('nouvelle')">➕ Nouvelle</button>
+        <button class="resa-nav-btn" id="resaNavListe" onclick="showResaTab('liste')">📋 Liste</button>
+      </div>
+
+      <div id="resaTabNouvelle" class="resa-form-section">
+        <div id="resaTableAlreadyWarning" style="display:none;"></div>
+        <div class="resa-form-group">
+          <label>🍽️ Table *</label>
+          <select id="resaTableSelect" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:var(--radius); font-size:14px; background:rgba(255,255,255,.85); font-family:'Nunito',sans-serif;" onchange="onResaTableChange()">
+            <option value="">— Sélectionner une table —</option>
+          </select>
+        </div>
+        <div class="resa-form-group">
+          <label>👤 Membre *</label>
+          <input type="text" id="resaMembreSearch" placeholder="Rechercher un membre..." oninput="filterResaMembres()" autocomplete="off" />
+          <div class="resa-membre-select" id="resaMembreList" style="margin-top:5px;"></div>
+          <input type="hidden" id="resaSelectedMembreId" />
+          <div id="resaSelectedMembreName" style="font-size:13px; color:var(--green2); font-weight:bold; margin-top:4px;"></div>
+        </div>
+        <div class="resa-form-group">
+          <label>📅 Date et heure *</label>
+          <input type="datetime-local" id="resaDate" />
+        </div>
+        <div class="resa-form-group">
+          <label>👥 Nombre de personnes *</label>
+          <input type="number" id="resaNbPersonnes" min="1" max="50" value="2" placeholder="ex: 4" />
+        </div>
+        <div class="resa-form-group">
+          <label>📝 Note (optionnel)</label>
+          <input type="text" id="resaNote" placeholder="ex: anniversaire, fenêtre souhaitée..." />
+        </div>
+        <button class="resa-submit-btn" onclick="saveReservation()">✅ Enregistrer la réservation</button>
+      </div>
+
+      <div id="resaTabListe" class="resa-list-section" style="display:none;">
+        <div id="resaListContent"></div>
+        <div class="resa-pagination" id="resaPagination"></div>
+      </div>
+
+      <div id="resaTabDetail" class="resa-detail-section" style="display:none;">
+        <button class="resa-detail-back" onclick="showResaTab('liste')">← Retour à la liste</button>
+        <div id="resaDetailContent"></div>
+      </div>
+
+      <button onclick="closeResaModal()" style="margin-top:12px; padding:10px; width:100%; border:none; background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border-radius:var(--radius); cursor:pointer; font-weight:800;">Fermer</button>
+    </div>
+  </div>
+
+  <!-- Tooltip réservation (survol point) -->
+  <div id="resaTooltip"></div>
+
+  <!-- Indicateur LED connexion serveur -->
+  <div id="syncStatusLed">
+    <div class="led"></div>
+    <span id="syncStatusText">Sync...</span>
+  </div>
+
+  <script>
+    // --- Données ---
+    let tables = JSON.parse(localStorage.getItem("tables")) || [];
+    let tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+    let membres = JSON.parse(localStorage.getItem("membres")) || [];
+    let selectedTable = null;
+
+    // ── Détection serveur local ──
+    // IS_SERVER = true dès qu'on passe par http:// (localhost OU IP)
+    // false seulement si on ouvre le fichier directement (file://)
+    const IS_SERVER = window.location.protocol === "http:";
+    const API_BASE  = window.location.protocol + "//" + window.location.host + "/api";
+
+    // ── Sync bidirectionnelle au démarrage ──
+    // 1. Envoie le localStorage vers le serveur
+    // 2. Récupère l'état complet du serveur et le réécrit dans localStorage
+    //    → comme ça file:// aura toujours les données à jour
+    // ── Indicateur LED sync ──
+    function setSyncLed(state, text) {
+      const led = document.getElementById("syncStatusLed");
+      const label = document.getElementById("syncStatusText");
+      led.className = "visible " + state;
+      label.textContent = text;
+      // Bandeau haut de page : visible pendant la sync, caché quand connecté
+      const banner = document.getElementById("syncBanner");
+      if (banner) {
+        if (state === "syncing") {
+          banner.style.display = "block";
+          // Décaler le contenu vers le bas pour ne pas cacher les boutons
+          document.body.style.paddingTop = "42px";
+        } else {
+          banner.style.display = "none";
+          document.body.style.paddingTop = "";
+        }
+      }
+      // Auto-masquer la LED après 4s si connecté
+      if (state === "connected") {
+        clearTimeout(led._hideTimeout);
+        led._hideTimeout = setTimeout(() => {
+          led.classList.remove("visible");
+        }, 4000);
+      }
+    }
+
+    async function syncToServer() {
+      if (!IS_SERVER) return;
+      setSyncLed("syncing", "Synchronisation...");
+      try {
+        // Étape 1 : relire le localStorage FRAIS (peut avoir été modifié par ticket.html/paiement.html)
+        const freshTables  = JSON.parse(localStorage.getItem("tables")             || "[]");
+        const freshTickets = JSON.parse(localStorage.getItem("tickets")            || "[]");
+        const freshMembres = JSON.parse(localStorage.getItem("membres")            || "[]");
+        // Mettre à jour les variables en mémoire avec les données fraîches
+        tables  = freshTables.length  ? freshTables  : tables;
+        tickets = freshTickets.length ? freshTickets : tickets;
+        membres = freshMembres.length ? freshMembres : membres;
+
+        const syncRes = await fetch(API_BASE + "/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tables:  tables,
+            tickets: tickets,
+            membres: membres,
+            reservations:       JSON.parse(localStorage.getItem("reservations")       || "[]"),
+            articlesData:       JSON.parse(localStorage.getItem("articlesData")       || "{}"),
+            stock:              JSON.parse(localStorage.getItem("stock")              || "{}"),
+            displayOptions:     JSON.parse(localStorage.getItem("displayOptions")     || "{}"),
+            availableTicketIds: JSON.parse(localStorage.getItem("availableTicketIds") || "[]"),
+            ticketsHistorique:  JSON.parse(localStorage.getItem("ticketsHistorique")  || "[]"),
+            deletedTickets:     JSON.parse(localStorage.getItem("deletedTickets")     || "[]"),
+            refundedTickets:    JSON.parse(localStorage.getItem("refundedTickets")    || "[]"),
+            lastMembreId:     parseInt(localStorage.getItem("lastMembreId")     || "0"),
+            lastTicketId:     parseInt(localStorage.getItem("lastTicketId")     || "0"),
+            lastTicketNumero: parseInt(localStorage.getItem("lastTicketNumero") || "0"),
+          })
+        });
+
+        // Étape 2 : utiliser la réponse du sync directement (contient déjà les données fusionnées)
+        const sData = await syncRes.json();
+
+        // Étape 3 : réécrit dans localStorage seulement si la valeur serveur est non-vide
+        const mapping = {
+          tables:             "tables",
+          tickets:            "tickets",
+          membres:            "membres",
+          reservations:       "reservations",
+          articlesData:       "articlesData",
+          stock:              "stock",
+          displayOptions:     "displayOptions",
+          availableTicketIds: "availableTicketIds",
+          pendingOrders:      "pendingOrders",
+          ticketsHistorique:  "ticketsHistorique",
+          deletedTickets:     "deletedTickets",
+          refundedTickets:    "refundedTickets",
+        };
+        for (const [serverKey, lsKey] of Object.entries(mapping)) {
+          const val = sData[serverKey];
+          // N'écraser le localStorage que si le serveur retourne quelque chose de non-vide
+          const isEmpty = val === undefined || val === null ||
+                          (Array.isArray(val) && val.length === 0) ||
+                          (typeof val === "object" && !Array.isArray(val) && Object.keys(val).length === 0);
+          if (!isEmpty) {
+            localStorage.setItem(lsKey, JSON.stringify(val));
+          }
+        }
+        const numKeys = ["lastMembreId","lastTicketId","lastTicketNumero"];
+        for (const k of numKeys) {
+          if (sData[k]) localStorage.setItem(k, String(sData[k]));
+        }
+
+        // Met à jour les variables en mémoire avec les données les plus récentes
+        tables  = JSON.parse(localStorage.getItem("tables")  || "[]");
+        tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+        membres = JSON.parse(localStorage.getItem("membres") || "[]");
+
+        // ── RECHARGE LA PAGE avec les nouvelles données ──
+        renderTables();
+        if (typeof applyOptions === "function") applyOptions();
+
+        syncDone = true; // ✅ Connexion établie — les tables peuvent être ouvertes
+        setSyncLed("connected", "✅ Connecté");
+
+      } catch(e) {
+        // Pas de serveur — mode local normal, rien à faire
+        console.log("Mode local (pas de serveur)");
+      }
+    }
+    // syncDone = false tant que la connexion serveur n'est pas établie
+    // Empêche d'ouvrir une table avant que les données soient bien synchronisées
+    let syncDone = !IS_SERVER; // Si pas de serveur (file://), pas besoin d'attendre
+    // Afficher le bandeau de connexion dès le départ si on est en mode serveur
+    if (IS_SERVER) {
+      setTimeout(() => {
+        const banner = document.getElementById("syncBanner");
+        if (banner && !syncDone) {
+          banner.style.display = "block";
+          document.body.style.paddingTop = "42px";
+        }
+      }, 200);
+    }
+    // Lance la sync 1,5s après le chargement
+    setTimeout(syncToServer, 1500);
+    let modeAction = "";
+    let editMode = false;
+    
+    // Migration : ajouter le champ 'numero' aux tickets existants qui n'en ont pas
+    let needsSave = false;
+    tickets.forEach(ticket => {
+      if (ticket.numero === undefined) {
+        ticket.numero = ticket.id; // Utiliser l'ID comme numéro pour les anciens tickets
+        needsSave = true;
+      }
+    });
+    if (needsSave) {
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+    }
+    
+    // Variables pour le drag
+    let draggedTable = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    // Init tables si vide
+    if (tables.length === 0) {
+      for (let i = 1; i <= 60; i++) {
+        tables.push({ 
+          id: i, 
+          nom: "Table " + i, 
+          ticketId: null,
+          position: null // position libre pour mode édition
+        });
+      }
+      saveData();
+    }
+
+    // --- Fonction de notification toast ---
+    function showToast(message, type = "success") {
+      // Supprimer les notifications existantes
+      const existingToast = document.querySelector('.toast-notification');
+      if (existingToast) {
+        existingToast.remove();
+      }
+      
+      const toast = document.createElement('div');
+      toast.className = `toast-notification ${type}`;
+      toast.innerHTML = `
+        <span style="font-size:1.3em;">${getIconForType(type)}</span>
+        <span>${message}</span>
+      `;
+      
+      document.body.appendChild(toast);
+      
+      // Supprimer après 4 secondes
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 4000);
+    }
+    
+    function getIconForType(type) {
+      switch(type) {
+        case 'success': return '✅';
+        case 'info': return 'ℹ️';
+        case 'warning': return '⚠️';
+        case 'error': return '❌';
+        default: return '💡';
+      }
+    }
+
+    // --- Options de personnalisation ---
+    function loadOptions() {
+      const saved = localStorage.getItem("displayOptions");
+      if (saved) {
+        return JSON.parse(saved);
+      }
+      return {
+        bgType: "color",
+        bgColor: "#1a1a2e",
+        gradColor1: "#1a1a2e",
+        gradColor2: "#16213e",
+        gradDirection: "to right",
+        bgImage: null,
+        freeColor: "#4CAF50",
+        occupiedColor: "#f44336"
+      };
+    }
+
+    function applyOptions() {
+      const opts = loadOptions();
+      
+      if (opts.bgType === "image" && opts.bgImage) {
+        document.body.style.backgroundImage = `url(${opts.bgImage})`;
+        document.body.style.backgroundColor = "";
+      } else if (opts.bgType === "gradient") {
+        document.body.style.backgroundImage = `linear-gradient(${opts.gradDirection}, ${opts.gradColor1}, ${opts.gradColor2})`;
+        document.body.style.backgroundColor = "";
+      } else {
+        document.body.style.backgroundImage = "";
+        document.body.style.backgroundColor = opts.bgColor;
+      }
+    }
+
+    function updateBgTypeVisibility() {
+      const type = document.getElementById("bgType").value;
+      document.getElementById("colorOptions").style.display = type === "color" ? "block" : "none";
+      document.getElementById("gradientOptions").style.display = type === "gradient" ? "block" : "none";
+      document.getElementById("imageOptions").style.display = type === "image" ? "block" : "none";
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          // Stocker l'image en base64
+          const opts = loadOptions();
+          opts.bgImage = e.target.result;
+          localStorage.setItem("displayOptions", JSON.stringify(opts));
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function removeBackgroundImage() {
+      const opts = loadOptions();
+      opts.bgImage = null;
+      localStorage.setItem("displayOptions", JSON.stringify(opts));
+      document.getElementById("bgImage").value = "";
+      showToast("✅ Image de fond supprimée !", "success");
+    }
+
+    function saveOptions() {
+      const opts = {
+        bgType: document.getElementById("bgType").value,
+        bgColor: document.getElementById("bgColor").value,
+        gradColor1: document.getElementById("gradColor1").value,
+        gradColor2: document.getElementById("gradColor2").value,
+        gradDirection: document.getElementById("gradDirection").value,
+        bgImage: loadOptions().bgImage, // Garder l'image existante
+        freeColor: document.getElementById("freeColor").value,
+        occupiedColor: document.getElementById("occupiedColor").value
+      };
+      localStorage.setItem("displayOptions", JSON.stringify(opts));
+      applyOptions();
+      renderTables();
+      document.getElementById("optionsModal").style.display = "none";
+      showToast("✅ Options enregistrées !", "success");
+    }
+
+    // Charger les options dans le modal
+    function openOptionsModal() {
+      const opts = loadOptions();
+      document.getElementById("bgType").value = opts.bgType;
+      document.getElementById("bgColor").value = opts.bgColor;
+      document.getElementById("gradColor1").value = opts.gradColor1;
+      document.getElementById("gradColor2").value = opts.gradColor2;
+      document.getElementById("gradDirection").value = opts.gradDirection;
+      document.getElementById("freeColor").value = opts.freeColor;
+      document.getElementById("occupiedColor").value = opts.occupiedColor;
+      updateBgTypeVisibility();
+      document.getElementById('optionsModal').style.display = 'flex';
+      tablesSetOccupee("configure les options");
+    }
+
+    // --- Modal Actions Rapides ---
+    function openQuickModal() {
+      document.getElementById("quickModal").style.display = "flex";
+      tablesSetOccupee("actions rapides");
+    }
+    function closeQuickModal() {
+      document.getElementById("quickModal").style.display = "none";
+      tablesClearOccupee();
+    }
+
+    // --- Fonctions pour l'avertissement de clôture ---
+    function showBackWarning() {
+      document.getElementById("backWarningModal").style.display = "flex";
+    }
+
+    function closeBackWarning() {
+      document.getElementById("backWarningModal").style.display = "none";
+      window.location.href = "index.html";
+    }
+
+    function goToRapports() {
+      document.getElementById("backWarningModal").style.display = "none";
+      window.location.href = "rapports.html";
+    }
+
+    function stayOnPage() {
+      document.getElementById("backWarningModal").style.display = "none";
+    }
+
+    // --- Mode Édition ---
+    function toggleEditMode() {
+      editMode = !editMode;
+      const btn = document.getElementById("editModeBtn");
+      const resetBtn = document.getElementById("resetGridBtn");
+      const grid = document.getElementById("tablesGrid");
+      
+      if (editMode) {
+        if (btn) {
+          btn.style.background = "linear-gradient(180deg,#f08080,#c0392b,#922b21)";
+          btn.style.borderColor = "#882020";
+          btn.querySelector('.quick-action-title').textContent = "✅ Terminer l'édition";
+          btn.querySelector('.quick-action-desc').textContent = "Sauvegarder les positions";
+        }
+        grid.classList.add("edit-mode");
+        resetBtn.style.display = "block";
+        showToast("📐 Mode édition activé", "info");
+      } else {
+        if (btn) {
+          btn.style.background = "linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0)";
+          btn.style.borderColor = "#1050a0";
+          btn.querySelector('.quick-action-title').textContent = "Mode Édition";
+          btn.querySelector('.quick-action-desc').textContent = "Déplacer et repositionner les tables";
+        }
+        grid.classList.remove("edit-mode");
+        resetBtn.style.display = "none";
+        saveData();
+        showToast("💾 Édition terminée - positions sauvegardées", "success");
+      }
+      
+      renderTables();
+    }
+
+    // --- Réinitialiser en grille ---
+    function resetToGrid() {
+      if (confirm("🔄 Remettre toutes les tables en grille automatique ?")) {
+        tables.forEach(table => {
+          table.position = null;
+        });
+        saveData();
+        renderTables();
+        showToast("✅ Tables remises en grille !", "success");
+      }
+    }
+
+    // --- Drag and Drop ---
+    function startDrag(e, table) {
+      if (!editMode) return;
+      
+      draggedTable = table;
+      const btn = e.currentTarget;
+      btn.classList.add("dragging");
+      
+      const rect = btn.getBoundingClientRect();
+      const gridRect = document.getElementById("tablesGrid").getBoundingClientRect();
+      
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      
+      e.preventDefault();
+    }
+
+    function drag(e) {
+      if (!editMode || !draggedTable) return;
+      
+      const btn = document.querySelector(".dragging");
+      if (!btn) return;
+      
+      const gridRect = document.getElementById("tablesGrid").getBoundingClientRect();
+      
+      let x = e.clientX - gridRect.left - offsetX;
+      let y = e.clientY - gridRect.top - offsetY;
+      
+      // Limites en pixels
+      x = Math.max(0, Math.min(x, gridRect.width - btn.offsetWidth));
+      y = Math.max(0, Math.min(y, gridRect.height - btn.offsetHeight));
+      
+      btn.style.left = x + "px";
+      btn.style.top = y + "px";
+    }
+
+    function endDrag(e) {
+      if (!editMode || !draggedTable) return;
+      
+      const btn = document.querySelector(".dragging");
+      if (btn) {
+        btn.classList.remove("dragging");
+        
+        // Sauvegarder la position en pourcentages
+        const gridRect = document.getElementById("tablesGrid").getBoundingClientRect();
+        const x = parseInt(btn.style.left) || 0;
+        const y = parseInt(btn.style.top) || 0;
+        
+        // Convertir en pourcentages
+        const xPercent = (x / gridRect.width) * 100;
+        const yPercent = (y / gridRect.height) * 100;
+        
+        draggedTable.position = {
+          x: xPercent,
+          y: yPercent,
+          isPercent: true // Flag pour savoir que c'est en %
+        };
+      }
+      
+      draggedTable = null;
+    }
+
+    // Events globaux pour le drag
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", endDrag);
+
+    // --- Render Tables ---
+    function renderTables() {
+      const grid = document.getElementById("tablesGrid");
+      const opts = loadOptions();
+      grid.innerHTML = "";
+
+      tables.forEach(table => {
+        const btn = document.createElement("div");
+        btn.className = "table-btn";
+        btn.textContent = table.nom;
+        
+        // Couleur selon état
+        if (table.ticketId) {
+          btn.style.background = opts.occupiedColor;
+        } else {
+          btn.style.background = opts.freeColor;
+        }
+
+        // Position (toujours en absolu maintenant)
+        if (table.position) {
+          if (table.position.isPercent) {
+            // Position en pourcentages (responsive)
+            btn.style.left = table.position.x + "%";
+            btn.style.top = table.position.y + "%";
+          } else {
+            // Anciennes positions en pixels (compatibilité)
+            btn.style.left = table.position.x + "px";
+            btn.style.top = table.position.y + "px";
+          }
+        } else {
+          // Position initiale basée sur l'index (grille par défaut)
+          // PLUS D'ESPACEMENT VERTICAL - augmentation de 8% à 12%
+          const index = tables.indexOf(table);
+          const columns = Math.min(12, Math.floor(window.innerWidth / 100)); // Plus de colonnes pour des tables plus petites
+          const x = (index % columns) * (100 / columns);
+          const y = Math.floor(index / columns) * 12; // Augmenté à 12% d'espacement vertical
+          btn.style.left = x + "%";
+          btn.style.top = y + "%";
+        }
+
+        // Mode édition
+        if (editMode) {
+          btn.classList.add("draggable");
+          // Drag events
+          btn.addEventListener("mousedown", (e) => startDrag(e, table));
+        } else {
+          // Mode normal - clic pour ouvrir popup
+          btn.onclick = () => openTablePopup(table);
+        }
+
+        // Point jaune si table réservée
+        const resa = reservations.find(r => r.tableId === table.id);
+        if (resa) {
+          btn.style.overflow = "visible";
+          const dot = document.createElement("div");
+          dot.className = "resa-dot";
+          dot.addEventListener("mouseenter", (e) => showResaDot(e, resa, table));
+          dot.addEventListener("mousemove", moveResaDot);
+          dot.addEventListener("mouseleave", hideResaDot);
+          dot.addEventListener("click", (e) => { e.stopPropagation(); showResaDetail(resa.id); });
+          btn.appendChild(dot);
+        }
+
+        grid.appendChild(btn);
+      });
+    }
+
+    // --- Popup table ---
+    function openTablePopup(table) {
+      _checkPresence("ouvrir table");
+      tablesSetOccupee("gère une table");
+      if (editMode) return;
+      // Bloquer si la sync serveur n'est pas encore terminée
+      if (!syncDone) {
+        showToast("⏳ Connexion en cours... Patientez quelques secondes avant d'ouvrir une table.", "warning");
+        return;
+      }
+      // Toujours recharger depuis localStorage pour avoir les données fraîches (local + localhost)
+      tables  = JSON.parse(localStorage.getItem("tables")  || "[]");
+      tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      const freshTable = tables.find(t => t.id === table.id) || table;
+      selectedTable = freshTable;
+      document.getElementById("popupTitle").textContent = freshTable.nom;
+      document.getElementById("popupMain").style.display = "flex";
+    }
+
+    function closePopup() {
+      document.getElementById("popupMain").style.display = "none";
+      document.getElementById("popupList").style.display = "none";
+      selectedTable = null;
+      tablesClearOccupee();
+    }
+
+    // --- Actions Table ---
+    function actionOuvrir() {
+      // On demande d'abord qui pointe sur ce ticket avant de l'ouvrir
+      openPointeurModal();
+    }
+
+    /* -----------------------
+       Modal "Qui pointe ?"
+       ----------------------- */
+    function makePointeurAvatarHTML(avatar, size) {
+      size = size || 44;
+      if (!avatar) return "<span style='font-size:" + (size*0.6) + "px;'>👤</span>";
+      if (typeof avatar === 'string' && avatar.startsWith('data:')) {
+        return "<img src='" + avatar + "' style='width:" + size + "px;height:" + size + "px;border-radius:50%;object-fit:cover;'>";
+      }
+      return "<span style='font-size:" + (size*0.6) + "px;'>" + avatar + "</span>";
+    }
+
+    function getPointeurUsers() {
+      var list = [];
+      try {
+        var u = JSON.parse(localStorage.getItem("users")) || [];
+        list = [{ username: "Admin", avatar: "👑", isAdmin: true }].concat(u);
+      } catch (e) {
+        list = [{ username: "Admin", avatar: "👑", isAdmin: true }];
+      }
+      return list;
+    }
+
+    function openPointeurModal() {
+      var list = document.getElementById('pointeurUserList');
+      list.innerHTML = '';
+      getPointeurUsers().forEach(function(u) {
+        var card = document.createElement('div');
+        card.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:12px 16px;border-radius:14px;border:2px solid var(--border2);background:rgba(255,255,255,.8);transition:all .2s;min-width:80px;';
+        card.innerHTML = "<div style='width:54px;height:54px;border-radius:50%;background:rgba(220,238,255,.7);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;overflow:hidden;'>"
+          + makePointeurAvatarHTML(u.avatar, 44)
+          + "</div><div style='font-weight:800;font-size:13px;color:var(--text);text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'>" + u.username + "</div>";
+        if (u.isAdmin) {
+          card.innerHTML += "<span style='font-size:10px;background:linear-gradient(135deg,#ffd84d,#e8a800);color:#5a3800;padding:2px 8px;border-radius:50px;font-weight:900;'>ADMIN</span>";
+        }
+        card.addEventListener('mouseenter', function() {
+          card.style.borderColor = 'var(--blue-light)';
+          card.style.background = 'rgba(210,238,255,.9)';
+          card.style.transform = 'translateY(-3px)';
+          card.style.boxShadow = '0 6px 18px var(--shadow)';
+        });
+        card.addEventListener('mouseleave', function() {
+          card.style.borderColor = 'var(--border2)';
+          card.style.background = 'rgba(255,255,255,.8)';
+          card.style.transform = '';
+          card.style.boxShadow = '';
+        });
+        card.addEventListener('click', function() {
+          closePointeurModal();
+          proceedActionOuvrir(u.username);
+        });
+        list.appendChild(card);
+      });
+      document.getElementById('pointeurModal').style.display = 'flex';
+    }
+
+    function closePointeurModal() {
+      document.getElementById('pointeurModal').style.display = 'none';
+    }
+
+    function proceedActionOuvrir(pointeurUsername) {
+      // Recharger tables/tickets depuis localStorage pour avoir les données les plus fraîches
+      tables  = JSON.parse(localStorage.getItem("tables")  || "[]");
+      tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+
+      // Pointer directement sur l'objet dans le tableau (pas une copie)
+      const tableIdx = tables.findIndex(t => t.id === selectedTable.id);
+      if (tableIdx === -1) {
+        showToast("❌ Table introuvable, réessayez.", "error");
+        return;
+      }
+      selectedTable = tables[tableIdx]; // référence directe dans tables[]
+
+      if (!selectedTable.ticketId) {
+        // ⚠️ On NE recycle plus les ids d'anciens tickets supprimés (availableTicketIds) :
+        // le serveur considère tout id présent dans deletedTickets/ticketsHistorique/
+        // refundedTickets comme définitivement mort et le supprime au sync suivant.
+        // Recycler un id = créer un ticket voué à disparaître à la prochaine synchro.
+        let ticketId;
+        const lastId = parseInt(localStorage.getItem("lastTicketId") || "0");
+        ticketId = lastId + 1;
+        localStorage.setItem("lastTicketId", ticketId.toString());
+
+        const lastNumero = parseInt(localStorage.getItem("lastTicketNumero") || "0");
+        const ticketNumero = lastNumero + 1;
+        localStorage.setItem("lastTicketNumero", ticketNumero.toString());
+
+        const newTicket = {
+          id: ticketId,
+          numero: ticketNumero,
+          tableId: selectedTable.id,
+          date: new Date().toLocaleDateString(),
+          heure: new Date().toLocaleTimeString(),
+          membre: null,
+          articles: []
+        };
+        tickets.push(newTicket);
+
+        // Modifier DIRECTEMENT l'objet dans tables[] → saveData() le verra
+        tables[tableIdx].ticketId = ticketId;
+        selectedTable = tables[tableIdx];
+
+        saveData();
+      }
+
+      // Enregistrer qui pointe sur ce ticket (utilisé dans ticket.html et le rapport de pointages)
+      try {
+        const pmap = JSON.parse(localStorage.getItem("pointeurTickets") || "{}");
+        pmap[selectedTable.ticketId] = pointeurUsername || "Utilisateur principal";
+        localStorage.setItem("pointeurTickets", JSON.stringify(pmap));
+      } catch (e) {}
+
+      window.location.href = `ticket.html?tableId=${selectedTable.id}`;
+    }
+
+    function showFusionList() {
+      modeAction = "fusion";
+      document.getElementById("popupMain").style.display = "none";
+      document.getElementById("popupList").style.display = "flex";
+      document.getElementById("popupListTitle").textContent = "Choisir table à fusionner";
+      renderTableList();
+    }
+
+    function showEchangeList() {
+      modeAction = "echange";
+      document.getElementById("popupMain").style.display = "none";
+      document.getElementById("popupList").style.display = "flex";
+      document.getElementById("popupListTitle").textContent = "Choisir table à échanger";
+      renderTableList();
+    }
+
+    function renderTableList() {
+      const list = document.getElementById("tablesList");
+      list.innerHTML = "";
+      tables.forEach(t => {
+        if (t.id !== selectedTable.id) {
+          const btn = document.createElement("button");
+          btn.textContent = t.nom;
+          btn.onclick = () => chooseTable(t.id);
+          list.appendChild(btn);
+        }
+      });
+    }
+
+    function chooseTable(autreId) {
+      const autreTable = tables.find(t => t.id === autreId);
+      if (!autreTable) return;
+
+      if (modeAction === "fusion") {
+        if (!selectedTable.ticketId || !autreTable.ticketId) {
+          showToast("❌ Les deux tables doivent avoir un ticket !", "error");
+          return;
+        }
+        const ticketSource = tickets.find(t => t.id === autreTable.ticketId);
+        const ticketDest = tickets.find(t => t.id === selectedTable.ticketId);
+        ticketSource.articles.forEach(art => {
+          let exist = ticketDest.articles.find(a => a.id === art.id);
+          if (exist) exist.qte += art.qte;
+          else ticketDest.articles.push({ ...art });
+        });
+        tickets = tickets.filter(t => t.id !== ticketSource.id);
+        autreTable.ticketId = null;
+        autreTable.nom = "Table " + autreTable.id;
+        saveData();
+        // Recharger depuis localStorage pour éviter les données obsolètes
+        tables  = JSON.parse(localStorage.getItem("tables")  || "[]");
+        tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+        showToast(`✅ Fusion réussie — articles transférés vers ${selectedTable.nom}`, "success");
+      }
+      else if (modeAction === "echange") {
+        const tmp = selectedTable.ticketId;
+        selectedTable.ticketId = autreTable.ticketId;
+        autreTable.ticketId = tmp;
+        saveData();
+        // Recharger depuis localStorage pour éviter les données obsolètes
+        tables  = JSON.parse(localStorage.getItem("tables")  || "[]");
+        tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+        showToast(`✅ Échange réussi avec ${autreTable.nom}`, "success");
+      }
+
+      renderTables();
+      closePopup();
+    }
+
+    // --- Modal clavier pour renommer ---
+    let currentName = "";
+    let renameMode = "pc"; // "pc" ou "virtuel"
+
+    function setRenameMode(mode) {
+      renameMode = mode;
+      const pcInput    = document.getElementById("renamePCInput");
+      const virtKbd    = document.getElementById("renameVirtualKeyboard");
+      const btnPC      = document.getElementById("btnModePC");
+      const btnVirtuel = document.getElementById("btnModeVirtuel");
+
+      if (mode === "pc") {
+        pcInput.style.display  = "block";
+        virtKbd.style.display  = "none";
+        btnPC.style.background      = "linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0)";
+        btnPC.style.color           = "white";
+        btnPC.style.borderColor     = "#1558b0";
+        btnVirtuel.style.background = "rgba(255,255,255,0.7)";
+        btnVirtuel.style.color      = "var(--text2)";
+        btnVirtuel.style.borderColor= "var(--border)";
+        const inp = document.getElementById("renameNativeInput");
+        inp.value = currentName;
+        setTimeout(() => inp.focus(), 50);
+      } else {
+        pcInput.style.display  = "none";
+        virtKbd.style.display  = "block";
+        btnVirtuel.style.background = "linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0)";
+        btnVirtuel.style.color      = "white";
+        btnVirtuel.style.borderColor= "#1558b0";
+        btnPC.style.background      = "rgba(255,255,255,0.7)";
+        btnPC.style.color           = "var(--text2)";
+        btnPC.style.borderColor     = "var(--border)";
+      }
+    }
+
+    function actionRenommer() {
+      // Relire les membres depuis le localStorage (peut avoir changé depuis membres.html)
+      membres = JSON.parse(localStorage.getItem("membres") || "[]");
+      currentName = selectedTable.nom;
+      updateRenameDisplay();
+      document.getElementById("membreSearchContainer").style.display = "none";
+      document.getElementById("renameModal").style.display = "flex";
+      setRenameMode("pc");
+    }
+
+    function updateRenameDisplay() {
+      document.getElementById("renameDisplay").textContent = currentName || "Tapez...";
+    }
+
+    function closeRename() {
+      document.getElementById("renameModal").style.display = "none";
+      document.getElementById("membreSearchContainer").style.display = "none";
+      currentName = "";
+    }
+
+    function toggleMembreSearch() {
+      const container = document.getElementById("membreSearchContainer");
+      if (container.style.display === "none") {
+        // Relire les membres depuis le localStorage au moment d'ouvrir la recherche
+        membres = JSON.parse(localStorage.getItem("membres") || "[]");
+        container.style.display = "block";
+        renderMembreList(membres);
+        document.getElementById("membreSearchInput").focus();
+      } else {
+        container.style.display = "none";
+      }
+    }
+
+    function renderMembreList(membresToShow) {
+      const list = document.getElementById("membreList");
+      list.innerHTML = "";
+      
+      if (membresToShow.length === 0) {
+        list.innerHTML = '<div class="membre-item" style="text-align:center; color:#999;">Aucun membre trouvé</div>';
+        return;
+      }
+
+      membresToShow.forEach(membre => {
+        const div = document.createElement("div");
+        div.className = "membre-item";
+        div.textContent = `${membre.prenom} ${membre.nom}`;
+        div.onclick = () => selectMembre(membre);
+        list.appendChild(div);
+      });
+    }
+
+    function selectMembre(membre) {
+      currentName = `${membre.prenom} ${membre.nom}`.toUpperCase();
+      updateRenameDisplay();
+      document.getElementById("membreSearchContainer").style.display = "none";
+      document.getElementById("membreSearchInput").value = "";
+      // Sync champ PC si actif
+      const inp = document.getElementById("renameNativeInput");
+      if (inp) inp.value = currentName;
+    }
+
+    function filterMembres() {
+      const searchTerm = document.getElementById("membreSearchInput").value.toLowerCase();
+      const filtered = membres.filter(m => 
+        (m.prenom && m.prenom.toLowerCase().includes(searchTerm)) ||
+        (m.nom && m.nom.toLowerCase().includes(searchTerm))
+      );
+      renderMembreList(filtered);
+    }
+
+    function createRenameKeypad() {
+      const chars = [
+        ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        ..."0123456789",
+        " "
+      ];
+      const container = document.getElementById("renameKeypad");
+      container.innerHTML = "";
+      chars.forEach(ch => {
+        const key = document.createElement("div");
+        key.className = "key";
+        key.textContent = ch === " " ? "⎵" : ch;
+        key.onclick = () => {
+          currentName += ch;
+          updateRenameDisplay();
+        };
+        container.appendChild(key);
+      });
+    }
+
+    document.addEventListener("keydown", (e) => {
+      const modal = document.getElementById("renameModal");
+      if (modal.style.display !== "flex") return;
+      if (e.target.id === "membreSearchInput") return;
+
+      if (e.key === "Enter") {
+        document.getElementById("renameOk").click();
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === "Escape") {
+        closeRename();
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === "Backspace" || e.key === "Delete") {
+        currentName = currentName.slice(0, -1);
+        updateRenameDisplay();
+        e.preventDefault();
+        return;
+      }
+
+      if (/^[a-zA-Z0-9 ]$/.test(e.key)) {
+        currentName += e.key.toUpperCase();
+        updateRenameDisplay();
+      }
+    });
+
+    document.getElementById("renameClear").onclick = () => {
+      currentName = "";
+      updateRenameDisplay();
+      document.getElementById("renameError").textContent = "";
+    };
+    document.getElementById("renameBack").onclick = () => {
+      currentName = currentName.slice(0, -1);
+      updateRenameDisplay();
+      document.getElementById("renameError").textContent = "";
+    };
+    document.getElementById("renameOk").onclick = () => {
+      if (!currentName.trim()) {
+        document.getElementById("renameError").textContent = "Le nom ne peut pas être vide.";
+        showToast("❌ Le nom ne peut pas être vide", "error");
+        return;
+      }
+      selectedTable.nom = currentName;
+      saveData();
+      // Recharger les données fraîches depuis localStorage
+      tables  = JSON.parse(localStorage.getItem("tables")  || "[]");
+      tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      renderTables();
+      closeRename();
+      // Rouvrir le popup avec le nom mis à jour
+      const freshTable = tables.find(t => t.id === selectedTable.id);
+      if (freshTable) {
+        selectedTable = freshTable;
+        document.getElementById("popupTitle").textContent = freshTable.nom;
+        document.getElementById("popupMain").style.display = "flex";
+      }
+      showToast(`✅ Table renommée en "${selectedTable.nom}"`, "success");
+    };
+
+    function actionAperçuImpression() {
+      if (!selectedTable.ticketId) {
+        showToast("⚠️ Aucun ticket ouvert sur cette table !", "warning");
+        return;
+      }
+      const ticket = tickets.find(t => t.id === selectedTable.ticketId);
+      if (!ticket) {
+        showToast("❌ Ticket introuvable !", "error");
+        return;
+      }
+
+      // Construire l'aperçu ticket style caisse
+      const total = ticket.articles.reduce((s, a) => s + a.prix * a.qte, 0);
+      const sep = "─".repeat(32);
+
+      let lignes = `<div style="text-align:center; font-weight:bold; font-size:15px; margin-bottom:6px;">🧾 ${selectedTable.nom}</div>`;
+      lignes += `<div style="text-align:center; font-size:11px; color:#666; margin-bottom:4px;">${ticket.date} ${ticket.heure}</div>`;
+      lignes += `<div style="text-align:center; font-size:11px; color:#666; margin-bottom:10px;">Ticket #${ticket.numero || ticket.id}</div>`;
+      lignes += `<div style="border-top:1px dashed #aaa; margin-bottom:8px;"></div>`;
+
+      if (!ticket.articles || ticket.articles.length === 0) {
+        lignes += `<div style="text-align:center; color:#aaa; padding:10px;">Aucun article</div>`;
+      } else {
+        ticket.articles.forEach(art => {
+          const prixLigne = (art.prix * art.qte).toFixed(2);
+          const offertTag = art.offert ? ' <span style="color:#e67e22;">[OFFERT]</span>' : '';
+          lignes += `
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px; align-items:baseline;">
+              <span>${art.nom}${offertTag} <span style="color:#888;">x${art.qte}</span></span>
+              <span style="font-weight:700;">${prixLigne} €</span>
+            </div>`;
+        });
+      }
+
+      lignes += `<div style="border-top:2px solid #333; margin:10px 0 8px;"></div>`;
+      lignes += `<div style="display:flex; justify-content:space-between; font-size:16px; font-weight:900;">
+                   <span>TOTAL</span><span>${total.toFixed(2)} €</span>
+                 </div>`;
+
+      document.getElementById("printTicketPreview").innerHTML = lignes;
+      document.getElementById("printStatus").textContent = "";
+      document.getElementById("btnConfirmerImpression").disabled = false;
+      document.getElementById("btnConfirmerImpression").style.opacity = "1";
+
+      // Fermer le popup principal et ouvrir l'aperçu
+      document.getElementById("popupMain").style.display = "none";
+      document.getElementById("printPreviewModal").style.display = "flex";
+    }
+
+    function closePrintPreview() {
+      document.getElementById("printPreviewModal").style.display = "none";
+      // Réouvrir le popup principal
+      if (selectedTable) {
+        document.getElementById("popupTitle").textContent = selectedTable.nom;
+        document.getElementById("popupMain").style.display = "flex";
+      }
+    }
+
+    async function confirmerImpression() {
+      const ticket = tickets.find(t => t.id === selectedTable.ticketId);
+      if (!ticket) return;
+
+      const btn = document.getElementById("btnConfirmerImpression");
+      const status = document.getElementById("printStatus");
+
+      btn.disabled = true;
+      btn.style.opacity = "0.6";
+      status.style.color = "var(--blue3)";
+      status.textContent = "⏳ Envoi en cours...";
+
+      try {
+        const ticketData = {
+          table: selectedTable.nom,
+          date: ticket.date,
+          heure: ticket.heure,
+          articles: ticket.articles.map(art => ({
+            nom: art.nom,
+            qte: art.qte,
+            prix: art.prix
+          }))
+        };
+
+        const response = await fetch('http://localhost:8088/print', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ticketData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          status.style.color = "var(--green2)";
+          status.textContent = "✅ Ticket imprimé avec succès !";
+          btn.style.opacity = "1";
+          btn.disabled = false;
+        } else {
+          throw new Error("Échec serveur");
+        }
+      } catch (e) {
+        status.style.color = "var(--red)";
+        status.textContent = "❌ Serveur d'impression non disponible";
+        btn.style.opacity = "1";
+        btn.disabled = false;
+      }
+    }
+
+    async function restartServeurImpression() {
+      const btn = document.getElementById("restartImpressionBtn");
+      if (btn) btn.style.opacity = "0.6";
+      showToast("🖨️ Redémarrage du serveur d'impression...", "info");
+
+      try {
+        const response = await fetch(API_BASE + "/restart-impression", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+        const result = await response.json();
+
+        if (result.ok) {
+          showToast("✅ Serveur d'impression redémarré !", "success");
+        } else {
+          showToast("❌ Échec du redémarrage : " + (result.message || "erreur inconnue"), "error");
+        }
+      } catch (e) {
+        showToast("❌ Impossible de contacter le serveur principal (port 8000)", "error");
+      } finally {
+        if (btn) btn.style.opacity = "1";
+        closeQuickModal();
+      }
+    }
+
+    function actionPaiement() {
+      if (!selectedTable.ticketId) {
+        showToast("⚠️ Aucun ticket ouvert sur cette table !", "warning");
+        return;
+      }
+      window.location.href = `paiement.html?ticketId=${selectedTable.ticketId}`;
+    }
+
+    function actionLiberer() {
+      if (!selectedTable.ticketId) {
+        showToast("ℹ️ La table est déjà libre !", "info");
+        closePopup();
+        return;
+      }
+      tickets = tickets.filter(t => t.id !== selectedTable.ticketId);
+      selectedTable.ticketId = null;
+      selectedTable.nom = "Table " + selectedTable.id;
+      saveData();
+      renderTables();
+      closePopup();
+      showToast("✅ Table libérée avec succès !", "success");
+    }
+
+    // --- Sauvegarde ---
+    async function saveData() {
+      // Toujours sauvegarder localement en premier : la caisse reste fonctionnelle
+      // même si le serveur principal est momentanément indisponible.
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+      localStorage.setItem("tables", JSON.stringify(tables));
+
+      // Puis synchroniser vers le serveur principal si la page est servie en HTTP.
+      // API_BASE vaut déjà "http(s)://hote:port/api", donc /save = /api/save.
+      if (!IS_SERVER) return true;
+
+      try {
+        const response = await fetch(API_BASE + "/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tables,
+            tickets,
+            stock: JSON.parse(localStorage.getItem("stock") || "{}")
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (!result.ok) {
+          throw new Error(result.error || "Sauvegarde serveur refusée");
+        }
+
+        return true;
+      } catch (e) {
+        console.warn("⚠️ Sauvegarde serveur impossible, données conservées en local :", e);
+        return false;
+      }
+    }
+
+    // --- Réinitialiser la numérotation ---
+    function resetNumeroTickets() {
+      if (confirm("⚠️ Reprendre la numérotation des tickets à 1 ?\nLes anciens tickets ne seront PAS effacés.")) {
+        localStorage.setItem("lastTicketId", "0");
+        localStorage.setItem("lastTicketNumero", "0"); // Reset aussi le numéro d'affichage
+        localStorage.setItem("availableTicketIds", "[]");
+        applyOptions();
+        renderTables();
+        showToast("✅ Numérotation remise à 1 !", "success");
+      }
+    }
+
+    // --- Fonction pour mettre à jour l'horloge ---
+    function updateHorloge() {
+      const now = new Date();
+      
+      const optionsDate = { 
+        weekday: 'short', 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric' 
+      };
+      const dateStr = now.toLocaleDateString('fr-FR', optionsDate);
+      
+      const heures = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const secondes = now.getSeconds().toString().padStart(2, '0');
+      const heureStr = `${heures}:${minutes}:${secondes}`;
+      
+      document.getElementById('horloge-date').textContent = dateStr;
+      document.getElementById('horloge-heure').textContent = heureStr;
+      
+      const emoji = document.querySelector('.horloge-emoji');
+      const heure = now.getHours();
+      if (heure >= 6 && heure < 12) {
+        emoji.textContent = '🌅';
+      } else if (heure >= 12 && heure < 18) {
+        emoji.textContent = '☀️';
+      } else if (heure >= 18 && heure < 22) {
+        emoji.textContent = '🌇';
+      } else {
+        emoji.textContent = '🌙';
+      }
+    }
+
+    // Lancer l'horloge
+    updateHorloge();
+    setInterval(updateHorloge, 1000);
+
+    // Redessiner les tables quand on redimensionne la fenêtre
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        renderTables();
+      }, 100);
+    });
+
+    // ===== SYSTÈME DE RÉSERVATIONS =====
+    let reservations = JSON.parse(localStorage.getItem("reservations")) || [];
+
+    // --- Init ---
+    applyOptions();
+    renderTables();
+    createRenameKeypad();
+
+    // Ouvrir la resa depuis le popup table (table pré-sélectionnée)
+    function actionReserverTable() {
+      closePopup();
+      openResaModal(selectedTable ? selectedTable.id : null);
+    }
+
+    // Tooltip survol point
+    function showResaDot(e, resa, table) {
+      const tt = document.getElementById("resaTooltip");
+      const d = new Date(resa.date);
+      const dateStr = d.toLocaleDateString("fr-FR", { weekday:"short", day:"numeric", month:"short", year:"numeric" });
+      const heureStr = d.toLocaleTimeString("fr-FR", { hour:"2-digit", minute:"2-digit" });
+      tt.innerHTML = `
+        <div class="tt-title">📅 Réservation · ${table.nom}</div>
+        <div class="tt-row">👤 <span>${resa.membreNom}</span></div>
+        <div class="tt-row">📅 <span>${dateStr} à ${heureStr}</span></div>
+        <div class="tt-row">👥 <span>${resa.nbPersonnes} personne${resa.nbPersonnes > 1 ? "s" : ""}</span></div>
+        ${resa.note ? `<div class="tt-row">📝 <span>${resa.note}</span></div>` : ""}
+        <div style="font-size:11px; color:#aaa; margin-top:5px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;">Cliquer pour voir le détail</div>
+      `;
+      tt.style.display = "block";
+      moveResaDot(e);
+      setTimeout(() => tt.style.opacity = "1", 10);
+    }
+    function moveResaDot(e) {
+      const tt = document.getElementById("resaTooltip");
+      let x = e.clientX + 15, y = e.clientY + 15;
+      if (x + 230 > window.innerWidth) x = e.clientX - 235;
+      if (y + 180 > window.innerHeight) y = e.clientY - 190;
+      tt.style.left = x + "px";
+      tt.style.top = y + "px";
+    }
+    function hideResaDot() {
+      const tt = document.getElementById("resaTooltip");
+      tt.style.opacity = "0";
+      setTimeout(() => tt.style.display = "none", 150);
+    }
+    let resaSelectedMembre = null;
+    let resaCurrentPage = 1;
+    const RESA_PER_PAGE = 5;
+
+    function openResaModal(preselectedTableId = null) {
+      resaSelectedMembre = null;
+      document.getElementById("resaMembreSearch").value = "";
+      document.getElementById("resaSelectedMembreId").value = "";
+      document.getElementById("resaSelectedMembreName").textContent = "";
+      document.getElementById("resaDate").value = "";
+      document.getElementById("resaNbPersonnes").value = "2";
+      document.getElementById("resaNote").value = "";
+      renderResaMembreList(membres);
+
+      // Remplir le select tables
+      const sel = document.getElementById("resaTableSelect");
+      sel.innerHTML = '<option value="">— Sélectionner une table —</option>';
+      tables.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.nom;
+        sel.appendChild(opt);
+      });
+
+      if (preselectedTableId) {
+        sel.value = preselectedTableId;
+        checkResaTableConflict(preselectedTableId);
+      } else {
+        document.getElementById("resaTableAlreadyWarning").style.display = "none";
+      }
+
+      showResaTab("nouvelle");
+      document.getElementById("resaModal").style.display = "flex";
+      tablesSetOccupee("gère les réservations");
+    }
+
+    function closeResaModal() {
+      document.getElementById("resaModal").style.display = "none";
+      tablesClearOccupee();
+    }
+
+    function onResaTableChange() {
+      const val = document.getElementById("resaTableSelect").value;
+      checkResaTableConflict(val ? parseInt(val) : null);
+    }
+
+    function checkResaTableConflict(tableId) {
+      const warning = document.getElementById("resaTableAlreadyWarning");
+      if (!tableId) { warning.style.display = "none"; return; }
+      const existing = reservations.find(r => r.tableId === tableId);
+      if (existing) {
+        const d = new Date(existing.date);
+        const dateStr = d.toLocaleDateString("fr-FR", { weekday:"short", day:"numeric", month:"short" });
+        const heureStr = d.toLocaleTimeString("fr-FR", { hour:"2-digit", minute:"2-digit" });
+        warning.innerHTML = `⚠️ <strong>Table déjà réservée !</strong><br>
+          👤 ${existing.membreNom} · 👥 ${existing.nbPersonnes} pers. · 📅 ${dateStr} à ${heureStr}
+          ${existing.note ? `· 📝 ${existing.note}` : ""}<br>
+          <small style="color:#856404;">Enregistrer une nouvelle réservation remplacera celle-ci.</small>`;
+        warning.style.display = "block";
+      } else {
+        warning.style.display = "none";
+      }
+    }
+
+    function showResaTab(tab) {
+      document.getElementById("resaTabNouvelle").style.display = "none";
+      document.getElementById("resaTabListe").style.display = "none";
+      document.getElementById("resaTabDetail").style.display = "none";
+      document.getElementById("resaNavNouvelle").classList.remove("active");
+      document.getElementById("resaNavListe").classList.remove("active");
+
+      if (tab === "nouvelle") {
+        document.getElementById("resaTabNouvelle").style.display = "block";
+        document.getElementById("resaNavNouvelle").classList.add("active");
+      } else if (tab === "liste") {
+        document.getElementById("resaTabListe").style.display = "block";
+        document.getElementById("resaNavListe").classList.add("active");
+        resaCurrentPage = 1;
+        renderResaList();
+      } else if (tab === "detail") {
+        document.getElementById("resaTabDetail").style.display = "block";
+        document.getElementById("resaNavListe").classList.add("active");
+      }
+    }
+
+    function filterResaMembres() {
+      const q = document.getElementById("resaMembreSearch").value.toLowerCase();
+      const filtered = membres.filter(m =>
+        (m.prenom && m.prenom.toLowerCase().includes(q)) ||
+        (m.nom && m.nom.toLowerCase().includes(q))
+      );
+      renderResaMembreList(filtered);
+    }
+
+    function renderResaMembreList(list) {
+      const container = document.getElementById("resaMembreList");
+      container.innerHTML = "";
+      if (list.length === 0) {
+        container.innerHTML = '<div class="resa-membre-item" style="color:#999;">Aucun membre trouvé</div>';
+        return;
+      }
+      list.forEach(m => {
+        const div = document.createElement("div");
+        div.className = "resa-membre-item" + (resaSelectedMembre && resaSelectedMembre.id === m.id ? " selected" : "");
+        div.innerHTML = (resaSelectedMembre && resaSelectedMembre.id === m.id ? '<span class="check">✓</span>' : '<span class="check" style="opacity:0">✓</span>') + `${m.prenom} ${m.nom}`;
+        div.onclick = () => selectResaMembre(m);
+        container.appendChild(div);
+      });
+    }
+
+    function selectResaMembre(m) {
+      resaSelectedMembre = m;
+      document.getElementById("resaSelectedMembreId").value = m.id;
+      document.getElementById("resaSelectedMembreName").textContent = `✓ Sélectionné : ${m.prenom} ${m.nom}`;
+      document.getElementById("resaMembreSearch").value = `${m.prenom} ${m.nom}`;
+      renderResaMembreList(membres);
+    }
+
+    // ============ SYSTÈME DE NOTIFICATIONS COMMANDES ============
+
+    let pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+    let notifPanelOpen = false;
+    let currentNotifTab = "pending";
+
+    function toggleNotifPanel() {
+      notifPanelOpen = !notifPanelOpen;
+      const panel = document.getElementById("notifPanel");
+      const overlay = document.getElementById("notifOverlay");
+      if (notifPanelOpen) {
+        overlay.style.display = "block";
+        panel.style.display = "block";
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            panel.style.transform = "translate(-50%,-50%) scale(1)";
+            panel.style.opacity = "1";
+          });
+        });
+        switchNotifTab(currentNotifTab);
+      } else {
+        panel.style.transform = "translate(-50%,-50%) scale(0.92)";
+        panel.style.opacity = "0";
+        overlay.style.display = "none";
+        setTimeout(() => { panel.style.display = "none"; }, 260);
+      }
+    }
+
+    function switchNotifTab(tab) {
+      currentNotifTab = tab;
+      document.getElementById("notifTabBtnPending").classList.toggle("active", tab === "pending");
+      document.getElementById("notifTabBtnHistory").classList.toggle("active", tab === "history");
+      document.getElementById("notifList").style.display = tab === "pending" ? "block" : "none";
+      document.getElementById("notifHistoryList").style.display = tab === "history" ? "block" : "none";
+      if (tab === "pending") renderNotifList();
+      else renderHistoryList();
+    }
+
+    function renderNotifList() {
+      pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+      const container = document.getElementById("notifList");
+      // update tab count
+      const countEl = document.getElementById("notifTabCount");
+      if (countEl) countEl.textContent = pendingOrders.length;
+      if (pendingOrders.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#aaa; padding:40px 0; font-size:15px; font-weight:600;">📭 Aucune commande en attente</div>';
+        return;
+      }
+      container.innerHTML = "";
+      pendingOrders.forEach(order => {
+        const table = tables.find(t => t.id === order.tableId);
+        const tableNom = table ? table.nom : "Table inconnue";
+        const timeStr = new Date(order.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+
+        const articlesHtml = order.articles.map(a => `<span style="display:inline-block; background:var(--blue-pale); color:var(--blue3); border-radius:8px; padding:2px 8px; margin:2px; font-weight:700; font-size:12px;">${a.qte}x ${a.nom}</span>`).join("");
+
+        const card = document.createElement("div");
+        card.className = "notif-card";
+        card.innerHTML = `
+          <div class="notif-card-header">
+            <span class="notif-card-title">🍽️ ${tableNom}</span>
+            <span class="notif-card-time">⏰ ${timeStr}</span>
+          </div>
+          ${order.note ? `<div style="font-size:12px; color:var(--orange); font-weight:700; margin-bottom:6px;">📝 ${order.note}</div>` : ""}
+          <div class="notif-card-articles">${articlesHtml}</div>
+          <div class="notif-card-actions">
+            <button class="notif-btn-accept" onclick="acceptOrder(${order.id})">✅ Accepter → Remplir table</button>
+            <button class="notif-btn-refuse" onclick="refuseOrder(${order.id})">❌ Refuser</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderHistoryList() {
+      const history = JSON.parse(localStorage.getItem("ordersHistory") || "[]");
+      const container = document.getElementById("notifHistoryList");
+      if (history.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#aaa; padding:40px 0; font-size:15px; font-weight:600;">📭 Aucun historique disponible</div>';
+        return;
+      }
+      container.innerHTML = "";
+
+      // Bouton vider l'historique
+      const clearBtn = document.createElement("button");
+      clearBtn.className = "btn-clear-history";
+      clearBtn.innerHTML = "🗑️ Vider l'historique";
+      clearBtn.onclick = clearHistory;
+      container.appendChild(clearBtn);
+
+      // Les plus récents en premier
+      [...history].reverse().forEach((entry, idx) => {
+        const realIdx = history.length - 1 - idx; // index réel dans le tableau original
+        const table = tables.find(t => t.id === entry.tableId);
+        const tableNom = table ? table.nom : (entry.tableNom || "Table inconnue");
+        const timeStr = new Date(entry.processedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+        const dateStr = new Date(entry.processedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+
+        const articlesHtml = (entry.articles || []).map(a => `<span style="display:inline-block; background:rgba(200,220,240,.5); color:var(--text2); border-radius:8px; padding:2px 8px; margin:2px; font-weight:700; font-size:12px;">${a.qte}x ${a.nom}</span>`).join("");
+
+        const card = document.createElement("div");
+        card.className = `history-card ${entry.status === "accepted" ? "accepted" : "refused"}`;
+        card.innerHTML = `
+          <div class="history-card-header">
+            <span class="history-card-title">🍽️ ${tableNom}</span>
+            <span class="history-card-time">📅 ${dateStr} ⏰ ${timeStr}</span>
+          </div>
+          ${entry.note ? `<div style="font-size:12px; color:var(--orange); font-weight:700; margin-bottom:5px;">📝 ${entry.note}</div>` : ""}
+          <div style="margin-bottom:8px;">${articlesHtml}</div>
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+            <span class="${entry.status === "accepted" ? "history-badge-accepted" : "history-badge-refused"}">
+              ${entry.status === "accepted" ? "✅ Acceptée → table remplie" : "❌ Refusée"}
+            </span>
+            <button onclick="recoverOrder(${realIdx})" style="padding:6px 12px; background:linear-gradient(180deg,#ffc870,var(--orange),#b86200); color:white; border:1px solid #a05800; border-radius:20px; font-size:12px; font-weight:800; cursor:pointer; transition:0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+              ♻️ Récupérer
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function addToHistory(order, status) {
+      const history = JSON.parse(localStorage.getItem("ordersHistory") || "[]");
+      const table = tables.find(t => t.id === order.tableId);
+      history.push({
+        id: order.id,
+        tableId: order.tableId,
+        tableNom: table ? table.nom : "Table inconnue",
+        articles: order.articles,
+        note: order.note || "",
+        createdAt: order.createdAt,
+        processedAt: new Date().toISOString(),
+        status: status
+      });
+      // Garder max 100 entrées
+      if (history.length > 100) history.splice(0, history.length - 100);
+      localStorage.setItem("ordersHistory", JSON.stringify(history));
+    }
+
+    function clearHistory() {
+      if (!confirm("🗑️ Vider tout l'historique des commandes ?")) return;
+      localStorage.setItem("ordersHistory", "[]");
+      renderHistoryList();
+      showToast("🗑️ Historique vidé", "success");
+    }
+
+    function recoverOrder(historyIdx) {
+      const history = JSON.parse(localStorage.getItem("ordersHistory") || "[]");
+      const entry = history[historyIdx];
+      if (!entry) return;
+
+      // Remettre comme nouvelle commande en attente avec un nouvel ID
+      const recovered = {
+        id: Date.now(),
+        tableId: entry.tableId,
+        articles: entry.articles,
+        note: entry.note || "",
+        createdAt: new Date().toISOString()
+      };
+
+      const pending = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+      pending.push(recovered);
+      localStorage.setItem("pendingOrders", JSON.stringify(pending));
+      pendingOrders = pending;
+
+      updateNotifBadge();
+      switchNotifTab("pending");
+      showToast(`♻️ Commande récupérée → remise en attente !`, "success");
+    }
+
+    async function acceptOrder(orderId) {
+      pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+      const order = pendingOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      // Trouver ou créer le ticket pour cette table
+      // Utiliser l'index pour modifier tables[] directement (évite le bug de copie)
+      const tableIdx = tables.findIndex(t => t.id === order.tableId);
+      if (tableIdx === -1) { showToast("❌ Table introuvable", "error"); return; }
+      let table = tables[tableIdx];
+
+      let ticket;
+      if (table.ticketId) {
+        ticket = tickets.find(t => parseInt(t.id) === parseInt(table.ticketId));
+      }
+
+      if (!ticket) {
+        // Créer un nouveau ticket
+        // ⚠️ Plus de recyclage d'id (voir explication plus haut dans le fichier)
+        let ticketId;
+        const lastId = parseInt(localStorage.getItem("lastTicketId") || "0");
+        ticketId = lastId + 1;
+        localStorage.setItem("lastTicketId", ticketId.toString());
+        const lastNumero = parseInt(localStorage.getItem("lastTicketNumero") || "0");
+        const ticketNumero = lastNumero + 1;
+        localStorage.setItem("lastTicketNumero", ticketNumero.toString());
+
+        ticket = {
+          id: ticketId,
+          numero: ticketNumero,
+          tableId: table.id,
+          date: new Date().toLocaleDateString(),
+          heure: new Date().toLocaleTimeString(),
+          membre: null,
+          articles: []
+        };
+        tickets.push(ticket);
+        tables[tableIdx].ticketId = ticketId; // modifier directement dans tables[]
+      }
+
+      // Ajouter les articles au ticket
+      order.articles.forEach(art => {
+        let line = ticket.articles.find(a => a.id === art.id && !a.offert && a.prix == art.prix);
+        if (line) {
+          line.qte += art.qte;
+        } else {
+          ticket.articles.push({ ...art, offert: false });
+        }
+      });
+
+      // Renommer la table si commande.html a envoyé un nouveau nom
+      if (order.tableNewNom && order.tableNewNom.trim() && order.tableNewNom !== tables[tableIdx].nom) {
+        tables[tableIdx].nom = order.tableNewNom.trim();
+      }
+
+      // Supprimer la commande des pending + sauver via serveur ou localStorage
+      addToHistory(order, "accepted");
+      pendingOrders = pendingOrders.filter(o => o.id !== orderId);
+      localStorage.setItem("pendingOrders", JSON.stringify(pendingOrders));
+      // Mémoriser l'ID accepté pour éviter qu'il revienne via le polling serveur
+      const acceptedIds = JSON.parse(localStorage.getItem("acceptedOrderIds") || "[]");
+      acceptedIds.push(orderId);
+      if (acceptedIds.length > 200) acceptedIds.splice(0, acceptedIds.length - 200);
+      localStorage.setItem("acceptedOrderIds", JSON.stringify(acceptedIds));
+      saveData();
+
+      // Notifie le serveur si disponible
+      try {
+        await fetch(API_BASE + "/order/accept", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: orderId,
+            order: order,
+            date:  new Date().toLocaleDateString(),
+            heure: new Date().toLocaleTimeString()
+          })
+        });
+      } catch(e) { /* mode local */ }
+
+      renderTables();
+      renderNotifList();
+      updateNotifBadge();
+      showToast(`✅ Commande acceptée → ${table.nom} mise à jour !`, "success");
+    }
+
+    async function refuseOrder(orderId) {
+      pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+      const order = pendingOrders.find(o => o.id === orderId);
+      if (order) addToHistory(order, "refused");
+      pendingOrders = pendingOrders.filter(o => o.id !== orderId);
+      localStorage.setItem("pendingOrders", JSON.stringify(pendingOrders));
+
+      // Mémoriser l'ID refusé pour éviter qu'il revienne via le polling serveur
+      const refusedIds = JSON.parse(localStorage.getItem("refusedOrderIds") || "[]");
+      refusedIds.push(orderId);
+      if (refusedIds.length > 200) refusedIds.splice(0, refusedIds.length - 200);
+      localStorage.setItem("refusedOrderIds", JSON.stringify(refusedIds));
+
+      // Notifier le serveur si disponible
+      try {
+        await fetch(API_BASE + "/order/refuse", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: orderId })
+        });
+      } catch(e) { /* mode local */ }
+
+      renderNotifList();
+      updateNotifBadge();
+      showToast("🗑️ Commande refusée", "warning");
+    }
+
+    function updateNotifBadge() {
+      pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+      const badge = document.getElementById("notifBadge");
+      const btn = document.getElementById("notifBtn");
+      const count = pendingOrders.length;
+      if (count > 0) {
+        badge.style.display = "flex";
+        badge.textContent = count;
+        btn.classList.add("has-notif");
+      } else {
+        badge.style.display = "none";
+        btn.classList.remove("has-notif");
+      }
+    }
+
+    // Vérifier toutes les 5 secondes si de nouvelles commandes arrivent
+    setInterval(async () => {
+      const oldCount = pendingOrders.length;
+      const refusedIds = JSON.parse(localStorage.getItem("refusedOrderIds") || "[]");
+
+      // Toujours relire tables depuis localStorage pour capter les renommages faits par commande.html
+      const freshTables = JSON.parse(localStorage.getItem("tables") || "[]");
+      if (freshTables.length > 0) {
+        let renamed = false;
+        freshTables.forEach(ft => {
+          const idx = tables.findIndex(t => t.id === ft.id);
+          if (idx !== -1 && tables[idx].nom !== ft.nom) {
+            tables[idx].nom = ft.nom;
+            renamed = true;
+          }
+        });
+        if (renamed) renderTables();
+      }
+
+      try {
+        // Essaie de récupérer depuis le serveur, sinon localStorage
+        const res = await fetch(API_BASE + "/pending", { signal: AbortSignal.timeout(3000) });
+        let serverOrders = await res.json();
+        // Filtrer les commandes déjà refusées ou acceptées côté caisse
+        const acceptedIds = JSON.parse(localStorage.getItem("acceptedOrderIds") || "[]");
+        serverOrders = serverOrders.filter(o => !refusedIds.includes(o.id) && !acceptedIds.includes(o.id));
+        pendingOrders = serverOrders;
+        localStorage.setItem("pendingOrders", JSON.stringify(pendingOrders));
+      } catch(e) {
+        pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+      }
+      const newCount = pendingOrders.length;
+      if (newCount > oldCount) {
+        const diff = newCount - oldCount;
+        showToast(`🔔 ${diff} nouvelle(s) commande(s) !`, "info");
+        // Auto-ouvrir le modal si fermé
+        if (!notifPanelOpen) {
+          notifPanelOpen = false; // forcer l'état pour que toggleNotifPanel l'ouvre
+          toggleNotifPanel();
+        }
+      }
+      updateNotifBadge();
+      if (notifPanelOpen) renderNotifList();
+    }, 5000);
+
+    // Init badge au chargement
+    setTimeout(updateNotifBadge, 500);
+
+    // Écouter les changements localStorage immédiats (renommage depuis commande.html)
+    window.addEventListener("storage", function(e) {
+      if (e.key === "tables" && e.newValue) {
+        try {
+          const freshTables = JSON.parse(e.newValue);
+          let renamed = false;
+          freshTables.forEach(ft => {
+            const idx = tables.findIndex(t => t.id === ft.id);
+            if (idx !== -1 && tables[idx].nom !== ft.nom) {
+              tables[idx].nom = ft.nom;
+              renamed = true;
+            }
+          });
+          if (renamed) renderTables();
+        } catch(err) {}
+      }
+    });
+
+    // ============ FIN NOTIFICATIONS ============
+
+    function saveReservation() {
+      const membreId = document.getElementById("resaSelectedMembreId").value;
+      const tableId = parseInt(document.getElementById("resaTableSelect").value);
+      const date = document.getElementById("resaDate").value;
+      const nb = parseInt(document.getElementById("resaNbPersonnes").value);
+      const note = document.getElementById("resaNote").value.trim();
+
+      if (!tableId) { showToast("❌ Veuillez sélectionner une table", "error"); return; }
+      if (!membreId) { showToast("❌ Veuillez sélectionner un membre", "error"); return; }
+      if (!date) { showToast("❌ Veuillez choisir une date", "error"); return; }
+      if (!nb || nb < 1) { showToast("❌ Nombre de personnes invalide", "error"); return; }
+
+      const membre = membres.find(m => String(m.id) === String(membreId));
+      const table = tables.find(t => t.id === tableId);
+
+      // Supprimer ancienne resa pour cette table si elle existe
+      reservations = reservations.filter(r => r.tableId !== tableId);
+
+      const resa = {
+        id: Date.now(),
+        tableId: tableId,
+        membreId: membreId,
+        membreNom: membre ? `${membre.prenom} ${membre.nom}` : "Inconnu",
+        date: date,
+        nbPersonnes: nb,
+        note: note,
+        createdAt: new Date().toISOString()
+      };
+
+      reservations.push(resa);
+      localStorage.setItem("reservations", JSON.stringify(reservations));
+      renderTables();
+      showToast(`✅ Réservation enregistrée pour ${resa.membreNom} · ${table ? table.nom : ""}`, "success");
+
+      // Reset form
+      resaSelectedMembre = null;
+      document.getElementById("resaMembreSearch").value = "";
+      document.getElementById("resaSelectedMembreId").value = "";
+      document.getElementById("resaSelectedMembreName").textContent = "";
+      document.getElementById("resaDate").value = "";
+      document.getElementById("resaNbPersonnes").value = "2";
+      document.getElementById("resaNote").value = "";
+      document.getElementById("resaTableSelect").value = "";
+      document.getElementById("resaTableAlreadyWarning").style.display = "none";
+      renderResaMembreList(membres);
+    }
+
+    function renderResaList() {
+      const container = document.getElementById("resaListContent");
+      const pagination = document.getElementById("resaPagination");
+
+      // Trier par date croissante
+      const sorted = [...reservations].sort((a, b) => new Date(a.date) - new Date(b.date));
+      const total = sorted.length;
+      const totalPages = Math.max(1, Math.ceil(total / RESA_PER_PAGE));
+
+      if (resaCurrentPage > totalPages) resaCurrentPage = totalPages;
+
+      const start = (resaCurrentPage - 1) * RESA_PER_PAGE;
+      const page = sorted.slice(start, start + RESA_PER_PAGE);
+
+      if (total === 0) {
+        container.innerHTML = '<div class="resa-empty">📭 Aucune réservation enregistrée</div>';
+        pagination.innerHTML = "";
+        return;
+      }
+
+      container.innerHTML = "";
+      page.forEach(resa => {
+        const d = new Date(resa.date);
+        const dateStr = d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+        const heureStr = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+
+        const card = document.createElement("div");
+        card.className = "resa-card";
+        card.innerHTML = `
+          <div class="resa-card-header">
+            <span class="resa-card-date">📅 ${dateStr} à ${heureStr}</span>
+            <span class="resa-card-count">👥 ${resa.nbPersonnes} pers.</span>
+          </div>
+          <div class="resa-card-membre">👤 ${resa.membreNom}</div>
+          ${resa.tableId ? `<div class="resa-card-nb" style="margin-top:4px;">🍽️ ${tables.find(t=>t.id===resa.tableId)?.nom || "Table inconnue"}</div>` : ""}
+          ${resa.note ? `<div class="resa-card-nb" style="margin-top:4px;">📝 ${resa.note}</div>` : ""}
+        `;
+        card.onclick = () => showResaDetail(resa.id);
+        container.appendChild(card);
+      });
+
+      // Pagination
+      pagination.innerHTML = "";
+      if (totalPages > 1) {
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "resa-page-btn";
+        prevBtn.textContent = "←";
+        prevBtn.disabled = resaCurrentPage === 1;
+        prevBtn.onclick = () => { resaCurrentPage--; renderResaList(); };
+        pagination.appendChild(prevBtn);
+
+        for (let i = 1; i <= totalPages; i++) {
+          const btn = document.createElement("button");
+          btn.className = "resa-page-btn" + (i === resaCurrentPage ? " current" : "");
+          btn.textContent = i;
+          btn.onclick = (page => () => { resaCurrentPage = page; renderResaList(); })(i);
+          pagination.appendChild(btn);
+        }
+
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "resa-page-btn";
+        nextBtn.textContent = "→";
+        nextBtn.disabled = resaCurrentPage === totalPages;
+        nextBtn.onclick = () => { resaCurrentPage++; renderResaList(); };
+        pagination.appendChild(nextBtn);
+
+        const info = document.createElement("span");
+        info.className = "resa-page-info";
+        info.textContent = `${total} réservation${total > 1 ? "s" : ""}`;
+        pagination.appendChild(info);
+      }
+    }
+
+    function showResaDetail(id) {
+      const resa = reservations.find(r => r.id === id);
+      if (!resa) return;
+
+      const d = new Date(resa.date);
+      const dateStr = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+      const heureStr = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+      const createdAt = new Date(resa.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+      const container = document.getElementById("resaDetailContent");
+      container.innerHTML = `
+        <div class="resa-detail-info">
+          <div class="resa-detail-row">
+            <span class="resa-detail-label">🍽️ Table</span>
+            <span class="resa-detail-value">${resa.tableId ? (tables.find(t=>t.id===resa.tableId)?.nom || "Table inconnue") : "Non définie"}</span>
+          </div>
+          <div class="resa-detail-row">
+            <span class="resa-detail-label">👤 Membre</span>
+            <span class="resa-detail-value">${resa.membreNom}</span>
+          </div>
+          <div class="resa-detail-row">
+            <span class="resa-detail-label">📅 Date</span>
+            <span class="resa-detail-value">${dateStr}</span>
+          </div>
+          <div class="resa-detail-row">
+            <span class="resa-detail-label">🕐 Heure</span>
+            <span class="resa-detail-value">${heureStr}</span>
+          </div>
+          <div class="resa-detail-row">
+            <span class="resa-detail-label">👥 Personnes</span>
+            <span class="resa-detail-value">${resa.nbPersonnes} personne${resa.nbPersonnes > 1 ? "s" : ""}</span>
+          </div>
+          ${resa.note ? `<div class="resa-detail-row">
+            <span class="resa-detail-label">📝 Note</span>
+            <span class="resa-detail-value">${resa.note}</span>
+          </div>` : ""}
+          <div class="resa-detail-row">
+            <span class="resa-detail-label">🗓️ Créé le</span>
+            <span class="resa-detail-value" style="font-size:12px; color:#999;">${createdAt}</span>
+          </div>
+        </div>
+        <button class="resa-delete-btn" onclick="deleteReservation(${resa.id})">🗑️ Supprimer cette réservation</button>
+      `;
+      showResaTab("detail");
+    }
+
+    function deleteReservation(id) {
+      if (!confirm("Supprimer cette réservation ?")) return;
+      reservations = reservations.filter(r => r.id !== id);
+      localStorage.setItem("reservations", JSON.stringify(reservations));
+      renderTables();
+      showToast("✅ Réservation supprimée", "success");
+      showResaTab("liste");
+    }
+
+    // ============ EXPORT / IMPORT localStorage ============
+
+    function toggleSyncMenu() {
+      const menu = document.getElementById("syncMenu");
+      menu.style.display = menu.style.display === "none" ? "block" : "none";
+    }
+    // Ferme le menu si on clique ailleurs
+    document.addEventListener("click", function(e) {
+      const menu = document.getElementById("syncMenu");
+      if (menu && !e.target.closest("#syncMenu") && !e.target.closest("[onclick*='toggleSyncMenu']")) {
+        menu.style.display = "none";
+      }
+    });
+
+    function exportLocalStorage() {
+      const keys = [
+        "tables","tickets","membres","reservations",
+        "articlesData","stock","displayOptions",
+        "availableTicketIds","pendingOrders","companySettings",
+        "lastMembreId","lastTicketId","lastTicketNumero",
+        "membresLogoOverride"
+      ];
+      const data = {};
+      keys.forEach(k => {
+        const val = localStorage.getItem(k);
+        if (val !== null) {
+          try { data[k] = JSON.parse(val); }
+          catch { data[k] = val; }
+        }
+      });
+      data._exportDate = new Date().toLocaleString();
+      data._version    = "bar-v2";
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a    = document.createElement("a");
+      a.href     = URL.createObjectURL(blob);
+      const date = new Date().toISOString().slice(0, 10);
+      a.download = `bar_backup_${date}.json`;
+      a.click();
+      showToast("💾 Données exportées !", "success");
+    }
+
+    function importLocalStorage(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+
+          if (!data._version) {
+            if (!confirm("Ce fichier ne semble pas être une sauvegarde du Bar. Importer quand même ?")) {
+              input.value = ""; return;
+            }
+          }
+          if (!confirm(`Importer la sauvegarde du ${data._exportDate || "?"} ?
+
+⚠️ Ça remplacera toutes tes données actuelles !`)) {
+            input.value = ""; return;
+          }
+
+          // Écrit tout dans localStorage
+          const skip = ["_exportDate", "_version"];
+          Object.entries(data).forEach(([k, v]) => {
+            if (!skip.includes(k)) {
+              localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v));
+            }
+          });
+
+          // Recharge les variables en mémoire
+          tables  = JSON.parse(localStorage.getItem("tables")  || "[]");
+          tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+          membres = JSON.parse(localStorage.getItem("membres") || "[]");
+          reservations = JSON.parse(localStorage.getItem("reservations") || "[]");
+
+          // Si on est sur le serveur → sync aussi vers bar_data.json
+          if (IS_SERVER) syncToServer();
+
+          // Redessine tout
+          renderTables();
+          if (typeof applyOptions === "function") applyOptions();
+
+          showToast("✅ Données importées avec succès !", "success");
+          input.value = "";
+
+        } catch(err) {
+          showToast("❌ Fichier invalide — " + err.message, "error");
+          input.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ============ FIN EXPORT / IMPORT ============
+
+  </script>
+
+  <!-- ===== MODAL SÉPARER TICKET ===== -->
+  <div class="popup-overlay" id="separerModal" style="display:none;">
+    <div class="popup-content" style="max-width:540px;">
+      <h3 id="separerTitle">✂️ Séparer le ticket</h3>
+
+      <!-- Indicateurs d'étapes -->
+      <div class="sep-step-indicator">
+        <div class="sep-step-dot active" id="sepDot1"></div>
+        <div class="sep-step-dot" id="sepDot2"></div>
+        <div class="sep-step-dot" id="sepDot3"></div>
+      </div>
+
+      <!-- ÉTAPE 1 : Choisir la table destination -->
+      <div class="sep-step active" id="sepStep1">
+        <p style="font-size:13px; color:var(--text2); font-weight:600; margin-bottom:12px;">
+          Choisissez une table <strong>libre</strong> vers laquelle transférer les articles :
+        </p>
+        <div class="sep-table-grid" id="sepTableGrid"></div>
+        <button onclick="closeSeparer()" style="width:100%; padding:10px; border:none; background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border-radius:var(--radius); font-weight:800; cursor:pointer;">❌ Annuler</button>
+      </div>
+
+      <!-- ÉTAPE 2 : Sélectionner les articles à transférer -->
+      <div class="sep-step" id="sepStep2">
+        <p style="font-size:13px; color:var(--text2); font-weight:600; margin-bottom:6px;">
+          Sélectionnez les articles à déplacer vers <strong id="sepDestName">—</strong> :
+        </p>
+        <div class="sep-articles-list" id="sepArticlesList"></div>
+        <div class="sep-nav-btns">
+          <button class="sep-btn-back" onclick="sepGoStep(1)">⬅️ Retour</button>
+          <button class="sep-btn-next" id="sepNextToStep3" onclick="sepGoStep(3)">Suivant ➜</button>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 3 : Assigner un membre / nom à la nouvelle table -->
+      <div class="sep-step" id="sepStep3">
+        <div class="sep-summary" id="sepSummary"></div>
+
+        <div class="sep-member-section">
+          <label>👤 Assigner un membre (optionnel)</label>
+          <input type="text" class="sep-search-input" id="sepMembreSearch" placeholder="Rechercher un membre..." oninput="filterSepMembres()" />
+          <div class="sep-member-list" id="sepMembreList"></div>
+        </div>
+
+        <div class="sep-member-section">
+          <label>🏷️ Ou saisir un nom libre</label>
+          <input type="text" class="sep-name-input" id="sepNomLibre" placeholder="Ex: Dupont, Table VIP..." />
+        </div>
+
+        <div class="sep-nav-btns">
+          <button class="sep-btn-back" onclick="sepGoStep(2)">⬅️ Retour</button>
+          <button class="sep-btn-confirm" onclick="confirmSeparer()">✅ Confirmer la séparation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ===== FIN MODAL SÉPARER ===== -->
+
+  <script>
+  // ===== LOGIQUE SÉPARER TICKET =====
+  let sepDestTable = null;      // table destination choisie
+  let sepArticlesSel = {};      // { articleId: qteATransferer }
+  let sepMembreSelected = null; // membre sélectionné pour la nouvelle table
+
+  function showSeparerModal() {
+    const ticket = tickets.find(t => t.id === selectedTable.ticketId);
+    if (!ticket || !ticket.articles || ticket.articles.length === 0) {
+      showToast("❌ La table n'a pas de ticket avec des articles !", "error");
+      return;
+    }
+    // Reset
+    sepDestTable = null;
+    sepArticlesSel = {};
+    sepMembreSelected = null;
+    document.getElementById("popupMain").style.display = "none";
+    document.getElementById("separerTitle").textContent = `✂️ Séparer — ${selectedTable.nom}`;
+    renderSepTableGrid();
+    sepGoStep(1);
+    document.getElementById("separerModal").style.display = "flex";
+    tablesSetOccupee("sépare une table");
+  }
+
+  function closeSeparer() {
+    document.getElementById("separerModal").style.display = "none";
+    sepDestTable = null; sepArticlesSel = {}; sepMembreSelected = null;
+    tablesClearOccupee();
+  }
+
+  function sepGoStep(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById("sepStep" + i).classList.toggle("active", i === n);
+      const dot = document.getElementById("sepDot" + i);
+      dot.classList.remove("active","done");
+      if (i < n) dot.classList.add("done");
+      else if (i === n) dot.classList.add("active");
+    });
+    if (n === 2) renderSepArticles();
+    if (n === 3) renderSepStep3();
+  }
+
+  function renderSepTableGrid() {
+    const grid = document.getElementById("sepTableGrid");
+    grid.innerHTML = "";
+    const opts = loadOptions();
+    tables.forEach(t => {
+      if (t.id === selectedTable.id) return;
+      const occupied = !!t.ticketId;
+      const card = document.createElement("div");
+      card.className = "sep-table-card" + (occupied ? " occupied" : "");
+      card.innerHTML = `${t.nom}<div class="sep-table-status">${occupied ? "🔴 Occupée" : "🟢 Libre"}</div>`;
+      if (!occupied) {
+        card.onclick = () => {
+          sepDestTable = t;
+          document.querySelectorAll(".sep-table-card").forEach(c => c.classList.remove("selected"));
+          card.classList.add("selected");
+          document.getElementById("sepDestName").textContent = t.nom;
+          // Auto-advance après petit délai
+          setTimeout(() => sepGoStep(2), 300);
+        };
+      }
+      grid.appendChild(card);
+    });
+  }
+
+  function renderSepArticles() {
+    const ticket = tickets.find(t => t.id === selectedTable.ticketId);
+    const list = document.getElementById("sepArticlesList");
+    list.innerHTML = "";
+    if (!ticket || !ticket.articles || ticket.articles.length === 0) {
+      list.innerHTML = '<div style="padding:20px; text-align:center; color:#aaa;">Aucun article dans ce ticket</div>';
+      return;
+    }
+    ticket.articles.forEach(art => {
+      if (!sepArticlesSel[art.id]) sepArticlesSel[art.id] = { qte: 0, max: art.qte };
+
+      const row = document.createElement("div");
+      row.className = "sep-article-row";
+      row.id = "sep-row-" + art.id;
+      row.onclick = (e) => {
+        if (e.target.classList.contains("sep-qte-btn")) return;
+        const cur = sepArticlesSel[art.id];
+        if (cur.qte === 0) {
+          sepArticlesSel[art.id].qte = 1;
+        } else {
+          sepArticlesSel[art.id].qte = 0;
+        }
+        refreshSepRow(art);
+      };
+
+      row.innerHTML = `
+        <div class="sep-article-check" id="sep-check-${art.id}"></div>
+        <div class="sep-article-name">${art.nom || art.id}</div>
+        <div class="sep-article-qte-ctrl">
+          <button class="sep-qte-btn" onclick="sepChangeQte(event, '${art.id}', -1)">−</button>
+          <span class="sep-qte-val" id="sep-qte-${art.id}">0</span>
+          <span class="sep-qte-max">/ ${art.qte}</span>
+          <button class="sep-qte-btn" onclick="sepChangeQte(event, '${art.id}', 1)">+</button>
+        </div>
+      `;
+      list.appendChild(row);
+      refreshSepRow(art);
+    });
+  }
+
+  function refreshSepRow(art) {
+    const sel = sepArticlesSel[art.id];
+    const row = document.getElementById("sep-row-" + art.id);
+    const check = document.getElementById("sep-check-" + art.id);
+    const qteEl = document.getElementById("sep-qte-" + art.id);
+    if (!row) return;
+    const isSelected = sel.qte > 0;
+    row.classList.toggle("selected", isSelected);
+    check.textContent = isSelected ? "✓" : "";
+    qteEl.textContent = sel.qte;
+  }
+
+  function sepChangeQte(e, artId, delta) {
+    e.stopPropagation();
+    const sel = sepArticlesSel[artId];
+    const ticket = tickets.find(t => t.id === selectedTable.ticketId);
+    const art = ticket.articles.find(a => a.id === artId || String(a.id) === String(artId));
+    if (!art) return;
+    sel.max = art.qte;
+    sel.qte = Math.max(0, Math.min(sel.max, sel.qte + delta));
+    refreshSepRow(art);
+  }
+
+  function renderSepStep3() {
+    // Résumé
+    const ticket = tickets.find(t => t.id === selectedTable.ticketId);
+    const articlesATransferer = ticket.articles.filter(a => {
+      const s = sepArticlesSel[a.id];
+      return s && s.qte > 0;
+    });
+
+    if (articlesATransferer.length === 0) {
+      showToast("⚠️ Sélectionnez au moins un article !", "warning");
+      sepGoStep(2); return;
+    }
+
+    let lignes = articlesATransferer.map(a => `• ${a.nom || a.id} × ${sepArticlesSel[a.id].qte}`).join("<br>");
+    document.getElementById("sepSummary").innerHTML =
+      `<strong>${articlesATransferer.length} article(s)</strong> vers <strong>${sepDestTable.nom}</strong> :<br>${lignes}`;
+
+    // Membres
+    document.getElementById("sepMembreSearch").value = "";
+    document.getElementById("sepNomLibre").value = "";
+    sepMembreSelected = null;
+    renderSepMembreList(membres);
+  }
+
+  function renderSepMembreList(list) {
+    const container = document.getElementById("sepMembreList");
+    container.innerHTML = "";
+    if (list.length === 0) {
+      container.innerHTML = '<div class="sep-member-item" style="color:#aaa;">Aucun membre trouvé</div>';
+      return;
+    }
+    list.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "sep-member-item" + (sepMembreSelected && sepMembreSelected.id === m.id ? " selected" : "");
+      div.textContent = `${m.prenom} ${m.nom}`;
+      div.onclick = () => {
+        sepMembreSelected = m;
+        document.getElementById("sepNomLibre").value = "";
+        document.querySelectorAll(".sep-member-item").forEach(x => x.classList.remove("selected"));
+        div.classList.add("selected");
+      };
+      container.appendChild(div);
+    });
+  }
+
+  function filterSepMembres() {
+    const q = document.getElementById("sepMembreSearch").value.toLowerCase();
+    renderSepMembreList(membres.filter(m =>
+      (m.prenom && m.prenom.toLowerCase().includes(q)) ||
+      (m.nom && m.nom.toLowerCase().includes(q))
+    ));
+  }
+
+  function confirmSeparer() {
+    const ticket = tickets.find(t => t.id === selectedTable.ticketId);
+    const articlesATransferer = ticket.articles.filter(a => {
+      const s = sepArticlesSel[a.id];
+      return s && s.qte > 0;
+    });
+
+    if (articlesATransferer.length === 0) {
+      showToast("⚠️ Aucun article sélectionné !", "warning"); return;
+    }
+
+    // Nom de la nouvelle table
+    const nomLibre = document.getElementById("sepNomLibre").value.trim();
+    let nouveauNom = "";
+    if (sepMembreSelected) {
+      nouveauNom = `${sepMembreSelected.prenom} ${sepMembreSelected.nom}`;
+    } else if (nomLibre) {
+      nouveauNom = nomLibre;
+    } else {
+      nouveauNom = sepDestTable.nom;
+    }
+
+    // Créer un nouveau ticket pour la table destination
+    // ⚠️ Plus de recyclage d'id (voir explication plus haut dans le fichier)
+    let newTicketId;
+    const lastId = parseInt(localStorage.getItem("lastTicketId") || "0");
+    newTicketId = lastId + 1;
+    localStorage.setItem("lastTicketId", newTicketId.toString());
+    const lastNumero = parseInt(localStorage.getItem("lastTicketNumero") || "0");
+    const newNumero = lastNumero + 1;
+    localStorage.setItem("lastTicketNumero", newNumero.toString());
+
+    const newTicket = {
+      id: newTicketId,
+      numero: newNumero,
+      tableId: sepDestTable.id,
+      date: new Date().toLocaleDateString(),
+      heure: new Date().toLocaleTimeString(),
+      membre: sepMembreSelected || null,
+      articles: []
+    };
+
+    // Transférer les articles sélectionnés
+    articlesATransferer.forEach(art => {
+      const qteTransfer = sepArticlesSel[art.id].qte;
+      newTicket.articles.push({ ...art, qte: qteTransfer });
+      // Réduire dans le ticket source
+      art.qte -= qteTransfer;
+    });
+
+    // Supprimer les articles à 0 du ticket source
+    ticket.articles = ticket.articles.filter(a => a.qte > 0);
+
+    // Assigner le ticket + nom à la table dest
+    sepDestTable.ticketId = newTicketId;
+    sepDestTable.nom = nouveauNom;
+
+    tickets.push(newTicket);
+    saveData();
+    tables  = JSON.parse(localStorage.getItem("tables")  || "[]");
+    tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+
+    renderTables();
+    closeSeparer();
+    showToast(`✅ Séparation réussie — ${articlesATransferer.length} article(s) vers "${nouveauNom}" !`, "success");
+  }
+  // ===== FIN LOGIQUE SÉPARER =====
+  </script>
+
+<script>
+// ══════════════════════════════════════════════════════
+// SYSTÈME DE PRÉSENCE
+// ══════════════════════════════════════════════════════
+(function() {
+  const IS_SERVER = window.location.protocol === "http:";
+  if (!IS_SERVER) return;
+
+  const API = window.location.origin + "/api/presence";
+  const PAGE = document.title || window.location.pathname.split('/').pop().replace('.html','');
+  const DEVICE_ID = localStorage.getItem("_deviceId") || (() => {
+    const id = Math.random().toString(36).slice(2);
+    localStorage.setItem("_deviceId", id);
+    return id;
+  })();
+
+  function getCurrentUser() {
+    try {
+      const h = JSON.parse(localStorage.getItem("loginHistory") || "[]");
+      const l = h[h.length - 1];
+      return (l && (l.user || l.nom)) ? (l.user || l.nom) : "Utilisateur";
+    } catch(e) { return "Utilisateur"; }
+  }
+
+  // Créer le badge de présence
+  const badge = document.createElement("div");
+  badge.id = "_presenceBadge";
+  badge.style.cssText = `
+    position:fixed; bottom:16px; left:16px; z-index:9000;
+    display:flex; flex-direction:column; gap:6px; pointer-events:none;
+  `;
+  document.body.appendChild(badge);
+
+  function renderPresence(data) {
+    badge.innerHTML = "";
+    const allUsers = [];
+    Object.entries(data).forEach(([page, users]) => {
+      users.forEach(u => {
+        if (u.user !== getCurrentUser()) {
+          allUsers.push({...u, page});
+        }
+      });
+    });
+    allUsers.forEach(u => {
+      const pill = document.createElement("div");
+      const pageLabel = {
+        tables: "Tables", commande: "Commande", membres: "Membres",
+        rapports: "Rapports", stock: "Stock", historique: "Historique",
+        articles: "Articles", paiement: "Paiement", parametres: "Paramètres"
+      }[u.page] || u.page;
+      pill.style.cssText = `
+        background:rgba(30,30,30,0.82); color:#fff;
+        padding:6px 12px; border-radius:50px;
+        font-size:12px; font-weight:600; font-family:sans-serif;
+        backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,0.15);
+        display:flex; align-items:center; gap:7px;
+      `;
+      const dot = document.createElement("span");
+      dot.style.cssText = "width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;";
+      pill.appendChild(dot);
+      pill.appendChild(document.createTextNode(`${u.user} — ${pageLabel}`));
+      badge.appendChild(pill);
+    });
+  }
+
+  async function heartbeat() {
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({page: PAGE.toLowerCase(), deviceId: DEVICE_ID, user: getCurrentUser()})
+      });
+      const data = await res.json();
+      renderPresence(data.presence || {});
+    } catch(e) {}
+  }
+
+  // Nettoyage au départ de la page
+  function leave() {
+    navigator.sendBeacon(API, JSON.stringify({
+      page: PAGE.toLowerCase(), deviceId: DEVICE_ID, user: null
+    }));
+  }
+  window.addEventListener("beforeunload", leave);
+  window.addEventListener("pagehide", leave);
+
+  // Heartbeat toutes les 10s + immédiatement
+  heartbeat();
+  setInterval(heartbeat, 10000);
+})();
+// ══════════════════════════════════════════════════════
+</script>
+<script>
+// ── Présence temps réel ───────────────────────────────────────────────────────
+const _IS_SRV = window.location.protocol === "http:";
+const _PAPI   = window.location.origin + "/api/presence";
+const _DEVICE = localStorage.getItem("_deviceId") || (()=>{
+  const id = Math.random().toString(36).slice(2);
+  localStorage.setItem("_deviceId", id);
+  return id;
+})();
+const _PAGE   = document.title.split(' ')[0].toLowerCase()
+                || window.location.pathname.split('/').pop().replace('.html','').toLowerCase();
+
+function _getUser() {
+  try {
+    const h = JSON.parse(localStorage.getItem("loginHistory")||"[]");
+    const l = h[h.length-1];
+    return (l && (l.user||l.nom)) || "Utilisateur";
+  } catch(e) { return "Utilisateur"; }
+}
+
+const _PAGE_LABELS = {
+  tables:"Tables", commande:"Commande", membres:"Membres",
+  rapports:"Rapports", stock:"Stock", historique:"Historique",
+  articles:"Articles", paiement:"Paiement", parametres:"Paramètres"
+};
+
+// Toast de présence (non bloquant, en haut à droite)
+function _showPresenceToast(msg) {
+  let c = document.getElementById("_presenceToasts");
+  if (!c) {
+    c = document.createElement("div");
+    c.id = "_presenceToasts";
+    c.style.cssText = "position:fixed;top:16px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none;";
+    document.body.appendChild(c);
+  }
+  const t = document.createElement("div");
+  t.style.cssText = "background:rgba(30,30,40,0.88);color:#fff;padding:10px 16px;border-radius:50px;font-size:13px;font-weight:600;font-family:sans-serif;display:flex;align-items:center;gap:8px;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.15);animation:_pfadeIn .2s ease;";
+  const dot = document.createElement("span");
+  dot.style.cssText = "width:7px;height:7px;border-radius:50%;background:#facc15;flex-shrink:0;";
+  t.appendChild(dot);
+  t.appendChild(document.createTextNode(msg));
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.opacity="0"; t.style.transition="opacity .3s"; setTimeout(()=>t.remove(),350); }, 4000);
+}
+
+// Vérifier qui est actif et avertir si besoin
+async function _checkPresence(actionLabel) {
+  if (!_IS_SRV) return;
+  try {
+    // Envoyer son heartbeat
+    const res = await fetch(_PAPI, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({page:_PAGE, deviceId:_DEVICE, user:_getUser()})
+    });
+    const data = await res.json();
+    const presence = data.presence || {};
+    const me = _getUser();
+    const others = [];
+    Object.entries(presence).forEach(([page, users]) => {
+      users.forEach(u => {
+        if (u.user !== me) {
+          others.push(`${u.user} (${_PAGE_LABELS[u.page]||u.page})`);
+        }
+      });
+    });
+    if (others.length > 0) {
+      _showPresenceToast(`⚠️ ${others.join(", ")} est aussi connecté${others.length>1?"s":""}`);
+    }
+  } catch(e) {}
+}
+
+// Heartbeat silencieux toutes les 15s
+if (_IS_SRV) {
+  setInterval(()=>{
+    fetch(_PAPI,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({page:_PAGE,deviceId:_DEVICE,user:_getUser()})
+    }).catch(()=>{});
+  }, 15000);
+  // Premier heartbeat
+  setTimeout(()=>{
+    fetch(_PAPI,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({page:_PAGE,deviceId:_DEVICE,user:_getUser()})
+    }).catch(()=>{});
+  }, 1000);
+}
+// ─────────────────────────────────────────────────────────────────────────────
+</script>
+<script>
+// ══════════════════════════════════════════════════════
+// VÉRIFICATION CAISSE OCCUPÉE (commande.html)
+// ══════════════════════════════════════════════════════
+(function() {
+  const LS_OCCUPE = "commandeOccupee";
+  const LS_TABLES = "tablesOccupee";
+
+  // ─── Helpers : signaler que tables est occupée ───
+  window.tablesSetOccupee = function(label) {
+    try {
+      localStorage.setItem(LS_TABLES, JSON.stringify({ label: label, depuis: new Date().toISOString() }));
+    } catch(e) {}
+  };
+  window.tablesClearOccupee = function() {
+    try { localStorage.removeItem(LS_TABLES); } catch(e) {}
+  };
+  // Libérer au départ de la page
+  window.addEventListener("beforeunload", window.tablesClearOccupee);
+  window.addEventListener("pagehide", window.tablesClearOccupee);
+
+  const PAGE_LABELS = {
+    commande: "prend des commandes",
+    membres:  "consulte les membres",
+    rapports: "consulte les rapports",
+    stock:    "gère le stock",
+    articles: "gère les articles",
+    paiement: "effectue un paiement",
+  };
+
+  // Créer le modal bloquant
+  const overlay = document.createElement("div");
+  overlay.id = "_caisseOccupeeOverlay";
+  overlay.style.cssText = "display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,40,90,.65); backdrop-filter:blur(8px); z-index:99990;";
+  document.body.appendChild(overlay);
+
+  const modal = document.createElement("div");
+  modal.id = "_caisseOccupeeModal";
+  modal.style.cssText = "display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:88%; max-width:360px; background:linear-gradient(160deg,#fff,#deeefb); border-radius:22px; padding:28px 22px 22px; z-index:99991; box-shadow:0 20px 60px rgba(20,60,180,.35); text-align:center;";
+  modal.innerHTML = `
+    <div style="font-size:3em; margin-bottom:10px;">🔒</div>
+    <div id="_caisseOccTitre" style="font-size:1.15em; font-weight:900; color:#0d4f9a; margin-bottom:8px;">Caisse occupée</div>
+    <div id="_caisseOccMsg" style="font-size:14px; font-weight:600; color:#4a6080; margin-bottom:22px; line-height:1.5;"></div>
+    <div style="font-size:12px; font-weight:600; color:#7a98b8; margin-bottom:16px;">Cette fenêtre se fermera automatiquement quand la caisse sera libérée.</div>
+    <div id="_caisseOccTimer" style="font-size:12px; font-weight:700; color:#2a7fd4;"></div>
+  `;
+  document.body.appendChild(modal);
+
+  let _modalVisible = false;
+  let _checkInterval = null;
+
+  function showOccupeeModal(occ) {
+    if (!_modalVisible) {
+      overlay.style.display = "block";
+      modal.style.display = "block";
+      _modalVisible = true;
+    }
+    const pageLabel = PAGE_LABELS[occ.page] || ("est sur \"" + occ.page + "\"");
+    document.getElementById("_caisseOccMsg").innerHTML =
+      "<strong>" + occ.user + "</strong> utilise actuellement la caisse et " + pageLabel + ".<br><br>Veuillez patienter.";
+  }
+
+  function hideOccupeeModal() {
+    overlay.style.display = "none";
+    modal.style.display = "none";
+    _modalVisible = false;
+  }
+
+  function checkOccupee() {
+    try {
+      const raw = localStorage.getItem(LS_OCCUPE);
+      if (!raw) { hideOccupeeModal(); return; }
+      const occ = JSON.parse(raw);
+      if (!occ || !occ.user) { hideOccupeeModal(); return; }
+      // Si commandeSession n'existe plus, la caisse est libre
+      const session = localStorage.getItem("commandeSession");
+      if (!session) {
+        localStorage.removeItem(LS_OCCUPE);
+        hideOccupeeModal();
+        return;
+      }
+      showOccupeeModal(occ);
+    } catch(e) { hideOccupeeModal(); }
+  }
+
+  // Vérif immédiate + toutes les 3s
+  document.addEventListener("DOMContentLoaded", function() {
+    checkOccupee();
+    _checkInterval = setInterval(checkOccupee, 3000);
+  });
+
+  // Écouter les changements localStorage (même onglet/tablette)
+  window.addEventListener("storage", function(e) {
+    if (e.key === LS_OCCUPE || e.key === "commandeSession") checkOccupee();
+  });
+})();
+// ══════════════════════════════════════════════════════
+</script>
+</body>
+</html>

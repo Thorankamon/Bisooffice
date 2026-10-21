@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💾 Gestionnaire de Données - Local/Server</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+        :root {
+            --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+            --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+            --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+            --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+            --purple:#7c3aed; --purple-pale:#f5f3ff;
+            --orange:#d97706; --orange-pale:#fff7ed;
+            --cyan:#0891b2; --cyan-pale:#ecfeff;
+            --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+            --border:#b0cce8; --border2:#d0e4f4;
+            --glass:rgba(255,255,255,0.82);
+            --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+            --radius:12px; --radius-lg:18px; --radius-xl:22px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family:'Nunito','Segoe UI',sans-serif;
+            font-size:14px;
+            background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+            min-height:100vh;
+            padding:24px;
+            color:var(--text);
+            position:relative;
+        }
+
+        .container {
+            max-width:1200px;
+            margin:0 auto;
+            position:relative;
+            z-index:2;
+        }
+
+        /* Bouton retour */
+        .back-btn {
+            background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(200,228,252,.85));
+            border:1px solid rgba(255,255,255,.9);
+            color:var(--blue2);
+            padding:9px 20px;
+            border-radius:50px;
+            cursor:pointer;
+            font-family:'Nunito',sans-serif;
+            font-weight:800; font-size:.9rem;
+            margin-bottom:20px;
+            display:inline-flex; align-items:center; gap:8px;
+            transition:all .2s;
+            box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+            text-decoration:none;
+        }
+        .back-btn:hover { background:linear-gradient(180deg,#fff,#d0e8ff); transform:translateX(-3px); }
+
+        /* Bannière de statut */
+        .status-banner {
+            background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(180,220,250,.88));
+            border:1px solid rgba(255,255,255,.95);
+            border-radius:var(--radius-xl);
+            padding:20px 30px;
+            margin-bottom:25px;
+            display:flex;
+            align-items:center;
+            gap:20px;
+            position:relative; overflow:hidden;
+            box-shadow:0 4px 20px var(--shadow2);
+        }
+
+        .status-banner.local {
+            border-left:6px solid var(--blue);
+        }
+
+        .status-banner.server {
+            border-left:6px solid var(--green);
+        }
+
+        .status-icon {
+            font-size:2.5rem;
+        }
+
+        .status-text {
+            flex:1;
+        }
+
+        .status-text .mode {
+            font-size:1.4rem;
+            font-weight:900;
+            color:var(--blue3);
+            margin-bottom:5px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .mode-forced {
+            background:var(--yellow);
+            color:white;
+            padding:2px 10px;
+            border-radius:20px;
+            font-size:0.7rem;
+            font-weight:800;
+            text-transform:uppercase;
+        }
+
+        .status-text .url {
+            font-size:0.9rem;
+            color:var(--text2);
+            font-weight:600;
+            word-break:break-all;
+        }
+
+        .status-badge {
+            padding:10px 20px;
+            border-radius:50px;
+            font-weight:800;
+            font-size:1rem;
+        }
+
+        .badge-local {
+            background:var(--blue-pale);
+            color:var(--blue3);
+            border:2px solid var(--blue);
+        }
+
+        .badge-server {
+            background:var(--green-pale);
+            color:var(--green2);
+            border:2px solid var(--green);
+        }
+
+        /* Grille des boutons */
+        .actions-grid {
+            display:grid;
+            grid-template-columns:repeat(2, 1fr);
+            gap:25px;
+            margin-bottom:30px;
+        }
+
+        .action-card {
+            background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+            border:1px solid rgba(255,255,255,.95);
+            border-radius:var(--radius-xl);
+            padding:35px 25px;
+            cursor:pointer;
+            transition:all .3s;
+            text-align:center;
+            position:relative; overflow:hidden;
+            box-shadow:0 4px 16px var(--shadow2);
+        }
+
+        .action-card:hover {
+            transform:translateY(-8px);
+            box-shadow:0 15px 35px var(--shadow);
+        }
+
+        .action-card .icon {
+            font-size:4rem;
+            margin-bottom:15px;
+        }
+
+        .action-card .title {
+            font-size:1.5rem;
+            font-weight:900;
+            color:var(--blue3);
+            margin-bottom:10px;
+        }
+
+        .action-card .subtitle {
+            font-size:1rem;
+            color:var(--text2);
+            font-weight:600;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+            gap:20px;
+            margin-bottom:25px;
+        }
+
+        .stat-card {
+            background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+            border:1px solid rgba(255,255,255,.95);
+            border-radius:var(--radius-xl);
+            padding:20px;
+            text-align:center;
+        }
+
+        .stat-card h3 {
+            color:var(--text2);
+            font-size:0.9rem;
+            font-weight:800;
+            text-transform:uppercase;
+            margin-bottom:10px;
+        }
+
+        .stat-card .value {
+            font-size:2.2rem;
+            font-weight:900;
+            color:var(--blue3);
+        }
+
+        /* Modale */
+        .modal-overlay {
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(10,40,90,.45);
+            backdrop-filter:blur(8px);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        }
+
+        .modal-content {
+            background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+            border:1px solid rgba(255,255,255,.95);
+            border-radius:var(--radius-xl);
+            padding:35px;
+            width:90%;
+            max-width:550px;
+            max-height:80vh;
+            overflow-y:auto;
+            position:relative;
+            animation:modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity:0; transform:scale(0.9); }
+            to { opacity:1; transform:scale(1); }
+        }
+
+        .modal-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+            padding-bottom:15px;
+            border-bottom:2px solid var(--border2);
+        }
+
+        .modal-header h2 {
+            color:var(--blue3);
+            font-size:1.6rem;
+            font-weight:900;
+        }
+
+        .close-modal {
+            width:40px; height:40px;
+            border-radius:50%;
+            background:linear-gradient(180deg,#f08080,#c0392b);
+            color:white;
+            border:none;
+            font-size:1.5rem;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .context-message {
+            background:var(--blue-pale);
+            border-radius:var(--radius);
+            padding:15px 20px;
+            margin:20px 0;
+            font-weight:600;
+            display:flex;
+            align-items:center;
+            gap:15px;
+            border-left:4px solid var(--blue);
+        }
+
+        .context-icon {
+            font-size:2rem;
+        }
+
+        .context-text {
+            color:var(--blue3);
+            font-size:1rem;
+            line-height:1.5;
+        }
+
+        .keys-list {
+            background:rgba(255,255,255,.7);
+            border-radius:var(--radius);
+            padding:15px;
+            margin:15px 0;
+            max-height:200px;
+            overflow-y:auto;
+            border:1px solid var(--border);
+        }
+
+        .key-item {
+            display:flex;
+            justify-content:space-between;
+            padding:8px;
+            border-bottom:1px solid var(--border2);
+            font-weight:600;
+        }
+
+        .btn {
+            padding:14px 28px;
+            border:none;
+            border-radius:var(--radius);
+            font-size:1rem;
+            font-weight:800;
+            cursor:pointer;
+            transition:all .2s;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            margin:5px;
+        }
+
+        .btn-primary {
+            background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+            color:white;
+        }
+
+        .btn-success {
+            background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+            color:white;
+        }
+
+        .btn-warning {
+            background:linear-gradient(180deg,#ffc870,var(--orange),#b86200);
+            color:white;
+        }
+
+        .btn-block {
+            width:100%;
+            margin:10px 0;
+        }
+
+        .file-info {
+            background:var(--blue-pale);
+            border-radius:var(--radius);
+            padding:15px;
+            margin:15px 0;
+            border:1px solid var(--blue);
+        }
+
+        .warning-box {
+            background:var(--yellow-pale);
+            border:1px solid var(--yellow);
+            border-radius:var(--radius);
+            padding:15px;
+            margin:15px 0;
+            color:var(--yellow2);
+            font-weight:600;
+        }
+
+        .server-note {
+            background:var(--green-pale);
+            border:1px solid var(--green);
+            border-radius:var(--radius);
+            padding:12px;
+            margin:15px 0;
+            color:var(--green2);
+            font-size:0.9rem;
+            font-weight:600;
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Bouton retour -->
+        <button class="back-btn" onclick="window.history.back()">← Retour</button>
+
+        <!-- Bannière de statut améliorée -->
+        <div class="status-banner" id="statusBanner">
+            <span class="status-icon" id="statusIcon">📁</span>
+            <div class="status-text">
+                <div class="mode" id="statusMode">
+                    <span id="modeText">Mode Fichier Local</span>
+                    <span id="modeForced" class="mode-forced" style="display:none;">FORCÉ</span>
+                </div>
+                <div class="url" id="statusUrl">file://...</div>
+            </div>
+            <div class="status-badge" id="statusBadge">📁 LOCAL</div>
+        </div>
+
+        <!-- Simplement 2 gros boutons -->
+        <div class="actions-grid">
+            <!-- EXPORTER -->
+            <div class="action-card" onclick="openModal('export')">
+                <div class="icon">💾</div>
+                <div class="title">EXPORTER</div>
+                <div class="subtitle">Sauvegarder toutes les données</div>
+            </div>
+
+            <!-- IMPORTER -->
+            <div class="action-card" onclick="openModal('import')">
+                <div class="icon">📂</div>
+                <div class="title">IMPORTER</div>
+                <div class="subtitle">Restaurer depuis un fichier</div>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <!-- Liste des clés -->
+        <div class="stat-card">
+            <h3>🔑 Clés dans localStorage</h3>
+            <div class="keys-list" id="keysList"></div>
+        </div>
+
+        <!-- Petit rappel serveur si accessible -->
+        <div id="serverNote" style="display:none;" class="server-note">
+            <span>🌐</span>
+            <span>Serveur accessible sur <strong>localhost:8000</strong> - Les données seront exportées/importées depuis/vers le localStorage du serveur</span>
+        </div>
+    </div>
+
+    <!-- MODALE UNIQUE -->
+    <div class="modal-overlay" id="mainModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Exporter</h2>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const SERVER_URL = 'http://localhost:8000';
+        const KEYS_APPLICATION = [
+            'tickets', 'ticketsHistorique', 'deletedTickets', 'refundedTickets',
+            'availableTicketIds', 'lastTicketId', 'lastTicketNumero',
+            'tables', 'reservations',
+            'membres', 'lastMembreId', 'membresLogoOverride',
+            'articlesData', 'articles', 'lastCategorieId', 'lastArticleId',
+            'stock',
+            'rapports', 'numX', 'numZ',
+            'users', 'loginHistory', 'lastLoginISO',
+            'companySettings', 'displayOptions',
+            'pendingOrders',
+            'ctrl_log',
+            'asbl_gestion_v1',
+            'emailSubject', 'emailBody'
+        ];
+
+        // ==================== ÉTAT ====================
+        let serverAccessible = false;
+        let isServerMode = false;
+        let isModeForced = false;
+        let importFileData = null;
+
+        // ==================== DÉTECTION DU MODE DEPUIS L'URL ====================
+        function getModeFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            
+            if (mode === 'serveur') {
+                return { type: 'serveur', forced: true };
+            } else if (mode === 'local') {
+                return { type: 'local', forced: true };
+            }
+            return { type: null, forced: false };
+        }
+
+        // ==================== DÉTECTION ====================
+        async function detecterMode() {
+            const modeFromUrl = getModeFromUrl();
+            const statusBanner = document.getElementById('statusBanner');
+            const statusIcon = document.getElementById('statusIcon');
+            const modeText = document.getElementById('modeText');
+            const statusUrl = document.getElementById('statusUrl');
+            const statusBadge = document.getElementById('statusBadge');
+            const serverNote = document.getElementById('serverNote');
+            const modeForced = document.getElementById('modeForced');
+
+            // Si on a un mode forcé par l'URL
+            if (modeFromUrl.forced) {
+                isModeForced = true;
+                modeForced.style.display = 'inline-block';
+                
+                if (modeFromUrl.type === 'serveur') {
+                    // Forcer le mode serveur
+                    isServerMode = true;
+                    try {
+                        const response = await fetch(`${SERVER_URL}/api/status`, { 
+                            signal: AbortSignal.timeout(2000) 
+                        });
+                        serverAccessible = response.ok;
+                        if (serverAccessible) {
+                            serverNote.style.display = 'flex';
+                        }
+                    } catch {
+                        serverAccessible = false;
+                        serverNote.style.display = 'none';
+                    }
+                } else {
+                    // Forcer le mode local
+                    isServerMode = false;
+                    serverAccessible = false;
+                    serverNote.style.display = 'none';
+                }
+            } else {
+                // Détection automatique normale
+                isModeForced = false;
+                modeForced.style.display = 'none';
+                
+                isServerMode = window.location.protocol === 'http:' && 
+                              (window.location.hostname === 'localhost' || 
+                               window.location.hostname === '127.0.0.1');
+                
+                if (isServerMode) {
+                    try {
+                        const response = await fetch(`${SERVER_URL}/api/status`, { 
+                            signal: AbortSignal.timeout(2000) 
+                        });
+                        serverAccessible = response.ok;
+                        if (serverAccessible) {
+                            serverNote.style.display = 'flex';
+                        }
+                    } catch {
+                        serverAccessible = false;
+                        serverNote.style.display = 'none';
+                    }
+                } else {
+                    try {
+                        const response = await fetch(`${SERVER_URL}/api/status`, { 
+                            signal: AbortSignal.timeout(1000) 
+                        });
+                        serverAccessible = response.ok;
+                        if (serverAccessible) {
+                            serverNote.style.display = 'flex';
+                        }
+                    } catch {
+                        serverAccessible = false;
+                        serverNote.style.display = 'none';
+                    }
+                }
+            }
+
+            // Mettre à jour l'interface
+            if (isServerMode) {
+                statusBanner.className = 'status-banner server';
+                statusIcon.textContent = '🌐';
+                modeText.textContent = 'Mode Serveur';
+                statusUrl.textContent = window.location.href;
+                statusBadge.textContent = '🌐 SERVEUR';
+                statusBadge.className = 'status-badge badge-server';
+            } else {
+                statusBanner.className = 'status-banner local';
+                statusIcon.textContent = '📁';
+                modeText.textContent = 'Mode Fichier Local';
+                statusUrl.textContent = window.location.href;
+                statusBadge.textContent = '📁 LOCAL';
+                statusBadge.className = 'status-badge badge-local';
+            }
+        }
+
+        // ==================== STATISTIQUES ====================
+        function mettreAJourStats() {
+            const stats = {};
+            let totalSize = 0;
+            
+            KEYS_APPLICATION.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    try {
+                        const parsed = JSON.parse(value);
+                        if (Array.isArray(parsed)) {
+                            stats[key] = parsed.length;
+                        } else if (parsed && typeof parsed === 'object') {
+                            stats[key] = Object.keys(parsed).length;
+                        } else {
+                            stats[key] = '✓';
+                        }
+                    } catch {
+                        stats[key] = '✓';
+                    }
+                    totalSize += value.length;
+                }
+            });
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <h3>Clés locales</h3>
+                    <div class="value">${Object.keys(stats).length}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Taille totale</h3>
+                    <div class="value">${(totalSize / 1024).toFixed(1)} KB</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Tickets (hist.)</h3>
+                    <div class="value">${stats['ticketsHistorique'] || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Membres</h3>
+                    <div class="value">${stats['membres'] || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Rapports</h3>
+                    <div class="value">${stats['rapports'] || 0}</div>
+                </div>
+            `;
+
+            const keysList = document.getElementById('keysList');
+            keysList.innerHTML = '';
+            
+            KEYS_APPLICATION.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    const size = (value.length / 1024).toFixed(2);
+                    keysList.innerHTML += `
+                        <div class="key-item">
+                            <span>🔑 ${key}</span>
+                            <span>${size} KB</span>
+                        </div>
+                    `;
+                }
+            });
+
+            if (keysList.innerHTML === '') {
+                keysList.innerHTML = '<div style="text-align:center; padding:20px;">Aucune donnée dans localStorage</div>';
+            }
+        }
+
+        // ==================== DONNÉES LOCALES ====================
+        function getLocalData() {
+            const data = {};
+            KEYS_APPLICATION.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value !== null) {
+                    try {
+                        data[key] = JSON.parse(value);
+                    } catch {
+                        data[key] = value;
+                    }
+                }
+            });
+            return data;
+        }
+
+        // ==================== MODALE ====================
+        function openModal(action) {
+            const modal = document.getElementById('mainModal');
+            const title = document.getElementById('modalTitle');
+            const content = document.getElementById('modalContent');
+
+            if (action === 'export') {
+                title.innerHTML = '💾 EXPORTER';
+                
+                const localData = getLocalData();
+                const nbKeys = Object.keys(localData).length;
+                const taille = (JSON.stringify(localData).length / 1024).toFixed(1);
+                
+                let contextMessage = '';
+                if (isServerMode) {
+                    contextMessage = `
+                        <div class="context-message">
+                            <span class="context-icon">🌐</span>
+                            <span class="context-text">
+                                <strong>Mode Serveur ${isModeForced ? '(forcé)' : ''}</strong><br>
+                                Tu es sur <strong>localhost:8000</strong>.<br>
+                                L'export va sauvegarder les données <strong>du serveur</strong> (depuis localStorage).
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    contextMessage = `
+                        <div class="context-message">
+                            <span class="context-icon">📁</span>
+                            <span class="context-text">
+                                <strong>Mode Fichier Local ${isModeForced ? '(forcé)' : ''}</strong><br>
+                                L'export va sauvegarder les données <strong>locales</strong> de cette page.
+                            </span>
+                        </div>
+                    `;
+                }
+
+                content.innerHTML = `
+                    ${contextMessage}
+                    <div class="file-info">
+                        <strong>📊 Données à exporter :</strong><br>
+                        ${nbKeys} clés · ${taille} KB
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="exporterFichier()">
+                        💾 Télécharger la sauvegarde
+                    </button>
+                    <button class="btn btn-block" onclick="closeModal()">Annuler</button>
+                `;
+            }
+            else if (action === 'import') {
+                title.innerHTML = '📂 IMPORTER';
+                
+                let contextMessage = '';
+                if (isServerMode) {
+                    contextMessage = `
+                        <div class="context-message">
+                            <span class="context-icon">🌐</span>
+                            <span class="context-text">
+                                <strong>Mode Serveur ${isModeForced ? '(forcé)' : ''}</strong><br>
+                                L'import va <strong>REMPLACER les données du serveur</strong> (localhost:8000).
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    contextMessage = `
+                        <div class="context-message">
+                            <span class="context-icon">📁</span>
+                            <span class="context-text">
+                                <strong>Mode Fichier Local ${isModeForced ? '(forcé)' : ''}</strong><br>
+                                L'import va <strong>REMPLACER les données locales</strong> de cette page.
+                            </span>
+                        </div>
+                    `;
+                }
+
+                content.innerHTML = `
+                    ${contextMessage}
+                    <div class="warning-box">
+                        ⚠️ Attention : Cette opération est irréversible !
+                    </div>
+                    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="preparerImport(this)">
+                    <button class="btn btn-success btn-block" onclick="document.getElementById('importFile').click()">
+                        📂 Choisir un fichier
+                    </button>
+                    <div id="importPreview" style="display:none;"></div>
+                    <button id="btnConfirmerImport" class="btn btn-warning btn-block" style="display:none;" onclick="confirmerImport()">
+                        ⚠️ CONFIRMER L'IMPORT
+                    </button>
+                    <button class="btn btn-block" onclick="closeModal()">Annuler</button>
+                `;
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('mainModal').style.display = 'none';
+            importFileData = null;
+        }
+
+        // ==================== EXPORT ====================
+        function exporterFichier() {
+            const data = getLocalData();
+            data['_exportInfo'] = {
+                date: new Date().toLocaleString(),
+                mode: isServerMode ? 'serveur' : 'local',
+                force: isModeForced,
+                url: window.location.href
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // Nom du fichier selon le mode
+            const prefix = isServerMode ? 'serveur' : 'local';
+            a.download = `${prefix}_${new Date().toISOString().split('T')[0]}.json`;
+            
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showMessage(`✅ Fichier exporté (mode ${isServerMode ? 'serveur' : 'local'}${isModeForced ? ' forcé' : ''}) !`, 'success');
+            closeModal();
+        }
+
+        // ==================== IMPORT ====================
+        function preparerImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    importFileData = JSON.parse(e.target.result);
+                    
+                    const preview = document.getElementById('importPreview');
+                    const nbKeys = Object.keys(importFileData).filter(k => !k.startsWith('_')).length;
+                    
+                    preview.innerHTML = `
+                        <div class="file-info">
+                            <strong>Fichier :</strong> ${file.name}<br>
+                            <strong>Taille :</strong> ${(file.size/1024).toFixed(1)} KB<br>
+                            <strong>Clés trouvées :</strong> ${nbKeys}
+                        </div>
+                    `;
+                    preview.style.display = 'block';
+                    document.getElementById('btnConfirmerImport').style.display = 'block';
+                } catch (err) {
+                    showMessage('❌ Fichier invalide', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function confirmerImport() {
+            if (!importFileData) return;
+
+            const mode = isServerMode ? 'serveur' : 'local';
+            if (!confirm(`⚠️ Confirmer l'import en mode ${mode}${isModeForced ? ' (forcé)' : ''} ? Cela va remplacer TOUTES les données ${mode}les !`)) {
+                return;
+            }
+
+            // Effacer d'abord
+            KEYS_APPLICATION.forEach(key => localStorage.removeItem(key));
+
+            // Importer
+            let compteur = 0;
+            KEYS_APPLICATION.forEach(key => {
+                if (importFileData[key] !== undefined) {
+                    try {
+                        localStorage.setItem(key, JSON.stringify(importFileData[key]));
+                        compteur++;
+                    } catch (err) {
+                        console.warn(`Erreur ${key}:`, err);
+                    }
+                }
+            });
+
+            mettreAJourStats();
+            showMessage(`✅ Import réussi ! ${compteur} clés restaurées en mode ${mode}${isModeForced ? ' forcé' : ''}`, 'success');
+            closeModal();
+        }
+
+        // ==================== MESSAGE ====================
+        function showMessage(text, type) {
+            const msg = document.createElement('div');
+            msg.style.cssText = `
+                position:fixed; top:20px; right:20px; padding:15px 25px;
+                background:${type === 'success' ? 'linear-gradient(135deg,#e8f5dc,#5aad2e)' : 
+                           type === 'error' ? 'linear-gradient(135deg,#fde8e8,#c0392b)' : 
+                           'linear-gradient(135deg,#deeefb,#2a7fd4)'};
+                color:white; border-radius:12px; font-weight:800; z-index:2000;
+                animation:slideIn 0.3s ease; box-shadow:0 4px 15px rgba(0,0,0,0.2);
+            `;
+            msg.textContent = text;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
+        }
+
+        // ==================== INIT ====================
+        window.onload = function() {
+            detecterMode();
+            mettreAJourStats();
+            
+            // Rafraîchir toutes les 30 secondes
+            setInterval(detecterMode, 30000);
+        };
+    </script>
+</body>
+</html>

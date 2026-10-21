@@ -1,0 +1,3974 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rapports X/Z - Numérotés</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #e8f4fd; --sky2: #c8e6f8; --sky3: #a8d5f4;
+      --blue: #2a7fd4; --blue2: #1a6bbf; --blue3: #0d4f9a;
+      --blue-light: #5ba3e8;
+      --green: #5aad2e; --green2: #4a9422; --green-light: #8dd45e;
+      --green-pale: #e8f5dc;
+      --yellow: #e8a800; --yellow2: #d49400; --yellow-light: #ffd84d;
+      --yellow-pale: #fff8dc;
+      --orange: #e06820; --red: #c0392b; --red-pale: #fde8e8;
+      --white: #ffffff; --pearl: #f0f6ff; --pearl2: #e2eeff;
+      --text: #1a2b4a; --text2: #4a6080; --text3: #7a98b8;
+      --border: #b0cce8; --border2: #d0e4f4;
+      --shadow: rgba(30,80,160,0.15); --shadow2: rgba(30,80,160,0.08);
+      --glass: rgba(255,255,255,0.82);
+      --radius: 12px; --radius-lg: 18px; --radius-xl: 22px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', 'Segoe UI', sans-serif;
+      font-size: 14px;
+      background: linear-gradient(160deg, #cde8f8 0%, #e2f0fb 25%, #d8edff 50%, #e8f5dc 75%, #fff8dc 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--text);
+    }
+
+    /* Ambient orbs */
+    body::before {
+      content: '';
+      position: fixed; top: -150px; left: -150px;
+      width: 550px; height: 550px;
+      background: radial-gradient(circle, rgba(168,213,244,0.55), transparent 70%);
+      pointer-events: none; z-index: 0; border-radius: 50%;
+    }
+    body::after {
+      content: '';
+      position: fixed; bottom: -100px; right: 5%;
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(184,232,154,0.45), transparent 70%);
+      pointer-events: none; z-index: 0; border-radius: 50%;
+    }
+
+    /* ====== BANNERS ROW (côte à côte) ====== */
+    .banners-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 900px) {
+      .banners-row { grid-template-columns: 1fr; }
+    }
+
+    /* ====== CA BANNER RED VARIANT ====== */
+    .ca-banner-red {
+      background: linear-gradient(135deg,
+        rgba(255,255,255,0.92) 0%,
+        rgba(255,220,210,0.85) 50%,
+        rgba(255,180,160,0.9) 100%
+      ) !important;
+    }
+
+    /* ====== MORE BUTTON + DROPDOWN ====== */
+    .more-btn-wrapper {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .btn-more {
+      padding: 10px 20px;
+      font-size: 0.9em;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(180deg, #7a8ea8 0%, #4a6080 45%, #2e4060 100%);
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 2px 10px rgba(30,60,100,0.3), 0 1px 0 rgba(255,255,255,0.3) inset;
+      position: relative; overflow: hidden;
+      transition: all 0.18s ease;
+    }
+    .btn-more::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px 20px 0 0;
+      pointer-events: none;
+    }
+    .btn-more:hover {
+      background: linear-gradient(180deg, #8fa0b8, #5a7090, #3a5070);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 16px rgba(30,60,100,0.4);
+    }
+
+    .plus-icon {
+      font-size: 1.3em;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .more-menu {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      right: 0;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 8px 32px rgba(30,80,160,0.18), 0 1px 0 rgba(255,255,255,0.9) inset;
+      min-width: 210px;
+      padding: 8px;
+      z-index: 100;
+      animation: popUp 0.18s ease;
+    }
+    .more-menu.open { display: block; }
+
+    @keyframes popUp {
+      from { opacity: 0; transform: translateY(8px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .more-menu button,
+    .more-menu label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      width: 100%;
+      padding: 10px 14px;
+      border: none !important;
+      background: transparent !important;
+      border-radius: 10px !important;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9em;
+      font-weight: 700;
+      color: var(--text2) !important;
+      transition: all 0.15s ease;
+      text-align: left;
+      box-shadow: none !important;
+    }
+    .more-menu button::before,
+    .more-menu label::before {
+      display: none !important;
+    }
+    .more-menu button:hover,
+    .more-menu label:hover {
+      background: var(--pearl2) !important;
+      color: var(--blue2) !important;
+      transform: none !important;
+    }
+
+    .more-file-wrapper {
+      display: block;
+    }
+    .more-file-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+    .more-file-wrapper label {
+      cursor: pointer;
+    }
+
+    /* ====== CA BANNER ====== */
+    .ca-banner {
+      background: linear-gradient(135deg,
+        rgba(255,255,255,0.92) 0%,
+        rgba(195,228,252,0.88) 50%,
+        rgba(140,196,240,0.92) 100%
+      );
+      border: 1px solid rgba(255,255,255,0.95);
+      border-radius: var(--radius-xl);
+      padding: 20px 22px 16px;
+      margin-bottom: 0;
+      box-shadow: 0 6px 28px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      animation: fadeInDown 0.5s ease;
+      position: relative; overflow: hidden;
+      z-index: 1;
+    }
+    .ca-banner::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.05));
+      border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events: none;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .ca-banner-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ca-banner-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid rgba(180,210,240,0.3);
+    }
+
+    .ca-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .ca-icon {
+      font-size: 3em;
+      animation: pulse 2s ease-in-out infinite;
+      filter: drop-shadow(0 3px 8px rgba(30,80,180,0.2));
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .ca-info { color: var(--text); }
+
+    .ca-label {
+      font-size: 0.8em;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--blue2);
+      margin-bottom: 5px;
+    }
+
+    .ca-amount {
+      font-size: 2.4em;
+      font-weight: 900;
+      color: var(--green2);
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      letter-spacing: -1px;
+      transition: transform 0.3s ease;
+    }
+
+    .ca-currency {
+      font-size: 0.55em;
+      font-weight: 700;
+      color: var(--text3);
+    }
+
+    .ca-stats {
+      display: flex;
+      gap: 28px;
+      color: var(--text);
+    }
+
+    .ca-stat { text-align: center; }
+
+    .ca-stat-value {
+      font-size: 1.5em;
+      font-weight: 900;
+      color: var(--yellow2);
+      letter-spacing: -0.5px;
+    }
+
+    .ca-stat-label {
+      font-size: 0.75em;
+      font-weight: 700;
+      color: var(--text3);
+      margin-top: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .ca-refresh {
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(210,235,255,0.85));
+      border: 1px solid var(--border);
+      color: var(--blue2);
+      padding: 8px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      font-size: 18px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+      position: relative; overflow: hidden;
+      flex-shrink: 0;
+    }
+    .ca-refresh::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,0.4);
+      border-radius: 20px 20px 0 0;
+      pointer-events: none;
+    }
+    .ca-refresh:hover {
+      background: linear-gradient(180deg, #fff, #d0e8ff);
+      transform: scale(1.04);
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+
+    .ca-refresh .icon {
+      display: inline-block;
+      transition: transform 0.35s ease;
+    }
+    .ca-refresh:hover .icon { transform: rotate(180deg); }
+
+    /* ====== CONTAINER ====== */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.95);
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      box-shadow: 0 8px 40px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+      position: relative; z-index: 1;
+    }
+    .container::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 35%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.5), transparent);
+      border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events: none;
+    }
+
+    /* ====== HEADER ====== */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--border2);
+    }
+
+    .header h1 {
+      font-size: 1.8em;
+      font-weight: 900;
+      color: var(--blue3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ====== VISTA BUTTON MIXIN ====== */
+    .back-btn, .actions button, .file-input-label,
+    .btn-cancel, .btn-generate, .pagination button,
+    .report-actions button {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      border-radius: 20px !important;
+      position: relative; overflow: hidden;
+      cursor: pointer; border: none;
+      transition: all 0.18s ease;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .back-btn::before, .actions button::before, .file-input-label::before,
+    .btn-cancel::before, .btn-generate::before, .pagination button::before,
+    .report-actions button::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,0.35);
+      border-radius: 20px 20px 0 0;
+      pointer-events: none;
+    }
+
+    .back-btn {
+      padding: 9px 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(210,220,230,0.85));
+      color: var(--text2);
+      border: 1px solid var(--border) !important;
+      font-size: 0.9em;
+      box-shadow: 0 2px 8px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .back-btn:hover {
+      background: linear-gradient(180deg, #fff, #d0dcea);
+      transform: translateX(-4px);
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+
+    /* ====== ACTIONS ====== */
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .actions button {
+      padding: 10px 20px;
+      font-size: 0.9em;
+      color: white;
+    }
+
+    /* ====== MODAL CONFIRM / ALERT CUSTOM ====== */
+    .modal-custom {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      background: rgba(10,40,90,0.5);
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.2s ease;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-custom.open { display: flex; }
+
+    .modal-custom-box {
+      background: linear-gradient(160deg, rgba(255,255,255,0.98), rgba(215,238,255,0.96));
+      border: 1px solid rgba(255,255,255,0.95);
+      border-radius: var(--radius-xl);
+      padding: 30px 32px;
+      max-width: 420px;
+      width: 92%;
+      box-shadow: 0 20px 60px rgba(30,80,160,0.22);
+      animation: popUp 0.2s ease;
+    }
+
+    .modal-custom-icon {
+      font-size: 2.6em;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .modal-custom-title {
+      font-size: 1.15em;
+      font-weight: 900;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .modal-custom-body {
+      font-size: 0.9em;
+      color: var(--text2);
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 22px;
+      white-space: pre-line;
+    }
+
+    .modal-custom-body .highlight-warn {
+      display: inline-block;
+      background: var(--red-pale);
+      color: var(--red);
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      margin: 6px 0;
+      font-size: 0.95em;
+    }
+
+    .modal-custom-body .highlight-ok {
+      display: inline-block;
+      background: var(--green-pale);
+      color: var(--green2);
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      margin: 4px 0;
+    }
+
+    .modal-custom-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .modal-custom-btns button {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.92em;
+      transition: all 0.15s ease;
+    }
+
+    .mcb-cancel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(210,220,230,0.85));
+      border: 1px solid var(--border) !important;
+      color: var(--text2);
+      box-shadow: 0 2px 8px var(--shadow2);
+    }
+    .mcb-cancel:hover { background: #fff; transform: translateY(-1px); }
+
+    .mcb-confirm {
+      background: linear-gradient(180deg, #f08080, #c0392b, #922b21);
+      color: white;
+      box-shadow: 0 3px 12px rgba(180,40,30,0.3);
+    }
+    .mcb-confirm:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(180,40,30,0.4); }
+
+    .mcb-confirm-green {
+      background: linear-gradient(180deg, #90d860, #5aad2e, #3d8a18);
+      color: white;
+      box-shadow: 0 3px 12px rgba(60,140,20,0.3);
+    }
+    .mcb-confirm-green:hover { transform: translateY(-1px); }
+
+    .mcb-confirm-blue {
+      background: linear-gradient(180deg, #5bb0f0, #2a7fd4, #1558b0);
+      color: white;
+      box-shadow: 0 3px 12px rgba(30,80,180,0.3);
+    }
+    .mcb-confirm-blue:hover { transform: translateY(-1px); }
+
+    /* Diag dons - liste dans la modale */
+    .diag-list {
+      max-height: 260px;
+      overflow-y: auto;
+      text-align: left;
+      margin: 10px 0 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .diag-item {
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.85em;
+    }
+    .diag-item-title {
+      font-weight: 900;
+      color: var(--blue3);
+      margin-bottom: 4px;
+    }
+    .diag-item-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text2);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .diag-don-line {
+      padding-left: 12px;
+      color: var(--text3);
+      font-size: 0.95em;
+    }
+    .diag-summary {
+      background: var(--yellow-pale);
+      border: 1px solid rgba(232,168,0,0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.88em;
+      color: var(--text2);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .btn-corbeille {
+      background: linear-gradient(180deg, #b0b8c8 0%, #7a8898 45%, #5a6878 100%) !important;
+      box-shadow: 0 2px 10px rgba(60,80,100,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+    }
+    .btn-corbeille:hover {
+      background: linear-gradient(180deg, #c0c8d8, #8a98a8, #6a7888) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 16px rgba(60,80,100,0.4);
+    }
+    .btn-corbeille .badge {
+      background: #e74c3c;
+      color: white;
+      font-size: 0.75em;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    /* ====== MODAL CORBEILLE ====== */
+    .corbeille-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .corbeille-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,248,0.85));
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.18s ease;
+    }
+    .corbeille-card:hover { box-shadow: 0 3px 12px var(--shadow2); }
+
+    .corbeille-card-info { flex: 1; }
+    .corbeille-card-title {
+      font-weight: 900;
+      color: var(--text);
+      font-size: 1em;
+      margin-bottom: 4px;
+    }
+    .corbeille-card-meta {
+      font-size: 0.82em;
+      color: var(--text3);
+      font-weight: 600;
+    }
+    .corbeille-card-date {
+      font-size: 0.78em;
+      color: var(--text3);
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    .corbeille-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-restore {
+      padding: 7px 14px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.82em;
+      background: linear-gradient(180deg, #90d860, #5aad2e, #3d8a18);
+      color: white;
+      box-shadow: 0 2px 8px rgba(60,140,20,0.25);
+      transition: all 0.15s ease;
+    }
+    .btn-restore:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(60,140,20,0.35); }
+
+    .btn-delete-perm {
+      padding: 7px 14px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.82em;
+      background: linear-gradient(180deg, #f08080, #c0392b, #922b21);
+      color: white;
+      box-shadow: 0 2px 8px rgba(180,40,30,0.25);
+      transition: all 0.15s ease;
+    }
+    .btn-delete-perm:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(180,40,30,0.35); }
+
+    .corbeille-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text3);
+    }
+    .corbeille-empty .icon { font-size: 3em; margin-bottom: 10px; }
+    .corbeille-empty p { font-weight: 700; font-size: 1em; color: var(--text2); }
+
+    /* Code PIN pour suppression définitive */
+    .pin-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(10,40,90,0.55);
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.2s ease;
+      justify-content: center;
+      align-items: center;
+    }
+    .pin-overlay.open { display: flex; }
+
+    .pin-box {
+      background: linear-gradient(160deg, rgba(255,255,255,0.98), rgba(215,238,255,0.96));
+      border: 1px solid rgba(255,255,255,0.95);
+      border-radius: var(--radius-xl);
+      padding: 32px 36px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(30,80,160,0.25);
+      max-width: 340px;
+      width: 90%;
+    }
+    .pin-box h3 {
+      font-size: 1.2em;
+      font-weight: 900;
+      color: var(--red);
+      margin-bottom: 6px;
+    }
+    .pin-box p {
+      font-size: 0.88em;
+      color: var(--text2);
+      margin-bottom: 20px;
+    }
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .pin-dot {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--border2);
+      transition: background 0.15s;
+    }
+    .pin-dot.filled { background: var(--blue2); }
+    .pin-dot.error  { background: var(--red); }
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .pin-key {
+      padding: 14px;
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(220,236,255,0.85));
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.2em;
+      font-weight: 800;
+      color: var(--blue3);
+      transition: all 0.12s ease;
+      box-shadow: 0 2px 6px var(--shadow2);
+    }
+    .pin-key:hover { background: linear-gradient(180deg,#fff,#d0e8ff); transform: scale(1.06); }
+    .pin-key.del { color: var(--red); font-size: 1em; }
+    .pin-cancel-btn {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      color: var(--text2);
+      font-size: 0.9em;
+      transition: all 0.15s;
+    }
+    .pin-cancel-btn:hover { background: var(--pearl2); }
+      background: linear-gradient(180deg, #5bb0f0 0%, #2a7fd4 45%, #1558b0 100%) !important;
+      box-shadow: 0 2px 10px rgba(30,80,180,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+    }
+    .btn-rapport-x:hover { background: linear-gradient(180deg,#7cc4f8,#3a90e4,#1a6cc0) !important; transform: translateY(-2px); box-shadow: 0 5px 16px rgba(30,80,180,0.4); }
+
+    .btn-rapport-z {
+      background: linear-gradient(180deg, #90d860 0%, #5aad2e 45%, #3d8a18 100%) !important;
+      box-shadow: 0 2px 10px rgba(60,140,20,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+    }
+    .btn-rapport-z:hover { background: linear-gradient(180deg,#a4e474,#6ac03a,#4a9a20) !important; transform: translateY(-2px); box-shadow: 0 5px 16px rgba(60,140,20,0.4); }
+
+    .btn-rapport-periode {
+      background: linear-gradient(180deg, #f08080 0%, #c0392b 45%, #922b21 100%) !important;
+      box-shadow: 0 2px 10px rgba(180,40,30,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+    }
+    .btn-rapport-periode:hover { background: linear-gradient(180deg,#f89898,#d44040,#a03030) !important; transform: translateY(-2px); box-shadow: 0 5px 16px rgba(180,40,30,0.4); }
+
+    .btn-export {
+      background: linear-gradient(180deg, #c070e0 0%, #8e44ad 45%, #6c3485 100%) !important;
+      box-shadow: 0 2px 10px rgba(140,60,180,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+    }
+    .btn-export:hover { background: linear-gradient(180deg,#d080f0,#a050c0,#7a3a98) !important; transform: translateY(-2px); }
+
+    .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; }
+    .file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
+
+    .file-input-label {
+      padding: 10px 20px;
+      background: linear-gradient(180deg, #ffd84d 0%, #e8a800 45%, #c08800 100%);
+      color: #5a3800;
+      font-size: 0.9em;
+      box-shadow: 0 2px 10px rgba(200,140,0,0.3), 0 1px 0 rgba(255,255,255,0.5) inset;
+    }
+    .file-input-label:hover { background: linear-gradient(180deg,#ffe460,#f0b800,#d09800); transform: translateY(-2px); box-shadow: 0 5px 16px rgba(200,140,0,0.4); }
+
+    /* ====== OPTIONS PANEL ====== */
+    .options-panel {
+      background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(215,235,255,0.75));
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 12px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+      position: relative; overflow: hidden;
+    }
+    .options-panel::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 40%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.5), transparent);
+      border-radius: var(--radius-lg) var(--radius-lg) 60% 60%;
+      pointer-events: none;
+    }
+    .options-panel::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--green), var(--yellow));
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .options-panel h3 {
+      color: var(--blue3);
+      margin-bottom: 14px;
+      font-size: 1.1em;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .option-item:hover {
+      box-shadow: 0 2px 10px var(--shadow2);
+      border-color: var(--border2);
+      background: rgba(255,255,255,0.9);
+    }
+
+    .option-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: var(--blue);
+    }
+
+    .option-item label {
+      cursor: pointer;
+      font-size: 0.95em;
+      color: var(--text2);
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 1.3em;
+      font-weight: 900;
+      color: var(--blue3);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .pagination button {
+      padding: 9px 20px;
+      border: 1px solid var(--border) !important;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(210,235,255,0.85));
+      color: var(--blue2);
+      font-size: 0.9em;
+      box-shadow: 0 2px 8px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .pagination button:hover:not(:disabled) {
+      background: linear-gradient(180deg, #fff, #d0e8ff);
+      transform: scale(1.05);
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+    .pagination button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      font-size: 0.9em;
+      color: var(--text3);
+      font-weight: 700;
+    }
+
+    /* ====== REPORTS GRID ====== */
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .report-card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.92) 0%, rgba(215,235,255,0.78) 100%);
+      border: 1px solid rgba(255,255,255,0.95);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: 0 3px 16px var(--shadow2), 0 1px 0 rgba(255,255,255,0.95) inset;
+      transition: all 0.22s ease;
+      position: relative; overflow: hidden;
+      border-left: 4px solid var(--blue);
+    }
+    .report-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 38%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.08));
+      border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events: none;
+    }
+    .report-card[data-type="Z"] { border-left-color: var(--green); }
+
+    .report-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 32px rgba(30,80,180,0.2), 0 1px 0 rgba(255,255,255,0.95) inset;
+      border-color: var(--blue-light);
+    }
+
+    .report-card h3 {
+      font-size: 1.2em;
+      font-weight: 900;
+      color: var(--blue3);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .report-card[data-type="Z"] h3 { color: var(--green2); border-bottom-color: rgba(90,173,46,0.25); }
+
+    .report-card .info-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      font-size: 0.9em;
+      border-bottom: 1px solid rgba(180,210,240,0.25);
+    }
+    .report-card .info-line:last-of-type { border-bottom: none; }
+
+    .info-line .label {
+      font-weight: 700;
+      color: var(--text2);
+    }
+
+    .info-line .value {
+      color: var(--text3);
+      font-weight: 600;
+    }
+
+    .report-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .report-actions button {
+      flex: 1;
+      padding: 9px 8px;
+      color: white;
+      font-size: 0.82em;
+      min-width: 70px;
+      justify-content: center;
+    }
+
+    .btn-pdf {
+      background: linear-gradient(180deg, #5bb0f0 0%, #2a7fd4 45%, #1558b0 100%);
+      box-shadow: 0 2px 8px rgba(30,80,180,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+    }
+    .btn-pdf:hover { background: linear-gradient(180deg,#7cc4f8,#3a90e4,#1a6cc0); transform: scale(1.05); box-shadow: 0 4px 12px rgba(30,80,180,0.4); }
+
+    .btn-thermal {
+      background: linear-gradient(180deg, #c070e0 0%, #8e44ad 45%, #6c3485 100%);
+      box-shadow: 0 2px 8px rgba(140,60,180,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+    }
+    .btn-thermal:hover { background: linear-gradient(180deg,#d080f0,#a050c0,#7a3a98); transform: scale(1.05); }
+
+    .btn-view {
+      background: linear-gradient(180deg, #ffd84d 0%, #e8a800 45%, #c08800 100%);
+      color: #5a3800 !important;
+      box-shadow: 0 2px 8px rgba(200,140,0,0.3), 0 1px 0 rgba(255,255,255,0.5) inset;
+    }
+    .btn-view:hover { background: linear-gradient(180deg,#ffe460,#f0b800,#d09800); transform: scale(1.05); box-shadow: 0 4px 12px rgba(200,140,0,0.4); }
+
+    .btn-delete {
+      background: linear-gradient(180deg, #f08080 0%, #c0392b 45%, #922b21 100%);
+      box-shadow: 0 2px 8px rgba(180,40,30,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+    }
+    .btn-delete:hover { background: linear-gradient(180deg,#f89898,#d44040,#a03030); transform: scale(1.05); }
+
+    /* ====== STATUS MESSAGE ====== */
+    .status-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 14px 22px;
+      border-radius: var(--radius-lg);
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      z-index: 9999;
+      animation: slideIn 0.3s ease-out;
+      box-shadow: 0 6px 24px var(--shadow), 0 1px 0 rgba(255,255,255,0.9) inset;
+      border: 1px solid rgba(255,255,255,0.9);
+    }
+
+    .status-success {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(210,245,185,0.9));
+      color: var(--green2);
+      border-left: 4px solid var(--green);
+    }
+
+    .status-error {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,220,220,0.9));
+      color: var(--red);
+      border-left: 4px solid var(--red);
+    }
+
+    /* ====== EMPTY STATE ====== */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text3);
+    }
+
+    .empty-state-icon {
+      font-size: 4em;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 4px 12px rgba(30,80,180,0.15));
+    }
+
+    .empty-state h3 {
+      font-size: 1.4em;
+      font-weight: 900;
+      color: var(--text2);
+      margin-bottom: 8px;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ====== MODALS ====== */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(10,40,90,0.45);
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.25s ease;
+    }
+
+    .modal-content {
+      background: linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(215,238,255,0.95) 100%);
+      border: 1px solid rgba(255,255,255,0.95);
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: var(--radius-xl);
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(20,60,180,0.25), 0 1px 0 rgba(255,255,255,0.9) inset;
+      animation: slideDown 0.28s ease;
+      position: relative; overflow: hidden;
+    }
+    .modal-content::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 35%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.55), transparent);
+      border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid var(--border2);
+    }
+
+    .modal-header h2 {
+      color: var(--blue3);
+      font-size: 1.4em;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .close-modal {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: linear-gradient(180deg, #f08080, #c0392b);
+      border: 1px solid #922b21 !important;
+      color: #fff; cursor: pointer; font-size: 1.2em;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s; font-weight: 900;
+      box-shadow: 0 2px 6px rgba(180,40,30,0.35);
+    }
+    .close-modal:hover {
+      background: linear-gradient(180deg, #f89898, #d44040);
+      transform: scale(1.12) rotate(5deg);
+    }
+
+    .modal-body { margin-bottom: 24px; }
+
+    .form-group { margin-bottom: 18px; }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--text2);
+      font-weight: 800;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95em;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 600;
+      color: var(--text);
+      background: rgba(255,255,255,0.85);
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 4px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px rgba(42,127,212,0.15), 0 1px 4px var(--shadow2);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .modal-footer button {
+      padding: 10px 22px;
+      font-size: 0.92em;
+    }
+
+    .btn-cancel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(210,220,230,0.85));
+      color: var(--text2);
+      border: 1px solid var(--border) !important;
+      box-shadow: 0 2px 8px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .btn-cancel:hover { background: linear-gradient(180deg,#fff,#d0dcea); }
+
+    .btn-generate {
+      background: linear-gradient(180deg, #5bb0f0 0%, #2a7fd4 45%, #1558b0 100%);
+      color: white;
+      box-shadow: 0 2px 10px rgba(30,80,180,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+    }
+    .btn-generate:hover { background: linear-gradient(180deg,#7cc4f8,#3a90e4,#1a6cc0); transform: translateY(-2px); box-shadow: 0 5px 16px rgba(30,80,180,0.4); }
+
+    /* ====== MODAL RAPPORT COMPLET ====== */
+    #modalRapportComplet .modal-content {
+      max-width: 700px;
+    }
+    .rapport-full-view {
+      font-family: 'Nunito', monospace;
+      font-size: 0.88em;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .rapport-full-section {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .rapport-full-section-title {
+      font-weight: 900;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--blue2);
+      margin-bottom: 10px;
+      padding-bottom: 7px;
+      border-bottom: 2px solid var(--border2);
+    }
+    .rapport-full-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px dashed rgba(176,204,232,0.4);
+      font-size: 0.9em;
+    }
+    .rapport-full-row:last-child { border-bottom: none; }
+    .rapport-full-row .lbl { font-weight: 700; color: var(--text2); }
+    .rapport-full-row .val { font-weight: 600; color: var(--text3); }
+    .rapport-full-row.highlight .val { color: var(--blue3); font-weight: 900; font-size: 1.05em; }
+    .rapport-full-row.highlight-green .val { color: var(--green2); font-weight: 900; font-size: 1.05em; }
+    .rapport-cat-title {
+      font-weight: 800; color: var(--text2);
+      font-size: 0.85em; text-transform: uppercase;
+      letter-spacing: 0.8px; margin: 8px 0 4px;
+      padding-left: 6px; border-left: 3px solid var(--blue-light);
+    }
+    .rapport-cat-item {
+      display: flex; justify-content: space-between;
+      padding: 3px 0 3px 14px; font-size: 0.88em;
+      color: var(--text3); border-bottom: 1px dashed rgba(176,204,232,0.3);
+    }
+
+    @media (max-width: 768px) {
+      .header { flex-direction: column; gap: 15px; }
+      .actions { flex-direction: column; }
+      .actions button, .file-input-label { width: 100%; justify-content: center; }
+      .reports-grid { grid-template-columns: 1fr; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(200,220,240,0.3); }
+    ::-webkit-scrollbar-thumb { background: var(--blue-light); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <!-- Modal pour impression tickets de la session -->
+  <div id="modalTickets" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2>🎫 Imprimer les Tickets de la Session</h2>
+        <button class="close-modal" onclick="fermerModalTickets()">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="ticketsSessionInfo" style="background:#f0f9f0;border:1px solid #2ecc71;border-radius:8px;padding:15px;margin-bottom:15px;">
+          <div style="font-weight:600;color:#27ae60;margin-bottom:8px;">📋 Tickets trouvés</div>
+          <div id="ticketsSessionCount" style="font-size:1.2em;color:#2c3e50;">Calcul en cours...</div>
+          <div id="ticketsSessionPeriode" style="font-size:0.85em;color:#7f8c8d;margin-top:5px;"></div>
+        </div>
+        <div style="display:flex;gap:15px;">
+          <div style="flex:1;">
+            <label style="display:block;margin-bottom:8px;font-weight:600;color:#34495e;">📅 Date/heure depuis :</label>
+            <input type="datetime-local" id="ticketsSinceDate" style="width:100%;padding:10px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;" onchange="mettreAJourCompteTickets()">
+          </div>
+        </div>
+        <div style="margin-top:15px;padding:12px;background:#fff3cd;border-radius:8px;border:1px solid #ffc107;font-size:0.9em;color:#856404;">
+          ⚠️ Cette fonction va générer un ticket individuel pour chaque vente. Pour de nombreux tickets, cela peut prendre quelques secondes.
+        </div>
+      </div>
+      <div class="modal-footer" style="flex-wrap:wrap;gap:10px;">
+        <button class="btn-cancel" onclick="fermerModalTickets()">Annuler</button>
+        <button onclick="imprimerTousTicketsPDF()" style="padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:600;background:linear-gradient(135deg,#3498db,#2980b9);color:white;transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">📄 Générer PDF</button>
+        <button onclick="imprimerTousTicketsThermique()" style="padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:600;background:linear-gradient(135deg,#9b59b6,#8e44ad);color:white;transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">🖨 Imprimer Thermique</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour génération sur période -->
+  <div id="modalPeriode" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📅 Générer un rapport sur période</h2>
+        <button class="close-modal" onclick="fermerModalPeriode()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="typeRapport">Type de rapport :</label>
+          <select id="typeRapport">
+            <option value="X">Rapport X</option>
+            <option value="Z">Rapport Z</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="dateDebut">Date de début :</label>
+          <input type="date" id="dateDebut" required>
+        </div>
+        <div class="form-group">
+          <label for="dateFin">Date de fin :</label>
+          <input type="date" id="dateFin" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="fermerModalPeriode()">Annuler</button>
+        <button class="btn-generate" onclick="genererRapportPeriode()">Générer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Rapport Complet -->
+  <div id="modalRapportComplet" class="modal">
+    <div class="modal-content" style="max-width:700px; max-height:85vh; overflow-y:auto;">
+      <div class="modal-header">
+        <h2 id="modalRapportCompletTitle">📊 Rapport Complet</h2>
+        <button class="close-modal" onclick="fermerModalRapportComplet()">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalRapportCompletBody"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="fermerModalRapportComplet()">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL CONFIRM GÉNÉRIQUE ====== -->
+  <div class="modal-custom" id="modalConfirm">
+    <div class="modal-custom-box">
+      <div class="modal-custom-icon" id="modalConfirmIcon">⚠️</div>
+      <div class="modal-custom-title" id="modalConfirmTitle"></div>
+      <div class="modal-custom-body" id="modalConfirmBody"></div>
+      <div class="modal-custom-btns" id="modalConfirmBtns"></div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL DIAGNOSTIC DONS ====== -->
+  <div class="modal-custom" id="modalDiag">
+    <div class="modal-custom-box" style="max-width:520px; max-height:85vh; overflow-y:auto;">
+      <div class="modal-custom-icon">🔍</div>
+      <div class="modal-custom-title">Diagnostic des Dons</div>
+      <div id="modalDiagContent"></div>
+      <div class="modal-custom-btns">
+        <button class="mcb-confirm-blue" onclick="document.getElementById('modalDiag').classList.remove('open')">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL ALERT GÉNÉRIQUE ====== -->
+  <div class="modal-custom" id="modalAlert">
+    <div class="modal-custom-box">
+      <div class="modal-custom-icon" id="modalAlertIcon">✅</div>
+      <div class="modal-custom-title" id="modalAlertTitle"></div>
+      <div class="modal-custom-body" id="modalAlertBody"></div>
+      <div class="modal-custom-btns">
+        <button class="mcb-confirm-blue" onclick="document.getElementById('modalAlert').classList.remove('open')">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL CORBEILLE ====== -->
+  <div id="modalCorbeille" class="modal">
+    <div class="modal-content" style="max-width:640px; max-height:85vh; overflow-y:auto;">
+      <div class="modal-header">
+        <h2>🗑 Corbeille des rapports</h2>
+        <button class="close-modal" onclick="fermerCorbeille()">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="corbeilleGrid" class="corbeille-grid"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="fermerCorbeille()">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== OVERLAY CODE PIN ====== -->
+  <div class="pin-overlay" id="pinOverlay">
+    <div class="pin-box">
+      <h3>⚠️ Suppression définitive</h3>
+      <p>Entrez le code à 4 chiffres pour confirmer la suppression permanente.</p>
+      <div class="pin-dots" id="pinDots">
+        <div class="pin-dot" id="dot0"></div>
+        <div class="pin-dot" id="dot1"></div>
+        <div class="pin-dot" id="dot2"></div>
+        <div class="pin-dot" id="dot3"></div>
+      </div>
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
+        <button class="pin-key del" onclick="pinDel()">⌫</button>
+        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key del" onclick="pinClear()">✕</button>
+      </div>
+      <button class="pin-cancel-btn" onclick="fermerPin()">Annuler</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- ====== HEADER : Titre + Retour ====== -->
+    <div class="header">
+      <h1>📊 Rapports de Caisse (X / Z)</h1>
+      <button class="back-btn" onclick="window.history.back()">⬅ Retour</button>
+    </div>
+
+    <!-- ====== DEUX CARTES CÔTE À CÔTE ====== -->
+    <div class="banners-row">
+
+      <!-- 💰 CA du jour -->
+      <div class="ca-banner">
+        <div class="ca-banner-top">
+          <div class="ca-banner-left">
+            <div class="ca-icon">💰</div>
+            <div class="ca-info">
+              <div class="ca-label">Chiffre d'affaires du jour</div>
+              <div class="ca-amount">
+                <span id="caJour">0.00</span>
+                <span class="ca-currency">€</span>
+              </div>
+            </div>
+          </div>
+          <button class="ca-refresh" onclick="actualiserCAJour(event)" title="Actualiser">
+            <span class="icon">♻️</span>
+          </button>
+        </div>
+        <div class="ca-banner-bottom">
+          <div class="ca-stats">
+            <div class="ca-stat">
+              <div class="ca-stat-value" id="nbTicketsJour">0</div>
+              <div class="ca-stat-label">Tickets</div>
+            </div>
+            <div class="ca-stat">
+              <div class="ca-stat-value" id="nbArticlesJour">0</div>
+              <div class="ca-stat-label">Articles</div>
+            </div>
+            <div class="ca-stat">
+              <div class="ca-stat-value" id="panierMoyenJour">0.00€</div>
+              <div class="ca-stat-label">Panier moyen</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🎯 Tickets en cours -->
+      <div class="ca-banner ca-banner-red">
+        <div class="ca-banner-top">
+          <div class="ca-banner-left">
+            <div class="ca-icon">🎯</div>
+            <div class="ca-info">
+              <div class="ca-label" style="color:#c0392b;">Tickets en cours (non payés)</div>
+              <div class="ca-amount" style="color:#922b21;">
+                <span id="totalEnCours">0.00</span>
+                <span class="ca-currency">€</span>
+              </div>
+            </div>
+          </div>
+          <button class="ca-refresh" onclick="actualiserTicketsEnCours(event)" title="Actualiser">
+            <span class="icon">♻️</span>
+          </button>
+        </div>
+        <div class="ca-banner-bottom">
+          <div class="ca-stats">
+            <div class="ca-stat">
+              <div class="ca-stat-value" id="nbTicketsEnCours" style="color:#c0392b;">0</div>
+              <div class="ca-stat-label">Tickets actifs</div>
+            </div>
+            <div class="ca-stat">
+              <div class="ca-stat-value" id="nbArticlesEnCours" style="color:#c0392b;">0</div>
+              <div class="ca-stat-label">Articles</div>
+            </div>
+            <div class="ca-stat">
+              <div class="ca-stat-value" id="panierMoyenEnCours" style="color:#c0392b;">0.00€</div>
+              <div class="ca-stat-label">Panier moyen</div>
+            </div>
+          </div>
+          <div class="ca-stat" style="text-align:right; padding-left: 16px; border-left: 2px solid rgba(192,57,43,0.2);">
+            <div class="ca-stat-label">Projection totale</div>
+            <div class="ca-stat-value" id="projectionTotale" style="color: var(--yellow2); font-size: 1.4em;">0.00€</div>
+            <div class="ca-stat-label" style="font-size: 0.7em;">(CA jour + en cours)</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end banners-row -->
+
+    <!-- Options Panel -->
+    <div class="options-panel">
+      <h3>⚙️ Options des Rapports</h3>
+      <div class="option-item">
+        <input type="checkbox" id="optionMembresBanque" checked>
+        <label for="optionMembresBanque">Inclure le détail des membres ayant payé par banque</label>
+      </div>
+      <div class="option-item">
+        <input type="checkbox" id="optionDons" checked>
+        <label for="optionDons">Afficher et décompter les dons du CA</label>
+      </div>
+    </div>
+
+    <!-- ====== ACTIONS ====== -->
+    <div class="actions">
+      <button class="btn-rapport-x" onclick="genererRapport('X')">🔄 Rapport X</button>
+      <button class="btn-rapport-z" onclick="genererRapport('Z')">✅ Clôturer Z</button>
+      <button class="btn-rapport-periode" onclick="ouvrirModalPeriode()">📅 Générer sur Période</button>
+      <button class="btn-export" onclick="ouvrirModalTickets()" style="background: linear-gradient(180deg, #3ec9ac 0%, #16a085 45%, #0e7060 100%);">🎫 Imprimer Tickets Session</button>
+      <button class="btn-corbeille" onclick="ouvrirCorbeille()">🗑 Corbeille <span class="badge" id="corbeilleBadge" style="display:none">0</span></button>
+
+      <!-- Bouton + avec menu déroulant -->
+      <div class="more-btn-wrapper" id="moreBtnWrapper">
+        <button class="btn-more" onclick="toggleMoreMenu()" id="moreBtnTrigger" title="Plus d'options">
+          <span class="plus-icon">＋</span>
+          <span>Plus</span>
+        </button>
+        <div class="more-menu" id="moreMenu">
+          <button onclick="exportJSON(); toggleMoreMenu()">💾 Export JSON</button>
+          <div class="file-input-wrapper more-file-wrapper">
+            <input type="file" id="importFile" onchange="importJSON(event)" accept=".json" />
+            <label for="importFile" onclick="toggleMoreMenu()">📥 Import JSON</label>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border2);margin:4px 0;">
+          <button onclick="exportExcelRapports(); toggleMoreMenu()">📊 Export Excel Rapports</button>
+          <div class="file-input-wrapper more-file-wrapper">
+            <input type="file" id="importExcelRapportsFile" onchange="importExcelRapports(event)" accept=".xlsx" />
+            <label for="importExcelRapportsFile" onclick="toggleMoreMenu()">📂 Import Excel Rapports</label>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border2);margin:4px 0;">
+          <button onclick="diagnostiquerDons(); toggleMoreMenu()">🔍 Diagnostic Dons</button>
+          <button onclick="recalculerTotauxTickets(); toggleMoreMenu()">🔧 Recalculer Tickets</button>
+          <button onclick="recalculerTousLesRapports(); toggleMoreMenu()">♻️ Recalculer Rapports</button>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">📋 Historique des Rapports</h2>
+
+    <div class="pagination" id="paginationContainer" style="display: none;">
+      <button onclick="changePage(currentPage - 1)" id="prevBtn">◀ Précédent</button>
+      <span class="pagination-info" id="pageInfo">Page 1 sur 1</span>
+      <button onclick="changePage(currentPage + 1)" id="nextBtn">Suivant ▶</button>
+    </div>
+
+    <div class="reports-grid" id="reportsGrid"></div>
+  </div>
+
+  <script src="jspdf.umd.min.js"></script>
+  <script>
+// ── Sync serveur automatique ──────────────────────────────────────────────────
+const _IS_SERVER = window.location.protocol === "http:";
+const _API_BASE  = window.location.origin + "/api";
+async function syncToServer(...keys) {
+  if (!_IS_SERVER) return;
+  const body = {};
+  keys.forEach(k => {
+    try { body[k] = JSON.parse(localStorage.getItem(k) || "null"); } catch(e) {}
+  });
+  try {
+    await fetch(_API_BASE + "/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  } catch(e) {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+    // ===========================
+    // VARIABLES GLOBALES
+    // ===========================
+    // Charger les articles depuis articlesData (comme dans articles.html)
+let articlesData = JSON.parse(localStorage.getItem("articlesData")) || {};
+let articles = articlesData.articles || [];
+    let ticketsHistorique = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+    let tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+    let rapports = JSON.parse(localStorage.getItem("rapports")) || [];
+    let tables = JSON.parse(localStorage.getItem("tables")) || [];
+    let numX = parseInt(localStorage.getItem("numX")) || 0;
+    let numZ = parseInt(localStorage.getItem("numZ")) || 0;
+    
+    // Migration : ajouter le champ 'numero' aux tickets existants qui n'en ont pas
+    let needsMigration = false;
+    ticketsHistorique.forEach(ticket => {
+      if (ticket.numero === undefined) {
+        ticket.numero = ticket.id;
+        needsMigration = true;
+      }
+    });
+    tickets.forEach(ticket => {
+      if (ticket.numero === undefined) {
+        ticket.numero = ticket.id;
+        needsMigration = true;
+      }
+    });
+    if (needsMigration) {
+      localStorage.setItem("ticketsHistorique", JSON.stringify(ticketsHistorique));
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+      syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+    }
+    
+    const settings = JSON.parse(localStorage.getItem("companySettings")) || {};
+    const entreprise = {
+      nom: settings.companyName || "Entreprise",
+      adresse: settings.companyAddress || "",
+      localite: settings.companyLocality || "",
+      num: settings.companyNumber || ""
+    };
+    
+    const loginHistory = JSON.parse(localStorage.getItem("loginHistory")) || [];
+
+    let currentPage = 1;
+    const itemsPerPage = 6;
+
+    // ===========================
+    // FONCTIONS UTILITAIRES
+    // ===========================
+    
+    function parseTicketDate(ticket) {
+      if (!ticket) return new Date(0);
+      
+      if (ticket.isoPaiement) return new Date(ticket.isoPaiement);
+      
+      if (ticket.datePaiement) {
+        const parts = ticket.datePaiement.split('/');
+        if (parts.length === 3) {
+          const day = parts[0].padStart(2, '0');
+          const month = parts[1].padStart(2, '0');
+          const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+          return new Date(`${year}-${month}-${day}T${ticket.heurePaiement || '00:00:00'}`);
+        }
+      }
+      
+      return new Date(0);
+    }
+
+    function safeISO(date) {
+      return (date instanceof Date && !isNaN(date)) ? date.toISOString() : new Date().toISOString();
+    }
+
+    function getArticleCategorie(nomArticle) {
+      const art = articles.find(a => a.nom === nomArticle);
+      return art ? art.categorie : "Sans catégorie";
+    }
+
+    function recalculerNumeros() {
+      const maxX = rapports
+        .filter(r => r.type === 'X')
+        .reduce((max, r) => Math.max(max, r.numero || 0), 0);
+      
+      const maxZ = rapports
+        .filter(r => r.type === 'Z')
+        .reduce((max, r) => Math.max(max, r.numero || 0), 0);
+      
+      numX = maxX;
+      numZ = maxZ;
+      
+      localStorage.setItem("numX", numX);
+      localStorage.setItem("numZ", numZ);
+      syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+    }
+
+    // Nouvelle fonction pour détecter si un article est un don
+    function estUnDon(nomArticle) {
+      return nomArticle.toLowerCase().includes('don');
+    }
+
+    // ⭐ NOUVELLE FONCTION : Recalculer le total d'un ticket en s'assurant que les dons sont inclus
+    function calculerTotalTicketAvecDons(ticket) {
+      // Recalculer le total à partir des articles pour être sûr que tout est inclus
+      if (Array.isArray(ticket.articles) && ticket.articles.length > 0) {
+        return ticket.articles.reduce((sum, article) => {
+          const prix = parseFloat(article.prix) || 0;
+          const qte = parseFloat(article.qte) || 0;
+          return sum + (prix * qte);
+        }, 0);
+      }
+      // Si pas d'articles, utiliser le total sauvegardé
+      return parseFloat(ticket.total) || 0;
+    }
+
+    // ===========================
+    // TVA HELPERS
+    // ===========================
+    function getTvaSettingsRapport() {
+      try { return JSON.parse(localStorage.getItem("tvaSettings") || "null"); } catch(e) { return null; }
+    }
+    function getArticleTvaRateForRapport(articleNom) {
+      // Find article by name in articlesData and return its TVA rate as a number
+      const articlesData = JSON.parse(localStorage.getItem("articlesData") || "{}");
+      const arts = articlesData.articles || [];
+      const art = arts.find(a => a.nom === articleNom);
+      if (!art) return 0;
+      return parseFloat(art.tva) || 0; // tva stored as "21%" → parseFloat gives 21
+    }
+
+    // ===========================
+    // GÉNÉRATION DE RAPPORTS
+    // ===========================
+    
+    function genererRapport(type) {
+      // TVA active ?
+      const tvaSettings = getTvaSettingsRapport();
+      const tvaActif = tvaSettings && tvaSettings.enabled === true;
+      // Récupération des options
+      const inclureMembresBanque = document.getElementById('optionMembresBanque').checked;
+      const afficherDons = document.getElementById('optionDons').checked;
+
+      // Vérification pour clôture Z : pas de tickets actifs
+      if (type === "Z") {
+        const tablesOccupees = tables.filter(t => t.ticketId !== null);
+        const ticketsActifsZ = tickets.filter(t => 
+          tablesOccupees.some(table => table.ticketId === t.id) && 
+          Array.isArray(t.articles) && 
+          t.articles.length > 0
+        );
+
+        if (ticketsActifsZ.length > 0) {
+          const tablesNoms = tablesOccupees
+            .filter(table => ticketsActifsZ.some(t => t.id === table.ticketId))
+            .map(table => table.nom)
+            .join(", ");
+          
+          showAlert({
+            icon: '⚠️',
+            title: 'Impossible de clôturer Z !',
+            body: `Il reste <strong>${ticketsActifsZ.length} ticket(s) actif(s)</strong> non payé(s) :<br><br><span class="highlight-warn">${tablesNoms}</span><br><br>Veuillez les encaisser ou les libérer avant de clôturer.`
+          });
+          return;
+        }
+      }
+
+      const now = new Date();
+      const dateCloture = now.toLocaleDateString('fr-FR');
+      const heureCloture = now.toLocaleTimeString('fr-FR');
+
+      let startTime = new Date();
+      let utilisateurNom = "Inconnu";
+      let heureOuvertureAffichee = new Date(startTime); // Valeur par défaut
+
+      if (loginHistory.length > 0) {
+        const lastLogin = loginHistory[loginHistory.length - 1];
+        utilisateurNom = lastLogin.user || lastLogin.nom || "Utilisateur";
+
+        // ⭐ FIX: l'heure d'ouverture AFFICHÉE sur le ticket doit toujours être
+        // l'heure de connexion réelle via index.html (dernier login), et non
+        // l'heure de clôture du Z précédent utilisée seulement pour le filtrage
+        // des tickets ci-dessous.
+        if (lastLogin.iso) {
+          heureOuvertureAffichee = new Date(lastLogin.iso);
+        } else if (lastLogin.date) {
+          const parsed = Date.parse(lastLogin.date);
+          if (!isNaN(parsed)) heureOuvertureAffichee = new Date(parsed);
+        }
+      }
+
+      // ⭐ FIX: la période de FILTRAGE DES TICKETS doit démarrer à la dernière clôture Z
+      // (même logique que l'en-tête / actualiserCAJour), sinon on retombe sur le dernier login.
+      // Avant ce fix, cette fonction ignorait les Z déjà clôturés et repartait
+      // toujours du dernier login : en régénérant un Z sans se reconnecter entre
+      // temps (ex: après "recalculer les tickets"/"recalculer les Z"), les
+      // tickets déjà inclus dans un Z précédent de la session étaient réinjectés.
+      // NB: ceci ne concerne QUE le filtrage des tickets. L'heure d'ouverture
+      // affichée sur le ticket vient de heureOuvertureAffichee (ci-dessus).
+      const dernierZPourPeriode = rapports
+        .filter(r => r.type === "Z")
+        .sort((a, b) => new Date(b.isoCloture) - new Date(a.isoCloture))[0];
+
+      if (dernierZPourPeriode && dernierZPourPeriode.isoCloture) {
+        startTime = new Date(dernierZPourPeriode.isoCloture);
+      } else if (loginHistory.length > 0) {
+        const lastLogin = loginHistory[loginHistory.length - 1];
+        if (lastLogin.iso) {
+          startTime = new Date(lastLogin.iso);
+        } else if (lastLogin.date) {
+          const parsed = Date.parse(lastLogin.date);
+          if (!isNaN(parsed)) {
+            startTime = new Date(parsed);
+          } else {
+            startTime.setHours(0, 0, 0, 0);
+          }
+        } else {
+          startTime.setHours(0, 0, 0, 0);
+        }
+      }
+
+      let totalEspeces = 0;
+      let totalBanque = 0;
+      let totalOfferts = 0;
+      let totalArticles = 0;
+      let totalDons = 0; // Nouveau: total des dons
+      let donsEspeces = 0;
+      let donsBanque = 0;
+      let categoriesRapport = {};
+      let articlesOfferts = {}; // ✅ NOUVEAU: Liste des articles offerts
+      let membresBanque = {};
+      let tvaVentilation = {}; // TVA: { "21": { base: 0, tva: 0, total: 0 } }
+
+      const ticketsInclus = ticketsHistorique.filter(t => {
+        const paiementDate = parseTicketDate(t);
+        return paiementDate >= startTime && paiementDate <= now;
+      });
+
+      ticketsInclus.forEach(ticket => {
+        // ⭐ FIX: Recalculer le total pour s'assurer que les dons sont inclus
+        const total = calculerTotalTicketAvecDons(ticket);
+        
+        // Calculer les dons dans ce ticket
+        let donsTicket = 0;
+        if (afficherDons && Array.isArray(ticket.articles)) {
+          ticket.articles.forEach(article => {
+            if (estUnDon(article.nom)) {
+              const qte = parseFloat(article.qte) || 0;
+              const prix = parseFloat(article.prix) || 0;
+              donsTicket += qte * prix;
+            }
+          });
+        }
+        
+        if (ticket.modePaiement === "especes") {
+          totalEspeces += total;
+          donsEspeces += donsTicket;
+        }
+        
+        if (ticket.modePaiement === "banque") {
+          totalBanque += total;
+          donsBanque += donsTicket;
+          if (inclureMembresBanque) {
+            enregistrerMembreBanque(ticket, total, membresBanque);
+          }
+        }
+        
+        if (ticket.modePaiement === "mixte") {
+          const montantEspecesMixte = parseFloat(ticket.montantEspeces) || 0;
+          const montantBanqueMixte = parseFloat(ticket.montantBanque) || 0;
+          totalEspeces += montantEspecesMixte;
+          totalBanque += montantBanqueMixte;
+          
+          // Répartir les dons au prorata pour le mode mixte
+          if (donsTicket > 0 && total > 0) {
+            const proportionEspeces = montantEspecesMixte / total;
+            const proportionBanque = montantBanqueMixte / total;
+            donsEspeces += donsTicket * proportionEspeces;
+            donsBanque += donsTicket * proportionBanque;
+          }
+          
+          if (montantBanqueMixte > 0 && inclureMembresBanque) {
+            enregistrerMembreBanque(ticket, montantBanqueMixte, membresBanque);
+          }
+        }
+
+        if (Array.isArray(ticket.articles)) {
+          ticket.articles.forEach(article => {
+            traiterArticle(article, categoriesRapport, articlesOfferts); // ✅ Passer articlesOfferts
+            const qte = parseFloat(article.qte) || 0;
+            const prix = parseFloat(article.prix) || 0;
+            
+            // Ne compter que les articles NON offerts dans totalArticles
+            if (!article.offert) {
+              totalArticles += qte;
+            }
+            
+            // ✅ FIX: Pour les articles offerts, utiliser le prix original sauvegardé
+            if (article.offert) {
+              const prixOriginal = parseFloat(article.prixOriginal) || prix || 0;
+              totalOfferts += qte * prixOriginal;
+            }
+
+            // Nouveau: détection et calcul des dons
+            if (afficherDons && estUnDon(article.nom)) {
+              totalDons += qte * prix;
+            }
+
+            // TVA ventilation (articles non offerts seulement)
+            if (!article.offert && tvaActif) {
+              const tvaRate = getArticleTvaRateForRapport(article.nom);
+              if (tvaRate >= 0) {
+                const prixLigne = qte * prix;
+                const base = prixLigne / (1 + tvaRate / 100);
+                const montantTva = prixLigne - base;
+                const key = tvaRate.toFixed(0);
+                if (!tvaVentilation[key]) tvaVentilation[key] = { base: 0, tva: 0, total: 0 };
+                tvaVentilation[key].base += base;
+                tvaVentilation[key].tva += montantTva;
+                tvaVentilation[key].total += prixLigne;
+              }
+            }
+          });
+        }
+      });
+
+      const tablesOccupees = tables.filter(t => t.ticketId !== null).map(t => t.ticketId);
+      const ticketsActifs = tickets.filter(t => 
+        tablesOccupees.includes(t.id) && 
+        Array.isArray(t.articles) && 
+        t.articles.length > 0
+      );
+
+      ticketsActifs.forEach(ticket => {
+        if (Array.isArray(ticket.articles)) {
+          ticket.articles.forEach(article => {
+            traiterArticle(article, categoriesRapport, articlesOfferts); // ✅ Passer articlesOfferts
+            const qte = parseFloat(article.qte) || 0;
+            const prix = parseFloat(article.prix) || 0;
+            
+            // Ne compter que les articles NON offerts dans totalArticles
+            if (!article.offert) {
+              totalArticles += qte;
+            }
+            
+            // ✅ FIX: Pour les articles offerts, utiliser le prix original sauvegardé
+            if (article.offert) {
+              const prixOriginal = parseFloat(article.prixOriginal) || prix || 0;
+              totalOfferts += qte * prixOriginal;
+            }
+
+            // Nouveau: détection et calcul des dons
+            if (afficherDons && estUnDon(article.nom)) {
+              totalDons += qte * prix;
+            }
+
+            // TVA ventilation (articles non offerts seulement)
+            if (!article.offert && tvaActif) {
+              const tvaRate = getArticleTvaRateForRapport(article.nom);
+              if (tvaRate >= 0) {
+                const prixLigne = qte * prix;
+                const base = prixLigne / (1 + tvaRate / 100);
+                const montantTva = prixLigne - base;
+                const key = tvaRate.toFixed(0);
+                if (!tvaVentilation[key]) tvaVentilation[key] = { base: 0, tva: 0, total: 0 };
+                tvaVentilation[key].base += base;
+                tvaVentilation[key].tva += montantTva;
+                tvaVentilation[key].total += prixLigne;
+              }
+            }
+          });
+        }
+      });
+
+      if (type === "X") {
+        numX++;
+        localStorage.setItem("numX", numX);
+        syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+      } else if (type === "Z") {
+        numZ++;
+        localStorage.setItem("numZ", numZ);
+        syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+
+        if (Array.isArray(tables)) {
+          tables.forEach(t => {
+            t.ticketId = null;
+            if (t.id) t.nom = "Table " + t.id;
+          });
+          localStorage.setItem("tables", JSON.stringify(tables));
+          syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+        }
+        
+        localStorage.setItem("lastZCloture", JSON.stringify({
+          date: dateCloture,
+          heure: heureCloture,
+          iso: now.toISOString()
+        }));
+      }
+
+      // Calcul du CA
+      const caGlobal = totalEspeces + totalBanque;
+      let caNet = caGlobal;
+      if (afficherDons) {
+        caNet -= totalDons; // CA Net = CA Global - Dons
+      }
+
+      const rapport = {
+        type,
+        numero: (type === "X" ? numX : numZ),
+        entreprise,
+        utilisateur: utilisateurNom,
+        dateOuverture: heureOuvertureAffichee.toLocaleDateString('fr-FR'),
+        heureOuverture: heureOuvertureAffichee.toLocaleTimeString('fr-FR'),
+        isoOuverture: safeISO(startTime),
+        dateCloture,
+        heureCloture,
+        isoCloture: now.toISOString(),
+        fondCaisse: 250,
+        totalEspeces,
+        totalBanque,
+        totalGlobal: 250 + totalEspeces + totalBanque,
+        caGlobal: caGlobal, // Nouveau: CA avant déduction dons
+        ca: caNet, // CA Net (après déduction dons si activé)
+        totalArticles,
+        totalOfferts,
+        articlesOfferts: articlesOfferts, // ✅ NOUVEAU: Liste des articles offerts
+        totalDons: afficherDons ? totalDons : 0,
+        donsEspeces: afficherDons ? donsEspeces : 0,
+        donsBanque: afficherDons ? donsBanque : 0,
+        afficherDons: afficherDons,
+        categories: categoriesRapport,
+        nbTickets: ticketsInclus.length,
+        nbTicketsActifs: ticketsActifs.length,
+        membresBanque: inclureMembresBanque ? membresBanque : {},
+        inclureMembresBanque: inclureMembresBanque,
+        tvaActif: tvaActif,
+        tvaVentilation: tvaActif ? tvaVentilation : {}
+      };
+
+      rapports.push(rapport);
+      localStorage.setItem("rapports", JSON.stringify(rapports));
+      declencherSauvegardeAutoRapports();
+      syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+
+      showMessage(`✔ Rapport ${type}-${rapport.numero} généré avec succès !`, 'success');
+      renderRapports();
+      exportPDF(rapport);
+      // Actualiser automatiquement CA et tickets en cours après génération
+      actualiserCAJour();
+      actualiserTicketsEnCours();
+    }
+
+    function enregistrerMembreBanque(ticket, montant, membresBanque) {
+      const membreKey = (ticket.membreId && ticket.membreNom && ticket.membrePrenom) 
+        ? `${ticket.membrePrenom} ${ticket.membreNom}` 
+        : `Ticket #${ticket.numero || ticket.id}`; // Utiliser numero pour l'affichage
+      
+      if (!membresBanque[membreKey]) {
+        membresBanque[membreKey] = { montant: 0, nb: 0 };
+      }
+      membresBanque[membreKey].montant += montant;
+      membresBanque[membreKey].nb += 1;
+    }
+
+    function traiterArticle(article, categoriesRapport, articlesOfferts = null) {
+      // Si l'article est offert et qu'on a un objet pour les stocker
+      if (article.offert && articlesOfferts !== null) {
+        if (!articlesOfferts[article.nom]) {
+          articlesOfferts[article.nom] = { qte: 0, prixOriginal: 0 };
+        }
+        const qte = parseFloat(article.qte) || 0;
+        const prixOriginal = parseFloat(article.prixOriginal) || parseFloat(article.prix) || 0;
+        articlesOfferts[article.nom].qte += qte;
+        articlesOfferts[article.nom].prixOriginal = prixOriginal; // Garder le prix unitaire
+        return; // Ne pas traiter dans les catégories normales
+      }
+      
+      // Traitement normal pour les articles non offerts
+      const cat = getArticleCategorie(article.nom);
+      
+      if (!categoriesRapport[cat]) {
+        categoriesRapport[cat] = {};
+      }
+      
+      if (!categoriesRapport[cat][article.nom]) {
+        categoriesRapport[cat][article.nom] = { qte: 0, total: 0 };
+      }
+      
+      const qte = parseFloat(article.qte) || 0;
+      const prix = parseFloat(article.prix) || 0;
+      
+      categoriesRapport[cat][article.nom].qte += qte;
+      categoriesRapport[cat][article.nom].total += qte * prix;
+    }
+
+    // ===========================
+    // EXPORT PDF
+    // ===========================
+    
+    function exportPDF(rapport, estCopie = false) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(12);
+
+      let y = 10;
+      
+      doc.setFontSize(16);
+      doc.text(estCopie ? `COPIE - RAPPORT ${rapport.type}-${rapport.numero}` : `RAPPORT ${rapport.type}-${rapport.numero}`, 10, y);
+      y += 10;
+      
+      doc.setFontSize(12);
+      doc.text(rapport.entreprise.nom, 10, y); y += 6;
+      doc.text(rapport.entreprise.adresse, 10, y); y += 6;
+      doc.text(rapport.entreprise.localite, 10, y); y += 6;
+      doc.text(`N°: ${rapport.entreprise.num}`, 10, y); y += 6;
+      doc.text(`Utilisateur: ${rapport.utilisateur || "N/A"}`, 10, y); y += 8;
+      
+      doc.text(`Ouverture: ${rapport.dateOuverture} ${rapport.heureOuverture}`, 10, y); y += 6;
+      doc.text(`Cloture: ${rapport.dateCloture} ${rapport.heureCloture}`, 10, y); y += 10;
+      
+      doc.text(`Fond de caisse: ${rapport.fondCaisse.toFixed(2)} EUR`, 10, y); y += 6;
+      doc.text(`Total especes: ${rapport.totalEspeces.toFixed(2)} EUR`, 10, y); y += 6;
+      doc.text(`Total banque: ${rapport.totalBanque.toFixed(2)} EUR`, 10, y); y += 6;
+      doc.text(`Total global: ${rapport.totalGlobal.toFixed(2)} EUR`, 10, y); y += 6;
+      doc.text(`C.A. Global: ${(rapport.caGlobal || rapport.ca).toFixed(2)} EUR`, 10, y); y += 6;
+      
+      // Affichage des dons si activé
+      if (rapport.afficherDons && rapport.totalDons > 0) {
+        doc.text(`Total dons: ${rapport.totalDons.toFixed(2)} EUR`, 10, y); y += 6;
+        if (rapport.donsEspeces > 0) {
+          doc.text(`  - Dons especes: ${rapport.donsEspeces.toFixed(2)} EUR`, 14, y); y += 6;
+          doc.text(`  - Especes hors dons: ${(rapport.totalEspeces - rapport.donsEspeces).toFixed(2)} EUR`, 14, y); y += 6;
+        }
+        if (rapport.donsBanque > 0) {
+          doc.text(`  - Dons banque: ${rapport.donsBanque.toFixed(2)} EUR`, 14, y); y += 6;
+          doc.text(`  - Banque hors dons: ${(rapport.totalBanque - rapport.donsBanque).toFixed(2)} EUR`, 14, y); y += 6;
+        }
+        doc.text(`C.A. Net: ${rapport.ca.toFixed(2)} EUR`, 10, y); y += 6;
+      }
+      doc.text(`Articles vendus: ${rapport.totalArticles}`, 10, y); y += 6;
+      doc.text(`Tickets payes: ${rapport.nbTickets || 0}`, 10, y); y += 6;
+      doc.text(`Tickets actifs: ${rapport.nbTicketsActifs || 0}`, 10, y); y += 6;
+      doc.text(`Offerts: ${rapport.totalOfferts.toFixed(2)} EUR`, 10, y); y += 10;
+
+      // TVA ventilation dans le PDF
+      if (rapport.tvaActif && rapport.tvaVentilation && Object.keys(rapport.tvaVentilation).length > 0) {
+        if (y > 250) { doc.addPage(); y = 20; }
+        doc.text("--- Ventilation TVA ---", 10, y); y += 6;
+        let totHTVA = 0, totTVA = 0;
+        Object.keys(rapport.tvaVentilation).sort((a,b)=>parseFloat(a)-parseFloat(b)).forEach(k => {
+          if (y > 270) { doc.addPage(); y = 20; }
+          const v = rapport.tvaVentilation[k];
+          totHTVA += v.base; totTVA += v.tva;
+          doc.text(`  TVA ${k}% : base ${v.base.toFixed(2)} EUR | TVA ${v.tva.toFixed(2)} EUR | TVAC ${v.total.toFixed(2)} EUR`, 10, y); y += 6;
+        });
+        doc.text(`  TOTAL HTVA: ${totHTVA.toFixed(2)} EUR | TOTAL TVA: ${totTVA.toFixed(2)} EUR`, 10, y); y += 10;
+      }
+      
+      for (let cat in rapport.categories) {
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.text(cat, 10, y); y += 6;
+        
+        for (let art in rapport.categories[cat]) {
+          if (y > 270) { doc.addPage(); y = 20; }
+          let obj = rapport.categories[cat][art];
+          doc.text(`  ${art} (${obj.qte}) : ${obj.total.toFixed(2)} EUR`, 14, y);
+          y += 6;
+        }
+      }
+
+      // ✅ NOUVEAU: Section OFFERTS
+      if (rapport.articlesOfferts && Object.keys(rapport.articlesOfferts).length > 0) {
+        if (y > 250) { doc.addPage(); y = 20; }
+        y += 6;
+        doc.text("=== OFFERTS ===", 10, y); y += 6;
+        
+        for (let art in rapport.articlesOfferts) {
+          if (y > 270) { doc.addPage(); y = 20; }
+          let obj = rapport.articlesOfferts[art];
+          let totalArticle = obj.qte * obj.prixOriginal;
+          doc.text(`  ${art} (${obj.qte}) x ${obj.prixOriginal.toFixed(2)} EUR = ${totalArticle.toFixed(2)} EUR`, 14, y);
+          y += 6;
+        }
+      }
+
+      // Affichage des membres banque si activé
+      if (rapport.inclureMembresBanque && rapport.membresBanque && Object.keys(rapport.membresBanque).length > 0) {
+        if (y > 250) { doc.addPage(); y = 20; }
+        y += 6;
+        doc.text("--- Membres - Paiements Banque ---", 10, y); y += 6;
+        
+        for (let membre in rapport.membresBanque) {
+          if (y > 270) { doc.addPage(); y = 20; }
+          const mb = rapport.membresBanque[membre];
+          const montantMb = typeof mb === 'object' ? (mb.montant || 0) : (mb || 0);
+          const nbMb = typeof mb === 'object' ? (mb.nb || 1) : 1;
+          doc.text(`  ${membre} (${nbMb} pmt) : ${montantMb.toFixed(2)} EUR`, 14, y);
+          y += 6;
+        }
+      }
+
+      const prefixeFichier = estCopie ? 'COPIE_rapport' : 'rapport';
+      doc.save(`${prefixeFichier}_${rapport.type}_${rapport.numero}_${rapport.dateCloture.replace(/\//g, '-')}.pdf`);
+    }
+
+    // ===========================
+    // IMPRESSION THERMIQUE
+    // ===========================
+    
+// ===========================
+// IMPRESSION THERMIQUE
+// ===========================
+
+function normaliserMembresBanque(membresBanque) {
+  // Compat : anciens rapports où chaque membre était stocké comme un simple
+  // nombre au lieu d'un objet {montant, nb} → évite de casser le serveur
+  // d'impression thermique (voir aussi exportPDF plus haut).
+  const source = membresBanque || {};
+  const result = {};
+  for (const membreNom in source) {
+    const val = source[membreNom];
+    if (val && typeof val === 'object') {
+      result[membreNom] = {
+        montant: parseFloat(val.montant) || 0,
+        nb: parseInt(val.nb, 10) || 0
+      };
+    } else {
+      result[membreNom] = { montant: parseFloat(val) || 0, nb: 1 };
+    }
+  }
+  return result;
+}
+
+async function printThermal(rapport, estCopie = false) {
+  try {
+    // 🔄 Relire les options actuelles de la page
+    const inclureMembresBanqueActuel = document.getElementById('optionMembresBanque').checked;
+    const afficherDonsActuel = document.getElementById('optionDons').checked;
+
+    // Confirmation avant réimpression (copie)
+    if (estCopie) {
+      const ok = window.confirm(`Réimprimer le ${rapport.type}-${rapport.numero} en tant que COPIE ?`);
+      if (!ok) return;
+
+      // 📄 Générer aussi un PDF de cette copie
+      try {
+        exportPDF(rapport, true);
+      } catch (e) {
+        console.warn('⚠️ Génération PDF de la copie échouée :', e.message);
+      }
+    }
+
+    // Préparer les données à envoyer au serveur d’impression
+    const rapportData = {
+      type: rapport.type,
+      numero: rapport.numero,
+      estCopie: estCopie,
+      entreprise: rapport.entreprise,
+      utilisateur: rapport.utilisateur || "N/A",
+      dateOuverture: rapport.dateOuverture,
+      heureOuverture: rapport.heureOuverture,
+      dateCloture: rapport.dateCloture,
+      heureCloture: rapport.heureCloture,
+      fondCaisse: rapport.fondCaisse,
+      totalEspeces: rapport.totalEspeces,
+      totalBanque: rapport.totalBanque,
+      totalGlobal: rapport.totalGlobal,
+      caGlobal: rapport.caGlobal || rapport.ca,
+      ca: rapport.ca,
+      totalArticles: rapport.totalArticles,
+      nbTickets: rapport.nbTickets || 0,
+      nbTicketsActifs: rapport.nbTicketsActifs || 0,
+      totalOfferts: rapport.totalOfferts,
+      totalDons: afficherDonsActuel ? (rapport.totalDons || 0) : 0,
+      donsEspeces: afficherDonsActuel ? (rapport.donsEspeces || 0) : 0,
+      donsBanque: afficherDonsActuel ? (rapport.donsBanque || 0) : 0,
+      afficherDons: afficherDonsActuel,
+      categories: rapport.categories,
+      membresBanque: inclureMembresBanqueActuel ? normaliserMembresBanque(rapport.membresBanque) : {},
+      inclureMembresBanque: inclureMembresBanqueActuel
+    };
+
+    // 🔸 Envoi au serveur d'impression thermique
+    const response = await fetch('http://localhost:8088/print-rapport', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rapportData)
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showMessage(estCopie ? '✔ Copie du Z réimprimée avec succès !' : '✔ Rapport imprimé avec succès !', 'success');
+    } else {
+      showMessage('✗ Erreur d\'impression', 'error');
+    }
+  } catch (error) {
+    console.error('Erreur:', error);
+    showMessage(`✗ Serveur d'impression non disponible (${error.message})`, 'error');
+  }
+}
+
+    // ===========================
+    // IMPORT / EXPORT
+    // ===========================
+    
+    function exportJSON() {
+      const data = JSON.stringify(rapports, null, 2);
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `rapports_export_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showMessage('✔ Export JSON réussi !', 'success');
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (Array.isArray(data)) {
+            rapports = data;
+            localStorage.setItem("rapports", JSON.stringify(rapports));
+            declencherSauvegardeAutoRapports();
+            syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+            recalculerNumeros();
+            renderRapports();
+            showMessage('✔ Import JSON réussi !', 'success');
+          } else {
+            showMessage('✗ Fichier JSON invalide', 'error');
+          }
+        } catch (error) {
+          console.error('Erreur import:', error);
+          showMessage('✗ Erreur lors de l\'import', 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // ===========================
+    // PAGINATION
+    // ===========================
+    
+    function changePage(page) {
+      const totalPages = Math.ceil(rapports.length / itemsPerPage);
+      
+      if (page < 1 || page > totalPages) return;
+      
+      currentPage = page;
+      renderRapports();
+    }
+
+    function updatePagination() {
+      const paginationContainer = document.getElementById('paginationContainer');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const pageInfo = document.getElementById('pageInfo');
+      
+      const totalPages = Math.ceil(rapports.length / itemsPerPage);
+      
+      if (rapports.length <= itemsPerPage) {
+        paginationContainer.style.display = 'none';
+        return;
+      }
+      
+      paginationContainer.style.display = 'flex';
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages;
+      pageInfo.textContent = `Page ${currentPage} sur ${totalPages}`;
+    }
+
+    // ===========================
+    // AFFICHAGE
+    // ===========================
+    
+    function renderRapports() {
+      const grid = document.getElementById("reportsGrid");
+      grid.innerHTML = "";
+      
+      if (rapports.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h3>Aucun rapport disponible</h3>
+            <p>Générez votre premier rapport X ou clôturez une journée avec un rapport Z</p>
+          </div>
+        `;
+        document.getElementById('paginationContainer').style.display = 'none';
+        return;
+      }
+      
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const rapportsToShow = rapports.slice(startIndex, endIndex);
+      
+      rapportsToShow.forEach((rapport, i) => {
+        const globalIndex = startIndex + i;
+        const card = document.createElement("div");
+        card.className = "report-card";
+        card.setAttribute('data-type', rapport.type);
+        
+        const nbMembresBanque = rapport.membresBanque ? Object.keys(rapport.membresBanque).length : 0;
+        
+        let donsHTML = '';
+        if (rapport.afficherDons && rapport.totalDons > 0) {
+          let detailDons = '';
+          if (rapport.donsEspeces > 0 || rapport.donsBanque > 0) {
+            detailDons = '<div style="font-size: 0.85em; margin-left: 20px;">';
+            if (rapport.donsEspeces > 0) {
+              detailDons += `💵 Espèces: ${rapport.donsEspeces.toFixed(2)} €<br>`;
+            }
+            if (rapport.donsBanque > 0) {
+              detailDons += `💳 Banque: ${rapport.donsBanque.toFixed(2)} €`;
+            }
+            detailDons += '</div>';
+          }
+          donsHTML = `
+            <div class="info-line">
+              <span class="label">🎁 Total dons:</span>
+              <span class="value">${rapport.totalDons.toFixed(2)} €</span>
+            </div>
+            ${detailDons}
+          `;
+        }
+        
+        card.innerHTML = `
+          <h3>📊 Rapport ${rapport.type}-${rapport.numero}</h3>
+          
+          <div class="info-line">
+            <span class="label">👤 Utilisateur:</span>
+            <span class="value">${rapport.utilisateur || "N/A"}</span>
+          </div>
+          
+          <div class="info-line">
+            <span class="label">🕐 Ouverture:</span>
+            <span class="value">${rapport.dateOuverture} ${rapport.heureOuverture}</span>
+          </div>
+          
+          <div class="info-line">
+            <span class="label">🕐 Clôture:</span>
+            <span class="value">${rapport.dateCloture} ${rapport.heureCloture}</span>
+          </div>
+          
+          <div class="info-line">
+            <span class="label">💰 C.A. Global:</span>
+            <span class="value">${(rapport.caGlobal || rapport.ca).toFixed(2)} €</span>
+          </div>
+          
+          ${donsHTML}
+          
+          <div class="info-line">
+            <span class="label">💚 C.A. Net:</span>
+            <span class="value">${rapport.ca.toFixed(2)} €</span>
+          </div>
+          
+          <div class="info-line">
+            <span class="label">🛒 Articles vendus:</span>
+            <span class="value">${rapport.totalArticles}</span>
+          </div>
+          
+          <div class="info-line">
+            <span class="label">🎁 Offerts:</span>
+            <span class="value">${rapport.totalOfferts.toFixed(2)} €</span>
+          </div>
+          
+          <div class="info-line">
+            <span class="label">🎫 Tickets payés:</span>
+            <span class="value">${rapport.nbTickets}</span>
+          </div>
+          
+          <div class="info-line">
+            <span class="label">⏳ Tickets actifs:</span>
+            <span class="value">${rapport.nbTicketsActifs || 0}</span>
+          </div>
+          
+          <div class="info-line">
+            <span class="label">💳 Paiements banque:</span>
+            <span class="value">${nbMembresBanque}</span>
+          </div>
+          
+          ${(rapport.tvaActif && rapport.tvaVentilation && Object.keys(rapport.tvaVentilation).length > 0) ? `
+          <div class="info-line" style="flex-direction:column;align-items:flex-start;gap:4px;">
+            <span class="label">🧾 TVA ventilation:</span>
+            ${Object.keys(rapport.tvaVentilation).sort((a,b)=>parseFloat(a)-parseFloat(b)).map(k => {
+              const v = rapport.tvaVentilation[k];
+              return `<span class="value" style="font-size:.85em;color:var(--text3);">TVA ${k}% → HTVA: ${v.base.toFixed(2)} € | TVA: ${v.tva.toFixed(2)} €</span>`;
+            }).join('')}
+          </div>` : ''}
+          
+          <div class="report-actions">
+            <button class="btn-view" onclick="ouvrirModalRapportComplet(${globalIndex})" title="Voir l'entièreté du rapport">🔍 Voir</button>
+            <button class="btn-pdf" onclick="exportPDF(rapports[${globalIndex}])" title="Exporter en PDF">📄 PDF</button>
+            <button class="btn-thermal" onclick="printThermal(rapports[${globalIndex}])" title="Imprimer sur imprimante thermique">🖨 Thermique</button>
+            <button class="btn-thermal" onclick="printThermal(rapports[${globalIndex}], true)" title="Réimprimer ce Z (marqué comme copie)" style="background:linear-gradient(135deg,#e06820,#c0392b);">🔁 Réimprimer Z</button>
+            <button class="btn-delete" onclick="supprimerRapport(${globalIndex})" title="Supprimer ce rapport">🗑 Supprimer</button>
+          </div>
+        `;
+        
+        grid.appendChild(card);
+      });
+      
+      updatePagination();
+    }
+
+    function supprimerRapport(index) {
+      const r = rapports[index];
+      showConfirm({
+        icon: '🗑',
+        title: 'Mettre à la corbeille ?',
+        body: `Le rapport <strong>${r.type}-${r.numero}</strong> (${r.dateCloture}) sera déplacé dans la corbeille.<br><br>Vous pourrez le restaurer à tout moment.`,
+        confirmLabel: '🗑 Déplacer',
+        confirmClass: 'mcb-confirm',
+        onConfirm: () => {
+          const corbeille = JSON.parse(localStorage.getItem("corbeilleRapports")) || [];
+          r._dateSuppression = new Date().toLocaleString('fr-FR');
+          corbeille.unshift(r);
+          localStorage.setItem("corbeilleRapports", JSON.stringify(corbeille));
+          syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+          rapports.splice(index, 1);
+          localStorage.setItem("rapports", JSON.stringify(rapports));
+          declencherSauvegardeAutoRapports();
+          syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+          recalculerNumeros();
+          const totalPages = Math.ceil(rapports.length / itemsPerPage);
+          if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+          else if (rapports.length === 0) currentPage = 1;
+          renderRapports();
+          majBadgeCorbeille();
+          showMessage('🗑 Rapport déplacé à la corbeille', 'success');
+        }
+      });
+    }
+
+    // ===========================
+    // CORBEILLE
+    // ===========================
+
+    function majBadgeCorbeille() {
+      const corbeille = JSON.parse(localStorage.getItem("corbeilleRapports")) || [];
+      const badge = document.getElementById('corbeilleBadge');
+      if (badge) {
+        badge.textContent = corbeille.length;
+        badge.style.display = corbeille.length > 0 ? 'inline' : 'none';
+      }
+    }
+
+    function ouvrirCorbeille() {
+      renderCorbeille();
+      document.getElementById('modalCorbeille').style.display = 'block';
+    }
+
+    function fermerCorbeille() {
+      document.getElementById('modalCorbeille').style.display = 'none';
+    }
+
+    function renderCorbeille() {
+      const corbeille = JSON.parse(localStorage.getItem("corbeilleRapports")) || [];
+      const grid = document.getElementById('corbeilleGrid');
+
+      if (corbeille.length === 0) {
+        grid.innerHTML = `
+          <div class="corbeille-empty">
+            <div class="icon">🗑</div>
+            <p>La corbeille est vide</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = corbeille.map((r, i) => `
+        <div class="corbeille-card" id="corbeilleCard_${i}">
+          <div class="corbeille-card-info">
+            <div class="corbeille-card-title">📊 Rapport ${r.type}-${r.numero}</div>
+            <div class="corbeille-card-meta">
+              ${r.dateCloture} ${r.heureCloture} · CA: ${(r.ca || 0).toFixed(2)} € · ${r.nbTickets || 0} tickets
+            </div>
+            <div class="corbeille-card-date">🗑 Supprimé le ${r._dateSuppression || '—'}</div>
+          </div>
+          <div class="corbeille-card-actions">
+            <button class="btn-restore" onclick="restaurerRapport(${i})">↩ Restaurer</button>
+            <button class="btn-delete-perm" onclick="demanderSuppDefinitive(${i})">🔒 Supprimer</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function restaurerRapport(index) {
+      const corbeille = JSON.parse(localStorage.getItem("corbeilleRapports")) || [];
+      const rapport = corbeille[index];
+      delete rapport._dateSuppression;
+      rapports.push(rapport);
+      localStorage.setItem("rapports", JSON.stringify(rapports));
+      declencherSauvegardeAutoRapports();
+      syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+      corbeille.splice(index, 1);
+      localStorage.setItem("corbeilleRapports", JSON.stringify(corbeille));
+      syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+      recalculerNumeros();
+      renderRapports();
+      renderCorbeille();
+      majBadgeCorbeille();
+      showMessage('✅ Rapport restauré avec succès !', 'success');
+    }
+
+    // ===========================
+    // CODE PIN SUPPRESSION DÉFI.
+    // ===========================
+    let pinValue = '';
+    let pinTargetIndex = null;
+    const PIN_CODE = '0000';
+
+    function demanderSuppDefinitive(index) {
+      pinTargetIndex = index;
+      pinValue = '';
+      updatePinDots();
+      document.getElementById('pinOverlay').classList.add('open');
+    }
+
+    function fermerPin() {
+      pinValue = '';
+      pinTargetIndex = null;
+      document.getElementById('pinOverlay').classList.remove('open');
+      updatePinDots();
+    }
+
+    function pinKey(digit) {
+      if (pinValue.length >= 4) return;
+      pinValue += digit;
+      updatePinDots();
+      if (pinValue.length === 4) {
+        setTimeout(validerPin, 120);
+      }
+    }
+
+    function pinDel() {
+      pinValue = pinValue.slice(0, -1);
+      updatePinDots();
+    }
+
+    function pinClear() {
+      pinValue = '';
+      updatePinDots();
+    }
+
+    function updatePinDots(error = false) {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById('dot' + i);
+        dot.classList.remove('filled', 'error');
+        if (error) dot.classList.add('error');
+        else if (i < pinValue.length) dot.classList.add('filled');
+      }
+    }
+
+    function validerPin() {
+      if (pinValue === PIN_CODE) {
+        fermerPin();
+        const corbeille = JSON.parse(localStorage.getItem("corbeilleRapports")) || [];
+        corbeille.splice(pinTargetIndex, 1);
+        localStorage.setItem("corbeilleRapports", JSON.stringify(corbeille));
+        syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+        renderCorbeille();
+        majBadgeCorbeille();
+        showMessage('🗑 Rapport supprimé définitivement', 'success');
+      } else {
+        updatePinDots(true);
+        pinValue = '';
+        setTimeout(() => { pinValue = ''; updatePinDots(); }, 700);
+      }
+    }
+
+    function showMessage(text, type) {
+      const msg = document.createElement('div');
+      msg.className = `status-message status-${type}`;
+      msg.textContent = text;
+      document.body.appendChild(msg);
+
+      setTimeout(() => {
+        msg.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => msg.remove(), 300);
+      }, 3000);
+    }
+
+    // ===========================
+    // INITIALISATION
+    // ===========================
+    
+    recalculerNumeros();
+    renderRapports();
+    majBadgeCorbeille();
+
+    // ===========================
+    // MODAL PÉRIODE
+    // ===========================
+    
+    function ouvrirModalPeriode() {
+      const modal = document.getElementById('modalPeriode');
+      modal.style.display = 'block';
+      
+      // Définir la date d'aujourd'hui par défaut
+      const aujourdhui = new Date().toISOString().split('T')[0];
+      document.getElementById('dateFin').value = aujourdhui;
+      
+      // Définir la date de début à il y a 7 jours par défaut
+      const il7jours = new Date();
+      il7jours.setDate(il7jours.getDate() - 7);
+      document.getElementById('dateDebut').value = il7jours.toISOString().split('T')[0];
+    }
+
+    function fermerModalPeriode() {
+      const modal = document.getElementById('modalPeriode');
+      modal.style.display = 'none';
+    }
+
+    // Fermer le modal en cliquant en dehors
+    window.onclick = function(event) {
+      const modal = document.getElementById('modalPeriode');
+      if (event.target === modal) {
+        fermerModalPeriode();
+      }
+    }
+
+    async function genererRapportPeriode() {
+      const typeRapport = document.getElementById('typeRapport').value;
+      const dateDebut = document.getElementById('dateDebut').value;
+      const dateFin = document.getElementById('dateFin').value;
+
+      if (!dateDebut || !dateFin) {
+        showMessage('⚠ Veuillez sélectionner les deux dates', 'error');
+        return;
+      }
+
+      if (new Date(dateDebut) > new Date(dateFin)) {
+        showMessage('⚠ La date de début doit être avant la date de fin', 'error');
+        return;
+      }
+
+      // Récupérer les options actuelles
+      const inclureMembresBanque = document.getElementById('optionMembresBanque').checked;
+      const afficherDons = document.getElementById('optionDons').checked;
+
+      // Créer les dates de début et fin avec les heures
+      const startTime = new Date(dateDebut);
+      startTime.setHours(0, 0, 0, 0);
+      
+      const endTime = new Date(dateFin);
+      endTime.setHours(23, 59, 59, 999);
+
+      let utilisateurNom = "Période personnalisée";
+      if (loginHistory.length > 0) {
+        const lastLogin = loginHistory[loginHistory.length - 1];
+        utilisateurNom = lastLogin.user || lastLogin.nom || "Utilisateur";
+      }
+
+      // Initialiser les totaux
+      let totalEspeces = 0;
+      let totalBanque = 0;
+      let totalOfferts = 0;
+      let totalArticles = 0;
+      let totalDons = 0;
+      let categoriesRapport = {};
+      let membresBanque = {};
+
+      // Filtrer les tickets dans la période choisie
+      const ticketsInclus = ticketsHistorique.filter(t => {
+        const paiementDate = parseTicketDate(t);
+        return paiementDate >= startTime && paiementDate <= endTime;
+      });
+
+      // Traiter les tickets payés
+      // Variables pour les dons par mode de paiement
+      let donsEspeces = 0;
+      let donsBanque = 0;
+
+      ticketsInclus.forEach(ticket => {
+        // ⭐ FIX: Recalculer le total pour s'assurer que les dons sont inclus
+        const total = calculerTotalTicketAvecDons(ticket);
+        
+        // Calculer les dons dans ce ticket
+        let donsTicket = 0;
+        if (afficherDons && Array.isArray(ticket.articles)) {
+          ticket.articles.forEach(article => {
+            if (estUnDon(article.nom)) {
+              const qte = parseFloat(article.qte) || 0;
+              const prix = parseFloat(article.prix) || 0;
+              donsTicket += qte * prix;
+            }
+          });
+        }
+        
+        if (ticket.modePaiement === "especes") {
+          totalEspeces += total;
+          donsEspeces += donsTicket;
+        }
+        
+        if (ticket.modePaiement === "banque") {
+          totalBanque += total;
+          donsBanque += donsTicket;
+          if (inclureMembresBanque) {
+            enregistrerMembreBanque(ticket, total, membresBanque);
+          }
+        }
+        
+        if (ticket.modePaiement === "mixte") {
+          const montantEspecesMixte = parseFloat(ticket.montantEspeces) || 0;
+          const montantBanqueMixte = parseFloat(ticket.montantBanque) || 0;
+          totalEspeces += montantEspecesMixte;
+          totalBanque += montantBanqueMixte;
+          
+          // Répartir les dons au prorata pour le mode mixte
+          if (donsTicket > 0 && total > 0) {
+            const proportionEspeces = montantEspecesMixte / total;
+            const proportionBanque = montantBanqueMixte / total;
+            donsEspeces += donsTicket * proportionEspeces;
+            donsBanque += donsTicket * proportionBanque;
+          }
+          
+          if (montantBanqueMixte > 0 && inclureMembresBanque) {
+            enregistrerMembreBanque(ticket, montantBanqueMixte, membresBanque);
+          }
+        }
+
+        if (Array.isArray(ticket.articles)) {
+          ticket.articles.forEach(article => {
+            traiterArticle(article, categoriesRapport);
+            const qte = parseFloat(article.qte) || 0;
+            const prix = parseFloat(article.prix) || 0;
+            totalArticles += qte;
+            
+            if (article.offert) {
+              totalOfferts += qte * prix;
+            }
+
+            if (afficherDons && estUnDon(article.nom)) {
+              totalDons += qte * prix;
+            }
+          });
+        }
+      });
+
+      // Calculer le CA
+      const caGlobal = totalEspeces + totalBanque;
+      let caNet = caGlobal;
+      if (afficherDons) {
+        caNet -= totalDons;
+      }
+
+      // Mettre à jour les numéros selon le type AVANT de créer le rapport
+      if (typeRapport === "X") {
+        numX++;
+        localStorage.setItem("numX", numX);
+        syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+      } else if (typeRapport === "Z") {
+        numZ++;
+        localStorage.setItem("numZ", numZ);
+        syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+      }
+
+      // Créer le rapport
+      const rapport = {
+        type: typeRapport,
+        numero: (typeRapport === "X" ? numX : numZ),
+        entreprise,
+        utilisateur: utilisateurNom,
+        dateOuverture: startTime.toLocaleDateString('fr-FR'),
+        heureOuverture: startTime.toLocaleTimeString('fr-FR'),
+        isoOuverture: safeISO(startTime),
+        dateCloture: endTime.toLocaleDateString('fr-FR'),
+        heureCloture: endTime.toLocaleTimeString('fr-FR'),
+        isoCloture: safeISO(endTime),
+        fondCaisse: 250,
+        totalEspeces,
+        totalBanque,
+        totalGlobal: 250 + totalEspeces + totalBanque,
+        caGlobal: caGlobal,
+        ca: caNet,
+        totalArticles,
+        totalOfferts,
+        totalDons: afficherDons ? totalDons : 0,
+        donsEspeces: afficherDons ? donsEspeces : 0,
+        donsBanque: afficherDons ? donsBanque : 0,
+        afficherDons: afficherDons,
+        categories: categoriesRapport,
+        nbTickets: ticketsInclus.length,
+        nbTicketsActifs: 0,
+        membresBanque: inclureMembresBanque ? membresBanque : {},
+        inclureMembresBanque: inclureMembresBanque
+      };
+
+      // Sauvegarder le rapport
+      rapports.push(rapport);
+      localStorage.setItem("rapports", JSON.stringify(rapports));
+      declencherSauvegardeAutoRapports();
+      syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+
+      fermerModalPeriode();
+      showMessage(`✔ Rapport ${typeRapport}-${rapport.numero} généré avec succès !`, 'success');
+      renderRapports();
+      exportPDF(rapport);
+    }
+
+    // ===========================
+    // FONCTION DE CORRECTION DES TOTAUX
+    // ===========================
+    
+    function diagnostiquerDons() {
+      console.clear();
+      console.log("=== DIAGNOSTIC DES DONS ===\n");
+      
+      let ticketsAvecDons = [];
+      
+      ticketsHistorique.forEach((ticket, index) => {
+        if (Array.isArray(ticket.articles)) {
+          let donsTicket = [];
+          let totalTicket = 0;
+          let totalDons = 0;
+          
+          ticket.articles.forEach(article => {
+            const prix = parseFloat(article.prix) || 0;
+            const qte = parseFloat(article.qte) || 0;
+            const sousTotal = prix * qte;
+            totalTicket += sousTotal;
+            
+            if (estUnDon(article.nom)) {
+              totalDons += sousTotal;
+              donsTicket.push({
+                nom: article.nom,
+                prix: prix,
+                qte: qte,
+                sousTotal: sousTotal,
+                offert: article.offert || false
+              });
+            }
+          });
+          
+          if (donsTicket.length > 0) {
+            ticketsAvecDons.push({
+              ticketId: ticket.id || ticket.numero,
+              date: ticket.datePaiement || ticket.date,
+              totalSauvegarde: parseFloat(ticket.total) || 0,
+              totalCalcule: totalTicket,
+              totalDons: totalDons,
+              dons: donsTicket,
+              modePaiement: ticket.modePaiement
+            });
+          }
+        }
+      });
+      
+      console.log(`Trouvé ${ticketsAvecDons.length} ticket(s) avec des dons\n`);
+      
+      ticketsAvecDons.forEach((t, i) => {
+        console.log(`--- Ticket #${i + 1} (ID: ${t.ticketId}) ---`);
+        console.log(`Date: ${t.date}`);
+        console.log(`Mode paiement: ${t.modePaiement}`);
+        console.log(`Total sauvegardé: ${t.totalSauvegarde.toFixed(2)}€`);
+        console.log(`Total calculé: ${t.totalCalcule.toFixed(2)}€`);
+        console.log(`Différence: ${(t.totalCalcule - t.totalSauvegarde).toFixed(2)}€`);
+        console.log(`Dons dans ce ticket:`);
+        t.dons.forEach(don => {
+          console.log(`  - ${don.nom}: ${don.qte} × ${don.prix.toFixed(2)}€ = ${don.sousTotal.toFixed(2)}€ ${don.offert ? '(🎁 OFFERT)' : ''}`);
+        });
+        console.log(`Total dons: ${t.totalDons.toFixed(2)}€\n`);
+      });
+      
+      const totalDonsTousTickets = ticketsAvecDons.reduce((sum, t) => sum + t.totalDons, 0);
+      const totalManquant = ticketsAvecDons.reduce((sum, t) => sum + (t.totalCalcule - t.totalSauvegarde), 0);
+
+      // Construire le contenu HTML du diagnostic
+      let html = '';
+      if (ticketsAvecDons.length === 0) {
+        html = `<div class="modal-custom-body">Aucun ticket avec des dons trouvé dans l'historique.</div>`;
+      } else {
+        html += `<div class="diag-summary">
+          🎫 <strong>${ticketsAvecDons.length}</strong> ticket(s) avec dons &nbsp;·&nbsp;
+          💰 Total dons : <strong>${totalDonsTousTickets.toFixed(2)} €</strong>
+          ${totalManquant !== 0 ? `&nbsp;·&nbsp; ⚠️ Manquant : <strong>${totalManquant.toFixed(2)} €</strong>` : '&nbsp;·&nbsp; ✅ Aucun écart'}
+        </div>
+        <div class="diag-list">`;
+        ticketsAvecDons.forEach(t => {
+          const diff = t.totalCalcule - t.totalSauvegarde;
+          html += `<div class="diag-item">
+            <div class="diag-item-title">🎫 Ticket #${t.ticketId} — ${t.date || '—'}</div>
+            <div class="diag-item-row"><span>Mode paiement</span><span>${t.modePaiement || '—'}</span></div>
+            <div class="diag-item-row"><span>Total sauvegardé</span><span>${t.totalSauvegarde.toFixed(2)} €</span></div>
+            <div class="diag-item-row"><span>Total calculé</span><span>${t.totalCalcule.toFixed(2)} €</span></div>
+            ${Math.abs(diff) > 0.01 ? `<div class="diag-item-row" style="color:var(--red);font-weight:800"><span>Écart</span><span>${diff > 0 ? '+' : ''}${diff.toFixed(2)} €</span></div>` : ''}
+            <div style="margin-top:6px;font-size:0.85em;color:var(--text3);font-weight:700;">Dons :</div>
+            ${t.dons.map(d => `<div class="diag-don-line">• ${d.nom} : ${d.qte} × ${d.prix.toFixed(2)} € = ${d.sousTotal.toFixed(2)} € ${d.offert ? '🎁' : ''}</div>`).join('')}
+          </div>`;
+        });
+        html += `</div>`;
+      }
+
+      document.getElementById('modalDiagContent').innerHTML = html;
+      document.getElementById('modalDiag').classList.add('open');
+    }
+    
+    function recalculerTotauxTickets() {
+      showConfirm({
+        icon: '🔧',
+        title: 'Recalculer les tickets ?',
+        body: `Cette opération va recalculer les totaux de <strong>tous les tickets</strong> dans l'historique en se basant sur leurs articles.<br><br><span class="highlight-warn">⚠️ Cette action est IRRÉVERSIBLE</span>`,
+        confirmLabel: '🔧 Recalculer',
+        confirmClass: 'mcb-confirm',
+        onConfirm: () => {
+          let ticketsModifies = 0;
+          let totalAjuste = 0;
+          ticketsHistorique.forEach(ticket => {
+            if (Array.isArray(ticket.articles) && ticket.articles.length > 0) {
+              const totalCalcule = ticket.articles.reduce((sum, article) => {
+                const prix = parseFloat(article.prix) || 0;
+                const qte = parseFloat(article.qte) || 0;
+                return sum + (prix * qte);
+              }, 0);
+              const ancienTotal = parseFloat(ticket.total) || 0;
+              if (Math.abs(totalCalcule - ancienTotal) > 0.01) {
+                totalAjuste += totalCalcule - ancienTotal;
+                ticket.total = totalCalcule;
+                ticketsModifies++;
+              }
+            }
+          });
+          if (ticketsModifies > 0) {
+            localStorage.setItem("ticketsHistorique", JSON.stringify(ticketsHistorique));
+            syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+            showMessage(`✅ ${ticketsModifies} ticket(s) corrigé(s) !`, 'success');
+            showAlert({
+              icon: '🎉',
+              title: 'Correction terminée !',
+              body: `<span class="highlight-ok">✅ ${ticketsModifies} ticket(s) corrigé(s)</span><br><br>💰 Total ajusté : <strong>${totalAjuste > 0 ? '+' : ''}${totalAjuste.toFixed(2)} €</strong><br><br>Vous pouvez maintenant régénérer vos rapports.`
+            });
+          } else {
+            showMessage('✓ Tous les tickets sont déjà corrects !', 'success');
+          }
+        }
+      });
+    }
+
+    // ===========================
+    // RECALCULER TOUS LES RAPPORTS
+    // ===========================
+    
+    function recalculerTousLesRapports() {
+      showConfirm({
+        icon: '♻️',
+        title: 'Recalculer tous les rapports ?',
+        body: `Cette opération va recalculer <strong>tous vos rapports X et Z</strong> à partir des tickets actuels.<br><br>
+          <span class="highlight-ok">✅ Garde les mêmes numéros</span><br>
+          <span class="highlight-ok">✅ Met à jour tous les montants</span><br><br>
+          <span class="highlight-warn">⚠️ Cette action est IRRÉVERSIBLE</span>`,
+        confirmLabel: '♻️ Recalculer',
+        confirmClass: 'mcb-confirm-blue',
+        onConfirm: () => {
+          const inclureMembresBanque = document.getElementById('optionMembresBanque').checked;
+          const afficherDons = document.getElementById('optionDons').checked;
+          let rapportsModifies = 0;
+
+          rapports.forEach((rapport, index) => {
+            const startTime = new Date(rapport.isoOuverture || rapport.dateOuverture);
+            const endTime = new Date(rapport.isoCloture || rapport.dateCloture);
+            let totalEspeces = 0, totalBanque = 0, totalArticles = 0, totalOfferts = 0,
+                totalDons = 0, donsEspeces = 0, donsBanque = 0, nbTickets = 0, nbTicketsActifs = 0;
+            let categoriesRapport = {}, membresBanque = {};
+
+            // Reprendre la logique de calcul existante
+            const ticketsRapport = ticketsHistorique.filter(ticket => {
+              const d = parseTicketDate(ticket);
+              return d >= startTime && d <= endTime;
+            });
+
+            ticketsRapport.forEach(ticket => {
+              // FIX: calculerTotalTicketAvecDons retourne un nombre, pas un objet
+              const total = calculerTotalTicketAvecDons(ticket);
+              // Calculer les dons séparément depuis les articles
+              let donsTicket = 0;
+              if (afficherDons && Array.isArray(ticket.articles)) {
+                ticket.articles.forEach(article => {
+                  if (estUnDon(article.nom || '')) {
+                    const qte = parseFloat(article.qte) || 0;
+                    const prix = parseFloat(article.prix) || 0;
+                    donsTicket += qte * prix;
+                  }
+                });
+              }
+              nbTickets++;
+              if (ticket.modePaiement === "especes") { totalEspeces += total; donsEspeces += donsTicket; }
+              if (ticket.modePaiement === "banque") {
+                totalBanque += total; donsBanque += donsTicket;
+                if (inclureMembresBanque) enregistrerMembreBanque(ticket, total, membresBanque);
+              }
+              if (ticket.modePaiement === "mixte") {
+                const me = parseFloat(ticket.montantEspeces) || 0;
+                const mb = parseFloat(ticket.montantBanque) || 0;
+                totalEspeces += me; totalBanque += mb;
+                if (donsTicket > 0 && total > 0) {
+                  donsEspeces += donsTicket * (me / total);
+                  donsBanque += donsTicket * (mb / total);
+                }
+                if (mb > 0 && inclureMembresBanque) enregistrerMembreBanque(ticket, mb, membresBanque);
+              }
+              if (Array.isArray(ticket.articles)) {
+                ticket.articles.forEach(article => {
+                  traiterArticle(article, categoriesRapport);
+                  const qte = parseFloat(article.qte) || 0;
+                  const prix = parseFloat(article.prix) || 0;
+                  totalArticles += qte;
+                  if (article.offert) totalOfferts += qte * prix;
+                  if (afficherDons && estUnDon(article.nom)) totalDons += qte * prix;
+                });
+              }
+            });
+
+            const caGlobal = totalEspeces + totalBanque;
+            let caNet = caGlobal;
+            if (afficherDons) caNet -= totalDons;
+
+            const ancienCA = rapport.ca || 0;
+            if (Math.abs(caNet - ancienCA) > 0.01 || ticketsRapport.length !== rapport.nbTickets) {
+              rapportsModifies++;
+            }
+
+            rapport.totalEspeces = totalEspeces; rapport.totalBanque = totalBanque;
+            rapport.caGlobal = caGlobal; rapport.ca = caNet;
+            rapport.totalArticles = totalArticles; rapport.totalOfferts = totalOfferts;
+            rapport.nbTickets = nbTickets; rapport.nbTicketsActifs = nbTicketsActifs;
+            rapport.totalDons = totalDons; rapport.donsEspeces = donsEspeces; rapport.donsBanque = donsBanque;
+            rapport.afficherDons = afficherDons;
+            rapport.categories = categoriesRapport;
+            rapport.membresBanque = inclureMembresBanque ? membresBanque : {};
+            rapport.inclureMembresBanque = inclureMembresBanque;
+          });
+
+          localStorage.setItem("rapports", JSON.stringify(rapports));
+          declencherSauvegardeAutoRapports();
+          syncToServer("rapports", "corbeilleRapports", "numX", "numZ", "lastZCloture", "ticketsHistorique", "tables", "tickets");
+          renderRapports();
+
+          if (rapportsModifies > 0) {
+            showMessage(`✅ ${rapportsModifies} rapport(s) recalculé(s) !`, 'success');
+            showAlert({
+              icon: '🎉',
+              title: 'Recalcul terminé !',
+              body: `<span class="highlight-ok">✅ ${rapportsModifies} rapport(s) recalculé(s)</span><br><br>Tous vos rapports sont maintenant à jour avec les tickets actuels !`
+            });
+          } else {
+            showMessage('✓ Tous les rapports sont déjà à jour !', 'success');
+          }
+        }
+      });
+    }
+
+    // ===========================
+    // CA DU JOUR EN TEMPS RÉEL
+    // ===========================
+    
+    function calculerCAJour() {
+      const aujourd_hui = new Date();
+      aujourd_hui.setHours(0, 0, 0, 0);
+      const demain = new Date(aujourd_hui);
+      demain.setDate(demain.getDate() + 1);
+      
+      let caTotal = 0;
+      let nbTickets = 0;
+      let nbArticles = 0;
+      
+      // Filtrer les tickets du jour
+      const ticketsDuJour = ticketsHistorique.filter(ticket => {
+        const dateTicket = parseTicketDate(ticket);
+        return dateTicket >= aujourd_hui && dateTicket < demain;
+      });
+      
+      // Calculer les totaux
+      ticketsDuJour.forEach(ticket => {
+        const total = calculerTotalTicketAvecDons(ticket);
+        caTotal += total;
+        nbTickets++;
+        
+        if (Array.isArray(ticket.articles)) {
+          ticket.articles.forEach(article => {
+            if (!article.offert) {
+              nbArticles += parseFloat(article.qte) || 0;
+            }
+          });
+        }
+      });
+      
+      const panierMoyen = nbTickets > 0 ? caTotal / nbTickets : 0;
+      
+      return {
+        ca: caTotal,
+        nbTickets: nbTickets,
+        nbArticles: Math.round(nbArticles),
+        panierMoyen: panierMoyen
+      };
+    }
+    
+// ===========================
+// 💰 MISE À JOUR DU CA EN DIRECT (corrigée)
+// ===========================
+
+function actualiserCAJour(evt) {
+  const ticketsHistorique = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+  const loginHistory = JSON.parse(localStorage.getItem("loginHistory")) || [];
+  const rapports = JSON.parse(localStorage.getItem("rapports")) || [];
+
+  const now = new Date();
+
+  // 🔍 Trouver la dernière clôture Z (début de nouvelle session)
+  const dernierZ = rapports
+    .filter(r => r.type === "Z")
+    .sort((a, b) => new Date(b.isoCloture) - new Date(a.isoCloture))[0];
+
+  // 🔍 Trouver le dernier login
+  const dernierLogin = loginHistory.length > 0 ? loginHistory[loginHistory.length - 1] : null;
+
+  // 🕐 Déterminer le point de départ de la session
+  let debutSession = new Date();
+  if (dernierZ && dernierZ.isoCloture) {
+    debutSession = new Date(dernierZ.isoCloture);
+  } else if (dernierLogin && dernierLogin.iso) {
+    debutSession = new Date(dernierLogin.iso);
+  }
+
+// 📅 Filtrer les tickets depuis cette date (corrigé)
+const ticketsSession = ticketsHistorique.filter(t => {
+  let dateT;
+
+  if (t.isoPaiement) {
+    // format ISO direct
+    dateT = new Date(t.isoPaiement);
+  } else if (t.datePaiement && t.heurePaiement) {
+    // format JJ/MM/AAAA + HH:mm:ss
+    const [jour, mois, annee] = t.datePaiement.split('/');
+    dateT = new Date(`${annee}-${mois}-${jour}T${t.heurePaiement}`);
+  } else if (t.datePaiement) {
+    // fallback : date seule
+    const [jour, mois, annee] = t.datePaiement.split('/');
+    dateT = new Date(`${annee}-${mois}-${jour}T00:00:00`);
+  } else {
+    // si aucune date connue
+    dateT = new Date(0);
+  }
+
+  return dateT >= debutSession && dateT <= now;
+});
+
+
+  // 🧮 Calculs
+  let ca = 0;
+  let nbTickets = ticketsSession.length;
+  let nbArticles = 0;
+
+  ticketsSession.forEach(t => {
+    const total = parseFloat(t.total) || 0;
+    ca += total;
+    if (Array.isArray(t.articles)) {
+      nbArticles += t.articles.reduce((s, a) => s + (parseFloat(a.qte) || 0), 0);
+    }
+  });
+
+  const panierMoyen = nbTickets > 0 ? ca / nbTickets : 0;
+
+  // 🎨 Animation et affichage
+  const caElement = document.getElementById('caJour');
+  caElement.style.transform = 'scale(1.2)';
+  setTimeout(() => {
+    caElement.textContent = ca.toFixed(2);
+    caElement.style.transform = 'scale(1)';
+  }, 150);
+
+  document.getElementById('nbTicketsJour').textContent = nbTickets;
+  document.getElementById('nbArticlesJour').textContent = nbArticles;
+  document.getElementById('panierMoyenJour').textContent = panierMoyen.toFixed(2) + '€';
+
+  // 🎬 Animation du bouton refresh
+  const btn = evt?.target?.closest('.ca-refresh');
+  if (btn) {
+    btn.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      btn.style.transform = 'scale(1)';
+    }, 100);
+  }
+  
+  // 🎯 Actualiser aussi les tickets en cours
+  actualiserTicketsEnCours();
+}
+
+// ===========================
+// 🎯 TICKETS EN COURS
+// ===========================
+
+function calculerTicketsEnCours() {
+  // Récupérer les données actuelles
+  const tables = JSON.parse(localStorage.getItem("tables")) || [];
+  const tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+  
+  let totalEnCours = 0;
+  let nbTicketsActifs = 0;
+  let nbArticlesTotal = 0;
+  
+  // Trouver tous les tickets associés à des tables occupées
+  const tablesOccupees = tables.filter(t => t.ticketId !== null);
+  
+  tablesOccupees.forEach(table => {
+    const ticket = tickets.find(t => t.id === table.ticketId);
+    
+    if (ticket && Array.isArray(ticket.articles) && ticket.articles.length > 0) {
+      // Calculer le total de ce ticket
+      let totalTicket = 0;
+      let nbArticlesTicket = 0;
+      
+      ticket.articles.forEach(article => {
+        const prix = parseFloat(article.prix) || 0;
+        const qte = parseFloat(article.qte) || 0;
+        totalTicket += prix * qte;
+        nbArticlesTicket += qte;
+      });
+      
+      totalEnCours += totalTicket;
+      nbTicketsActifs++;
+      nbArticlesTotal += nbArticlesTicket;
+    }
+  });
+  
+  // Calculer le panier moyen des tickets en cours
+  const panierMoyen = nbTicketsActifs > 0 ? totalEnCours / nbTicketsActifs : 0;
+  
+  return {
+    total: totalEnCours,
+    nbTickets: nbTicketsActifs,
+    nbArticles: nbArticlesTotal,
+    panierMoyen: panierMoyen
+  };
+}
+
+// ===========================
+// 🎯 ACTUALISER L'AFFICHAGE DES TICKETS EN COURS (VERSION CORRIGÉE)
+// ===========================
+
+function actualiserTicketsEnCours(evt) {
+  const enCours = calculerTicketsEnCours();
+  
+  // Récupérer le CA déjà affiché dans la première bannière
+  const caJourElement = document.getElementById('caJour');
+  const caJour = parseFloat(caJourElement.textContent) || 0;
+  
+  // Calculer la projection totale (CA depuis dernière Z + tickets en cours)
+  const projectionTotale = caJour + enCours.total;
+  
+  // Animation sur le montant
+  const totalElement = document.getElementById('totalEnCours');
+  totalElement.style.transform = 'scale(1.2)';
+  setTimeout(() => {
+    totalElement.textContent = enCours.total.toFixed(2);
+    totalElement.style.transform = 'scale(1)';
+  }, 150);
+  
+  // Mettre à jour tous les champs
+  document.getElementById('nbTicketsEnCours').textContent = enCours.nbTickets;
+  document.getElementById('nbArticlesEnCours').textContent = enCours.nbArticles;
+  document.getElementById('panierMoyenEnCours').textContent = enCours.panierMoyen.toFixed(2) + '€';
+  document.getElementById('projectionTotale').textContent = projectionTotale.toFixed(2) + '€';
+  
+  // Animation du bouton refresh
+  const btn = evt?.target?.closest('.ca-refresh');
+  if (btn) {
+    btn.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      btn.style.transform = 'scale(1)';
+    }, 100);
+  }
+}
+
+// 🚀 Actualiser au chargement + auto-refresh
+window.addEventListener('DOMContentLoaded', () => {
+  actualiserCAJour();
+  actualiserTicketsEnCours();
+  // Auto-refresh toutes les 30 secondes
+  setInterval(() => {
+    actualiserCAJour();
+    actualiserTicketsEnCours();
+  }, 30000);
+});
+
+// ===========================
+// 🎫 IMPRESSION TICKETS DE SESSION
+// ===========================
+
+function getDebutSession() {
+  const rapports = JSON.parse(localStorage.getItem("rapports")) || [];
+  const loginHistory = JSON.parse(localStorage.getItem("loginHistory")) || [];
+  
+  const dernierZ = rapports
+    .filter(r => r.type === "Z")
+    .sort((a, b) => new Date(b.isoCloture) - new Date(a.isoCloture))[0];
+
+  const dernierLogin = loginHistory.length > 0 ? loginHistory[loginHistory.length - 1] : null;
+
+  let debutSession = new Date();
+  debutSession.setHours(0, 0, 0, 0);
+
+  if (dernierZ && dernierZ.isoCloture) {
+    debutSession = new Date(dernierZ.isoCloture);
+  } else if (dernierLogin && dernierLogin.iso) {
+    debutSession = new Date(dernierLogin.iso);
+  }
+  return debutSession;
+}
+
+function getTicketsSinceDate(since) {
+  const ticketsHistorique = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+  const now = new Date();
+  return ticketsHistorique.filter(t => {
+    let dateT;
+    if (t.isoPaiement) {
+      dateT = new Date(t.isoPaiement);
+    } else if (t.datePaiement && t.heurePaiement) {
+      const [j, m, a] = t.datePaiement.split('/');
+      dateT = new Date(`${a}-${m}-${j}T${t.heurePaiement}`);
+    } else if (t.datePaiement) {
+      const [j, m, a] = t.datePaiement.split('/');
+      dateT = new Date(`${a}-${m}-${j}T00:00:00`);
+    } else {
+      dateT = new Date(0);
+    }
+    return dateT >= since && dateT <= now;
+  }).sort((a, b) => {
+    const da = a.isoPaiement ? new Date(a.isoPaiement) : parseTicketDate(a);
+    const db = b.isoPaiement ? new Date(b.isoPaiement) : parseTicketDate(b);
+    return da - db;
+  });
+}
+
+function toLocalDatetimeValue(date) {
+  const pad = n => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function ouvrirModalTickets() {
+  const modal = document.getElementById('modalTickets');
+  modal.style.display = 'block';
+  
+  const debut = getDebutSession();
+  const input = document.getElementById('ticketsSinceDate');
+  input.value = toLocalDatetimeValue(debut);
+  
+  mettreAJourCompteTickets();
+}
+
+function fermerModalTickets() {
+  document.getElementById('modalTickets').style.display = 'none';
+}
+
+function mettreAJourCompteTickets() {
+  const input = document.getElementById('ticketsSinceDate');
+  const since = input.value ? new Date(input.value) : getDebutSession();
+  const tickets = getTicketsSinceDate(since);
+  
+  const countEl = document.getElementById('ticketsSessionCount');
+  const periodeEl = document.getElementById('ticketsSessionPeriode');
+  
+  const totalCA = tickets.reduce((s, t) => s + (parseFloat(t.total) || 0), 0);
+  countEl.innerHTML = `<strong>${tickets.length}</strong> ticket(s) trouvé(s) — CA total : <strong>${totalCA.toFixed(2)} €</strong>`;
+  
+  if (tickets.length > 0) {
+    const first = parseTicketDate(tickets[0]);
+    const last = parseTicketDate(tickets[tickets.length - 1]);
+    periodeEl.textContent = `Du ${first.toLocaleDateString('fr-FR')} ${first.toLocaleTimeString('fr-FR')} au ${last.toLocaleDateString('fr-FR')} ${last.toLocaleTimeString('fr-FR')}`;
+  } else {
+    periodeEl.textContent = 'Aucun ticket dans cette période.';
+  }
+}
+
+function genererTicketPDFContent(doc, ticket, y, settings) {
+  const pageH = 297;
+  const marginLeft = 10;
+  const largeur = 80; // largeur ticket en mm
+  const entreprise = settings || {};
+  
+  if (y + 60 > pageH - 10) {
+    doc.addPage();
+    y = 10;
+  }
+  
+  const startY = y;
+  
+  // En-tête
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  const nomEntreprise = entreprise.companyName || 'Établissement';
+  doc.text(nomEntreprise, marginLeft + largeur / 2, y, { align: 'center' });
+  y += 6;
+  
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  if (entreprise.companyAddress) { doc.text(entreprise.companyAddress, marginLeft + largeur / 2, y, { align: 'center' }); y += 5; }
+  if (entreprise.companyLocality) { doc.text(entreprise.companyLocality, marginLeft + largeur / 2, y, { align: 'center' }); y += 5; }
+  if (entreprise.companyNumber) { doc.text(`N° : ${entreprise.companyNumber}`, marginLeft + largeur / 2, y, { align: 'center' }); y += 5; }
+  
+  y += 2;
+  doc.setDrawColor(180, 180, 180);
+  doc.line(marginLeft, y, marginLeft + largeur, y);
+  y += 4;
+  
+  // Infos ticket
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Ticket #${ticket.numero || ticket.id}`, marginLeft, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  
+  const dateTicket = ticket.datePaiement || '';
+  const heureTicket = ticket.heurePaiement || '';
+  doc.text(`Date : ${dateTicket} ${heureTicket}`, marginLeft, y); y += 4;
+  
+  if (ticket.tableNom) { doc.text(`Table : ${ticket.tableNom}`, marginLeft, y); y += 4; }
+  if (ticket.membreNom || ticket.membrePrenom) {
+    doc.text(`Client : ${ticket.membrePrenom || ''} ${ticket.membreNom || ''}`.trim(), marginLeft, y); y += 4;
+  }
+  
+  y += 1;
+  doc.line(marginLeft, y, marginLeft + largeur, y);
+  y += 3;
+  
+  // Articles
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Article', marginLeft, y);
+  doc.text('Qté', marginLeft + 50, y);
+  doc.text('Total', marginLeft + 65, y);
+  y += 4;
+  doc.setFont('helvetica', 'normal');
+  doc.line(marginLeft, y, marginLeft + largeur, y);
+  y += 3;
+  
+  if (Array.isArray(ticket.articles)) {
+    ticket.articles.forEach(art => {
+      if (y + 5 > pageH - 15) { doc.addPage(); y = 10; }
+      const qte = parseFloat(art.qte) || 0;
+      const prix = parseFloat(art.prix) || 0;
+      const total = qte * prix;
+      const nomTronque = art.nom.length > 28 ? art.nom.substring(0, 27) + '…' : art.nom;
+      doc.text(nomTronque + (art.offert ? ' (offert)' : ''), marginLeft, y);
+      doc.text(`x${qte}`, marginLeft + 50, y);
+      doc.text(`${total.toFixed(2)}€`, marginLeft + 65, y);
+      y += 4;
+    });
+  }
+  
+  y += 1;
+  doc.line(marginLeft, y, marginLeft + largeur, y);
+  y += 4;
+  
+  // Total
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('TOTAL :', marginLeft, y);
+  doc.text(`${parseFloat(ticket.total || 0).toFixed(2)} €`, marginLeft + largeur, y, { align: 'right' });
+  y += 6;
+  
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  const modeLabel = ticket.modePaiement === 'especes' ? 'Espèces' : ticket.modePaiement === 'banque' ? 'Banque/Carte' : ticket.modePaiement === 'mixte' ? 'Mixte' : (ticket.modePaiement || 'N/A');
+  doc.text(`Mode de paiement : ${modeLabel}`, marginLeft, y); y += 4;
+  
+  if (ticket.modePaiement === 'mixte') {
+    if (ticket.montantEspeces) { doc.text(`  Espèces : ${parseFloat(ticket.montantEspeces).toFixed(2)} €`, marginLeft, y); y += 4; }
+    if (ticket.montantBanque) { doc.text(`  Banque : ${parseFloat(ticket.montantBanque).toFixed(2)} €`, marginLeft, y); y += 4; }
+  }
+  
+  y += 2;
+  doc.setFontSize(8);
+  doc.text('Merci de votre visite !', marginLeft + largeur / 2, y, { align: 'center' });
+  y += 4;
+  doc.line(marginLeft, y, marginLeft + largeur, y);
+  y += 8; // espace entre tickets
+  
+  return y;
+}
+
+async function imprimerTousTicketsPDF() {
+  const input = document.getElementById('ticketsSinceDate');
+  const since = input.value ? new Date(input.value) : getDebutSession();
+  const tickets = getTicketsSinceDate(since);
+  
+  if (tickets.length === 0) {
+    showMessage('⚠ Aucun ticket trouvé dans cette période', 'error');
+    return;
+  }
+  
+  fermerModalTickets();
+  showMessage(`⏳ Génération de ${tickets.length} ticket(s) en PDF...`, 'success');
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const settings = JSON.parse(localStorage.getItem("companySettings")) || {};
+  
+  let y = 10;
+  
+  tickets.forEach((ticket, idx) => {
+    y = genererTicketPDFContent(doc, ticket, y, settings);
+  });
+  
+  const dateStr = new Date().toISOString().split('T')[0];
+  doc.save(`tickets_session_${dateStr}.pdf`);
+  showMessage(`✔ PDF généré avec ${tickets.length} ticket(s) !`, 'success');
+}
+
+async function imprimerTousTicketsThermique() {
+  const input = document.getElementById('ticketsSinceDate');
+  const since = input.value ? new Date(input.value) : getDebutSession();
+  const tickets = getTicketsSinceDate(since);
+  
+  if (tickets.length === 0) {
+    showMessage('⚠ Aucun ticket trouvé dans cette période', 'error');
+    return;
+  }
+  
+  fermerModalTickets();
+  showMessage(`⏳ Envoi de ${tickets.length} ticket(s) à l'imprimante...`, 'success');
+  
+  const settings = JSON.parse(localStorage.getItem("companySettings")) || {};
+  const entreprise = {
+    nom: settings.companyName || "Entreprise",
+    adresse: settings.companyAddress || "",
+    localite: settings.companyLocality || "",
+    num: settings.companyNumber || ""
+  };
+  
+  let success = 0;
+  let errors = 0;
+  
+  for (const ticket of tickets) {
+    try {
+      const ticketData = {
+        numero: ticket.numero || ticket.id,
+        entreprise: entreprise,
+        datePaiement: ticket.datePaiement || '',
+        heurePaiement: ticket.heurePaiement || '',
+        tableNom: ticket.tableNom || '',
+        membreNom: ticket.membreNom || '',
+        membrePrenom: ticket.membrePrenom || '',
+        articles: ticket.articles || [],
+        total: parseFloat(ticket.total) || 0,
+        modePaiement: ticket.modePaiement || '',
+        montantEspeces: parseFloat(ticket.montantEspeces) || 0,
+        montantBanque: parseFloat(ticket.montantBanque) || 0
+      };
+      
+      const response = await fetch('http://localhost:8088/print-ticket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ticketData)
+      });
+      
+      const result = await response.json();
+      if (result.success) { success++; } else { errors++; }
+      
+      // Petite pause entre chaque ticket pour ne pas surcharger l'imprimante
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+    } catch (err) {
+      errors++;
+    }
+  }
+  
+  if (errors === 0) {
+    showMessage(`✔ ${success} ticket(s) imprimé(s) avec succès !`, 'success');
+  } else if (success > 0) {
+    showMessage(`⚠ ${success} imprimé(s), ${errors} erreur(s)`, 'error');
+  } else {
+    showMessage('✗ Serveur d\'impression non disponible', 'error');
+  }
+}
+
+// Fermer modal tickets en cliquant en dehors
+window.addEventListener('click', function(event) {
+  const modal = document.getElementById('modalTickets');
+  if (event.target === modal) fermerModalTickets();
+  const modalRC = document.getElementById('modalRapportComplet');
+  if (event.target === modalRC) fermerModalRapportComplet();
+  const modalCorb = document.getElementById('modalCorbeille');
+  if (event.target === modalCorb) fermerCorbeille();
+
+  // Fermer le menu "+" si clic en dehors
+  const wrapper = document.getElementById('moreBtnWrapper');
+  const menu = document.getElementById('moreMenu');
+  if (wrapper && menu && !wrapper.contains(event.target)) {
+    menu.classList.remove('open');
+  }
+});
+
+// ===========================
+// MODALES CUSTOM (confirm / alert / diag)
+// ===========================
+
+function showConfirm({ icon = '⚠️', title, body, confirmLabel = 'Confirmer', confirmClass = 'mcb-confirm', onConfirm }) {
+  document.getElementById('modalConfirmIcon').textContent = icon;
+  document.getElementById('modalConfirmTitle').textContent = title;
+  document.getElementById('modalConfirmBody').innerHTML = body;
+  const btns = document.getElementById('modalConfirmBtns');
+  btns.innerHTML = `
+    <button class="mcb-cancel" onclick="document.getElementById('modalConfirm').classList.remove('open')">Annuler</button>
+    <button class="${confirmClass}" id="modalConfirmOK">${confirmLabel}</button>
+  `;
+  document.getElementById('modalConfirmOK').onclick = () => {
+    document.getElementById('modalConfirm').classList.remove('open');
+    onConfirm();
+  };
+  document.getElementById('modalConfirm').classList.add('open');
+}
+
+function showAlert({ icon = '✅', title, body }) {
+  document.getElementById('modalAlertIcon').textContent = icon;
+  document.getElementById('modalAlertTitle').textContent = title;
+  document.getElementById('modalAlertBody').innerHTML = body;
+  document.getElementById('modalAlert').classList.add('open');
+}
+
+// ====== MENU PLUS ======
+function toggleMoreMenu() {
+  const menu = document.getElementById('moreMenu');
+  menu.classList.toggle('open');
+}
+
+// ===========================
+// MODAL RAPPORT COMPLET
+// ===========================
+
+function ouvrirModalRapportComplet(index) {
+  const rapport = rapports[index];
+  if (!rapport) return;
+
+  document.getElementById('modalRapportCompletTitle').textContent =
+    `📊 Rapport ${rapport.type}-${rapport.numero} — ${rapport.dateCloture}`;
+
+  const body = document.getElementById('modalRapportCompletBody');
+
+  // ---- Infos générales ----
+  let html = `
+    <div class="rapport-full-view">
+      <div class="rapport-full-section">
+        <div class="rapport-full-section-title">🏢 Informations générales</div>
+        <div class="rapport-full-row"><span class="lbl">Entreprise</span><span class="val">${rapport.entreprise?.nom || '—'}</span></div>
+        <div class="rapport-full-row"><span class="lbl">Adresse</span><span class="val">${rapport.entreprise?.adresse || '—'}</span></div>
+        <div class="rapport-full-row"><span class="lbl">Localité</span><span class="val">${rapport.entreprise?.localite || '—'}</span></div>
+        <div class="rapport-full-row"><span class="lbl">N° entreprise</span><span class="val">${rapport.entreprise?.num || '—'}</span></div>
+        <div class="rapport-full-row"><span class="lbl">Utilisateur</span><span class="val">${rapport.utilisateur || '—'}</span></div>
+        <div class="rapport-full-row"><span class="lbl">Type</span><span class="val">Rapport ${rapport.type} n°${rapport.numero}</span></div>
+      </div>
+
+      <div class="rapport-full-section">
+        <div class="rapport-full-section-title">🕐 Période</div>
+        <div class="rapport-full-row"><span class="lbl">Ouverture</span><span class="val">${rapport.dateOuverture} ${rapport.heureOuverture}</span></div>
+        <div class="rapport-full-row"><span class="lbl">Clôture</span><span class="val">${rapport.dateCloture} ${rapport.heureCloture}</span></div>
+      </div>
+
+      <div class="rapport-full-section">
+        <div class="rapport-full-section-title">💰 Totaux financiers</div>
+        <div class="rapport-full-row"><span class="lbl">Fond de caisse</span><span class="val">${(rapport.fondCaisse||0).toFixed(2)} €</span></div>
+        <div class="rapport-full-row"><span class="lbl">Total espèces</span><span class="val">${(rapport.totalEspeces||0).toFixed(2)} €</span></div>
+        <div class="rapport-full-row"><span class="lbl">Total banque</span><span class="val">${(rapport.totalBanque||0).toFixed(2)} €</span></div>
+        <div class="rapport-full-row"><span class="lbl">Total global (avec fond)</span><span class="val">${(rapport.totalGlobal||0).toFixed(2)} €</span></div>
+        <div class="rapport-full-row highlight"><span class="lbl">C.A. Global</span><span class="val">${((rapport.caGlobal||rapport.ca)||0).toFixed(2)} €</span></div>
+        ${rapport.afficherDons && rapport.totalDons > 0 ? `
+        <div class="rapport-full-row"><span class="lbl">🎁 Total dons</span><span class="val">${(rapport.totalDons||0).toFixed(2)} €</span></div>
+        ${rapport.donsEspeces > 0 ? `<div class="rapport-full-row"><span class="lbl" style="padding-left:16px">💵 Dons espèces</span><span class="val">${(rapport.donsEspeces||0).toFixed(2)} €</span></div>
+        <div class="rapport-full-row"><span class="lbl" style="padding-left:16px">💵 Espèces hors dons</span><span class="val">${((rapport.totalEspeces||0) - (rapport.donsEspeces||0)).toFixed(2)} €</span></div>` : ''}
+        ${rapport.donsBanque > 0 ? `<div class="rapport-full-row"><span class="lbl" style="padding-left:16px">💳 Dons banque</span><span class="val">${(rapport.donsBanque||0).toFixed(2)} €</span></div>
+        <div class="rapport-full-row"><span class="lbl" style="padding-left:16px">💳 Banque hors dons</span><span class="val">${((rapport.totalBanque||0) - (rapport.donsBanque||0)).toFixed(2)} €</span></div>` : ''}
+        ` : ''}
+        <div class="rapport-full-row highlight-green"><span class="lbl">💚 C.A. Net</span><span class="val">${(rapport.ca||0).toFixed(2)} €</span></div>
+        <div class="rapport-full-row"><span class="lbl">🛒 Articles vendus</span><span class="val">${rapport.totalArticles||0}</span></div>
+        <div class="rapport-full-row"><span class="lbl">🎁 Valeur offerts</span><span class="val">${(rapport.totalOfferts||0).toFixed(2)} €</span></div>
+        <div class="rapport-full-row"><span class="lbl">🎫 Tickets payés</span><span class="val">${rapport.nbTickets||0}</span></div>
+        <div class="rapport-full-row"><span class="lbl">⏳ Tickets actifs</span><span class="val">${rapport.nbTicketsActifs||0}</span></div>
+      </div>`;
+
+  // ---- TVA Ventilation ----
+  if (rapport.tvaActif && rapport.tvaVentilation && Object.keys(rapport.tvaVentilation).length > 0) {
+    html += `<div class="rapport-full-section">
+      <div class="rapport-full-section-title">🧾 Ventilation TVA</div>
+      <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.88em;">
+        <thead>
+          <tr style="background:rgba(42,127,212,.1);">
+            <th style="padding:6px 10px;text-align:left;font-weight:800;color:var(--blue3);">Taux</th>
+            <th style="padding:6px 10px;text-align:right;font-weight:800;color:var(--blue3);">Base HTVA</th>
+            <th style="padding:6px 10px;text-align:right;font-weight:800;color:var(--blue3);">Montant TVA</th>
+            <th style="padding:6px 10px;text-align:right;font-weight:800;color:var(--blue3);">Total TVAC</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    let totHTVA = 0, totTVA = 0, totTVAC = 0;
+    Object.keys(rapport.tvaVentilation).sort((a,b)=>parseFloat(a)-parseFloat(b)).forEach(k => {
+      const v = rapport.tvaVentilation[k];
+      totHTVA += v.base; totTVA += v.tva; totTVAC += v.total;
+      html += `<tr style="border-bottom:1px solid var(--border2);">
+        <td style="padding:6px 10px;font-weight:700;">${k}%</td>
+        <td style="padding:6px 10px;text-align:right;">${v.base.toFixed(2)} €</td>
+        <td style="padding:6px 10px;text-align:right;">${v.tva.toFixed(2)} €</td>
+        <td style="padding:6px 10px;text-align:right;">${v.total.toFixed(2)} €</td>
+      </tr>`;
+    });
+    html += `<tr style="font-weight:900;background:rgba(42,127,212,.08);border-top:2px solid var(--blue);">
+        <td style="padding:6px 10px;">TOTAL</td>
+        <td style="padding:6px 10px;text-align:right;">${totHTVA.toFixed(2)} €</td>
+        <td style="padding:6px 10px;text-align:right;">${totTVA.toFixed(2)} €</td>
+        <td style="padding:6px 10px;text-align:right;">${totTVAC.toFixed(2)} €</td>
+      </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>`;
+  }
+
+  // ---- Articles par catégories ----
+  if (rapport.categories && Object.keys(rapport.categories).length > 0) {
+    html += `<div class="rapport-full-section">
+      <div class="rapport-full-section-title">📦 Articles par catégories</div>`;
+    for (const cat in rapport.categories) {
+      html += `<div class="rapport-cat-title">${cat}</div>`;
+      for (const art in rapport.categories[cat]) {
+        const obj = rapport.categories[cat][art];
+        html += `<div class="rapport-cat-item">
+          <span>${art}</span>
+          <span>${obj.qte} × → ${(obj.total||0).toFixed(2)} €</span>
+        </div>`;
+      }
+    }
+    html += `</div>`;
+  }
+
+  // ---- Articles offerts ----
+  if (rapport.articlesOfferts && Object.keys(rapport.articlesOfferts).length > 0) {
+    html += `<div class="rapport-full-section">
+      <div class="rapport-full-section-title">🎁 Articles offerts</div>`;
+    for (const art in rapport.articlesOfferts) {
+      const obj = rapport.articlesOfferts[art];
+      const tot = (obj.qte * obj.prixOriginal);
+      html += `<div class="rapport-full-row">
+        <span class="lbl">${art}</span>
+        <span class="val">${obj.qte} × ${(obj.prixOriginal||0).toFixed(2)} € = ${tot.toFixed(2)} €</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // ---- Membres banque ----
+  if (rapport.inclureMembresBanque && rapport.membresBanque && Object.keys(rapport.membresBanque).length > 0) {
+    html += `<div class="rapport-full-section">
+      <div class="rapport-full-section-title">💳 Membres — Paiements banque</div>`;
+    for (const membre in rapport.membresBanque) {
+      const mb = rapport.membresBanque[membre];
+      const montant = typeof mb === 'object' ? mb.montant : mb;
+      html += `<div class="rapport-full-row">
+        <span class="lbl">${membre}</span>
+        <span class="val">${(montant||0).toFixed(2)} €</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `</div>`; // end rapport-full-view
+  body.innerHTML = html;
+  document.getElementById('modalRapportComplet').style.display = 'block';
+}
+
+function fermerModalRapportComplet() {
+  document.getElementById('modalRapportComplet').style.display = 'none';
+}
+
+
+
+  </script>
+</html>
+</html>
+<script>
+// ============================================================
+// EXCEL — EXPORT / IMPORT / SAUVEGARDE AUTO (rapports)
+// Sans patch global localStorage — appels ciblés uniquement
+// ============================================================
+const _EXCEL_SRV = window.location.origin;
+let _excelRapportsOk = null;
+let _excelRapportsTimer = null;
+
+async function _pingRapportsServeur() {
+  if (_excelRapportsOk !== null) return _excelRapportsOk;
+  try {
+    await fetch(`${_EXCEL_SRV}/api/export-excel-rapports`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rapports: [] }), signal: AbortSignal.timeout(2000)
+    });
+    _excelRapportsOk = true;
+  } catch(e) { _excelRapportsOk = false; }
+  return _excelRapportsOk;
+}
+
+// À appeler juste après chaque localStorage.setItem('rapports', ...)
+function declencherSauvegardeAutoRapports() {
+  clearTimeout(_excelRapportsTimer);
+  _excelRapportsTimer = setTimeout(async () => {
+    try {
+      const rapports = JSON.parse(localStorage.getItem('rapports') || '[]');
+      if (!rapports.length) return;
+      const res = await fetch(`${_EXCEL_SRV}/api/export-excel-rapports?auto=1`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rapports }), signal: AbortSignal.timeout(10000)
+      });
+      if (res.ok) {
+        _excelRapportsOk = true;
+        console.log(`💾 [AUTO] ${rapports.length} rapport(s) sauvegardés en Excel`);
+      }
+    } catch(e) {
+      _excelRapportsOk = false;
+      console.warn('⚠️ [AUTO] Sauvegarde rapports Excel échouée :', e.message);
+    }
+  }, 5000);
+}
+
+window.exportExcelRapports = async function() {
+  const rapports = JSON.parse(localStorage.getItem('rapports') || '[]');
+  if (!rapports.length) return showAlert({ icon: '⚠️', title: 'Aucun rapport', body: "Il n'y a aucun rapport à exporter." });
+  if (!(await _pingRapportsServeur())) {
+    return showAlert({ icon: '⚠️', title: 'Serveur requis', body: "Lance <strong>node server.js</strong> puis réessaie.<br>Le serveur n'est pas détecté sur localhost:3000." });
+  }
+  try {
+    const res = await fetch(`${_EXCEL_SRV}/api/export-excel-rapports`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rapports })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error); }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Rapports_Z_${new Date().toLocaleDateString('fr-BE').replace(/\//g,'-')}.xlsx`;
+    a.click();
+    showAlert({ icon: '✅', title: 'Export réussi !', body: `${rapports.length} rapport(s) exporté(s).<br><small>📁 Copie dans <strong>"sauvegarde données"</strong> sur le serveur.</small>` });
+  } catch(err) {
+    showAlert({ icon: '❌', title: 'Erreur export', body: `Impossible de contacter le serveur.<br><small>${err.message}</small>` });
+  }
+};
+
+window.importExcelRapports = async function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+  if (!(await _pingRapportsServeur())) {
+    return showAlert({ icon: '⚠️', title: 'Serveur requis', body: "Lance <strong>node server.js</strong> puis réessaie." });
+  }
+  try {
+    const buf = await file.arrayBuffer();
+    const res = await fetch(`${_EXCEL_SRV}/api/import-excel-rapports`, {
+      method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: buf
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error); }
+    const data = await res.json();
+    showConfirm({
+      icon: '📂', title: 'Importer depuis Excel ?',
+      body: `${data.count} rapport(s) trouvé(s) avec toutes leurs données (catégories, TVA...).<br>Voulez-vous remplacer les rapports existants ?`,
+      confirmLabel: 'Remplacer tout', confirmClass: 'mcb-confirm',
+      onConfirm: () => {
+        localStorage.setItem('rapports', JSON.stringify(data.rapports));
+        afficherRapports();
+        showAlert({ icon: '✅', title: 'Import réussi !', body: `${data.count} rapport(s) importé(s) avec toutes leurs données.` });
+      }
+    });
+  } catch(err) {
+    showAlert({ icon: '❌', title: 'Erreur import', body: `Echec de l'import Excel.<br><small>${err.message}</small>` });
+  }
+};
+
+// Sauvegarde auto au chargement de la page
+if (localStorage.getItem('rapports')) declencherSauvegardeAutoRapports();
+</script>

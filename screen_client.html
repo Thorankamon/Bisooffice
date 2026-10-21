@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Écran Client</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#2a7fd4; --green:#5aad2e; --text:#1a2b4a; --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:linear-gradient(160deg,#cde8f8 0%,#e8f5dc 100%);
+  color:var(--text);
+  display:flex;
+  gap:0;
+  height:100vh;
+  overflow:hidden;
+  transition:background .5s ease, background-image .5s ease;
+  background-size:cover; background-position:center;
+}
+
+/* Layout */
+.left,.right{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px;position:relative}
+.ticket-container{
+  width:92%; max-width:680px; background:rgba(255,255,255,0.92); border-radius:var(--radius); padding:26px; box-shadow:0 12px 35px rgba(0,0,0,0.12);
+  overflow:auto;
+}
+.ticket-header{text-align:center;margin-bottom:14px}
+.ticket-header h1{margin:0;font-size:2.2rem;color:var(--blue);font-weight:900}
+.ticket-header h3{margin:6px 0 0;font-size:1.05rem;color:#2f4f76;font-weight:700;opacity:.9}
+
+.item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(20,40,80,0.06);font-weight:700}
+.total{margin-top:12px;text-align:right;font-weight:900;font-size:1.35rem;color:var(--blue)}
+
+/* QR / Rendu */
+.qr-display,.rendu-display{
+  width:86%; max-width:420px; padding:28px; border-radius:14px; background:rgba(255,255,255,0.94); box-shadow:0 12px 36px rgba(0,0,0,0.12); text-align:center;
+}
+.qr-display h2, .rendu-display h2{margin:0;font-size:1.4rem;color:var(--text);font-weight:800}
+#qrcode{margin-top:18px}
+.rendu-display .montant{font-size:2.6rem;color:var(--green);font-weight:900;margin-top:12px}
+
+/* waiting text */
+.qr-waiting{margin-top:14px;font-weight:900;color:var(--blue);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.04)}}
+
+/* controls (top-right) */
+.controls{position:fixed;top:18px;right:18px;display:flex;gap:10px;z-index:40}
+.control-btn{background:linear-gradient(180deg,#7cc4f8,#2a7fd4);color:#fff;border:0;padding:10px 16px;font-weight:900;border-radius:12px;cursor:pointer;box-shadow:0 6px 18px rgba(42,127,212,.22)}
+.control-btn:hover{transform:translateY(-3px);transition:transform .15s}
+
+/* personalisation modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,30,60,.45);backdrop-filter:blur(6px);z-index:60;align-items:center;justify-content:center}
+.modal{background:linear-gradient(160deg,rgba(255,255,255,.98),#eaf6ff);padding:22px;border-radius:12px;min-width:320px;max-width:540px}
+.modal h2{margin:0;color:var(--blue);font-weight:900}
+.modal label{display:block;margin-top:12px;font-weight:800}
+.modal input[type="color"], .modal input[type="file"]{margin-top:8px}
+.modal-buttons{display:flex;gap:10px; margin-top:18px}
+.btn-modal{flex:1;padding:10px 12px;border:0;border-radius:10px;font-weight:900;color:#fff;cursor:pointer}
+.btn-cancel{background:linear-gradient(180deg,#f08080,#c0392b)}.btn-apply{background:linear-gradient(180deg,#84d47c,#4a9422)}
+
+/* success overlay */
+#successOverlay{display:none;position:fixed;inset:0;z-index:55;align-items:center;justify-content:center;background:rgba(10,30,60,.45)}
+.success-card{background:linear-gradient(160deg,#ecfff0,#dff8e8);padding:28px;border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.28);text-align:center}
+.check{width:96px;height:96px;border-radius:999px;background:linear-gradient(180deg,#4bd08a,#2b8a45);display:flex;align-items:center;justify-content:center;color:#fff;font-size:44px;margin:0 auto 12px}
+.success-card h2{margin:6px 0;font-size:1.6rem;color:#0b3d22;font-weight:900}
+
+/* responsive */
+@media(max-width:900px){body{flex-direction:column} .left,.right{padding:18px} .controls{position:fixed;top:12px;right:12px}}
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button class="control-btn" onclick="openSettings()">🎨 Personnaliser</button>
+  <button class="control-btn" onclick="toggleFullScreen()">⛶ Plein écran</button>
+</div>
+
+<div class="left">
+  <div id="displayZone"><!-- QR / rendu injectés ici --></div>
+</div>
+
+<div class="right">
+  <div class="ticket-container">
+    <div class="ticket-header">
+      <h1 id="clientName">Client</h1>
+      <h3 id="ticketInfo">En attente...</h3>
+    </div>
+    <div id="itemsList"></div>
+    <div class="total" id="totalDisplay">Total : 0.00 €</div>
+  </div>
+</div>
+
+<!-- personnalisation modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h2>🎨 Personnaliser</h2>
+    <label>Couleur dégradé haut</label>
+    <input type="color" id="color1" value="#cde8f8" />
+    <label>Couleur dégradé bas</label>
+    <input type="color" id="color2" value="#e8f5dc" />
+    <label>Image de fond (optionnel)</label>
+    <input type="file" id="bgImage" accept="image/*" />
+    <div class="modal-buttons">
+      <button class="btn-modal btn-cancel" onclick="closeSettings()">Annuler</button>
+      <button class="btn-modal btn-apply" onclick="applySettings()">Appliquer</button>
+    </div>
+  </div>
+</div>
+
+<!-- success overlay -->
+<div id="successOverlay">
+  <div class="success-card">
+    <div class="check">✓</div>
+    <h2>Paiement reçu !</h2>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+<script>
+/* ---------- util DOM ---------- */
+const clientName = document.getElementById('clientName');
+const ticketInfo = document.getElementById('ticketInfo');
+const itemsList = document.getElementById('itemsList');
+const totalDisplay = document.getElementById('totalDisplay');
+const displayZone = document.getElementById('displayZone');
+const successOverlay = document.getElementById('successOverlay');
+
+/* ---------- update display logic ---------- */
+let lastPayload = null;    // dernier payload traité
+let lastTimestamp = 0;
+let lastRenderedTs = null; // ts du dernier vrai render DOM
+let serverAvailable = false; // true si le serveur répond
+
+function processPayload(payload) {
+    if (!payload) {
+        showWaiting();
+        return;
+    }
+
+    // Ne re-render que si le ts a vraiment changé (toutes sources confondues)
+    const ts = payload.ts || 0;
+    if (ts && ts === lastRenderedTs) {
+        // Mettre à jour lastPayload silencieusement pour la cohérence
+        lastPayload = payload;
+        return;
+    }
+
+    lastPayload = payload;
+    lastTimestamp = ts;
+    lastRenderedTs = ts;
+
+    // Si on reçoit paymentSuccess => afficher animation
+    if (payload.paymentSuccess) {
+        showPaymentSuccess();
+    }
+
+    // Mise à jour du contenu du ticket
+    clientName.textContent = payload.clientName || 'Client';
+    ticketInfo.textContent = payload.ticketLabel || 'En attente...';
+
+    // Calcul du total si non fourni
+    let total = payload.total || 0;
+    if (payload.articles && payload.articles.length > 0 && total === 0) {
+        total = payload.articles.reduce((sum, a) => sum + (a.prix || 0) * (a.qte || 1), 0);
+    }
+    totalDisplay.textContent = 'Total : ' + total.toFixed(2) + ' €';
+
+    // Affichage des articles
+    const arts = payload.articles || [];
+    itemsList.innerHTML = arts.map(a => {
+        const prix = ((a.prix || 0) * (a.qte || 1)).toFixed(2);
+        return `<div class="item"><span>${a.nom} x${a.qte}</span><span>${prix} €</span></div>`;
+    }).join('') || '<div style="opacity:.7;padding:8px 0;">Aucun article</div>';
+
+    // Zone de gauche (QR / rendu)
+    displayZone.innerHTML = '';
+
+    if (!payload.mode) {
+        // Pas de mode de paiement actif
+        showWaiting();
+        return;
+    }
+
+    if (payload.mode === 'especes') {
+        const div = document.createElement('div');
+        div.className = 'rendu-display';
+        div.innerHTML = `<h2>💵 Paiement espèces</h2><div class="montant">Rendu : ${(payload.rendu || 0).toFixed(2)} €</div>`;
+        displayZone.appendChild(div);
+        return;
+    }
+
+    // Banque ou mixte -> afficher QR
+    const qrContainer = document.createElement('div');
+    qrContainer.className = 'qr-display';
+
+    if (payload.mode === 'banque') {
+        qrContainer.innerHTML = `<h2>💳 Paiement par QR</h2><div id="qrcode"></div>`;
+    } else if (payload.mode === 'mixte') {
+        qrContainer.innerHTML = `<h2>🔀 Paiement mixte</h2>
+            <p style="margin:8px 0;font-weight:900">Espèces : ${(payload.especes || 0).toFixed(2)} €</p>
+            <p style="margin:6px 0;font-weight:900">Banque : ${(payload.banque || 0).toFixed(2)} €</p>
+            <div id="qrcode"></div>`;
+    }
+
+    displayZone.appendChild(qrContainer);
+
+    // Ajouter le message d'attente
+    const waitingMsg = document.createElement('div');
+    waitingMsg.className = 'qr-waiting';
+    waitingMsg.textContent = 'En attente du paiement...';
+    qrContainer.appendChild(waitingMsg);
+
+    // Générer le QR si le texte est présent
+    if (payload.qrText) {
+        setTimeout(() => {
+            const el = document.getElementById('qrcode');
+            if (el) {
+                el.innerHTML = '';
+                try {
+                    new QRCode(el, {
+                        text: payload.qrText,
+                        width: 220,
+                        height: 220,
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                } catch(err) {
+                    console.warn('Erreur QR:', err);
+                }
+            }
+        }, 50);
+    }
+}
+
+/* show waiting/empty */
+function showWaiting() {
+    clientName.textContent = 'Prochain client';
+    ticketInfo.textContent = 'En attente...';
+    itemsList.innerHTML = '<div style="opacity:.7;padding:8px 0;">Aucun article</div>';
+    totalDisplay.textContent = 'Total : 0.00 €';
+    displayZone.innerHTML = `<div class="qr-display"><h2>En attente</h2><div style="margin-top:10px;font-weight:900;color:var(--blue)">Prêt pour le prochain client</div></div>`;
+}
+
+/* payment success animation */
+let successTimeout = null;
+function showPaymentSuccess() {
+    successOverlay.style.display = 'flex';
+    clearTimeout(successTimeout);
+    successTimeout = setTimeout(() => {
+        successOverlay.style.display = 'none';
+    }, 1800);
+}
+
+/* ---------- Lecture et mise à jour améliorée ---------- */
+function readAndProcess() {
+    try {
+        const raw = localStorage.getItem('clientDisplayData');
+
+        if (!raw) {
+            // Sur tablette/GSM le localStorage est vide — ne pas écraser
+            // ce que le serveur a déjà affiché
+            if (lastPayload !== null && !serverAvailable) {
+                lastPayload = null;
+                showWaiting();
+            }
+            return;
+        }
+
+        try {
+            const newPayload = JSON.parse(raw);
+
+            // Forcer la mise à jour si le timestamp est différent
+            if (!lastPayload || newPayload.ts !== lastPayload.ts) {
+                processPayload(newPayload);
+            }
+        } catch (e) {
+            console.error('Erreur parsing JSON:', e);
+        }
+    } catch(e) {
+        console.error('Erreur lecture localStorage:', e);
+    }
+}
+
+// Écouteur pour les événements storage (venant d'autres onglets/fenêtres)
+window.addEventListener('storage', (e) => {
+    if (e.key === 'clientDisplayData') {
+        readAndProcess();
+    }
+});
+
+// Écouteur pour les événements personnalisés (pour la même fenêtre)
+window.addEventListener('localDataUpdate', () => {
+    readAndProcess();
+});
+
+// Polling plus rapide (toutes les 100ms) pour être sûr
+let pollTimer = setInterval(readAndProcess, 100);
+
+
+/* ---------- Polling serveur localhost:8000 ---------- */
+
+async function pollServer() {
+  try {
+    const serverBase = `${location.protocol}//${location.hostname}:8000`;
+    const res = await fetch(`${serverBase}/api/client-display`, {cache: 'no-store'});
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.empty) return; // serveur n'a rien encore
+    serverAvailable = true;
+    // Même logique que readAndProcess : on ne traite que si le ts a changé
+    if (!lastPayload || data.ts !== lastPayload.ts) {
+      processPayload(data);
+    }
+  } catch(e) {
+    // Serveur absent ou CORS → on reste sur localStorage uniquement
+    if (serverAvailable) {
+      console.warn('Serveur inaccessible, retour localStorage');
+      serverAvailable = false;
+    }
+  }
+}
+
+// Polling serveur toutes les 300ms
+setInterval(pollServer, 300);
+
+/* ---------- personalisation modal ---------- */
+const modal = document.getElementById('settingsModal');
+const color1 = document.getElementById('color1');
+const color2 = document.getElementById('color2');
+const bgImage = document.getElementById('bgImage');
+
+function openSettings() {
+    modal.style.display = 'flex';
+}
+
+function closeSettings() {
+    modal.style.display = 'none';
+}
+
+function applySettings() {
+    const file = bgImage.files[0];
+    const c1 = color1.value, c2 = color2.value;
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            document.body.style.backgroundImage = `url(${reader.result})`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.background = ''; // reset gradient
+            saveSettings({image: reader.result, colors: [c1, c2]});
+        };
+        reader.readAsDataURL(file);
+    } else {
+        document.body.style.background = `linear-gradient(160deg,${c1},${c2})`;
+        document.body.style.backgroundImage = '';
+        saveSettings({image: null, colors: [c1, c2]});
+    }
+    closeSettings();
+}
+
+function saveSettings(obj) {
+    localStorage.setItem('clientScreenSettings', JSON.stringify(obj));
+}
+
+function loadSettings() {
+    try {
+        const s = JSON.parse(localStorage.getItem('clientScreenSettings') || '{}');
+        if (s.image) {
+            document.body.style.backgroundImage = `url(${s.image})`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.background = '';
+        } else if (s.colors) {
+            document.body.style.background = `linear-gradient(160deg,${s.colors[0]},${s.colors[1]})`;
+        }
+    } catch(e) {
+        console.warn(e);
+    }
+}
+loadSettings();
+
+/* ---------- fullscreen util ---------- */
+function toggleFullScreen() {
+    const doc = document;
+    const el = doc.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    const cancel = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
+
+    if (!doc.fullscreenElement && !doc.webkitFullscreenElement && !doc.mozFullScreenElement) {
+        try { req.call(el); } catch(e) { console.warn(e); }
+    } else {
+        try { cancel.call(doc); } catch(e) { console.warn(e); }
+    }
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    // Première lecture
+    readAndProcess();
+
+    // Le polling serveur (300ms) et localStorage (100ms) suffisent
+});
+
+console.log('✅ Écran client synchronisé - Prêt à recevoir les paiements');
+</script>
+</body>
+</html>

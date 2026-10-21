@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Administration - Utilisateurs</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#7c3aed; --purple-pale:#f5f3ff;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --cyan:#0891b2; --cyan-pale:#ecfeff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --glass:rgba(255,255,255,0.82);
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      font-size:14px;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      padding:24px;
+      color:var(--text);
+      position:relative;
+    }
+    body::before {
+      content:''; position:fixed; top:-150px; left:-150px;
+      width:550px; height:550px;
+      background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+    body::after {
+      content:''; position:fixed; bottom:-100px; right:5%;
+      width:450px; height:450px;
+      background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+
+    /* ── Bouton retour ── */
+    .back-btn {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(200,228,252,.85));
+      border:1px solid rgba(255,255,255,.9);
+      color:var(--blue2);
+      padding:9px 20px;
+      border-radius:50px;
+      cursor:pointer;
+      font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:.9rem;
+      margin-bottom:20px;
+      display:inline-flex; align-items:center; gap:8px;
+      transition:all .2s;
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .back-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .back-btn:hover { background:linear-gradient(180deg,#fff,#d0e8ff); transform:translateX(-3px); box-shadow:0 4px 14px var(--shadow); }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      position:relative;
+      z-index:2;
+    }
+
+    /* ── En-tête entreprise ── */
+    .company-header {
+      background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(180,220,250,.88),rgba(120,185,240,.92));
+      border:1px solid rgba(255,255,255,.95);
+      color:var(--blue3);
+      padding:20px 28px;
+      border-radius:var(--radius-xl);
+      margin-bottom:20px;
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .company-header::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .company-header strong { font-size:1.3em; font-weight:900; display:block; margin-bottom:6px; }
+
+    h1 {
+      margin-bottom:20px; color:var(--blue3);
+      text-align:center; font-size:2rem; font-weight:900;
+      font-family:'Nunito',sans-serif; letter-spacing:-.5px;
+      position:relative; z-index:1;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      border:1px solid rgba(255,255,255,.95);
+      padding:30px;
+      border-radius:var(--radius-xl);
+      box-shadow:0 4px 16px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      backdrop-filter:blur(10px);
+      transition:all .3s ease;
+      position:relative; overflow:hidden;
+    }
+    .card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:5px;
+      background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));
+    }
+    .card::after {
+      content:''; position:absolute; top:5px; left:0; right:0; height:38%;
+      background:rgba(255,255,255,.42); border-radius:0 0 60% 60%;
+      pointer-events:none;
+    }
+    .card:hover { transform:translateY(-5px); box-shadow:0 12px 32px var(--shadow); }
+    .card h2 {
+      color:var(--blue3);
+      margin-bottom:20px;
+      font-size:1.5em;
+      font-weight:900;
+      position:relative;
+    }
+    .card p {
+      margin-bottom:20px;
+      color:var(--text2);
+      font-weight:600;
+      position:relative;
+    }
+
+    .btn {
+      padding:12px 24px;
+      border:none;
+      border-radius:var(--radius);
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      transition:all .3s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-family:'Nunito',sans-serif;
+      position:relative; overflow:hidden;
+    }
+    .btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+
+    .btn-primary {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white;
+      border:1px solid #1050a0;
+      box-shadow:0 2px 8px rgba(30,80,180,.25),0 1px 0 rgba(255,255,255,.4) inset;
+    }
+    .btn-primary:hover { background:linear-gradient(180deg,#90d4ff,#3a90e4,#1a6cc0); transform:translateY(-2px); box-shadow:0 4px 14px rgba(30,80,180,.4); }
+
+    .btn-secondary {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      color:var(--text2);
+      border:1px solid var(--border);
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    }
+    .btn-secondary:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); transform:translateY(-2px); }
+
+    .btn-danger {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      color:white;
+      border:1px solid #882020;
+      box-shadow:0 2px 8px rgba(180,40,30,.3),0 1px 0 rgba(255,255,255,.4) inset;
+    }
+    .btn-danger:hover { background:linear-gradient(180deg,#f89898,#d44040,#a03030); transform:translateY(-2px); }
+
+    .btn-small {
+      padding:8px 16px;
+      font-size:14px;
+    }
+
+    .table-container {
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      border:1px solid rgba(255,255,255,.95);
+      padding:30px;
+      border-radius:var(--radius-xl);
+      box-shadow:0 4px 16px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      backdrop-filter:blur(10px);
+      margin-bottom:25px;
+      overflow-x:auto;
+      position:relative; z-index:1;
+    }
+    .table-container::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:5px;
+      background:linear-gradient(90deg,var(--blue-light),var(--purple),var(--cyan));
+      border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+    }
+    .table-container::after {
+      content:''; position:absolute; top:5px; left:0; right:0; height:25%;
+      background:rgba(255,255,255,.3); border-radius:0 0 60% 60%;
+      pointer-events:none;
+    }
+    .table-container > * { position:relative; z-index:2; }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .table-header h2 {
+      color:var(--blue3);
+      font-weight:900;
+      font-size:1.4rem;
+    }
+    .table-header span {
+      color:var(--text2);
+      font-weight:600;
+    }
+
+    table {
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+    }
+
+    th {
+      background:linear-gradient(180deg,#4a9fd8,#2a7fd4,#1a5fb0);
+      color:white;
+      padding:15px;
+      text-align:left;
+      font-weight:800;
+      position:sticky;
+      top:0;
+      font-size:.95rem;
+    }
+    th:first-child { border-radius:12px 0 0 0; }
+    th:last-child { border-radius:0 12px 0 0; }
+
+    td {
+      padding:15px;
+      border-bottom:1px solid var(--border2);
+      background:rgba(255,255,255,.7);
+      font-weight:600;
+      color:var(--text2);
+    }
+    tr:last-child td:first-child { border-radius:0 0 0 12px; }
+    tr:last-child td:last-child { border-radius:0 0 12px 0; }
+    tr:hover td { background:rgba(220,240,255,.8); }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text3);
+      font-weight:600;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .pagination button {
+      padding:8px 14px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.7);
+      border-radius:var(--radius);
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      color:var(--text2);
+      transition:all 0.2s;
+      font-family:'Nunito',sans-serif;
+      position:relative; overflow:hidden;
+    }
+    .pagination button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .pagination button:hover:not(:disabled) { 
+      border-color:var(--blue-light); 
+      background:linear-gradient(180deg,#fff,#d0e4f8);
+      color:var(--blue3);
+      transform:translateY(-2px);
+    }
+    .pagination button.active {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white;
+      border-color:#1050a0;
+    }
+    .pagination button:disabled { opacity:0.4; cursor:not-allowed; }
+
+    .pagination-info {
+      font-size:13px;
+      color:var(--text3);
+      text-align:center;
+      margin-top:8px;
+      font-weight:600;
+    }
+
+    /* ── Modals ── */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:rgba(10,40,90,.45);
+      backdrop-filter:blur(8px);
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal.active { display: flex; justify-content: center; align-items: center; }
+
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    @keyframes slideIn {
+      from { opacity:0; transform:translateY(-50px) scale(0.9); }
+      to { opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    .modal-content {
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+      border:1px solid rgba(255,255,255,.95);
+      padding:40px;
+      border-radius:var(--radius-xl);
+      max-width:500px;
+      width:90%;
+      max-height:90vh;
+      overflow-y:auto;
+      box-shadow:0 20px 60px rgba(20,60,180,.25),0 1px 0 rgba(255,255,255,.9) inset;
+      animation:slideIn 0.3s ease;
+      position:relative;
+    }
+    .modal-content::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:25%;
+      background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+
+    /* ── Wizard Steps ── */
+    .wizard-steps {
+      display:flex; align-items:center; justify-content:center;
+      gap:0; margin-bottom:28px; position:relative; z-index:1;
+    }
+    .wizard-step-item {
+      display:flex; flex-direction:column; align-items:center; gap:5px;
+      position:relative; z-index:1;
+    }
+    .wizard-step-circle {
+      width:38px; height:38px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:16px; font-weight:900;
+      border:2px solid var(--border);
+      background:rgba(255,255,255,.8);
+      color:var(--text3);
+      transition:all .3s ease;
+    }
+    .wizard-step-item.active .wizard-step-circle {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      border-color:#1050a0; color:white;
+      box-shadow:0 3px 10px rgba(30,80,180,.3);
+    }
+    .wizard-step-item.done .wizard-step-circle {
+      background:linear-gradient(180deg,#8edb5f,#5aad2e,#3d8a1a);
+      border-color:#3a8018; color:white;
+    }
+    .wizard-step-label {
+      font-size:10px; font-weight:800; color:var(--text3);
+      text-transform:uppercase; letter-spacing:.04em;
+      white-space:nowrap;
+      transition:color .3s;
+    }
+    .wizard-step-item.active .wizard-step-label { color:var(--blue); }
+    .wizard-step-item.done .wizard-step-label { color:var(--green2); }
+    .wizard-connector {
+      width:40px; height:2px;
+      background:var(--border2);
+      margin-bottom:18px;
+      transition:background .3s;
+      flex-shrink:0;
+    }
+    .wizard-connector.done { background:var(--green); }
+
+    /* ── Step pages ── */
+    .wizard-page { display:none; }
+    .wizard-page.active { display:block; animation:slideIn .25s ease; }
+
+    /* ── Nav buttons ── */
+    .wizard-nav {
+      display:flex; gap:12px; margin-top:20px; position:relative; z-index:1;
+    }
+    .wizard-nav .btn { flex:1; justify-content:center; }
+
+    .modal-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:25px;
+      position:relative;
+    }
+    .modal-header h2 {
+      color:var(--blue3);
+      font-weight:900;
+      font-size:1.5rem;
+    }
+
+    .close-btn {
+      background:none;
+      border:none;
+      font-size:28px;
+      cursor:pointer;
+      color:var(--text3);
+      transition:color 0.3s;
+      width:40px; height:40px;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:50%;
+    }
+    .close-btn:hover {
+      color:var(--red);
+      background:var(--red-pale);
+    }
+
+    .form-group {
+      margin-bottom:20px;
+      position:relative;
+    }
+    .form-group label {
+      display:block;
+      margin-bottom:8px;
+      font-weight:800;
+      color:var(--text2);
+      font-size:.9rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .form-group input[type="text"], .form-group input[type="file"] {
+      width:100%;
+      padding:14px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      font-size:15px;
+      font-weight:600;
+      background:rgba(255,255,255,.85);
+      color:var(--text);
+      transition:all .2s;
+      font-family:'Nunito',sans-serif;
+    }
+    .form-group input:focus {
+      outline:none;
+      border-color:var(--blue-light);
+      box-shadow:0 0 0 3px rgba(42,127,212,.15);
+    }
+
+    .message {
+      padding:15px 20px;
+      border-radius:var(--radius);
+      margin:15px 0;
+      font-weight:700;
+      animation:slideIn 0.3s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .message::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .message.success { background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(210,245,185,.9)); color:var(--green2); border-left:4px solid var(--green); }
+    .message.error { background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,220,220,.9)); color:var(--red); border-left:4px solid var(--red); }
+
+    .avatar-preview {
+      width:60px; height:60px; border-radius:50%; object-fit:cover;
+      border:2px solid var(--border); display:block; margin:10px 0;
+    }
+    .icon-option {
+      font-size:28px; cursor:pointer; padding:6px;
+      border:2px solid transparent; border-radius:10px;
+      transition:0.2s; display:inline-block;
+    }
+    .icon-option:hover { background:var(--blue-pale); }
+    .icon-option.selected { border-color:var(--blue); background:var(--blue-pale); }
+    .avatar-buttons { display:flex; justify-content:center; gap:10px; margin-top:10px; }
+
+    /* ── Numpad ── */
+    .numpad-display {
+      width:100%;
+      padding:14px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      font-size:22px;
+      letter-spacing:8px;
+      text-align:center;
+      min-height:54px;
+      background:rgba(255,255,255,.9);
+      color:var(--text);
+      margin-bottom:12px;
+      font-family:monospace;
+      font-weight:700;
+    }
+    .numpad-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:6px;
+    }
+    .numpad-key {
+      padding:16px 10px;
+      font-size:20px;
+      font-weight:800;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.85);
+      cursor:pointer;
+      transition:all 0.15s ease;
+      color:var(--text2);
+      font-family:'Nunito',sans-serif;
+      position:relative; overflow:hidden;
+    }
+    .numpad-key::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .numpad-key:hover {
+      border-color:var(--blue-light);
+      background:linear-gradient(180deg,#fff,#d0e4f8);
+      color:var(--blue3);
+      transform:translateY(-2px);
+      box-shadow:0 4px 10px var(--shadow);
+    }
+    .numpad-key.key-del { background:#fff0f0; border-color:var(--red); color:var(--red); }
+    .numpad-key.key-del:hover { background:linear-gradient(180deg,#f89898,#d44040); color:white; border-color:var(--red2); }
+    .numpad-key.key-ok { background:linear-gradient(180deg,#7cc4f8,#2a7fd4); color:white; border-color:#1050a0; }
+    .numpad-key.key-ok:hover { background:linear-gradient(180deg,#90d4ff,#3a90e4); }
+
+    /* ── Clavier virtuel ── */
+    .vkb-toggle-bar {
+      display:flex; align-items:center; gap:10px; margin-bottom:8px;
+    }
+    .vkb-toggle-btn {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      border:1px solid var(--border);
+      color:var(--text2);
+      padding:7px 14px;
+      border-radius:50px;
+      cursor:pointer;
+      font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:.8rem;
+      transition:all .2s;
+      box-shadow:0 2px 6px var(--shadow2);
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .vkb-toggle-btn.active {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white; border-color:#1050a0;
+      box-shadow:0 2px 8px rgba(30,80,180,.3);
+    }
+    .vkb-toggle-btn:hover { transform:translateY(-1px); box-shadow:0 4px 10px var(--shadow); }
+
+    .virtual-keyboard {
+      display:none;
+      flex-direction:column;
+      gap:6px;
+      margin-top:8px;
+      padding:12px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--border2);
+      border-radius:var(--radius);
+      backdrop-filter:blur(6px);
+    }
+    .virtual-keyboard.visible { display:flex; }
+    .vkb-row {
+      display:flex; gap:5px; justify-content:center;
+    }
+    .vkb-key {
+      min-width:34px; height:38px;
+      padding:0 8px;
+      font-size:13px; font-weight:800;
+      border:1px solid var(--border);
+      border-radius:8px;
+      background:rgba(255,255,255,.9);
+      cursor:pointer;
+      transition:all 0.12s ease;
+      color:var(--text2);
+      font-family:'Nunito',sans-serif;
+      position:relative; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .vkb-key::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:8px 8px 0 0; pointer-events:none;
+    }
+    .vkb-key:hover {
+      border-color:var(--blue-light);
+      background:linear-gradient(180deg,#fff,#d0e4f8);
+      color:var(--blue3);
+      transform:translateY(-2px);
+      box-shadow:0 3px 8px var(--shadow);
+    }
+    .vkb-key:active { transform:translateY(0); box-shadow:none; }
+    .vkb-key.key-wide { min-width:60px; }
+    .vkb-key.key-space { min-width:160px; }
+    .vkb-key.key-del { background:#fff0f0; border-color:var(--red); color:var(--red); }
+    .vkb-key.key-del:hover { background:linear-gradient(180deg,#f89898,#d44040); color:white; border-color:var(--red2); }
+    .vkb-key.key-caps { background:#f0f8ff; }
+    .vkb-key.key-caps.caps-on { background:linear-gradient(180deg,#d0e8ff,#a8d0f8); color:var(--blue3); border-color:var(--blue); }
+
+    /* Admin row style */
+    .admin-row td { background:linear-gradient(90deg,rgba(255,248,220,.85),rgba(255,255,255,.7)) !important; }
+    .admin-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      background:linear-gradient(135deg,#ffd84d,#e8a800);
+      color:#5a3800;
+      padding:3px 10px; border-radius:50px;
+      font-size:11px; font-weight:900;
+      border:1px solid #d49400;
+      box-shadow:0 1px 4px rgba(200,150,0,.3);
+    }
+
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:rgba(200,220,240,.3); }
+    ::-webkit-scrollbar-thumb { background:var(--blue-light); border-radius:3px; }
+
+    @media(max-width:768px) {
+      body { padding:12px; }
+      .cards-grid { grid-template-columns:1fr; }
+      .actions { flex-direction:column; }
+      .modal-content { width:95vw; padding:25px; }
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.history.back()">← Retour</button>
+
+  <div class="container">
+    <div id="companyHeader" class="company-header"></div>
+    
+    <h1>🔐 Administration</h1>
+
+    <div class="cards-grid">
+      <div class="card">
+        <h2>👥 Gestion des utilisateurs</h2>
+        <p>Gérez les comptes utilisateurs de votre système</p>
+        <button class="btn btn-primary" onclick="openUserModal()">➕ Ajouter un utilisateur</button>
+      </div>
+
+      <div class="card">
+        <h2>🔑 Connexion</h2>
+        <p>Testez la connexion avec vos identifiants</p>
+        <button class="btn btn-primary" onclick="openLoginModal()">🔓 Se connecter</button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="table-header">
+        <h2>Utilisateurs enregistrés</h2>
+        <span id="userCount"></span>
+      </div>
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Identifiant</th>
+            <th>Mot de passe</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="table-container">
+      <div class="table-header">
+        <h2>Historique des connexions</h2>
+        <button class="btn btn-danger btn-small" id="clearHistory">🗑️ Vider l'historique</button>
+      </div>
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>Date/Heure</th>
+            <th>Utilisateur</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="pagination" id="histPagination"></div>
+      <div class="pagination-info" id="histPaginationInfo"></div>
+    </div>
+  </div>
+
+  <!-- Modal Utilisateur (3 étapes) -->
+  <div id="userModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="userModalTitle">Ajouter un utilisateur</h2>
+        <button class="close-btn" onclick="closeUserModal()">×</button>
+      </div>
+
+      <!-- Indicateur d'étapes -->
+      <div class="wizard-steps">
+        <div class="wizard-step-item active" id="stepItem1">
+          <div class="wizard-step-circle">👤</div>
+          <div class="wizard-step-label">Nom</div>
+        </div>
+        <div class="wizard-connector" id="connector1"></div>
+        <div class="wizard-step-item" id="stepItem2">
+          <div class="wizard-step-circle">🔑</div>
+          <div class="wizard-step-label">Code</div>
+        </div>
+        <div class="wizard-connector" id="connector2"></div>
+        <div class="wizard-step-item" id="stepItem3">
+          <div class="wizard-step-circle">🎨</div>
+          <div class="wizard-step-label">Apparence</div>
+        </div>
+      </div>
+
+      <form id="userForm">
+        <input type="hidden" id="editIndex">
+
+        <!-- ══ PAGE 1 : Nom + Clavier virtuel ══ -->
+        <div class="wizard-page active" id="wizardPage1">
+          <div class="form-group">
+            <label for="username">Identifiant</label>
+            <div class="vkb-toggle-bar">
+              <input type="text" id="username" required placeholder="Entrez l'identifiant" style="flex:1;">
+              <button type="button" class="vkb-toggle-btn active" id="vkbToggleBtn" onclick="toggleVirtualKeyboard()">⌨️ Clavier</button>
+            </div>
+            <!-- Clavier virtuel (visible par défaut page 1) -->
+            <div class="virtual-keyboard visible" id="virtualKeyboard">
+              <div class="vkb-row">
+                <button type="button" class="vkb-key" onclick="vkbPress('a')">a</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('z')">z</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('e')">e</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('r')">r</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('t')">t</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('y')">y</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('u')">u</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('i')">i</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('o')">o</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('p')">p</button>
+              </div>
+              <div class="vkb-row">
+                <button type="button" class="vkb-key" onclick="vkbPress('q')">q</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('s')">s</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('d')">d</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('f')">f</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('g')">g</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('h')">h</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('j')">j</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('k')">k</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('l')">l</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('m')">m</button>
+              </div>
+              <div class="vkb-row">
+                <button type="button" class="vkb-key key-caps caps-on" id="vkbCapsBtn" onclick="vkbToggleCaps()">⇧ MAJ</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('w')">w</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('x')">x</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('c')">c</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('v')">v</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('b')">b</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('n')">n</button>
+                <button type="button" class="vkb-key key-del key-wide" onclick="vkbDelete()">⌫</button>
+              </div>
+              <div class="vkb-row">
+                <button type="button" class="vkb-key" onclick="vkbPress('-')">-</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('_')">_</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('.')">.</button>
+                <button type="button" class="vkb-key key-space" onclick="vkbPress(' ')">Espace</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('1')">1</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('2')">2</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('3')">3</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('4')">4</button>
+                <button type="button" class="vkb-key" onclick="vkbPress('5')">5</button>
+              </div>
+            </div>
+          </div>
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-primary" onclick="wizardNext(1)">Suivant → Code secret</button>
+          </div>
+        </div>
+
+        <!-- ══ PAGE 2 : Code PIN ══ -->
+        <div class="wizard-page" id="wizardPage2">
+          <div class="form-group">
+            <label>Code secret <span style="font-size:12px;color:var(--text3);">(chiffres uniquement)</span></label>
+            <input type="hidden" id="password" required>
+            <div class="numpad-display" id="numpadDisplay">—</div>
+            <div class="numpad-grid">
+              <button type="button" class="numpad-key" onclick="numpadPress('1')">1</button>
+              <button type="button" class="numpad-key" onclick="numpadPress('2')">2</button>
+              <button type="button" class="numpad-key" onclick="numpadPress('3')">3</button>
+              <button type="button" class="numpad-key" onclick="numpadPress('4')">4</button>
+              <button type="button" class="numpad-key" onclick="numpadPress('5')">5</button>
+              <button type="button" class="numpad-key" onclick="numpadPress('6')">6</button>
+              <button type="button" class="numpad-key" onclick="numpadPress('7')">7</button>
+              <button type="button" class="numpad-key" onclick="numpadPress('8')">8</button>
+              <button type="button" class="numpad-key" onclick="numpadPress('9')">9</button>
+              <button type="button" class="numpad-key key-del" onclick="numpadDelete()">⌫ Suppr.</button>
+              <button type="button" class="numpad-key key-zero" onclick="numpadPress('0')">0</button>
+              <button type="button" class="numpad-key key-ok" onclick="numpadOk()">✓ OK</button>
+            </div>
+          </div>
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-secondary" onclick="wizardBack(2)">← Retour</button>
+            <button type="button" class="btn btn-primary" onclick="wizardNext(2)">Suivant → Apparence</button>
+          </div>
+        </div>
+
+        <!-- ══ PAGE 3 : Avatar + Sauvegarde ══ -->
+        <div class="wizard-page" id="wizardPage3">
+          <div class="form-group">
+            <label>Avatar / Icône</label>
+            <div>
+              <label><input type="radio" name="avatarType" value="icon" checked> Icône prédéfini</label>
+              <label style="margin-left:15px;"><input type="radio" name="avatarType" value="photo"> Photo personnalisée</label>
+            </div>
+
+            <div id="iconSelector" style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+              <span class="icon-option">👩‍💻</span>
+              <span class="icon-option">👨‍🔧</span>
+              <span class="icon-option">🧑‍🎓</span>
+              <span class="icon-option">🧑‍🚀</span>
+              <span class="icon-option">🧑‍🍳</span>
+              <span class="icon-option">🦸‍♂️</span>
+            </div>
+
+            <div id="photoSelector" style="display:none;margin-top:10px;">
+              <input type="file" id="photoInput" accept="image/*">
+            </div>
+
+            <img id="avatarPreview" class="avatar-preview" src="" alt="Aperçu" style="display:none;">
+
+            <div class="avatar-buttons">
+              <button type="button" class="btn btn-secondary" id="changeAvatar">🖼️ Changer</button>
+              <button type="button" class="btn btn-danger" id="removeAvatar">❌ Retirer</button>
+            </div>
+          </div>
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-secondary" onclick="wizardBack(3)">← Retour</button>
+            <button type="submit" class="btn btn-primary">💾 Sauvegarder</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Connexion -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content" style="max-width:520px;">
+      <div class="modal-header">
+        <h2 id="loginModalTitle">🔓 Connexion</h2>
+        <button class="close-btn" onclick="closeLoginModal()">×</button>
+      </div>
+
+      <!-- Étape 1 : Choisir l'utilisateur -->
+      <div id="loginStep1">
+        <p style="color:var(--text2);font-weight:700;margin-bottom:18px;text-align:center;position:relative;z-index:1;">Qui êtes-vous ?</p>
+        <div id="loginUserList" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;position:relative;z-index:1;margin-bottom:8px;"></div>
+        <div id="loginStep1Msg" style="margin-top:12px;position:relative;z-index:1;"></div>
+      </div>
+
+      <!-- Étape 2 : Saisir le code PIN -->
+      <div id="loginStep2" style="display:none;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;position:relative;z-index:1;">
+          <div id="loginSelectedAvatar" style="font-size:38px;width:54px;height:54px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.8);border:2px solid var(--border2);border-radius:50%;flex-shrink:0;"></div>
+          <div>
+            <div id="loginSelectedName" style="font-weight:900;font-size:1.15rem;color:var(--blue3);"></div>
+            <div style="font-size:12px;color:var(--text3);font-weight:600;">Entrez votre code secret</div>
+          </div>
+          <button type="button" onclick="loginBackToUsers()" style="margin-left:auto;background:rgba(255,255,255,.7);border:1px solid var(--border);border-radius:50px;padding:6px 14px;font-size:12px;font-weight:800;cursor:pointer;color:var(--text2);font-family:'Nunito',sans-serif;">← Changer</button>
+        </div>
+        <div class="numpad-display" id="loginPinDisplay">—</div>
+        <div class="numpad-grid">
+          <button type="button" class="numpad-key" onclick="loginPinPress('1')">1</button>
+          <button type="button" class="numpad-key" onclick="loginPinPress('2')">2</button>
+          <button type="button" class="numpad-key" onclick="loginPinPress('3')">3</button>
+          <button type="button" class="numpad-key" onclick="loginPinPress('4')">4</button>
+          <button type="button" class="numpad-key" onclick="loginPinPress('5')">5</button>
+          <button type="button" class="numpad-key" onclick="loginPinPress('6')">6</button>
+          <button type="button" class="numpad-key" onclick="loginPinPress('7')">7</button>
+          <button type="button" class="numpad-key" onclick="loginPinPress('8')">8</button>
+          <button type="button" class="numpad-key" onclick="loginPinPress('9')">9</button>
+          <button type="button" class="numpad-key key-del" onclick="loginPinDelete()">⌫ Suppr.</button>
+          <button type="button" class="numpad-key key-zero" onclick="loginPinPress('0')">0</button>
+          <button type="button" class="numpad-key key-ok" onclick="loginPinValidate()">✓ OK</button>
+        </div>
+        <div id="loginMessage" style="margin-top:12px;position:relative;z-index:1;"></div>
+      </div>
+
+      <!-- champ caché pour compatibilité -->
+      <form id="loginForm" style="display:none;">
+        <input type="text" id="loginUser">
+        <input type="password" id="loginPass">
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal changement mot de passe Admin -->
+  <div id="adminPwModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>👑 Modifier le code Admin</h2>
+        <button class="close-btn" onclick="closeAdminPwModal()">×</button>
+      </div>
+      <p style="color:var(--text2);font-weight:600;margin-bottom:20px;">Saisissez d'abord le code actuel, puis le nouveau code.</p>
+
+      <div class="form-group">
+        <label>Code actuel</label>
+        <div class="numpad-display" id="adminCurDisplay">—</div>
+        <div class="numpad-grid">
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','1')">1</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','2')">2</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','3')">3</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','4')">4</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','5')">5</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','6')">6</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','7')">7</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','8')">8</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','9')">9</button>
+          <button type="button" class="numpad-key key-del" onclick="adminNumpadDel('cur')">⌫</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('cur','0')">0</button>
+          <button type="button" class="numpad-key" style="visibility:hidden;"></button>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:20px;">
+        <label>Nouveau code</label>
+        <div class="numpad-display" id="adminNewDisplay">—</div>
+        <div class="numpad-grid">
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','1')">1</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','2')">2</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','3')">3</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','4')">4</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','5')">5</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','6')">6</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','7')">7</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','8')">8</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','9')">9</button>
+          <button type="button" class="numpad-key key-del" onclick="adminNumpadDel('new')">⌫</button>
+          <button type="button" class="numpad-key" onclick="adminNumpadPress('new','0')">0</button>
+          <button type="button" class="numpad-key" style="visibility:hidden;"></button>
+        </div>
+      </div>
+
+      <div id="adminPwMessage"></div>
+      <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="saveAdminPassword()">💾 Enregistrer le nouveau code</button>
+    </div>
+  </div>
+
+  <script>
+// ── Sync serveur automatique ──────────────────────────────────────────────────
+const _IS_SERVER = window.location.protocol === "http:";
+const _API_BASE  = window.location.origin + "/api";
+async function syncToServer(...keys) {
+  if (!_IS_SERVER) return;
+  const body = {};
+  keys.forEach(k => {
+    try { body[k] = JSON.parse(localStorage.getItem(k) || "null"); } catch(e) {}
+  });
+  try {
+    await fetch(_API_BASE + "/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  } catch(e) {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+    const userForm = document.getElementById("userForm");
+    const usersTable = document.querySelector("#usersTable tbody");
+    const historyTbody = document.querySelector("#historyTable tbody");
+    const clearHistoryBtn = document.getElementById("clearHistory");
+    const userModal = document.getElementById("userModal");
+    const loginModal = document.getElementById("loginModal");
+    
+    // Company header
+    const companySettings = JSON.parse(localStorage.getItem("companySettings")) || {};
+    function renderCompanyHeader() {
+      const header = document.getElementById("companyHeader");
+      if (!header) return;
+      header.innerHTML = `
+        <strong>${companySettings.companyName || "Mon Entreprise"}</strong><br>
+        ${companySettings.companyAddress || ""} ${companySettings.companyLocality || ""}<br>
+        N° Entreprise : ${companySettings.companyNumber || ""}
+      `;
+    }
+    renderCompanyHeader();
+
+    /* -----------------------
+       Numpad logic
+       ----------------------- */
+    let numpadValue = "";
+    const numpadDisplay = document.getElementById("numpadDisplay");
+    const passwordInput = document.getElementById("password");
+
+    function updateNumpadDisplay() {
+      if (numpadValue.length === 0) {
+        numpadDisplay.textContent = "—";
+        numpadDisplay.style.color = "var(--text3)";
+      } else {
+        numpadDisplay.textContent = "●".repeat(numpadValue.length);
+        numpadDisplay.style.color = "var(--text)";
+      }
+      passwordInput.value = numpadValue;
+    }
+
+    function numpadPress(digit) {
+      numpadValue += digit;
+      updateNumpadDisplay();
+    }
+
+    function numpadDelete() {
+      numpadValue = numpadValue.slice(0, -1);
+      updateNumpadDisplay();
+    }
+
+    function numpadOk() {
+      if (numpadValue.length === 0) {
+        numpadDisplay.style.borderColor = "var(--red)";
+        numpadDisplay.style.color = "var(--red)";
+        numpadDisplay.textContent = "Saisissez un code !";
+        setTimeout(() => updateNumpadDisplay(), 1200);
+        return;
+      }
+      numpadDisplay.style.borderColor = "var(--green)";
+      numpadDisplay.style.color = "var(--green)";
+      numpadDisplay.textContent = "✓ " + "●".repeat(numpadValue.length);
+      setTimeout(() => updateNumpadDisplay(), 800);
+    }
+
+    function resetNumpad() {
+      numpadValue = "";
+      updateNumpadDisplay();
+      numpadDisplay.style.borderColor = "var(--border)";
+      numpadDisplay.style.color = "var(--text)";
+    }
+
+    // ── Compte Admin permanent (non supprimable) ──
+    const ADMIN_USER = { username: "Admin", password: "0000", avatar: "👑", isAdmin: true };
+    // Le mot de passe admin peut être modifié et est stocké dans localStorage
+    let adminPassword = localStorage.getItem("adminPassword") || ADMIN_USER.password;
+    // On synchronise
+    ADMIN_USER.password = adminPassword;
+
+    // ── Modal changement mot de passe Admin ──
+    let adminCurValue = "";
+    let adminNewValue = "";
+
+    function adminNumpadPress(field, digit) {
+      if (field === 'cur') {
+        adminCurValue += digit;
+        updateAdminDisplay('cur');
+      } else {
+        adminNewValue += digit;
+        updateAdminDisplay('new');
+      }
+    }
+    function adminNumpadDel(field) {
+      if (field === 'cur') { adminCurValue = adminCurValue.slice(0,-1); updateAdminDisplay('cur'); }
+      else { adminNewValue = adminNewValue.slice(0,-1); updateAdminDisplay('new'); }
+    }
+    function updateAdminDisplay(field) {
+      var val = field === 'cur' ? adminCurValue : adminNewValue;
+      var el = document.getElementById(field === 'cur' ? 'adminCurDisplay' : 'adminNewDisplay');
+      el.textContent = val.length === 0 ? "—" : "●".repeat(val.length);
+      el.style.color = val.length === 0 ? "var(--text3)" : "var(--text)";
+    }
+    function openAdminPwModal() {
+      adminCurValue = ""; adminNewValue = "";
+      updateAdminDisplay('cur'); updateAdminDisplay('new');
+      document.getElementById('adminPwMessage').innerHTML = "";
+      var m = document.getElementById('adminPwModal');
+      m.classList.add('active'); m.style.display = 'flex';
+    }
+    function closeAdminPwModal() {
+      var m = document.getElementById('adminPwModal');
+      m.classList.remove('active'); m.style.display = 'none';
+    }
+    function saveAdminPassword() {
+      var msg = document.getElementById('adminPwMessage');
+      if (adminCurValue !== ADMIN_USER.password) {
+        msg.innerHTML = "<div class='message error'>❌ Code actuel incorrect !</div>";
+        return;
+      }
+      if (adminNewValue.length === 0) {
+        msg.innerHTML = "<div class='message error'>❌ Le nouveau code ne peut pas être vide.</div>";
+        return;
+      }
+      ADMIN_USER.password = adminNewValue;
+      adminPassword = adminNewValue;
+      localStorage.setItem("adminPassword", adminNewValue);
+      syncToServer("users", "loginHistory", "lastLoginISO", "adminPassword");
+      renderUsers();
+      msg.innerHTML = "<div class='message success'>✅ Code Admin mis à jour !</div>";
+      setTimeout(closeAdminPwModal, 1500);
+    }
+    window.openAdminPwModal = openAdminPwModal;
+    window.closeAdminPwModal = closeAdminPwModal;
+
+    let users = [];
+    let connHistory = [];
+    const HIST_PER_PAGE = 15;
+    let histPage = 1;
+
+    try {
+      users = JSON.parse(localStorage.getItem("users")) || [];
+      connHistory = JSON.parse(localStorage.getItem("loginHistory")) || [];
+    } catch (e) {
+      users = [];
+      connHistory = [];
+    }
+
+    // ── Clavier virtuel ──
+    let vkbCaps = true; // majuscules par défaut
+    function toggleVirtualKeyboard() {
+      const kb = document.getElementById('virtualKeyboard');
+      const btn = document.getElementById('vkbToggleBtn');
+      kb.classList.toggle('visible');
+      btn.classList.toggle('active', kb.classList.contains('visible'));
+    }
+
+    /* -----------------------
+       Wizard (3 étapes)
+       ----------------------- */
+    let currentWizardStep = 1;
+
+    function wizardGoTo(step) {
+      // Masquer toutes les pages
+      for (let i = 1; i <= 3; i++) {
+        document.getElementById('wizardPage' + i).classList.remove('active');
+        var item = document.getElementById('stepItem' + i);
+        item.classList.remove('active', 'done');
+      }
+      // Marquer les étapes
+      for (let i = 1; i < step; i++) {
+        document.getElementById('stepItem' + i).classList.add('done');
+        if (i < 3) document.getElementById('connector' + i).classList.add('done');
+      }
+      document.getElementById('stepItem' + step).classList.add('active');
+      if (step > 1) document.getElementById('connector' + (step-1)).classList.add('done');
+      if (step < 3) document.getElementById('connector' + step).classList.remove('done');
+      // Afficher la page courante
+      document.getElementById('wizardPage' + step).classList.add('active');
+      currentWizardStep = step;
+    }
+
+    function wizardNext(fromStep) {
+      if (fromStep === 1) {
+        var username = document.getElementById('username').value.trim();
+        if (!username) {
+          document.getElementById('username').style.borderColor = 'var(--red)';
+          document.getElementById('username').focus();
+          setTimeout(() => document.getElementById('username').style.borderColor = '', 1500);
+          return;
+        }
+        var editIndex = document.getElementById('editIndex').value;
+        if (username.toLowerCase() === 'admin' && editIndex === '') {
+          alert('⚠️ Le nom « Admin » est réservé au compte administrateur.');
+          return;
+        }
+        wizardGoTo(2);
+      } else if (fromStep === 2) {
+        if (numpadValue.length === 0) {
+          numpadDisplay.style.borderColor = 'var(--red)';
+          numpadDisplay.style.color = 'var(--red)';
+          numpadDisplay.textContent = 'Saisissez un code !';
+          setTimeout(() => updateNumpadDisplay(), 1200);
+          return;
+        }
+        wizardGoTo(3);
+      }
+    }
+
+    function wizardBack(fromStep) {
+      wizardGoTo(fromStep - 1);
+    }
+    function vkbPress(char) {
+      const input = document.getElementById('username');
+      const ch = vkbCaps ? char.toUpperCase() : char.toLowerCase();
+      input.value += ch;
+      input.focus();
+    }
+    function vkbDelete() {
+      const input = document.getElementById('username');
+      input.value = input.value.slice(0, -1);
+      input.focus();
+    }
+    function vkbToggleCaps() {
+      vkbCaps = !vkbCaps;
+      const btn = document.getElementById('vkbCapsBtn');
+      btn.classList.toggle('caps-on', vkbCaps);
+      btn.textContent = vkbCaps ? '⇧ MAJ' : '⇩ min';
+    }
+
+    /* -----------------------
+       Avatar UI wiring
+       ----------------------- */
+    const avatarPreview = document.getElementById('avatarPreview');
+    const photoInput = document.getElementById('photoInput');
+    const iconSelector = document.getElementById('iconSelector');
+    const photoSelector = document.getElementById('photoSelector');
+    const removeAvatarBtn = document.getElementById('removeAvatar');
+    const changeAvatarBtn = document.getElementById('changeAvatar');
+    let selectedIcon = '👩‍💻';
+
+    document.querySelectorAll('.icon-option').forEach(icon => {
+      icon.addEventListener('click', () => {
+        document.querySelectorAll('.icon-option').forEach(i=>i.classList.remove('selected'));
+        icon.classList.add('selected');
+        selectedIcon = icon.textContent;
+        avatarPreview.style.display = 'none';
+      });
+    });
+
+    document.querySelectorAll('input[name="avatarType"]').forEach(r=>{
+      r.addEventListener('change', ()=>{
+        if (r.value === 'icon' && r.checked) {
+          iconSelector.style.display = 'flex';
+          photoSelector.style.display = 'none';
+          avatarPreview.src = '';
+          avatarPreview.style.display = 'none';
+        } else if (r.value === 'photo' && r.checked) {
+          iconSelector.style.display = 'none';
+          photoSelector.style.display = 'block';
+          avatarPreview.src = '';
+          avatarPreview.style.display = 'none';
+        }
+      });
+    });
+
+    if (photoInput) {
+      photoInput.addEventListener('change', e=>{
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            avatarPreview.src = evt.target.result;
+            avatarPreview.style.display = 'block';
+          }
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    changeAvatarBtn.addEventListener('click', ()=>{
+      const avatarType = document.querySelector('input[name="avatarType"]:checked').value;
+      avatarPreview.src = '';
+      avatarPreview.style.display = 'none';
+      if (avatarType === 'icon') {
+        iconSelector.style.display = 'flex';
+        photoSelector.style.display = 'none';
+      } else {
+        iconSelector.style.display = 'none';
+        photoSelector.style.display = 'block';
+        photoInput.value = '';
+      }
+    });
+
+    removeAvatarBtn.addEventListener('click', ()=>{
+      selectedIcon = '👩‍💻';
+      avatarPreview.src = '';
+      avatarPreview.style.display = 'none';
+      photoInput.value = '';
+      document.querySelector('input[value="icon"]').checked = true;
+      iconSelector.style.display = 'flex';
+      photoSelector.style.display = 'none';
+      document.querySelectorAll('.icon-option').forEach(i=>{
+        i.classList.toggle('selected', i.textContent === '👩‍💻');
+      });
+    });
+
+    /* -----------------------
+       Open/Close modals
+       ----------------------- */
+    function openUserModal(editIndex) {
+      editIndex = editIndex !== undefined ? editIndex : null;
+      userModal.classList.add("active");
+      userModal.style.display = 'flex';
+      document.getElementById("userModalTitle").textContent = editIndex !== null ? "Modifier l'utilisateur" : "Ajouter un utilisateur";
+
+      // Réinitialiser le wizard à l'étape 1
+      wizardGoTo(1);
+
+      if (editIndex !== null) {
+        const u = users[editIndex];
+        document.getElementById("username").value = u.username;
+        numpadValue = u.password;
+        updateNumpadDisplay();
+        document.getElementById("editIndex").value = editIndex;
+
+        if (u.avatar && u.avatar.startsWith('data:')) {
+          document.querySelector('input[value="photo"]').checked = true;
+          iconSelector.style.display = 'none';
+          photoSelector.style.display = 'block';
+          avatarPreview.src = u.avatar;
+          avatarPreview.style.display = 'block';
+          document.querySelectorAll('.icon-option').forEach(i=>i.classList.remove('selected'));
+          selectedIcon = null;
+        } else {
+          document.querySelector('input[value="icon"]').checked = true;
+          iconSelector.style.display = 'flex';
+          photoSelector.style.display = 'none';
+          selectedIcon = u.avatar || '👩‍💻';
+          document.querySelectorAll('.icon-option').forEach(i=>{
+            i.classList.toggle('selected', i.textContent === selectedIcon);
+          });
+          avatarPreview.src = '';
+          avatarPreview.style.display = 'none';
+        }
+      } else {
+        userForm.reset();
+        document.getElementById("editIndex").value = "";
+        resetNumpad();
+        avatarPreview.style.display = 'none';
+        document.querySelectorAll('.icon-option').forEach(i=>i.classList.remove('selected'));
+        document.querySelector('input[value="icon"]').checked = true;
+        iconSelector.style.display = 'flex';
+        photoSelector.style.display = 'none';
+        selectedIcon = '👩‍💻';
+      }
+
+      // Clavier virtuel visible par défaut sur page 1
+      const kb = document.getElementById('virtualKeyboard');
+      if (kb) kb.classList.add('visible');
+      const vkbBtn = document.getElementById('vkbToggleBtn');
+      if (vkbBtn) vkbBtn.classList.add('active');
+    }
+
+    function closeUserModal() {
+      userModal.classList.remove("active");
+      userModal.style.display = 'none';
+      userForm.reset();
+      document.getElementById("editIndex").value = "";
+      resetNumpad();
+      avatarPreview.style.display = 'none';
+      document.querySelectorAll('.icon-option').forEach(i=>i.classList.remove('selected'));
+      wizardGoTo(1);
+      // Clavier virtuel visible par défaut
+      const kb = document.getElementById('virtualKeyboard');
+      if (kb) kb.classList.add('visible');
+      const vkbBtn = document.getElementById('vkbToggleBtn');
+      if (vkbBtn) vkbBtn.classList.add('active');
+    }
+
+    function openLoginModal() {
+      loginModal.classList.add("active");
+      loginModal.style.display = 'flex';
+      document.getElementById("loginMessage").innerHTML = "";
+      loginPinValue = "";
+      loginSelectedUser = null;
+      renderLoginUserList();
+      document.getElementById('loginStep1').style.display = 'block';
+      document.getElementById('loginStep2').style.display = 'none';
+    }
+
+    function closeLoginModal() {
+      loginModal.classList.remove("active");
+      loginModal.style.display = 'none';
+      document.getElementById("loginForm").reset();
+      document.getElementById("loginMessage").innerHTML = "";
+      loginPinValue = "";
+      loginSelectedUser = null;
+    }
+
+    window.onclick = function(event) {
+      if (event.target === userModal) closeUserModal();
+      if (event.target === loginModal) closeLoginModal();
+    };
+
+    /* -----------------------
+       Render users
+       ----------------------- */
+    function makeAvatarHTML(avatar) {
+      if (!avatar) return "<span style='font-size:26px;display:inline-block;width:40px;height:40px;line-height:40px;text-align:center;'>👩‍💻</span>";
+      if (typeof avatar === 'string' && avatar.startsWith('data:')) {
+        return "<img src='" + avatar + "' style='width:40px;height:40px;border-radius:50%;object-fit:cover;'>";
+      }
+      return "<span style='font-size:26px;display:inline-block;width:40px;height:40px;line-height:40px;text-align:center;'>" + avatar + "</span>";
+    }
+
+    function renderUsers() {
+      usersTable.innerHTML = "";
+      var total = users.length + 1; // +1 for admin
+      document.getElementById("userCount").textContent = total + " utilisateur(s)";
+
+      // ── Ligne Admin (fixe, non supprimable) ──
+      var adminRow = document.createElement("tr");
+      adminRow.className = "admin-row";
+      adminRow.innerHTML = "<td>" + makeAvatarHTML(ADMIN_USER.avatar) + "</td>"
+        + "<td><strong>" + ADMIN_USER.username + "</strong> <span class='admin-badge'>👑 ADMIN</span></td>"
+        + "<td>" + "•".repeat(ADMIN_USER.password.length) + "</td>"
+        + "<td class='actions'>"
+        + "<button class='btn btn-primary btn-small' onclick='openAdminPwModal()'>✏️ Modifier</button>"
+        + "<span style='color:var(--text3);font-weight:700;font-size:12px;margin-left:6px;'>🔒 Non supprimable</span>"
+        + "</td>";
+      usersTable.appendChild(adminRow);
+
+      if (users.length === 0) return;
+
+      users.forEach(function(u, i) {
+        var row = document.createElement("tr");
+        row.innerHTML = "<td>" + makeAvatarHTML(u.avatar) + "</td>"
+          + "<td><strong>" + u.username + "</strong></td>"
+          + "<td>" + "•".repeat(u.password.length) + "</td>"
+          + "<td class='actions'>"
+          + "<button class='btn btn-primary btn-small' onclick='openUserModal(" + i + ")'>✏️ Modifier</button>"
+          + "<button class='btn btn-danger btn-small' onclick='deleteUser(" + i + ")'>🗑️ Supprimer</button>"
+          + "</td>";
+        usersTable.appendChild(row);
+      });
+    }
+
+    /* -----------------------
+       Render history with pagination
+       ----------------------- */
+    function renderHistory() {
+      historyTbody.innerHTML = "";
+      var pagination = document.getElementById("histPagination");
+      var info = document.getElementById("histPaginationInfo");
+      pagination.innerHTML = "";
+      info.textContent = "";
+
+      if (connHistory.length === 0) {
+        historyTbody.innerHTML = "<tr><td colspan='2' class='empty-state'><div>Aucune connexion enregistrée</div></td></tr>";
+        return;
+      }
+
+      var total = connHistory.length;
+      var totalPages = Math.ceil(total / HIST_PER_PAGE);
+      if (histPage > totalPages) histPage = totalPages;
+      if (histPage < 1) histPage = 1;
+
+      var reversed = connHistory.slice().reverse();
+      var start = (histPage - 1) * HIST_PER_PAGE;
+      var pageItems = reversed.slice(start, start + HIST_PER_PAGE);
+
+      pageItems.forEach(function(h) {
+        var row = document.createElement("tr");
+        row.innerHTML = "<td>" + h.date + "</td><td><strong>" + h.user + "</strong></td>";
+        historyTbody.appendChild(row);
+      });
+
+      function mkBtn(label, disabled, onclick) {
+        var b = document.createElement("button");
+        b.textContent = label;
+        b.disabled = disabled;
+        if (!disabled) b.onclick = onclick;
+        return b;
+      }
+
+      pagination.appendChild(mkBtn("← Préc.", histPage === 1, function() { histPage--; renderHistory(); }));
+
+      var ps = Math.max(1, histPage - 2);
+      var pe = Math.min(totalPages, histPage + 2);
+
+      if (ps > 1) {
+        pagination.appendChild(mkBtn("1", false, function() { histPage = 1; renderHistory(); }));
+        if (ps > 2) pagination.appendChild(mkBtn("…", true, null));
+      }
+      for (var i = ps; i <= pe; i++) {
+        var b = mkBtn(i, false, (function(p) { return function() { histPage = p; renderHistory(); }; })(i));
+        if (i === histPage) b.className = "active";
+        pagination.appendChild(b);
+      }
+      if (pe < totalPages) {
+        if (pe < totalPages - 1) pagination.appendChild(mkBtn("…", true, null));
+        pagination.appendChild(mkBtn(totalPages, false, function() { histPage = totalPages; renderHistory(); }));
+      }
+
+      pagination.appendChild(mkBtn("Suiv. →", histPage === totalPages, function() { histPage++; renderHistory(); }));
+      info.textContent = "Page " + histPage + " / " + totalPages + " — " + (start + 1) + " à " + Math.min(start + HIST_PER_PAGE, total) + " sur " + total + " connexion(s)";
+    }
+
+    /* -----------------------
+       Form submit (add / edit user)
+       ----------------------- */
+    userForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var username = document.getElementById("username").value.trim();
+      var password = document.getElementById("password").value;
+      var editIndex = document.getElementById("editIndex").value;
+
+      var avatar = null;
+      var avatarType = document.querySelector('input[name="avatarType"]:checked').value;
+      if (avatarType === 'photo' && avatarPreview && avatarPreview.src) {
+        avatar = avatarPreview.src;
+      } else if (avatarType === 'icon') {
+        avatar = selectedIcon || '👩‍💻';
+      } else {
+        avatar = '👩‍💻';
+      }
+
+      if (editIndex !== "") {
+        users[editIndex] = { username: username, password: password, avatar: avatar };
+      } else {
+        users.push({ username: username, password: password, avatar: avatar });
+      }
+      localStorage.setItem("users", JSON.stringify(users));
+      syncToServer("users", "loginHistory", "lastLoginISO", "adminPassword");
+      renderUsers();
+      closeUserModal();
+    });
+
+    window.deleteUser = function(i) {
+      if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+        users.splice(i, 1);
+        localStorage.setItem("users", JSON.stringify(users));
+        syncToServer("users", "loginHistory", "lastLoginISO", "adminPassword");
+        renderUsers();
+      }
+    };
+
+    /* -----------------------
+       Login handling
+       ----------------------- */
+    function addLoginHistory(user) {
+      var now = new Date();
+      connHistory.push({ date: now.toLocaleString(), iso: now.toISOString(), user: user });
+      localStorage.setItem("loginHistory", JSON.stringify(connHistory));
+      localStorage.setItem("lastLoginISO", now.toISOString());
+      syncToServer("users", "loginHistory", "lastLoginISO", "adminPassword");
+      histPage = 1;
+      renderHistory();
+    }
+
+    clearHistoryBtn.addEventListener("click", function() {
+      if (confirm("Êtes-vous sûr de vouloir vider tout l'historique ?")) {
+        connHistory = [];
+        histPage = 1;
+        localStorage.removeItem("loginHistory");
+        renderHistory();
+      }
+    });
+
+    /* -----------------------
+       Login modal (nouveau flow)
+       ----------------------- */
+    var loginMessage = document.getElementById("loginMessage");
+    var loginPinValue = "";
+    var loginSelectedUser = null;
+
+    function makeLoginAvatarHTML(avatar, size) {
+      size = size || 44;
+      if (!avatar) return "<span style='font-size:" + (size*0.6) + "px;'>👩‍💻</span>";
+      if (typeof avatar === 'string' && avatar.startsWith('data:')) {
+        return "<img src='" + avatar + "' style='width:" + size + "px;height:" + size + "px;border-radius:50%;object-fit:cover;'>";
+      }
+      return "<span style='font-size:" + (size*0.6) + "px;'>" + avatar + "</span>";
+    }
+
+    function renderLoginUserList() {
+      var list = document.getElementById('loginUserList');
+      list.innerHTML = '';
+      // Tous les users + admin
+      var allUsers = [ADMIN_USER].concat(users);
+      allUsers.forEach(function(u) {
+        var card = document.createElement('div');
+        card.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:12px 16px;border-radius:14px;border:2px solid var(--border2);background:rgba(255,255,255,.8);transition:all .2s;min-width:80px;';
+        card.innerHTML = "<div style='width:54px;height:54px;border-radius:50%;background:rgba(220,238,255,.7);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;overflow:hidden;'>"
+          + makeLoginAvatarHTML(u.avatar, 44)
+          + "</div><div style='font-weight:800;font-size:13px;color:var(--text);text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'>" + u.username + "</div>";
+        if (u.isAdmin) {
+          card.innerHTML += "<span style='font-size:10px;background:linear-gradient(135deg,#ffd84d,#e8a800);color:#5a3800;padding:2px 8px;border-radius:50px;font-weight:900;'>ADMIN</span>";
+        }
+        card.addEventListener('mouseenter', function() {
+          card.style.borderColor = 'var(--blue-light)';
+          card.style.background = 'rgba(210,238,255,.9)';
+          card.style.transform = 'translateY(-3px)';
+          card.style.boxShadow = '0 6px 18px var(--shadow)';
+        });
+        card.addEventListener('mouseleave', function() {
+          card.style.borderColor = 'var(--border2)';
+          card.style.background = 'rgba(255,255,255,.8)';
+          card.style.transform = '';
+          card.style.boxShadow = '';
+        });
+        card.addEventListener('click', function() { loginSelectUser(u); });
+        list.appendChild(card);
+      });
+    }
+
+    function loginSelectUser(u) {
+      loginSelectedUser = u;
+      loginPinValue = '';
+      // Afficher l'avatar et le nom
+      document.getElementById('loginSelectedAvatar').innerHTML = makeLoginAvatarHTML(u.avatar, 44);
+      document.getElementById('loginSelectedName').textContent = u.username;
+      updateLoginPinDisplay();
+      document.getElementById('loginMessage').innerHTML = '';
+      document.getElementById('loginStep1').style.display = 'none';
+      document.getElementById('loginStep2').style.display = 'block';
+    }
+
+    function loginBackToUsers() {
+      loginPinValue = '';
+      loginSelectedUser = null;
+      document.getElementById('loginMessage').innerHTML = '';
+      document.getElementById('loginStep1').style.display = 'block';
+      document.getElementById('loginStep2').style.display = 'none';
+    }
+
+    function updateLoginPinDisplay() {
+      var d = document.getElementById('loginPinDisplay');
+      if (loginPinValue.length === 0) {
+        d.textContent = '—'; d.style.color = 'var(--text3)'; d.style.borderColor = 'var(--border)';
+      } else {
+        d.textContent = '●'.repeat(loginPinValue.length); d.style.color = 'var(--text)';
+      }
+    }
+
+    function loginPinPress(digit) { loginPinValue += digit; updateLoginPinDisplay(); }
+    function loginPinDelete() { loginPinValue = loginPinValue.slice(0,-1); updateLoginPinDisplay(); }
+
+    function loginPinValidate() {
+      if (!loginSelectedUser) return;
+      var msg = document.getElementById('loginMessage');
+      if (loginPinValue.length === 0) {
+        var d = document.getElementById('loginPinDisplay');
+        d.style.borderColor = 'var(--red)'; d.style.color = 'var(--red)'; d.textContent = 'Saisissez un code !';
+        setTimeout(updateLoginPinDisplay, 1200); return;
+      }
+      if (loginPinValue === loginSelectedUser.password) {
+        msg.innerHTML = "<div class='message success'>✅ Bonjour " + loginSelectedUser.username + " !</div>";
+        addLoginHistory(loginSelectedUser.username);
+        setTimeout(function() { closeLoginModal(); }, 1400);
+      } else {
+        msg.innerHTML = "<div class='message error'>❌ Code incorrect, réessayez.</div>";
+        loginPinValue = '';
+        updateLoginPinDisplay();
+      }
+    }
+
+    // Compatibilité ancien form (inutilisé mais conservé)
+    var loginForm = document.getElementById("loginForm");
+    loginForm.addEventListener("submit", function(e) { e.preventDefault(); });
+
+    // initial render
+    renderUsers();
+    renderHistory();
+  </script>
+</body>
+</html>

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Installation · BisoOffice</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+            --green:#5aad2e; --green2:#4a9422;
+            --yellow:#e8a800;
+            --red:#c0392b;
+            --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+            --border:#b0cce8; --border2:#d0e4f4;
+            --shadow:rgba(30,80,160,0.18); --shadow2:rgba(30,80,160,0.08);
+            --radius:12px; --radius-lg:18px; --radius-xl:24px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Nunito', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 30px 20px 40px;
+            color: var(--text);
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content:''; position:fixed; top:-160px; left:-160px; width:560px; height:560px;
+            background:radial-gradient(circle,rgba(255,255,255,0.18),transparent 70%);
+            pointer-events:none; z-index:0; border-radius:50%;
+        }
+        body::after {
+            content:''; position:fixed; bottom:-100px; right:4%; width:460px; height:460px;
+            background:radial-gradient(circle,rgba(255,255,255,0.18),transparent 70%);
+            pointer-events:none; z-index:0; border-radius:50%;
+        }
+
+        /* ===== CONTENEUR PRINCIPAL ===== */
+        .page-principale {
+            width: 100%; max-width: 900px;
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(18px);
+            border-radius: var(--radius-xl);
+            padding: 40px 36px 36px;
+            border: 2px solid rgba(255,255,255,0.55);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.22);
+            text-align: center;
+            position: relative; z-index: 2;
+        }
+        .page-principale::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:38%;
+            background:rgba(255,255,255,0.12); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+            pointer-events:none;
+        }
+        .page-principale > * { position: relative; z-index:2; }
+
+        .titre-page {
+            font-size: 2.6rem; font-weight:900; color:white;
+            margin-bottom:10px; letter-spacing:2px;
+            text-shadow: 0 4px 16px rgba(0,0,0,0.22);
+        }
+        .sous-titre {
+            font-size: 1.05rem; color:rgba(255,255,255,0.9); font-weight:600;
+            margin-bottom:30px;
+            background:rgba(255,255,255,0.15); padding:9px 22px;
+            border-radius:50px; display:inline-block;
+        }
+
+        /* ===== ONGLETS OS ===== */
+        .os-tabs {
+            display:flex; gap:12px; justify-content:center; margin-bottom:22px;
+        }
+        .os-tab {
+            display:flex; align-items:center; gap:10px;
+            padding:13px 28px; border-radius:50px;
+            border:2px solid rgba(255,255,255,0.4);
+            background:rgba(255,255,255,0.12);
+            color:rgba(255,255,255,0.75);
+            font-family:'Nunito',sans-serif; font-size:1.05rem; font-weight:900;
+            cursor:pointer; transition:all 0.22s ease; letter-spacing:0.3px;
+            position:relative; overflow:hidden;
+        }
+        .os-tab::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:50%;
+            background:rgba(255,255,255,0.1); border-radius:50px 50px 0 0; pointer-events:none;
+        }
+        .os-tab .tab-icon { font-size:1.5rem; }
+        .os-tab:hover { background:rgba(255,255,255,0.22); border-color:rgba(255,255,255,0.7); color:white; transform:translateY(-2px); }
+        .os-tab.active {
+            background:rgba(255,255,255,0.95); border-color:white;
+            color:var(--blue3); box-shadow:0 8px 28px rgba(0,0,0,0.2); transform:translateY(-3px);
+        }
+        .tab-badge {
+            font-size:0.65rem; font-weight:900; padding:2px 8px; border-radius:50px;
+            background:rgba(255,255,255,0.25); color:rgba(255,255,255,0.9);
+            letter-spacing:0.5px; text-transform:uppercase;
+        }
+        .os-tab.active .tab-badge { background:var(--green); color:white; }
+
+        /* ===== SECTIONS OS ===== */
+        .os-section { display:none; }
+        .os-section.active { display:block; }
+
+        /* Bandeau info auto-install */
+        .auto-badge {
+            display:inline-flex; align-items:center; gap:10px;
+            background:rgba(255,255,255,0.22); border:1.5px solid rgba(255,255,255,0.5);
+            border-radius:var(--radius-lg); padding:12px 20px; margin-bottom:20px;
+            font-size:0.9rem; font-weight:700; color:white; text-align:left; width:100%;
+        }
+        .auto-badge .badge-icon { font-size:1.4rem; flex-shrink:0; }
+        .auto-badge code {
+            background:rgba(255,255,255,0.2); padding:1px 7px; border-radius:6px;
+            font-family:'Courier New',monospace; font-size:0.9em;
+        }
+
+        /* ===== GRILLE 2 BOUTONS PAR OS ===== */
+        .boutons-os {
+            display:grid; grid-template-columns:repeat(2,1fr); gap:16px;
+        }
+
+        /* ===== STYLE COMMUN DES BOUTONS ===== */
+        .gros-bouton {
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            gap:11px; padding:30px 18px 26px;
+            border:none; border-radius:var(--radius-xl); cursor:pointer;
+            font-family:'Nunito',sans-serif; font-size:1.1rem; font-weight:900;
+            color:white; letter-spacing:0.4px;
+            box-shadow:0 10px 35px var(--shadow);
+            transition:transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+            position:relative; overflow:hidden; text-decoration:none;
+        }
+        .gros-bouton::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:48%;
+            background:rgba(255,255,255,0.22);
+            border-radius:var(--radius-xl) var(--radius-xl) 60% 60%; pointer-events:none;
+        }
+        .gros-bouton:hover { transform:translateY(-6px) scale(1.03); box-shadow:0 20px 50px var(--shadow); filter:brightness(1.07); }
+        .gros-bouton:active { transform:translateY(-2px) scale(1.01); }
+        .gros-bouton .icone { font-size:2.4rem; position:relative; z-index:2; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.2)); }
+        .gros-bouton .label-btn { position:relative; z-index:2; text-shadow:0 2px 6px rgba(0,0,0,0.18); }
+        .gros-bouton .sub-label {
+            position:relative; z-index:2; font-size:0.72rem; font-weight:700; opacity:0.88;
+            background:rgba(0,0,0,0.15); padding:3px 12px; border-radius:50px;
+            border:1px solid rgba(255,255,255,0.3); letter-spacing:0.4px;
+        }
+
+        /* Couleurs boutons */
+        .btn-offline-lnx { background:linear-gradient(145deg,#43e97b,#22c55e,#16a34a); }
+        .btn-enligne-lnx { background:linear-gradient(145deg,#4f7df9,#2a50c8,#1a3ba0); }
+        .btn-offline-win { background:linear-gradient(145deg,#06b6d4,#0891b2,#0e7490); }
+        .btn-enligne-win { background:linear-gradient(145deg,#f97316,#ea580c,#c2410c); }
+
+        /* ===== SÉPARATEUR ===== */
+        .section-sep { border:none; border-top:2px solid rgba(255,255,255,0.25); margin:28px 0; }
+
+        /* ===== BOUTON CAISSE ===== */
+        .btn-caisse {
+            display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+            gap:10px; padding:28px 52px;
+            border-radius:var(--radius-xl);
+            background:linear-gradient(145deg,#a855f7,#7c3aed,#5b21b6);
+            color:white; font-family:'Nunito',sans-serif; font-size:1.2rem; font-weight:900;
+            text-decoration:none; box-shadow:0 10px 35px var(--shadow);
+            transition:transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+            position:relative; overflow:hidden; letter-spacing:0.3px;
+        }
+        .btn-caisse::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:48%;
+            background:rgba(255,255,255,0.22); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%; pointer-events:none;
+        }
+        .btn-caisse .icone { font-size:2.2rem; position:relative; z-index:2; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.2)); }
+        .btn-caisse .label-btn { position:relative; z-index:2; text-shadow:0 2px 6px rgba(0,0,0,0.18); }
+        .btn-caisse .sub-label {
+            position:relative; z-index:2; font-size:0.72rem; font-weight:700; opacity:0.88;
+            background:rgba(0,0,0,0.15); padding:3px 12px; border-radius:50px;
+            border:1px solid rgba(255,255,255,0.3);
+        }
+        .btn-caisse:hover { transform:translateY(-6px) scale(1.03); box-shadow:0 20px 50px var(--shadow); filter:brightness(1.07); }
+
+        /* ===== COPYRIGHT ===== */
+        .copyright {
+            color:rgba(255,255,255,0.85); font-size:0.88rem; font-weight:600;
+            margin-top:22px; background:rgba(255,255,255,0.12);
+            padding:10px 20px; border-radius:50px; display:inline-block;
+        }
+
+        /* ====================================================
+           MODALES
+           ==================================================== */
+        .modal-overlay {
+            display:none; position:fixed; inset:0;
+            background:rgba(10,30,80,0.55); backdrop-filter:blur(12px);
+            align-items:center; justify-content:center; z-index:1000; padding:20px;
+        }
+        .modal-overlay.active { display:flex; }
+        .modal-contenu {
+            width:100%; max-width:680px;
+            background:linear-gradient(160deg,rgba(255,255,255,0.97),rgba(215,238,255,0.94));
+            border:2px solid rgba(255,255,255,0.95); border-radius:var(--radius-xl);
+            box-shadow:0 30px 80px rgba(20,60,180,0.32);
+            position:relative; max-height:90vh; overflow-y:auto; overflow-x:hidden;
+            animation:modalIn 0.28s cubic-bezier(0.175,.885,.32,1.275);
+        }
+        .modal-contenu::-webkit-scrollbar { width:5px; }
+        .modal-contenu::-webkit-scrollbar-thumb { background:var(--blue-light); border-radius:3px; }
+        @keyframes modalIn {
+            from { transform:scale(0.86) translateY(24px); opacity:0; }
+            to   { transform:scale(1) translateY(0); opacity:1; }
+        }
+
+        /* Bannière colorée */
+        .modal-banner {
+            border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+            padding:22px 26px 20px; position:relative; overflow:hidden;
+            display:flex; align-items:center; gap:14px;
+        }
+        .modal-banner::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:55%;
+            background:rgba(255,255,255,0.22); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%; pointer-events:none;
+        }
+        .modal-banner::after {
+            content:''; position:absolute; bottom:-30px; right:-30px;
+            width:130px; height:130px; background:rgba(255,255,255,0.1); border-radius:50%; pointer-events:none;
+        }
+        .banner-icone { font-size:2.1rem; position:relative; z-index:2; filter:drop-shadow(0 3px 8px rgba(0,0,0,0.22)); }
+        .banner-texte { position:relative; z-index:2; text-align:left; }
+        .banner-texte h2 { font-size:1.3rem; font-weight:900; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.2); }
+        .banner-texte p  { font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.85); margin-top:2px; }
+        .btn-fermer {
+            margin-left:auto; position:relative; z-index:2;
+            width:34px; height:34px; border-radius:50%;
+            background:rgba(255,255,255,0.25); border:2px solid rgba(255,255,255,0.6);
+            color:white; cursor:pointer; font-size:16px;
+            display:flex; align-items:center; justify-content:center;
+            transition:all 0.18s; font-weight:900; flex-shrink:0;
+        }
+        .btn-fermer:hover { background:rgba(255,255,255,0.45); transform:scale(1.1) rotate(90deg); }
+
+        /* Couleurs bannières */
+        .banner-green  { background:linear-gradient(135deg,#43e97b,#22c55e,#16a34a); }
+        .banner-blue   { background:linear-gradient(135deg,#4f7df9,#2a50c8,#1a3ba0); }
+        .banner-cyan   { background:linear-gradient(135deg,#06b6d4,#0891b2,#0e7490); }
+        .banner-orange { background:linear-gradient(135deg,#f97316,#ea580c,#c2410c); }
+
+        /* Corps modale */
+        .modal-body { padding:22px 26px 20px; }
+        .progress-bar-wrap { background:var(--border2); border-radius:50px; height:6px; margin-bottom:18px; overflow:hidden; }
+        .progress-bar-fill { height:100%; border-radius:50px; transition:width 0.35s cubic-bezier(0.4,0,0.2,1); }
+        .progress-green  { background:linear-gradient(90deg,#43e97b,#16a34a); }
+        .progress-blue   { background:linear-gradient(90deg,#5ba3e8,#2a50c8); }
+        .progress-cyan   { background:linear-gradient(90deg,#06b6d4,#0e7490); }
+        .progress-orange { background:linear-gradient(90deg,#f97316,#c2410c); }
+
+        /* Pages */
+        .page-container { min-height:230px; }
+        .page { display:none; animation:slide 0.3s ease; }
+        .page.active { display:block; }
+        @keyframes slide { from{opacity:0.2;transform:translateX(18px);} to{opacity:1;transform:translateX(0);} }
+
+        .titre-page-modal {
+            font-size:1.12rem; font-weight:900; color:var(--blue3);
+            margin-bottom:14px; display:flex; align-items:center; gap:10px;
+        }
+        .titre-page-modal::before {
+            content:''; display:inline-block; width:5px; height:20px;
+            background:var(--yellow); border-radius:4px; flex-shrink:0;
+        }
+
+        /* Liste étapes */
+        .liste-etapes-modal { list-style:none; display:flex; flex-direction:column; gap:9px; }
+        .liste-etapes-modal li {
+            background:rgba(255,255,255,0.85); border-radius:var(--radius-lg);
+            padding:11px 15px 11px 12px; border:1.5px solid rgba(255,255,255,0.95);
+            box-shadow:0 3px 0 var(--border2), 0 5px 14px var(--shadow2);
+            display:flex; align-items:center; gap:12px;
+            font-size:0.92rem; font-weight:600; color:var(--text);
+            transition:transform 0.15s ease, box-shadow 0.15s ease;
+            position:relative; overflow:hidden;
+        }
+        .liste-etapes-modal li::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:50%;
+            background:rgba(255,255,255,0.4); border-radius:var(--radius-lg) var(--radius-lg) 60% 60%; pointer-events:none;
+        }
+        .liste-etapes-modal li:hover { transform:translateX(4px); box-shadow:0 3px 0 var(--border),0 8px 22px var(--shadow); }
+        .liste-etapes-modal li code {
+            background:var(--blue-pale); color:var(--blue3); padding:2px 6px; border-radius:6px;
+            font-family:'Courier New',monospace; font-size:0.84em; font-weight:800; border:1px solid var(--border2);
+        }
+        .pastille-page {
+            background:linear-gradient(145deg,var(--blue-pale),#c8e6fa);
+            min-width:32px; height:32px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:900; font-size:0.9rem; color:var(--blue3);
+            border:2px solid var(--border); box-shadow:0 3px 0 var(--border),inset 0 1px 0 rgba(255,255,255,0.8);
+            flex-shrink:0; position:relative; z-index:2;
+        }
+        .note-modal {
+            background:linear-gradient(135deg,#fffbea,#fff3c4);
+            border-radius:var(--radius-lg); padding:11px 15px;
+            border:1.5px solid #ffd84d; border-left:5px solid #e8a800;
+            margin:14px 0 4px; font-weight:700; font-size:0.87rem; color:var(--text);
+            box-shadow:0 3px 12px rgba(232,168,0,0.12);
+            position:relative; overflow:hidden;
+        }
+        .note-modal::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:50%;
+            background:rgba(255,255,255,0.4); border-radius:var(--radius-lg) var(--radius-lg) 60% 60%; pointer-events:none;
+        }
+
+        /* Navigation interne */
+        .nav-interne {
+            display:flex; justify-content:space-between; align-items:center;
+            margin-top:18px; padding-top:15px; border-top:2px solid var(--border2); gap:12px;
+        }
+        .btn-nav-interne {
+            display:flex; align-items:center; gap:7px;
+            background:rgba(255,255,255,0.9); border:2px solid var(--border); border-bottom:4px solid var(--border);
+            border-radius:50px; padding:9px 20px;
+            font-weight:900; font-size:0.88rem; font-family:'Nunito',sans-serif; color:var(--blue3);
+            cursor:pointer; transition:all 0.18s ease; min-width:110px; justify-content:center;
+            position:relative; overflow:hidden;
+        }
+        .btn-nav-interne::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:50%;
+            background:rgba(255,255,255,0.5); border-radius:50px 50px 0 0; pointer-events:none;
+        }
+        .btn-nav-interne:disabled { opacity:0.3; pointer-events:none; }
+        .btn-nav-interne:not(:disabled):hover {
+            background:white; border-color:var(--yellow); border-bottom-color:var(--yellow);
+            transform:translateY(-3px); box-shadow:0 6px 18px var(--shadow2);
+        }
+        .indicateur-interne {
+            background:linear-gradient(135deg,var(--blue-pale),#c8e6fa);
+            border-radius:50px; padding:7px 16px; border:2px solid var(--border2);
+            font-weight:900; font-size:0.88rem; color:var(--blue3);
+            box-shadow:0 2px 8px var(--shadow2); white-space:nowrap;
+        }
+
+        /* Responsive */
+        @media (max-width:640px) {
+            .os-tabs { flex-direction:column; align-items:center; }
+            .boutons-os { grid-template-columns:1fr; gap:12px; }
+            .titre-page { font-size:1.9rem; }
+            .modal-contenu { border-radius:var(--radius-lg); }
+            .liste-etapes-modal li { flex-wrap:wrap; }
+            .gros-bouton { padding:22px 14px; }
+            .btn-caisse { padding:22px 32px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-principale">
+    <h1 class="titre-page">⚙️ INSTALLATION</h1>
+    <p class="sous-titre">BisoOffice · Choisis ton système d'exploitation</p>
+
+    <!-- ===== ONGLETS OS ===== -->
+    <div class="os-tabs">
+        <button class="os-tab active" onclick="switchOS('linux')">
+            <span class="tab-icon">🐧</span>
+            <span>Linux</span>
+            <span class="tab-badge">Auto</span>
+        </button>
+        <button class="os-tab" onclick="switchOS('windows')">
+            <span class="tab-icon">🪟</span>
+            <span>Windows</span>
+            <span class="tab-badge">.bat</span>
+        </button>
+    </div>
+
+    <!-- ===== SECTION LINUX ===== -->
+    <div class="os-section active" id="section-linux">
+        <div class="auto-badge">
+            <span class="badge-icon">🚀</span>
+            <span>Installation <b>100% automatique</b> — le fichier <code>bisooffice.desktop</code> installe Node.js, npm et lance tout seul au premier démarrage</span>
+        </div>
+        <div class="boutons-os">
+            <button class="gros-bouton btn-offline-lnx" id="ouvrirOfflineLnx">
+                <span class="icone">📴</span>
+                <span class="label-btn">Hors ligne</span>
+                <span class="sub-label">localStorage · navigateur</span>
+            </button>
+            <button class="gros-bouton btn-enligne-lnx" id="ouvrirEnligneLnx">
+                <span class="icone">🌐</span>
+                <span class="label-btn">En ligne</span>
+                <span class="sub-label">commande gsm · tablette</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== SECTION WINDOWS ===== -->
+    <div class="os-section" id="section-windows">
+        <div class="auto-badge">
+            <span class="badge-icon">⚡</span>
+            <span>Installation via <code>lancer_bisooffice.bat</code> — double-clique et c'est parti, Node.js et npm s'installent automatiquement</span>
+        </div>
+        <div class="boutons-os">
+            <button class="gros-bouton btn-offline-win" id="ouvrirOfflineWin">
+                <span class="icone">📴</span>
+                <span class="label-btn">Hors ligne</span>
+                <span class="sub-label">localStorage · navigateur</span>
+            </button>
+            <button class="gros-bouton btn-enligne-win" id="ouvrirEnligneWin">
+                <span class="icone">🌐</span>
+                <span class="label-btn">En ligne</span>
+                <span class="sub-label">commande gsm · tablette</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== SÉPARATEUR ===== -->
+    <hr class="section-sep">
+
+    <!-- ===== BOUTON CAISSE ===== -->
+    <a href="index.html" class="btn-caisse">
+        <span class="icone">💰</span>
+        <span class="label-btn">Accéder à la caisse</span>
+        <span class="sub-label">BisoOffice · démarrer</span>
+    </a>
+
+    <p class="copyright">⭐ Copyright (c) 2026 Julien Schmitz (thorankamon) · voir LICENSE</p>
+</div>
+
+
+<!-- ===========================================================
+     MODALE HORS LIGNE — LINUX 🐧
+     Ajouter étape  : <li> dans la liste
+     Ajouter page   : <div class="page" id="lnxOffP5"> + ajout dans le script
+     =========================================================== -->
+<div class="modal-overlay" id="modalOfflineLnx">
+    <div class="modal-contenu">
+        <div class="modal-banner banner-green">
+            <span class="banner-icone">🐧📴</span>
+            <div class="banner-texte">
+                <h2>Linux · Hors ligne</h2>
+                <p>localStorage · sans serveur · .desktop auto-installant</p>
+            </div>
+            <button class="btn-fermer" id="fermerOfflineLnx">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="progress-bar-wrap"><div class="progress-bar-fill progress-green" id="progressOfflineLnx" style="width:25%"></div></div>
+            <div class="page-container">
+
+                <div class="page active" id="lnxOffP1">
+                    <h3 class="titre-page-modal">📦 Étape 1 : Récupérer les fichiers</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Télécharge l'archive BisoOffice et extrais-la dans un dossier, ex : <code>~/BisoOffice/</code></li>
+                        <li><span class="pastille-page">2</span> Vérifie la présence de : <code>index.html</code>, <code>parametres.html</code>, <code>screen_client.html</code>, <code>bisooffice.desktop</code></li>
+                        <li><span class="pastille-page">3</span> Tous les fichiers <b>doivent rester dans le même dossier</b> — les liens sont relatifs</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">💡 Recommandé : place le dossier dans <code>~/Bureau/BisoOffice/</code> pour le retrouver facilement</div>
+                </div>
+
+                <div class="page" id="lnxOffP2">
+                    <h3 class="titre-page-modal">🚀 Étape 2 : Lancer le .desktop</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Double-clique sur <code>bisooffice.desktop</code> — ou clic droit → <b>Lancer</b></li>
+                        <li><span class="pastille-page">2</span> Au premier lancement, le script installe automatiquement <b>Node.js</b> et <b>npm</b> si absents</li>
+                        <li><span class="pastille-page">3</span> Un terminal s'ouvre brièvement pour l'installation, puis BisoOffice s'ouvre dans le navigateur</li>
+                        <li><span class="pastille-page">4</span> Si le navigateur ne s'ouvre pas : ouvre Chrome/Firefox et accède à <code>file:///~/BisoOffice/index.html</code></li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">🔑 Si une demande de mot de passe apparaît (sudo), c'est normal — c'est pour installer Node.js au niveau système</div>
+                </div>
+
+                <div class="page" id="lnxOffP3">
+                    <h3 class="titre-page-modal">⚙️ Étape 3 : Configurer l'entreprise</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Va dans <b>Administration → Paramètres</b> (<code>parametres.html</code>)</li>
+                        <li><span class="pastille-page">2</span> Remplis : nom, numéro d'entreprise, adresse, téléphone, logo</li>
+                        <li><span class="pastille-page">3</span> Configure la banque : nom, IBAN, BIC, communication structurée</li>
+                        <li><span class="pastille-page">4</span> Active/désactive la TVA et règle les taux selon ton activité</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">💡 Sur tablette, active le <b>Clavier virtuel</b> ⌨️ en bas de la page Paramètres pour saisir confortablement</div>
+                </div>
+
+                <div class="page" id="lnxOffP4">
+                    <h3 class="titre-page-modal">💾 Étape 4 : Données & Sauvegardes</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Toutes les données sont dans le <b>localStorage</b> du navigateur (automatique)</li>
+                        <li><span class="pastille-page">2</span> Exporte régulièrement : <b>Outils → Plus d'actions → Exporter</b> → fichier JSON</li>
+                        <li><span class="pastille-page">3</span> Pour restaurer : <b>Outils → Importer</b> et sélectionne ton fichier JSON</li>
+                        <li><span class="pastille-page">4</span> Ne jamais vider le localStorage du navigateur sans avoir exporté au préalable</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">⚠️ Changer de navigateur ou de profil = données vides. Reste toujours sur le <b>même navigateur</b></div>
+                </div>
+
+                <!-- AJOUTE UNE NOUVELLE PAGE ICI ↓
+                <div class="page" id="lnxOffP5">
+                    <h3 class="titre-page-modal">🔧 Étape 5 : Titre</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Étape A</li>
+                    </ul>
+                    <div class="note-modal">📝 Note ici</div>
+                </div>
+                Ajoute 'lnxOffP5' dans pagesIds du script !
+                -->
+
+            </div>
+            <div class="nav-interne">
+                <button class="btn-nav-interne" id="prevLnxOff" disabled>◀ Précédent</button>
+                <span class="indicateur-interne" id="indLnxOff">1 / 4</span>
+                <button class="btn-nav-interne" id="nextLnxOff">Suivant ▶</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===========================================================
+     MODALE EN LIGNE — LINUX 🐧
+     =========================================================== -->
+<div class="modal-overlay" id="modalEnligneLnx">
+    <div class="modal-contenu">
+        <div class="modal-banner banner-blue">
+            <span class="banner-icone">🐧🌐</span>
+            <div class="banner-texte">
+                <h2>Linux · En ligne</h2>
+                <p>serveur local · commande gsm · tablette · écran client</p>
+            </div>
+            <button class="btn-fermer" id="fermerEnligneLnx">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="progress-bar-wrap"><div class="progress-bar-fill progress-blue" id="progressEnligneLnx" style="width:20%"></div></div>
+            <div class="page-container">
+
+                <div class="page active" id="lnxEnlP1">
+                    <h3 class="titre-page-modal">🚀 Étape 1 : Lancement automatique</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Double-clique sur <code>bisooffice.desktop</code> — Node.js et npm s'installent automatiquement si absents</li>
+                        <li><span class="pastille-page">2</span> Le script démarre un <b>serveur HTTP local</b> (port 8000) et ouvre BisoOffice dans le navigateur</li>
+                        <li><span class="pastille-page">3</span> Une LED 🟢 apparaît dans l'interface si le serveur est bien actif</li>
+                        <li><span class="pastille-page">4</span> Ne ferme pas le terminal ouvert par le .desktop — c'est le serveur en cours d'exécution</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">💡 Commande manuelle : dans le dossier BisoOffice → <code>python3 -m http.server 8000</code></div>
+                </div>
+
+                <div class="page" id="lnxEnlP2">
+                    <h3 class="titre-page-modal">📡 Étape 2 : Trouver l'adresse IP</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Ouvre un terminal et tape : <code>ip a</code> ou <code>hostname -I</code></li>
+                        <li><span class="pastille-page">2</span> Repère l'adresse <b>IPv4</b> locale, ex : <code>192.168.1.42</code></li>
+                        <li><span class="pastille-page">3</span> Assure-toi que le PC serveur et les appareils mobiles sont sur le <b>même réseau Wi-Fi</b></li>
+                        <li><span class="pastille-page">4</span> Pour une IP fixe : Paramètres réseau → IPv4 → Manuel → assigne une IP statique</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">📌 Note l'IP, tous les appareils utiliseront : <code>http://192.168.1.42:8000/</code></div>
+                </div>
+
+                <div class="page" id="lnxEnlP3">
+                    <h3 class="titre-page-modal">📲 Étape 3 : Accès GSM & Tablette</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Connecte le GSM / la tablette au même réseau Wi-Fi que le serveur Linux</li>
+                        <li><span class="pastille-page">2</span> Ouvre <b>Chrome</b> (Android) ou <b>Safari</b> (iPhone/iPad)</li>
+                        <li><span class="pastille-page">3</span> Tape l'adresse : <code>http://192.168.1.42:8000/</code> (adapte l'IP)</li>
+                        <li><span class="pastille-page">4</span> Crée un raccourci : menu navigateur → <b>"Ajouter à l'écran d'accueil"</b></li>
+                        <li><span class="pastille-page">5</span> Les nouvelles commandes GSM apparaissent avec la cloche 🔔 dans Gestion</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">🔄 Les données se synchronisent en temps réel entre tous les postes connectés via <code>http://</code></div>
+                </div>
+
+                <div class="page" id="lnxEnlP4">
+                    <h3 class="titre-page-modal">🖥️ Étape 4 : Écran client</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Branche un second écran ou utilise une tablette dédiée</li>
+                        <li><span class="pastille-page">2</span> Ouvre <code>http://192.168.1.42:8000/screen_client.html</code></li>
+                        <li><span class="pastille-page">3</span> Clique <b>⛶ Plein écran</b> pour occuper tout l'affichage</li>
+                        <li><span class="pastille-page">4</span> L'écran affiche le ticket en cours, le QR de paiement et l'animation de succès en temps réel</li>
+                        <li><span class="pastille-page">5</span> Personnalise fond et couleurs via le bouton <b>🎨 Personnaliser</b></li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">📺 Mise à jour automatique toutes les 100ms — aucune manipulation nécessaire</div>
+                </div>
+
+                <div class="page" id="lnxEnlP5">
+                    <h3 class="titre-page-modal">🔧 Étape 5 : Config finale</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Configure l'entreprise : <b>Administration → Paramètres</b> (logo, IBAN, TVA…)</li>
+                        <li><span class="pastille-page">2</span> Crée les utilisateurs avec leur PIN : <b>Administration → Membres</b></li>
+                        <li><span class="pastille-page">3</span> Consulte le guide complet : <code>Fonctions.html</code> (6 modules, 36 astuces)</li>
+                        <li><span class="pastille-page">4</span> Exporte tes données régulièrement : <b>Outils → Plus d'actions → Exporter</b></li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">✅ Raccourcis : <b>Entrée</b> = valider · <b>Échap</b> = fermer · <b>Ctrl+S</b> = sauvegarde rapide</div>
+                </div>
+
+                <!-- AJOUTE UNE NOUVELLE PAGE ICI ↓
+                <div class="page" id="lnxEnlP6">
+                    <h3 class="titre-page-modal">🔧 Étape 6 : Titre</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Étape A</li>
+                    </ul>
+                    <div class="note-modal">📝 Note ici</div>
+                </div>
+                Ajoute 'lnxEnlP6' dans pagesIds du script !
+                -->
+
+            </div>
+            <div class="nav-interne">
+                <button class="btn-nav-interne" id="prevLnxEnl" disabled>◀ Précédent</button>
+                <span class="indicateur-interne" id="indLnxEnl">1 / 5</span>
+                <button class="btn-nav-interne" id="nextLnxEnl">Suivant ▶</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===========================================================
+     MODALE HORS LIGNE — WINDOWS 🪟
+     =========================================================== -->
+<div class="modal-overlay" id="modalOfflineWin">
+    <div class="modal-contenu">
+        <div class="modal-banner banner-cyan">
+            <span class="banner-icone">🪟📴</span>
+            <div class="banner-texte">
+                <h2>Windows · Hors ligne</h2>
+                <p>localStorage · sans serveur · .bat auto-installant</p>
+            </div>
+            <button class="btn-fermer" id="fermerOfflineWin">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="progress-bar-wrap"><div class="progress-bar-fill progress-cyan" id="progressOfflineWin" style="width:25%"></div></div>
+            <div class="page-container">
+
+                <div class="page active" id="winOffP1">
+                    <h3 class="titre-page-modal">📦 Étape 1 : Récupérer les fichiers</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Télécharge l'archive BisoOffice et extrais-la, ex : <code>C:\BisoOffice\</code> ou sur le Bureau</li>
+                        <li><span class="pastille-page">2</span> Vérifie la présence de : <code>index.html</code>, <code>parametres.html</code>, <code>screen_client.html</code>, <code>lancer_bisooffice.bat</code></li>
+                        <li><span class="pastille-page">3</span> Tous les fichiers <b>doivent rester dans le même dossier</b> — les liens sont relatifs</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">⚠️ Ne déplace pas les fichiers séparément — le .bat doit être dans le même dossier que <code>index.html</code></div>
+                </div>
+
+                <div class="page" id="winOffP2">
+                    <h3 class="titre-page-modal">🚀 Étape 2 : Lancer le .bat</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Double-clique sur <code>lancer_bisooffice.bat</code></li>
+                        <li><span class="pastille-page">2</span> Si Windows Defender alerte : clique <b>"Informations complémentaires" → "Exécuter quand même"</b></li>
+                        <li><span class="pastille-page">3</span> Au premier lancement, le .bat installe automatiquement <b>Node.js</b> via winget si absent</li>
+                        <li><span class="pastille-page">4</span> BisoOffice s'ouvre dans Chrome ou Edge automatiquement</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">🔑 Si une fenêtre UAC apparaît, clique <b>Oui</b> — c'est nécessaire pour installer Node.js</div>
+                </div>
+
+                <div class="page" id="winOffP3">
+                    <h3 class="titre-page-modal">⚙️ Étape 3 : Configurer l'entreprise</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Va dans <b>Administration → Paramètres</b> (<code>parametres.html</code>)</li>
+                        <li><span class="pastille-page">2</span> Remplis : nom, numéro d'entreprise, adresse, téléphone, logo</li>
+                        <li><span class="pastille-page">3</span> Configure la banque : nom, IBAN, BIC, communication structurée</li>
+                        <li><span class="pastille-page">4</span> Active/désactive la TVA et règle les taux selon ton activité</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">💡 Sur tablette, active le <b>Clavier virtuel</b> ⌨️ en bas de la page Paramètres</div>
+                </div>
+
+                <div class="page" id="winOffP4">
+                    <h3 class="titre-page-modal">💾 Étape 4 : Données & Sauvegardes</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Toutes les données sont dans le <b>localStorage</b> du navigateur (automatique)</li>
+                        <li><span class="pastille-page">2</span> Exporte régulièrement : <b>Outils → Plus d'actions → Exporter</b> → fichier JSON</li>
+                        <li><span class="pastille-page">3</span> Pour restaurer : <b>Outils → Importer</b> et sélectionne ton fichier JSON</li>
+                        <li><span class="pastille-page">4</span> Ne jamais vider le localStorage sans avoir exporté — lié au profil Windows + navigateur</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">⚠️ Changer de PC ou de profil Windows = données vides. Reste sur le <b>même navigateur</b></div>
+                </div>
+
+                <!-- AJOUTE UNE NOUVELLE PAGE ICI ↓
+                <div class="page" id="winOffP5">
+                    <h3 class="titre-page-modal">🔧 Étape 5 : Titre</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Étape A</li>
+                    </ul>
+                    <div class="note-modal">📝 Note ici</div>
+                </div>
+                Ajoute 'winOffP5' dans pagesIds du script !
+                -->
+
+            </div>
+            <div class="nav-interne">
+                <button class="btn-nav-interne" id="prevWinOff" disabled>◀ Précédent</button>
+                <span class="indicateur-interne" id="indWinOff">1 / 4</span>
+                <button class="btn-nav-interne" id="nextWinOff">Suivant ▶</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===========================================================
+     MODALE EN LIGNE — WINDOWS 🪟
+     =========================================================== -->
+<div class="modal-overlay" id="modalEnligneWin">
+    <div class="modal-contenu">
+        <div class="modal-banner banner-orange">
+            <span class="banner-icone">🪟🌐</span>
+            <div class="banner-texte">
+                <h2>Windows · En ligne</h2>
+                <p>serveur local · commande gsm · tablette · écran client</p>
+            </div>
+            <button class="btn-fermer" id="fermerEnligneWin">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="progress-bar-wrap"><div class="progress-bar-fill progress-orange" id="progressEnligneWin" style="width:20%"></div></div>
+            <div class="page-container">
+
+                <div class="page active" id="winEnlP1">
+                    <h3 class="titre-page-modal">🚀 Étape 1 : Lancement du serveur</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Double-clique sur <code>lancer_bisooffice.bat</code> — Node.js et npm s'installent automatiquement</li>
+                        <li><span class="pastille-page">2</span> Le .bat démarre un <b>serveur HTTP local</b> (port 8000) et ouvre BisoOffice dans le navigateur</li>
+                        <li><span class="pastille-page">3</span> Une LED 🟢 apparaît dans l'interface si le serveur est bien actif</li>
+                        <li><span class="pastille-page">4</span> <b>Ne ferme pas</b> la fenêtre noire — c'est le serveur en cours d'exécution</li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">💡 Serveur manuel : <code>Win+R</code> → <code>cmd</code> → <code>cd C:\BisoOffice</code> → <code>python -m http.server 8000</code></div>
+                </div>
+
+                <div class="page" id="winEnlP2">
+                    <h3 class="titre-page-modal">📡 Étape 2 : Trouver l'adresse IP</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Appuie sur <code>Win + R</code>, tape <code>cmd</code> et valide</li>
+                        <li><span class="pastille-page">2</span> Dans l'invite, tape : <code>ipconfig</code></li>
+                        <li><span class="pastille-page">3</span> Repère la ligne <b>"Adresse IPv4"</b>, ex : <code>192.168.1.42</code></li>
+                        <li><span class="pastille-page">4</span> Pour une IP fixe : Paramètres → Réseau → Wi-Fi → Propriétés → <b>IP manuelle</b></li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">📌 Tous les appareils utiliseront : <code>http://192.168.1.42:8000/</code></div>
+                </div>
+
+                <div class="page" id="winEnlP3">
+                    <h3 class="titre-page-modal">📲 Étape 3 : Accès GSM & Tablette</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Connecte le GSM / la tablette au même réseau Wi-Fi que le PC Windows</li>
+                        <li><span class="pastille-page">2</span> Ouvre <b>Chrome</b> (Android) ou <b>Safari</b> (iPhone/iPad)</li>
+                        <li><span class="pastille-page">3</span> Tape l'adresse : <code>http://192.168.1.42:8000/</code> (adapte l'IP)</li>
+                        <li><span class="pastille-page">4</span> Crée un raccourci : menu navigateur → <b>"Ajouter à l'écran d'accueil"</b></li>
+                        <li><span class="pastille-page">5</span> Si la connexion échoue : vérifie que le <b>pare-feu Windows autorise le port 8000</b></li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">🔥 Pare-feu : Panneau de configuration → Pare-feu Windows → <b>Autoriser une appli</b> → ajouter Node/Python port 8000</div>
+                </div>
+
+                <div class="page" id="winEnlP4">
+                    <h3 class="titre-page-modal">🖥️ Étape 4 : Écran client</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Branche un second écran ou ouvre un autre onglet / appareil</li>
+                        <li><span class="pastille-page">2</span> Ouvre <code>http://192.168.1.42:8000/screen_client.html</code></li>
+                        <li><span class="pastille-page">3</span> Clique <b>⛶ Plein écran</b> pour occuper tout l'affichage</li>
+                        <li><span class="pastille-page">4</span> L'écran affiche le ticket en cours, le QR de paiement et l'animation de succès en temps réel</li>
+                        <li><span class="pastille-page">5</span> Personnalise fond et couleurs via <b>🎨 Personnaliser</b></li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">📺 Mise à jour automatique toutes les 100ms — aucune manipulation nécessaire</div>
+                </div>
+
+                <div class="page" id="winEnlP5">
+                    <h3 class="titre-page-modal">🔧 Étape 5 : Config finale</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Configure l'entreprise : <b>Administration → Paramètres</b> (logo, IBAN, TVA…)</li>
+                        <li><span class="pastille-page">2</span> Crée les utilisateurs avec leur PIN : <b>Administration → Membres</b></li>
+                        <li><span class="pastille-page">3</span> Consulte le guide complet : <code>Fonctions.html</code> (6 modules, 36 astuces)</li>
+                        <li><span class="pastille-page">4</span> Exporte tes données régulièrement : <b>Outils → Plus d'actions → Exporter</b></li>
+                        <!-- AJOUTE TES ÉTAPES ICI ↓ -->
+                    </ul>
+                    <div class="note-modal">✅ Raccourcis : <b>Entrée</b> = valider · <b>Échap</b> = fermer · <b>Ctrl+S</b> = sauvegarde rapide</div>
+                </div>
+
+                <!-- AJOUTE UNE NOUVELLE PAGE ICI ↓
+                <div class="page" id="winEnlP6">
+                    <h3 class="titre-page-modal">🔧 Étape 6 : Titre</h3>
+                    <ul class="liste-etapes-modal">
+                        <li><span class="pastille-page">1</span> Étape A</li>
+                    </ul>
+                    <div class="note-modal">📝 Note ici</div>
+                </div>
+                Ajoute 'winEnlP6' dans pagesIds du script !
+                -->
+
+            </div>
+            <div class="nav-interne">
+                <button class="btn-nav-interne" id="prevWinEnl" disabled>◀ Précédent</button>
+                <span class="indicateur-interne" id="indWinEnl">1 / 5</span>
+                <button class="btn-nav-interne" id="nextWinEnl">Suivant ▶</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function () {
+
+    /* ── Onglets OS ── */
+    window.switchOS = function(os) {
+        document.querySelectorAll('.os-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('section-' + os).classList.add('active');
+        document.querySelector(`.os-tab[onclick="switchOS('${os}')"]`).classList.add('active');
+    };
+
+    /* ── Gestion d'une modale ──────────────────────────────────
+       Pour ajouter une page :
+         1. Ajoute <div class="page" id="NOUVEL_ID"> dans le page-container
+         2. Ajoute 'NOUVEL_ID' dans le tableau pagesIds ci-dessous
+       ──────────────────────────────────────────────────────── */
+    function modal({ modalId, btnId, fermerId, pagesIds, prevId, nextId, indId, progressId }) {
+        const overlay = document.getElementById(modalId);
+        const btn     = document.getElementById(btnId);
+        const fermer  = document.getElementById(fermerId);
+        const pages   = pagesIds.map(id => document.getElementById(id));
+        const prev    = document.getElementById(prevId);
+        const next    = document.getElementById(nextId);
+        const ind     = document.getElementById(indId);
+        const prog    = progressId ? document.getElementById(progressId) : null;
+        let idx = 0;
+
+        function show(i) {
+            pages.forEach(p => p.classList.remove('active'));
+            pages[i].classList.add('active');
+            ind.textContent = (i + 1) + ' / ' + pages.length;
+            prev.disabled = (i === 0);
+            next.disabled = (i === pages.length - 1);
+            if (prog) prog.style.width = ((i + 1) / pages.length * 100) + '%';
+        }
+
+        if (btn) btn.addEventListener('click', () => { overlay.classList.add('active'); idx = 0; show(0); });
+        fermer.addEventListener('click', () => overlay.classList.remove('active'));
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('active'); });
+        prev.addEventListener('click', () => { if (idx > 0) show(--idx); });
+        next.addEventListener('click', () => { if (idx < pages.length - 1) show(++idx); });
+        show(0);
+    }
+
+    // ── Linux · Hors ligne ────────────────────────────────────
+    // Ajoute les IDs de tes nouvelles pages dans ce tableau ↓
+    modal({ modalId:'modalOfflineLnx', btnId:'ouvrirOfflineLnx', fermerId:'fermerOfflineLnx',
+        pagesIds:['lnxOffP1','lnxOffP2','lnxOffP3','lnxOffP4'],
+        prevId:'prevLnxOff', nextId:'nextLnxOff', indId:'indLnxOff', progressId:'progressOfflineLnx' });
+
+    // ── Linux · En ligne ──────────────────────────────────────
+    // Ajoute les IDs de tes nouvelles pages dans ce tableau ↓
+    modal({ modalId:'modalEnligneLnx', btnId:'ouvrirEnligneLnx', fermerId:'fermerEnligneLnx',
+        pagesIds:['lnxEnlP1','lnxEnlP2','lnxEnlP3','lnxEnlP4','lnxEnlP5'],
+        prevId:'prevLnxEnl', nextId:'nextLnxEnl', indId:'indLnxEnl', progressId:'progressEnligneLnx' });
+
+    // ── Windows · Hors ligne ──────────────────────────────────
+    // Ajoute les IDs de tes nouvelles pages dans ce tableau ↓
+    modal({ modalId:'modalOfflineWin', btnId:'ouvrirOfflineWin', fermerId:'fermerOfflineWin',
+        pagesIds:['winOffP1','winOffP2','winOffP3','winOffP4'],
+        prevId:'prevWinOff', nextId:'nextWinOff', indId:'indWinOff', progressId:'progressOfflineWin' });
+
+    // ── Windows · En ligne ────────────────────────────────────
+    // Ajoute les IDs de tes nouvelles pages dans ce tableau ↓
+    modal({ modalId:'modalEnligneWin', btnId:'ouvrirEnligneWin', fermerId:'fermerEnligneWin',
+        pagesIds:['winEnlP1','winEnlP2','winEnlP3','winEnlP4','winEnlP5'],
+        prevId:'prevWinEnl', nextId:'nextWinEnl', indId:'indWinEnl', progressId:'progressEnligneWin' });
+
+})();
+</script>
+
+</body>
+</html>

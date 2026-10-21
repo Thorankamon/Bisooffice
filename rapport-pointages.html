@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rapport des Pointages</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#7c3aed; --purple-pale:#f5f3ff;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --cyan:#0891b2; --cyan-pale:#ecfeff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --glass:rgba(255,255,255,0.82);
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      font-size:14px;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      padding:24px;
+      color:var(--text);
+    }
+    body::before {
+      content:''; position:fixed; top:-150px; left:-150px;
+      width:550px; height:550px;
+      background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+    body::after {
+      content:''; position:fixed; bottom:-100px; right:5%;
+      width:450px; height:450px;
+      background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+
+    .back-btn {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(200,228,252,.85));
+      border:1px solid rgba(255,255,255,.9);
+      color:var(--blue2);
+      padding:9px 20px;
+      border-radius:50px;
+      cursor:pointer;
+      font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:.9rem;
+      margin-bottom:20px;
+      display:inline-flex; align-items:center; gap:8px;
+      transition:all .2s;
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .back-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .back-btn:hover { background:linear-gradient(180deg,#fff,#d0e8ff); transform:translateX(-3px); box-shadow:0 4px 14px var(--shadow); }
+
+    .company-header {
+      background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(180,220,250,.88),rgba(120,185,240,.92));
+      border:1px solid rgba(255,255,255,.95);
+      color:var(--blue3);
+      padding:20px 28px;
+      border-radius:var(--radius-xl);
+      margin-bottom:20px;
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .company-header::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .company-header strong { font-size:1.3em; font-weight:900; display:block; margin-bottom:6px; }
+
+    h1 {
+      margin-bottom:20px; color:var(--blue3);
+      text-align:center; font-size:2rem; font-weight:900;
+      font-family:'Nunito',sans-serif; letter-spacing:-.5px;
+      position:relative; z-index:1;
+    }
+
+    /* ── Résumé par utilisateur ── */
+    .summary-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:14px; margin-bottom:24px; position:relative; z-index:1;
+    }
+    .summary-card {
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-lg);
+      padding:16px 18px;
+      box-shadow:0 4px 14px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden;
+    }
+    .summary-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:4px;
+      background:linear-gradient(90deg,var(--blue-light),var(--green));
+    }
+    .summary-card .su-user { font-weight:900; color:var(--blue3); font-size:1.02em; margin-bottom:4px; display:flex; align-items:center; gap:6px; }
+    .summary-card .su-count { font-weight:800; color:var(--green2); font-size:.88em; }
+
+    /* ── Filtres ── */
+    .filters {
+      margin-bottom:22px; padding:18px 22px;
+      background:var(--glass); backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-xl);
+      box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .filters::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:40%;
+      background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events:none;
+    }
+    .filters label { font-weight:800; color:var(--text2); font-size:.88rem; text-transform:uppercase; letter-spacing:.04em; }
+    .filters input, .filters select {
+      padding:9px 12px; border:1px solid var(--border);
+      border-radius:var(--radius); font-size:.9rem; font-family:'Nunito',sans-serif; font-weight:600;
+      background:rgba(255,255,255,.85); color:var(--text); transition:all .2s;
+      box-shadow:0 1px 4px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    }
+    .filters input:focus, .filters select:focus { border-color:var(--blue-light); outline:none; box-shadow:0 0 0 3px rgba(42,127,212,.15); }
+    .filters button {
+      padding:9px 18px; border:none; border-radius:var(--radius);
+      cursor:pointer; font-weight:800; font-size:.88rem; font-family:'Nunito',sans-serif;
+      transition:all .2s; position:relative; overflow:hidden;
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      color:var(--text2); border:1px solid var(--border);
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+    }
+    .filters button:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); transform:translateY(-2px); }
+    .filters .clear-log-btn {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21) !important;
+      color:white !important; border:1px solid #882020 !important;
+      margin-left:auto;
+    }
+    .filters .clear-log-btn:hover { background:linear-gradient(180deg,#f89898,#d44040,#a03030) !important; }
+
+    /* ── Cartes session (ticket) ── */
+    .sessions-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+      gap:18px; margin-bottom:28px; position:relative; z-index:1;
+    }
+    .session-card {
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-xl);
+      padding:18px 20px;
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      backdrop-filter:blur(10px);
+      box-shadow:0 4px 16px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden;
+    }
+    .session-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:5px;
+      background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));
+    }
+    .session-card h3 { margin:0 0 4px 0; color:var(--blue3); font-size:1.15em; font-weight:900; }
+    .session-card .session-meta { font-size:.82em; color:var(--text3); font-weight:700; margin-bottom:12px; }
+    .session-card .pointage-line {
+      font-size:.88em; color:var(--text2); font-weight:600;
+      padding:6px 0; border-bottom:1px dashed var(--border2);
+    }
+    .session-card .pointage-line:last-child { border-bottom:none; }
+    .session-card .pointage-line strong { color:var(--green2); }
+
+    .empty-msg {
+      text-align:center; color:var(--text3); font-size:1.1em; font-weight:700;
+      grid-column:1/-1; padding:40px 20px;
+    }
+
+    /* ── Pagination ── */
+    .pagination {
+      margin-top:10px; text-align:center;
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(210,235,255,.78));
+      border:1px solid rgba(255,255,255,.95);
+      padding:16px 20px; border-radius:var(--radius-xl);
+      box-shadow:0 2px 12px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .pagination button {
+      padding:9px 16px; margin:0 4px;
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white;
+      border:1px solid #1050a0; border-radius:var(--radius);
+      cursor:pointer; font-size:.88rem; font-weight:800; font-family:'Nunito',sans-serif;
+      transition:all .2s;
+      box-shadow:0 2px 8px rgba(30,80,180,.25),0 1px 0 rgba(255,255,255,.4) inset;
+    }
+    .pagination button:hover:not(:disabled) { background:linear-gradient(180deg,#90d4ff,#3a90e4,#1a6cc0); transform:translateY(-2px); }
+    .pagination button:disabled { opacity:.45; cursor:not-allowed; background:linear-gradient(180deg,#c0d8f0,#8ab0d0,#6090b0); }
+    #pageInfo {
+      margin:0 16px; font-weight:800; display:inline-block;
+      color:var(--blue2); font-size:.95em;
+      padding:7px 14px; background:rgba(255,255,255,.85);
+      border-radius:var(--radius); border:1px solid var(--border);
+    }
+
+    /* ── Confirmation ── */
+    .confirm-overlay {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(10,40,90,.5); display:none;
+      justify-content:center; align-items:center; z-index:2000;
+      backdrop-filter:blur(8px);
+    }
+    .confirm-dialog {
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(255,225,225,.92));
+      border:1px solid rgba(255,255,255,.95);
+      padding:28px; border-radius:var(--radius-xl); width:420px; max-width:90vw;
+      box-shadow:0 20px 60px rgba(180,30,20,.2),0 1px 0 rgba(255,255,255,.9) inset;
+    }
+    .confirm-dialog h3 { margin-top:0; color:var(--red); font-weight:900; border-bottom:2px solid var(--red-pale); padding-bottom:10px; }
+    .confirm-dialog p { color:var(--text2); font-weight:600; line-height:1.6; margin:8px 0; }
+    .confirm-buttons { margin-top:22px; text-align:right; display:flex; gap:10px; justify-content:flex-end; }
+    .confirm-buttons button {
+      padding:10px 20px; border:none; border-radius:var(--radius);
+      cursor:pointer; font-size:.88rem; font-weight:800; font-family:'Nunito',sans-serif;
+      transition:all .2s;
+    }
+    .confirm-buttons .btn-cancel {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      color:var(--text2); border:1px solid var(--border);
+    }
+    .confirm-buttons .btn-cancel:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); }
+    .confirm-buttons .btn-confirm {
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21);
+      color:white; border:1px solid #882020;
+    }
+    .confirm-buttons .btn-confirm:hover { background:linear-gradient(180deg,#f89898,#d44040,#a03030); }
+
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:rgba(200,220,240,.3); }
+    ::-webkit-scrollbar-thumb { background:var(--blue-light); border-radius:3px; }
+
+    @media(max-width:768px) {
+      body { padding:12px; }
+      .sessions-grid { grid-template-columns:1fr; }
+      .filters { flex-direction:column; align-items:stretch; }
+      .filters .clear-log-btn { margin-left:0; }
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.location.href='tables.html'">← Retour</button>
+
+  <div id="companyHeader" class="company-header"></div>
+
+  <h1>📋 Rapport des Pointages</h1>
+
+  <div class="summary-grid" id="summaryGrid"></div>
+
+  <div class="filters">
+    <label>Date : <input type="date" id="filterDate"></label>
+    <label>Mois : <input type="month" id="filterMonth"></label>
+    <label>Utilisateur :
+      <select id="filterUser"><option value="">Tous</option></select>
+    </label>
+    <button onclick="resetFilters()">Réinitialiser</button>
+    <button class="clear-log-btn" onclick="confirmClearLog()">🗑️ Vider le journal</button>
+  </div>
+
+  <div class="sessions-grid" id="sessionsGrid"></div>
+
+  <div class="pagination" id="pagination">
+    <button onclick="changePage(-1)" id="prevBtn">« Précédent</button>
+    <span id="pageInfo"></span>
+    <button onclick="changePage(1)" id="nextBtn">Suivant »</button>
+  </div>
+
+  <div class="confirm-overlay" id="confirmClear">
+    <div class="confirm-dialog">
+      <h3>⚠ Vider le journal de pointage</h3>
+      <p>Cette action supprime définitivement tout l'historique des pointages (qui a pointé quoi). Cette action est irréversible.</p>
+      <div class="confirm-buttons">
+        <button class="btn-cancel" onclick="document.getElementById('confirmClear').style.display='none'">Annuler</button>
+        <button class="btn-confirm" onclick="clearLog()">Vider</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const companySettings = JSON.parse(localStorage.getItem("companySettings")) || {};
+    function renderCompanyHeader() {
+      const header = document.getElementById("companyHeader");
+      header.innerHTML = `
+        <strong>${companySettings.companyName || "Mon Entreprise"}</strong><br>
+        ${companySettings.companyAddress || ""} ${companySettings.companyLocality || ""}<br>
+        N° Entreprise : ${companySettings.companyNumber || ""}
+      `;
+    }
+    renderCompanyHeader();
+
+    const SESSIONS_PER_PAGE = 12;
+    let currentPage = 1;
+    let allSessions = []; // calculées une fois au chargement
+
+    function loadCtrlLog() {
+      try { return JSON.parse(localStorage.getItem("ctrl_log")) || []; } catch (e) { return []; }
+    }
+    function parseDelta(deltaStr) {
+      if (typeof deltaStr !== "string") return 0;
+      const m = deltaStr.match(/-?\d+/);
+      return m ? parseInt(m[0], 10) : 0;
+    }
+
+    // Regroupe le journal de contrôle par ticket (session de pointage)
+    function buildSessions() {
+      const log = loadCtrlLog().filter(l => ["AJOUT", "QTE", "SUPPR"].includes(l.type));
+      const sessions = {};
+      log.forEach(l => {
+        const key = l.ticketId;
+        if (!sessions[key]) {
+          sessions[key] = { ticketId: l.ticketId, table: l.table, firstTs: l.dt, lastTs: l.dt, users: {} };
+        }
+        const s = sessions[key];
+        if (l.dt < s.firstTs) s.firstTs = l.dt;
+        if (l.dt > s.lastTs) s.lastTs = l.dt;
+        const user = l.user || "Non renseigné";
+        if (!s.users[user]) s.users[user] = {};
+        if (!s.users[user][l.article]) s.users[user][l.article] = 0;
+        s.users[user][l.article] += parseDelta(l.delta);
+      });
+      return Object.values(sessions).sort((a, b) => (a.lastTs < b.lastTs ? 1 : -1));
+    }
+
+    function populateUserFilter(sessions) {
+      const select = document.getElementById("filterUser");
+      const users = new Set();
+      sessions.forEach(s => Object.keys(s.users).forEach(u => users.add(u)));
+      [...users].sort().forEach(u => {
+        const opt = document.createElement("option");
+        opt.value = u; opt.textContent = u;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderSummary(sessions) {
+      const totals = {}; // user -> total articles pointés (net positif)
+      sessions.forEach(s => {
+        Object.entries(s.users).forEach(([user, articles]) => {
+          const sum = Object.values(articles).reduce((acc, q) => acc + (q > 0 ? q : 0), 0);
+          totals[user] = (totals[user] || 0) + sum;
+        });
+      });
+      const grid = document.getElementById("summaryGrid");
+      const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+      if (!entries.length) { grid.innerHTML = ""; return; }
+      grid.innerHTML = entries.map(([user, total]) => `
+        <div class="summary-card">
+          <div class="su-user">👤 ${user}</div>
+          <div class="su-count">${total} article${total > 1 ? "s" : ""} pointé${total > 1 ? "s" : ""} au total</div>
+        </div>
+      `).join("");
+    }
+
+    function getFiltered() {
+      const filterDate = document.getElementById("filterDate").value;
+      const filterMonth = document.getElementById("filterMonth").value;
+      const filterUser = document.getElementById("filterUser").value;
+      return allSessions.filter(s => {
+        if (filterDate && !s.firstTs.startsWith(filterDate)) return false;
+        if (filterMonth && !s.firstTs.startsWith(filterMonth)) return false;
+        if (filterUser && !s.users[filterUser]) return false;
+        return true;
+      });
+    }
+
+    function renderSessions() {
+      const grid = document.getElementById("sessionsGrid");
+      grid.innerHTML = "";
+      const filtered = getFiltered();
+      const filterUser = document.getElementById("filterUser").value;
+
+      if (!filtered.length) {
+        grid.innerHTML = "<p class='empty-msg'>Aucun pointage trouvé pour ces critères.</p>";
+        document.getElementById("pagination").style.display = "none";
+        return;
+      }
+
+      const totalPages = Math.max(1, Math.ceil(filtered.length / SESSIONS_PER_PAGE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      const start = (currentPage - 1) * SESSIONS_PER_PAGE;
+      const pageItems = filtered.slice(start, start + SESSIONS_PER_PAGE);
+
+      pageItems.forEach(s => {
+        const card = document.createElement("div");
+        card.className = "session-card";
+        const d = new Date(s.lastTs);
+        const dateStr = isNaN(d) ? "" : d.toLocaleDateString("fr-FR") + " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+
+        let lignes = "";
+        Object.entries(s.users).forEach(([user, articles]) => {
+          if (filterUser && user !== filterUser) return;
+          const items = Object.entries(articles)
+            .filter(([nom, qte]) => qte > 0)
+            .map(([nom, qte]) => `${qte}× ${nom}`);
+          if (items.length) {
+            lignes += `<div class="pointage-line">👤 <strong>${user}</strong> a pointé : ${items.join(", ")}</div>`;
+          }
+        });
+        if (!lignes) return; // rien à afficher pour ce filtre
+
+        card.innerHTML = `
+          <h3>🍽️ ${s.table || "Table inconnue"} — Ticket #${s.ticketId}</h3>
+          <div class="session-meta">${dateStr}</div>
+          ${lignes}
+        `;
+        grid.appendChild(card);
+      });
+
+      if (!grid.children.length) {
+        grid.innerHTML = "<p class='empty-msg'>Aucun pointage trouvé pour ces critères.</p>";
+      }
+
+      updatePagination(totalPages, filtered.length);
+    }
+
+    function updatePagination(totalPages, total) {
+      const pagination = document.getElementById("pagination");
+      if (totalPages <= 1) { pagination.style.display = "none"; return; }
+      pagination.style.display = "block";
+      document.getElementById("pageInfo").textContent = `Page ${currentPage} / ${totalPages} (${total} ticket(s) pointé(s))`;
+      document.getElementById("prevBtn").disabled = currentPage === 1;
+      document.getElementById("nextBtn").disabled = currentPage === totalPages;
+    }
+
+    function changePage(direction) {
+      currentPage += direction;
+      if (currentPage < 1) currentPage = 1;
+      renderSessions();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetFilters() {
+      document.getElementById("filterDate").value = "";
+      document.getElementById("filterMonth").value = "";
+      document.getElementById("filterUser").value = "";
+      currentPage = 1;
+      renderSessions();
+    }
+
+    function confirmClearLog() {
+      document.getElementById("confirmClear").style.display = "flex";
+    }
+    function clearLog() {
+      localStorage.removeItem("ctrl_log");
+      document.getElementById("confirmClear").style.display = "none";
+      init();
+    }
+
+    ["filterDate", "filterMonth", "filterUser"].forEach(id => {
+      document.getElementById(id).addEventListener("change", () => { currentPage = 1; renderSessions(); });
+    });
+
+    function init() {
+      allSessions = buildSessions();
+      document.getElementById("filterUser").innerHTML = '<option value="">Tous</option>';
+      populateUserFilter(allSessions);
+      renderSummary(allSessions);
+      currentPage = 1;
+      renderSessions();
+    }
+
+    init();
+  </script>
+</body>
+</html>

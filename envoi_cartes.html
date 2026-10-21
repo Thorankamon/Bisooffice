@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Envoi des Cartes Membres</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#7c3aed; --purple-pale:#f5f3ff;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --cyan:#0891b2; --cyan-pale:#ecfeff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --glass:rgba(255,255,255,0.82);
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      font-size:14px;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      padding:20px;
+      color:var(--text);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      position:relative;
+    }
+
+    body::before {
+      content:''; position:fixed; top:-150px; left:-150px;
+      width:550px; height:550px;
+      background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+    body::after {
+      content:''; position:fixed; bottom:-100px; right:5%;
+      width:450px; height:450px;
+      background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+
+    h1 {
+      color: var(--blue3);
+      margin-top: 20px;
+      font-size: 2rem;
+      font-weight: 900;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    input[type="text"].search {
+      padding: 12px 16px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      min-width: 280px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      background: rgba(255,255,255,.85);
+      color: var(--text);
+      font-weight: 600;
+      box-shadow: 0 2px 8px var(--shadow2);
+      transition: all 0.2s;
+    }
+    input[type="text"].search:focus {
+      outline: none;
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px rgba(42,127,212,.15);
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Nunito', sans-serif;
+      box-shadow: 0 4px 10px var(--shadow);
+    }
+    .btn::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,.3); border-radius: 50px 50px 0 0; pointer-events: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #7cc4f8, #2a7fd4, #1558b0);
+      color: white;
+      border: 1px solid #1050a0;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px var(--shadow);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(210,228,248,.85));
+      color: var(--text2);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: linear-gradient(180deg, #fff, #d0e4f8);
+      color: var(--blue3);
+      transform: translateY(-2px);
+    }
+
+    .btn-send {
+      background: linear-gradient(180deg, #7cc4f8, #2a7fd4, #1558b0);
+      color: white;
+      border: 1px solid #1050a0;
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-send:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px var(--shadow);
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(255,255,255,.88), rgba(215,238,255,.75));
+      border: 1px solid rgba(255,255,255,.95);
+      border-radius: var(--radius-xl);
+      padding: 25px;
+      box-shadow: 0 4px 16px var(--shadow2);
+      width: 95%;
+      max-width: 1000px;
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg, var(--blue-light), var(--green), var(--yellow));
+    }
+    .card::after {
+      content: ''; position: absolute; top: 5px; left: 0; right: 0; height: 25%;
+      background: rgba(255,255,255,.42); border-radius: 0 0 60% 60%;
+      pointer-events: none;
+    }
+    .card > * { position: relative; z-index: 2; }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 15px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    th {
+      background: linear-gradient(180deg, #4a9fd8, #2a7fd4, #1a5fb0);
+      color: white;
+      font-weight: 800;
+    }
+    th:first-child { border-radius: var(--radius-lg) 0 0 0; }
+    th:last-child { border-radius: 0 var(--radius-lg) 0 0; }
+
+    td {
+      background: rgba(255,255,255,.7);
+      border-bottom: 1px solid var(--border2);
+      color: var(--text2);
+    }
+    tr:last-child td:first-child { border-radius: 0 0 0 var(--radius-lg); }
+    tr:last-child td:last-child { border-radius: 0 0 var(--radius-lg) 0; }
+    tr:hover td { background: var(--blue-pale); }
+
+    .status-ok { color: var(--green2); font-weight: 800; }
+    .status-error { color: var(--red2); font-weight: 800; }
+    .status-wait { color: var(--text3); font-weight: 600; }
+
+    /* Options Panel */
+    #optionsPanel {
+      background: linear-gradient(145deg, rgba(255,255,255,.88), rgba(215,238,255,.75));
+      border: 1px solid rgba(255,255,255,.95);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      width: 95%;
+      max-width: 900px;
+      margin-top: 15px;
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+    #optionsPanel::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg, var(--blue-light), var(--green), var(--yellow));
+    }
+    #optionsPanel > * { position: relative; z-index: 2; }
+
+    #optionsPanel h3 {
+      color: var(--blue3);
+      margin-bottom: 15px;
+      font-weight: 900;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text2);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    #mailSubject, #mailBody {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      background: rgba(255,255,255,.85);
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    #mailSubject:focus, #mailBody:focus {
+      outline: none;
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px rgba(42,127,212,.15);
+    }
+
+    #btnSaveOptions {
+      margin-top: 10px;
+      background: linear-gradient(180deg, #84d47c, #4a9422, #2d6a1a);
+      color: white;
+      border: 1px solid #2d6a1a;
+      padding: 10px 18px;
+      border-radius: 50px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #btnSaveOptions:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(74,148,34,0.4);
+    }
+
+    /* Pagination */
+    .pagination {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pagination button {
+      background: rgba(255,255,255,.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text2);
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .pagination button.active {
+      background: linear-gradient(180deg, #7cc4f8, #2a7fd4, #1558b0);
+      color: white;
+      border-color: #1050a0;
+    }
+    .pagination button:hover:not(:disabled):not(.active) {
+      background: var(--blue-pale);
+      border-color: var(--blue);
+      color: var(--blue3);
+      transform: translateY(-2px);
+    }
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* MODALE DE CHARGEMENT */
+    .modal-loading {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,40,90,.45);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    .modal-loading-content {
+      background: linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(215,238,255,0.95) 100%);
+      border: 1px solid rgba(255,255,255,0.95);
+      width: 100%;
+      max-width: 400px;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 60px rgba(20,60,180,.25), 0 1px 0 rgba(255,255,255,0.9) inset;
+      overflow: hidden;
+      animation: slideUp .25s cubic-bezier(.16,1,.3,1) both;
+      position: relative;
+      text-align: center;
+      padding: 30px;
+    }
+    .modal-loading-content::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 30%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.5), transparent);
+      border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events: none;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(42,127,212,0.2);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .modal-loading-content p {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--blue3);
+      margin-bottom: 5px;
+    }
+    .modal-loading-content small {
+      color: var(--text3);
+      font-weight: 600;
+    }
+
+    /* MODALE PDF MANQUANT */
+    .modal-pdf {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,40,90,.45);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    .modal-pdf-content {
+      background: linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(215,238,255,0.95) 100%);
+      border: 1px solid rgba(255,255,255,0.95);
+      width: 100%;
+      max-width: 500px;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 60px rgba(20,60,180,.25), 0 1px 0 rgba(255,255,255,0.9) inset;
+      overflow: hidden;
+      animation: slideUp .25s cubic-bezier(.16,1,.3,1) both;
+      position: relative;
+    }
+    .modal-pdf-content::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 30%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.5), transparent);
+      border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events: none;
+    }
+    .modal-pdf-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,220,220,0.9) 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.9);
+      padding: 20px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    .modal-pdf-header::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,0.45);
+      border-radius: 0 0 60% 60%;
+      pointer-events: none;
+    }
+    .modal-pdf-header h3 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--red2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .close-modal {
+      background: var(--red);
+      border: none;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .close-modal:hover {
+      transform: scale(1.1);
+      background: var(--red2);
+    }
+    .modal-pdf-body {
+      padding: 25px;
+      text-align: center;
+    }
+    .modal-pdf-icon {
+      font-size: 3rem;
+      color: var(--red);
+      margin-bottom: 15px;
+    }
+    .modal-pdf-body p {
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .modal-pdf-body .member-name {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--blue3);
+      margin: 10px 0;
+    }
+    .modal-pdf-footer {
+      padding: 15px 25px 25px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .btn-modal {
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .92rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .2s ease;
+      position: relative;
+      overflow: hidden;
+      border: none;
+    }
+    .btn-modal::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50px 50px 0 0;
+      pointer-events: none;
+    }
+    .btn-modal-primary {
+      background: linear-gradient(180deg, #7cc4f8, #2a7fd4, #1558b0);
+      color: white;
+      border: 1px solid #1050a0;
+    }
+    .btn-modal-primary:hover {
+      background: linear-gradient(180deg, #90d4ff, #3a90e4, #1a6cc0);
+      transform: translateY(-1px);
+    }
+    .btn-modal-secondary {
+      background: linear-gradient(180deg, #f08080, #c0392b, #922b21);
+      color: white;
+      border: 1px solid #882020;
+    }
+    .btn-modal-secondary:hover {
+      background: linear-gradient(180deg, #f89898, #d44040, #a03030);
+      transform: translateY(-1px);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: linear-gradient(180deg, #7cc4f8, #2a7fd4);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 50px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      font-size: 14px;
+      font-weight: 700;
+      z-index: 999;
+      box-shadow: 0 10px 30px var(--shadow);
+      border: 1px solid rgba(255,255,255,.3);
+    }
+    .toast.show { opacity: 1; }
+
+    /* Empty state */
+    td[colspan] {
+      text-align: center;
+      padding: 40px;
+      color: var(--text3);
+      font-weight: 600;
+    }
+
+    /* Highlight pour le membre sélectionné */
+    .member-highlight {
+      background: rgba(42,127,212,0.15) !important;
+      transition: background 0.5s ease;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(200,220,240,.3); }
+    ::-webkit-scrollbar-thumb { background: var(--blue-light); border-radius: 3px; }
+
+    @media (max-width: 768px) {
+      .toolbar { flex-direction: column; align-items: center; }
+      input[type="text"].search { width: 100%; }
+      th, td { padding: 8px; font-size: 12px; }
+    }
+    /* ── Modale envoi en masse ── */
+    .modal-bulk {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,40,90,.45);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    .modal-bulk-content {
+      background: linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(215,238,255,0.95) 100%);
+      border: 1px solid rgba(255,255,255,0.95);
+      width: 100%;
+      max-width: 520px;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 60px rgba(20,60,180,.25), 0 1px 0 rgba(255,255,255,0.9) inset;
+      overflow: hidden;
+      animation: slideUp .25s cubic-bezier(.16,1,.3,1) both;
+      position: relative;
+    }
+    .modal-bulk-content::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 30%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.5), transparent);
+      border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+      pointer-events: none;
+    }
+    .modal-bulk-header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(220,240,255,0.9) 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.9);
+      padding: 20px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    .modal-bulk-header::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,0.45);
+      border-radius: 0 0 60% 60%;
+      pointer-events: none;
+    }
+    .modal-bulk-header h3 {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--blue3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-bulk-body {
+      padding: 25px;
+    }
+    .bulk-info-box {
+      background: var(--blue-pale);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      color: var(--blue3);
+      font-size: 0.95rem;
+    }
+    .bulk-info-box i { font-size: 1.4rem; color: var(--blue); flex-shrink: 0; }
+    .bulk-delay-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .bulk-delay-row label {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text2);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .delay-options {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .delay-chip {
+      padding: 7px 14px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.85);
+      color: var(--text2);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .delay-chip:hover, .delay-chip.active {
+      background: linear-gradient(180deg, #7cc4f8, #2a7fd4);
+      color: white;
+      border-color: #1050a0;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px var(--shadow);
+    }
+    .custom-delay-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .custom-delay-row label { margin: 0; font-weight: 700; color: var(--text2); font-size: 13px; white-space: nowrap; }
+    .custom-delay-row input[type="number"] {
+      width: 90px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      background: rgba(255,255,255,.85);
+      color: var(--text);
+    }
+    .custom-delay-row input[type="number"]:focus {
+      outline: none;
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px rgba(42,127,212,.15);
+    }
+    .bulk-skip-sent {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      cursor: pointer;
+    }
+    .bulk-skip-sent input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--blue); }
+    .bulk-skip-sent span { font-weight: 700; color: var(--text2); font-size: 14px; }
+    /* Barre de progression */
+    .bulk-progress-area {
+      display: none;
+      margin-top: 10px;
+    }
+    .bulk-progress-bar-bg {
+      background: var(--border2);
+      border-radius: 50px;
+      height: 12px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .bulk-progress-bar-fill {
+      height: 100%;
+      border-radius: 50px;
+      background: linear-gradient(90deg, var(--blue-light), var(--blue));
+      transition: width .4s ease;
+      width: 0%;
+    }
+    .bulk-progress-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text2);
+      text-align: center;
+    }
+    .bulk-current-member {
+      font-size: 13px;
+      color: var(--blue3);
+      font-weight: 800;
+      text-align: center;
+      margin-top: 4px;
+      min-height: 18px;
+    }
+    .bulk-log {
+      max-height: 120px;
+      overflow-y: auto;
+      background: rgba(255,255,255,.6);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 10px;
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .bulk-log .log-ok { color: var(--green2); }
+    .bulk-log .log-err { color: var(--red2); }
+    .bulk-log .log-skip { color: var(--text3); }
+    .modal-bulk-footer {
+      padding: 15px 25px 25px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .btn-bulk-start {
+      background: linear-gradient(180deg, #84d47c, #4a9422, #2d6a1a);
+      color: white;
+      border: 1px solid #2d6a1a;
+      padding: 12px 28px;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-bulk-start::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,.3);
+      border-radius: 50px 50px 0 0; pointer-events: none;
+    }
+    .btn-bulk-start:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(74,148,34,0.4);
+    }
+    .btn-bulk-start:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .btn-bulk-stop {
+      background: linear-gradient(180deg, #f08080, #c0392b, #922b21);
+      color: white;
+      border: 1px solid #882020;
+      padding: 12px 28px;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden;
+      display: none;
+    }
+    .btn-bulk-stop::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: rgba(255,255,255,.3);
+      border-radius: 50px 50px 0 0; pointer-events: none;
+    }
+    .btn-bulk-stop:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(192,57,43,0.4); }
+
+    .btn-send-all {
+      background: linear-gradient(180deg, #84d47c, #4a9422, #2d6a1a);
+      color: white;
+      border: 1px solid #2d6a1a;
+    }
+    .btn-send-all:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(74,148,34,0.4);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Bouton retour ── */
+    .back-btn {
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(200,228,252,.85));
+      border:1px solid rgba(255,255,255,.9);
+      color:var(--blue2);
+      padding:9px 20px;
+      border-radius:50px;
+      cursor:pointer;
+      font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:.9rem;
+      margin-bottom:20px;
+      display:inline-flex; align-items:center; gap:8px;
+      transition:all .2s;
+      box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+      position:relative; overflow:hidden; z-index:1;
+    }
+    .back-btn::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .back-btn:hover { background:linear-gradient(180deg,#fff,#d0e8ff); transform:translateX(-3px); box-shadow:0 4px 14px var(--shadow); }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      position:relative;
+      z-index:2;
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.history.back()">← Retour</button>
+  <h1><i class="fas fa-paper-plane"></i> Envoi des Cartes Membres</h1>
+
+  <div class="toolbar">
+    <input type="text" id="searchInput" class="search" placeholder="🔍 Rechercher un membre...">
+    <button id="btnOptions" class="btn btn-secondary"><i class="fas fa-cog"></i> Options</button>
+    <button id="btnSendAll" class="btn btn-send-all"><i class="fas fa-paper-plane"></i> Envoyer tout</button>
+  </div>
+
+  <div id="optionsPanel" style="display:none;">
+    <h3><i class="fas fa-sliders-h"></i> Paramètres d'envoi</h3>
+    <label>Objet du mail :</label>
+    <input id="mailSubject" type="text" placeholder="Ex: Votre carte de membre digitale">
+    <label>Message :</label>
+    <textarea id="mailBody" rows="9">Bonjour {{prenom}} {{nom}},
+
+Veuillez trouver ci-joint votre carte de membre.
+
+Voici vos accès à l'Espace Membre (pour consulter et télécharger vos tickets) :
+Identifiant : {{pseudo}}
+Mot de passe : {{motDePasse}}
+Code d'accès : {{codeAcces}}
+
+⚠️ Cet espace membre est consultable uniquement à l'intérieur du Cube.
+
+Cordialement,
+Le Cube Club Karaoké ASBL</textarea>
+    <p style="margin-top:6px; font-size:12px; color:var(--text3); font-weight:600;">
+      Balises disponibles : {{prenom}}, {{nom}}, {{pseudo}}, {{motDePasse}}, {{codeAcces}}
+    </p>
+    <button id="btnSaveOptions"><i class="fas fa-save"></i> Sauvegarder</button>
+  </div>
+
+  <div class="card">
+    <table id="membresTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Action</th>
+          <th>Statut</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- MODALE DE CHARGEMENT -->
+  <div id="loadingModal" class="modal-loading" style="display:none;">
+    <div class="modal-loading-content">
+      <div class="spinner"></div>
+      <p>Envoi en cours...</p>
+      <small id="loadingMemberName"></small>
+    </div>
+  </div>
+
+  <!-- MODALE PDF MANQUANT -->
+  <div id="pdfMissingModal" class="modal-pdf" style="display:none;">
+    <div class="modal-pdf-content">
+      <div class="modal-pdf-header">
+        <h3><i class="fas fa-exclamation-triangle"></i> Carte PDF introuvable</h3>
+        <button class="close-modal" onclick="closePdfModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-pdf-body">
+        <div class="modal-pdf-icon">
+          <i class="fas fa-file-pdf"></i>
+        </div>
+        <p>La carte PDF pour ce membre n'a pas été trouvée.</p>
+        <div id="missingMemberInfo" class="member-name"></div>
+        <p style="font-size:0.9rem; color:var(--text3);">Veuillez d'abord générer la carte dans la gestion des membres.</p>
+      </div>
+      <div class="modal-pdf-footer">
+        <button class="btn-modal btn-modal-secondary" onclick="closePdfModal()">
+          <i class="fas fa-times"></i> Fermer
+        </button>
+        <button class="btn-modal btn-modal-primary" onclick="goToMemberManagement()">
+          <i class="fas fa-users"></i> Gestion des membres
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE ENVOI EN MASSE -->
+  <div id="bulkModal" class="modal-bulk" style="display:none;">
+    <div class="modal-bulk-content">
+      <div class="modal-bulk-header">
+        <h3><i class="fas fa-paper-plane"></i> Envoi en masse</h3>
+        <button class="close-modal" id="btnCloseBulk"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-bulk-body">
+        <div class="bulk-info-box">
+          <i class="fas fa-users"></i>
+          <span id="bulkCount">Chargement...</span>
+        </div>
+
+        <div class="bulk-delay-row">
+          <label><i class="fas fa-clock"></i> Délai entre envois :</label>
+          <div class="delay-options">
+            <button class="delay-chip" data-delay="2">2s</button>
+            <button class="delay-chip active" data-delay="5">5s</button>
+            <button class="delay-chip" data-delay="10">10s</button>
+            <button class="delay-chip" data-delay="30">30s</button>
+            <button class="delay-chip" data-delay="60">1 min</button>
+          </div>
+        </div>
+
+        <div class="custom-delay-row">
+          <label><i class="fas fa-sliders-h"></i> Délai personnalisé (sec) :</label>
+          <input type="number" id="customDelay" min="1" max="3600" value="5" placeholder="5">
+        </div>
+
+        <label class="bulk-skip-sent">
+          <input type="checkbox" id="skipAlreadySent" checked>
+          <span>Ignorer les membres déjà envoyés avec succès</span>
+        </label>
+
+        <div class="bulk-progress-area" id="bulkProgressArea">
+          <div class="bulk-progress-bar-bg">
+            <div class="bulk-progress-bar-fill" id="bulkProgressFill"></div>
+          </div>
+          <div class="bulk-progress-text" id="bulkProgressText">0 / 0</div>
+          <div class="bulk-current-member" id="bulkCurrentMember"></div>
+          <div class="bulk-log" id="bulkLog"></div>
+        </div>
+      </div>
+      <div class="modal-bulk-footer">
+        <button class="btn-modal btn-modal-secondary" id="btnCancelBulk">
+          <i class="fas fa-times"></i> Fermer
+        </button>
+        <button class="btn-bulk-start" id="btnStartBulk">
+          <i class="fas fa-rocket"></i> Lancer l'envoi
+        </button>
+        <button class="btn-bulk-stop" id="btnStopBulk">
+          <i class="fas fa-stop"></i> Arrêter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const _baseUrl = (JSON.parse(localStorage.getItem("serverConfig") || "{}").serverUrl || "http://localhost:3000").replace(/\/+$/, "");
+    const API_URL = _baseUrl + "/send-email";
+    let membres = JSON.parse(localStorage.getItem("membres")) || [];
+    let historique = JSON.parse(localStorage.getItem("historiqueEmails")) || [];
+
+    const tbody = document.querySelector("#membresTable tbody");
+    const toast = document.getElementById("toast");
+    const paginationDiv = document.getElementById("pagination");
+    const searchInput = document.getElementById("searchInput");
+    const loadingModal = document.getElementById("loadingModal");
+    const loadingMemberName = document.getElementById("loadingMemberName");
+    const pdfModal = document.getElementById("pdfMissingModal");
+    const missingMemberInfo = document.getElementById("missingMemberInfo");
+
+    const itemsPerPage = 10;
+    let currentPage = 1;
+    let filteredMembres = [...membres];
+    let pendingMember = null;
+
+    // Vérifier si on vient de la page membres avec une carte à envoyer
+    const carteAEnvoyer = JSON.parse(localStorage.getItem("carteAEnvoyer"));
+    if (carteAEnvoyer) {
+      localStorage.removeItem("carteAEnvoyer");
+      window.membreAEnvoyer = carteAEnvoyer;
+    }
+
+    function showToast(message, type="info") {
+      toast.textContent = message;
+      toast.style.background = type === "error" ? "linear-gradient(180deg, #f08080, #c0392b)" : 
+                              (type === "success" ? "linear-gradient(180deg, #84d47c, #4a9422)" : 
+                              "linear-gradient(180deg, #7cc4f8, #2a7fd4)");
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+
+    function showLoadingModal(membre) {
+      loadingMemberName.textContent = `${membre.prenom} ${membre.nom}`;
+      loadingModal.style.display = "flex";
+    }
+
+    function hideLoadingModal() {
+      loadingModal.style.display = "none";
+    }
+
+    // --- OPTIONS ---
+    const btnOptions = document.getElementById("btnOptions");
+    const panel = document.getElementById("optionsPanel");
+    const btnSaveOptions = document.getElementById("btnSaveOptions");
+    const subjectInput = document.getElementById("mailSubject");
+    const bodyInput = document.getElementById("mailBody");
+
+    btnOptions.onclick = () => panel.style.display = panel.style.display === "none" ? "block" : "none";
+    subjectInput.value = localStorage.getItem("mailSubject") || "Votre carte de membre digitale";
+    bodyInput.value = localStorage.getItem("mailBody") || "Bonjour {{prenom}} {{nom}},\n\nVeuillez trouver ci-joint votre carte de membre.\n\nVoici vos accès à l'Espace Membre (pour consulter et télécharger vos tickets) :\nIdentifiant : {{pseudo}}\nMot de passe : {{motDePasse}}\nCode d'accès : {{codeAcces}}\n\n⚠️ Cet espace membre est consultable uniquement à l'intérieur du Cube.\n\nCordialement,\nLe Cube Club Karaoké ASBL";
+
+    btnSaveOptions.onclick = () => {
+      localStorage.setItem("mailSubject", subjectInput.value);
+      localStorage.setItem("mailBody", bodyInput.value);
+      showToast("Options sauvegardées ✅", "success");
+    };
+
+    // --- GESTION MODALE PDF ---
+    function showPdfModal(membre) {
+      missingMemberInfo.textContent = `${membre.prenom} ${membre.nom} (ID: ${membre.id})`;
+      pdfModal.style.display = "flex";
+    }
+
+    function closePdfModal() {
+      pdfModal.style.display = "none";
+      pendingMember = null;
+    }
+
+    function goToMemberManagement() {
+      if (pendingMember) {
+        localStorage.setItem("carteAGenerer", JSON.stringify(pendingMember));
+      }
+      window.location.href = "membres.html";
+    }
+
+    // --- RENDER TABLE ---
+    function renderTable() {
+      tbody.innerHTML = "";
+      if (filteredMembres.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">Aucun membre trouvé</td></tr>';
+        paginationDiv.innerHTML = "";
+        return;
+      }
+
+      const totalPages = Math.ceil(filteredMembres.length / itemsPerPage);
+      if (currentPage > totalPages) currentPage = totalPages;
+      const start = (currentPage - 1) * itemsPerPage;
+      const pageMembres = filteredMembres.slice(start, start + itemsPerPage);
+
+      pageMembres.forEach(m => {
+        const entry = historique.find(h => h.id === m.id) || {};
+        const statusClass = entry.status === "success" ? "status-ok" : entry.status === "error" ? "status-error" : "status-wait";
+
+        const tr = document.createElement("tr");
+        if (window.membreAEnvoyer && window.membreAEnvoyer.id === m.id) {
+          tr.classList.add("member-highlight");
+        }
+        
+        tr.innerHTML = `
+          <td>${m.id}</td>
+          <td><strong>${m.prenom || ""} ${m.nom || ""}</strong></td>
+          <td>${m.email || "-"}</td>
+          <td><button class="btn-send" onclick="sendDirect('${m.id}', '${m.email}', '${m.prenom}', '${m.nom}')"><i class='fas fa-paper-plane'></i> Envoyer</button></td>
+          <td class="${statusClass}">${entry.status || "En attente"}</td>
+          <td>${entry.date ? new Date(entry.date).toLocaleString() : "-"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Pagination
+      paginationDiv.innerHTML = "";
+      const prev = document.createElement("button");
+      prev.textContent = "◀";
+      prev.disabled = currentPage === 1;
+      prev.onclick = () => { currentPage--; renderTable(); };
+      paginationDiv.appendChild(prev);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.classList.toggle("active", i === currentPage);
+        btn.onclick = () => { currentPage = i; renderTable(); };
+        paginationDiv.appendChild(btn);
+      }
+
+      const next = document.createElement("button");
+      next.textContent = "▶";
+      next.disabled = currentPage === totalPages;
+      next.onclick = () => { currentPage++; renderTable(); };
+      paginationDiv.appendChild(next);
+    }
+
+    // --- RECHERCHE ---
+    searchInput.addEventListener("input", e => {
+      const q = e.target.value.toLowerCase();
+      filteredMembres = membres.filter(m =>
+        (m.nom || "").toLowerCase().includes(q) ||
+        (m.prenom || "").toLowerCase().includes(q) ||
+        (m.email || "").toLowerCase().includes(q) ||
+        (m.id || "").toLowerCase().includes(q)
+      );
+      currentPage = 1;
+      renderTable();
+    });
+
+    // --- ENVOI DIRECT ---
+    async function sendDirect(id, email, prenom, nom) {
+      if ((!id || id === 'undefined') && window.membreAEnvoyer) {
+        id = window.membreAEnvoyer.id;
+        email = window.membreAEnvoyer.email;
+        prenom = window.membreAEnvoyer.prenom;
+        nom = window.membreAEnvoyer.nom;
+        window.membreAEnvoyer = null;
+      }
+      
+      if (!email || email === "anonyme") {
+        showToast("Adresse email manquante pour ce membre.", "error");
+        return;
+      }
+
+      showLoadingModal({ prenom, nom });
+      
+      const subject = localStorage.getItem("mailSubject") || "Votre carte de membre digitale";
+      let bodyTemplate = localStorage.getItem("mailBody") || "Bonjour {{prenom}} {{nom}},\n\nVeuillez trouver ci-joint votre carte de membre.\n\nVoici vos accès à l'Espace Membre (pour consulter et télécharger vos tickets) :\nIdentifiant : {{pseudo}}\nMot de passe : {{motDePasse}}\nCode d'accès : {{codeAcces}}\n\n⚠️ Cet espace membre est consultable uniquement à l'intérieur du Cube.\n\nCordialement,\nLe Cube Club Karaoké ASBL";
+
+      const membreFull = membres.find(x => x.id === id) || {};
+
+      let body = bodyTemplate
+        .replace(/{{prenom}}/g, prenom || "")
+        .replace(/{{nom}}/g, nom || "")
+        .replace(/{{pseudo}}/g, membreFull.pseudo || "—")
+        .replace(/{{motDePasse}}/g, membreFull.motDePasse || "—")
+        .replace(/{{codeAcces}}/g, membreFull.codeAcces || "—");
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, email, subject, body })
+        });
+        
+        hideLoadingModal();
+        
+        if (res.status === 404) {
+          const errorData = await res.json().catch(() => ({}));
+          if (errorData.error && errorData.error.includes("Carte introuvable")) {
+            pendingMember = { id, email, prenom, nom };
+            showPdfModal(pendingMember);
+            return;
+          }
+        }
+        
+        const ok = res.ok;
+        
+        // Mettre à jour l'historique
+        const newEntry = { 
+          id, 
+          email, 
+          status: ok ? "success" : "error", 
+          date: new Date().toISOString()
+        };
+        
+        // Supprimer l'ancienne entrée pour ce membre si elle existe
+        historique = historique.filter(h => h.id !== id);
+        // Ajouter la nouvelle
+        historique.push(newEntry);
+        
+        localStorage.setItem("historiqueEmails", JSON.stringify(historique));
+        
+        // Recharger les données depuis localStorage
+        membres = JSON.parse(localStorage.getItem("membres")) || [];
+        filteredMembres = [...membres];
+        
+        // Appliquer la recherche en cours si elle existe
+        const q = searchInput.value.toLowerCase();
+        if (q) {
+          filteredMembres = membres.filter(m =>
+            (m.nom || "").toLowerCase().includes(q) ||
+            (m.prenom || "").toLowerCase().includes(q) ||
+            (m.email || "").toLowerCase().includes(q) ||
+            (m.id || "").toLowerCase().includes(q)
+          );
+        }
+        
+        renderTable();
+        
+        showToast(ok ? "Carte envoyée avec succès !" : "Erreur lors de l'envoi", ok ? "success" : "error");
+      } catch (err) {
+        hideLoadingModal();
+        console.error("Erreur détaillée:", err);
+        
+        // Mettre à jour l'historique en erreur
+        historique = historique.filter(h => h.id !== id);
+        historique.push({ id, email, status: "error", date: new Date().toISOString() });
+        localStorage.setItem("historiqueEmails", JSON.stringify(historique));
+        
+        // Recharger et rafraîchir
+        membres = JSON.parse(localStorage.getItem("membres")) || [];
+        filteredMembres = [...membres];
+        renderTable();
+        
+        showToast("Erreur : impossible de contacter le serveur.", "error");
+      }
+    }
+
+    // Si on a un membre à envoyer depuis la page précédente
+    if (window.membreAEnvoyer) {
+      setTimeout(() => {
+        sendDirect(
+          window.membreAEnvoyer.id,
+          window.membreAEnvoyer.email,
+          window.membreAEnvoyer.prenom,
+          window.membreAEnvoyer.nom
+        );
+      }, 100);
+    }
+
+    // Initialisation
+    renderTable();
+
+    // Fonctions globales
+    window.sendDirect = sendDirect;
+    window.closePdfModal = closePdfModal;
+    window.goToMemberManagement = goToMemberManagement;
+    // --- ENVOI EN MASSE ---
+    const bulkModal      = document.getElementById("bulkModal");
+    const btnSendAll     = document.getElementById("btnSendAll");
+    const btnCloseBulk   = document.getElementById("btnCloseBulk");
+    const btnCancelBulk  = document.getElementById("btnCancelBulk");
+    const btnStartBulk   = document.getElementById("btnStartBulk");
+    const btnStopBulk    = document.getElementById("btnStopBulk");
+    const bulkCount      = document.getElementById("bulkCount");
+    const bulkProgressArea = document.getElementById("bulkProgressArea");
+    const bulkProgressFill = document.getElementById("bulkProgressFill");
+    const bulkProgressText = document.getElementById("bulkProgressText");
+    const bulkCurrentMember = document.getElementById("bulkCurrentMember");
+    const bulkLog        = document.getElementById("bulkLog");
+    const skipAlreadySent = document.getElementById("skipAlreadySent");
+    const customDelayInput = document.getElementById("customDelay");
+
+    let bulkRunning = false;
+    let bulkStop    = false;
+    let selectedDelay = 5; // secondes
+
+    // Chips délai
+    document.querySelectorAll(".delay-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".delay-chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        selectedDelay = parseInt(chip.dataset.delay);
+        customDelayInput.value = selectedDelay;
+      });
+    });
+
+    customDelayInput.addEventListener("input", () => {
+      const v = parseInt(customDelayInput.value);
+      if (!isNaN(v) && v >= 1) {
+        selectedDelay = v;
+        document.querySelectorAll(".delay-chip").forEach(c => {
+          c.classList.toggle("active", parseInt(c.dataset.delay) === v);
+        });
+      }
+    });
+
+    function updateBulkCount() {
+      const skip = skipAlreadySent.checked;
+      const total = membres.filter(m => m.email && m.email !== "anonyme").length;
+      const already = historique.filter(h => h.status === "success").map(h => h.id);
+      const toSend = skip
+        ? membres.filter(m => m.email && m.email !== "anonyme" && !already.includes(m.id)).length
+        : total;
+      bulkCount.innerHTML = `<strong>${toSend}</strong> carte(s) à envoyer${skip ? ` <span style="font-weight:600;color:var(--text3)">(${total - toSend} déjà envoyé(s) ignoré(s))</span>` : ""}`;
+    }
+
+    skipAlreadySent.addEventListener("change", updateBulkCount);
+
+    btnSendAll.onclick = () => {
+      bulkProgressArea.style.display = "none";
+      bulkLog.innerHTML = "";
+      bulkProgressFill.style.width = "0%";
+      bulkProgressText.textContent = "0 / 0";
+      bulkCurrentMember.textContent = "";
+      btnStartBulk.style.display = "";
+      btnStopBulk.style.display = "none";
+      btnCloseBulk.disabled = false;
+      btnCancelBulk.disabled = false;
+      updateBulkCount();
+      bulkModal.style.display = "flex";
+    };
+
+    function closeBulkModal() {
+      if (bulkRunning) return;
+      bulkModal.style.display = "none";
+    }
+    btnCloseBulk.onclick  = closeBulkModal;
+    btnCancelBulk.onclick = closeBulkModal;
+
+    btnStopBulk.onclick = () => {
+      bulkStop = true;
+      btnStopBulk.disabled = true;
+      btnStopBulk.innerHTML = '<i class="fas fa-hourglass-half"></i> Arrêt en cours...';
+    };
+
+    function addBulkLog(text, type) {
+      const div = document.createElement("div");
+      div.className = "log-" + type;
+      div.textContent = text;
+      bulkLog.appendChild(div);
+      bulkLog.scrollTop = bulkLog.scrollHeight;
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    btnStartBulk.onclick = async () => {
+      const skip = skipAlreadySent.checked;
+      const delay = Math.max(1, parseInt(customDelayInput.value) || selectedDelay) * 1000;
+      const alreadySent = historique.filter(h => h.status === "success").map(h => h.id);
+
+      const queue = membres.filter(m => {
+        if (!m.email || m.email === "anonyme") return false;
+        if (skip && alreadySent.includes(m.id)) return false;
+        return true;
+      });
+
+      if (queue.length === 0) {
+        showToast("Aucun membre à envoyer.", "info");
+        return;
+      }
+
+      // UI : démarrage
+      bulkRunning = true;
+      bulkStop    = false;
+      bulkProgressArea.style.display = "block";
+      bulkLog.innerHTML = "";
+      btnStartBulk.style.display = "none";
+      btnStopBulk.style.display  = "";
+      btnStopBulk.disabled = false;
+      btnStopBulk.innerHTML = '<i class="fas fa-stop"></i> Arrêter';
+      btnCloseBulk.disabled  = true;
+      btnCancelBulk.disabled = true;
+
+      const subject      = localStorage.getItem("mailSubject") || "Votre carte de membre digitale";
+      const bodyTemplate = localStorage.getItem("mailBody")    || "Bonjour {{prenom}} {{nom}},\n\nVeuillez trouver ci-joint votre carte de membre.\n\nVoici vos accès à l'Espace Membre (pour consulter et télécharger vos tickets) :\nIdentifiant : {{pseudo}}\nMot de passe : {{motDePasse}}\nCode d'accès : {{codeAcces}}\n\n⚠️ Cet espace membre est consultable uniquement à l'intérieur du Cube.\n\nCordialement,\nLe Cube Club Karaoké ASBL";
+
+      let done = 0, ok = 0, errors = 0;
+      const total = queue.length;
+
+      for (const m of queue) {
+        if (bulkStop) {
+          addBulkLog("⛔ Envoi stoppé manuellement.", "skip");
+          break;
+        }
+
+        bulkCurrentMember.textContent = `En cours : ${m.prenom || ""} ${m.nom || ""} (${m.email})`;
+        const body = bodyTemplate
+          .replace(/{{prenom}}/g, m.prenom || "")
+          .replace(/{{nom}}/g, m.nom || "")
+          .replace(/{{pseudo}}/g, m.pseudo || "—")
+          .replace(/{{motDePasse}}/g, m.motDePasse || "—")
+          .replace(/{{codeAcces}}/g, m.codeAcces || "—");
+
+        try {
+          const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: m.id, email: m.email, subject, body })
+          });
+
+          const success = res.ok;
+          historique = historique.filter(h => h.id !== m.id);
+          historique.push({ id: m.id, email: m.email, status: success ? "success" : "error", date: new Date().toISOString() });
+          localStorage.setItem("historiqueEmails", JSON.stringify(historique));
+
+          if (success) {
+            ok++;
+            addBulkLog(`✅ ${m.prenom} ${m.nom} (${m.email})`, "ok");
+          } else {
+            errors++;
+            addBulkLog(`❌ ${m.prenom} ${m.nom} — erreur serveur`, "err");
+          }
+        } catch (e) {
+          errors++;
+          historique = historique.filter(h => h.id !== m.id);
+          historique.push({ id: m.id, email: m.email, status: "error", date: new Date().toISOString() });
+          localStorage.setItem("historiqueEmails", JSON.stringify(historique));
+          addBulkLog(`❌ ${m.prenom} ${m.nom} — impossible de joindre le serveur`, "err");
+        }
+
+        done++;
+        bulkProgressFill.style.width = Math.round((done / total) * 100) + "%";
+        bulkProgressText.textContent = `${done} / ${total} — ✅ ${ok}  ❌ ${errors}`;
+        renderTable();
+
+        // Délai (sauf pour le dernier)
+        if (done < total && !bulkStop) await sleep(delay);
+      }
+
+      // Fin
+      bulkRunning = false;
+      bulkCurrentMember.textContent = bulkStop
+        ? `Stoppé à ${done}/${total} — ✅ ${ok} envoyé(s), ❌ ${errors} erreur(s)`
+        : `Terminé ! ✅ ${ok} envoyé(s), ❌ ${errors} erreur(s)`;
+      btnStartBulk.style.display = "";
+      btnStopBulk.style.display  = "none";
+      btnCloseBulk.disabled  = false;
+      btnCancelBulk.disabled = false;
+      updateBulkCount();
+
+      showToast(bulkStop ? `Stoppé — ${ok} envoyé(s)` : `Envoi terminé — ${ok} succès, ${errors} erreur(s)`,
+                errors === 0 ? "success" : "error");
+    };
+
+  </script>
+</body>
+</html>

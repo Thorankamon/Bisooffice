@@ -1,0 +1,12 @@
+{
+  "pendingOrders": [],
+  "asbl_gestion_v1": {
+    "dons": [],
+    "inventaire": [],
+    "settings": {}
+  },
+  "mailSubject": "",
+  "mailBody": "",
+  "historiqueEmails": [],
+  "historiqueFactures": []
+}

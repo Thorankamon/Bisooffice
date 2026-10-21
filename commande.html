@@ -1,0 +1,2552 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>📱 Commander</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red-pale:#fde8e8;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --shadow:rgba(30,80,160,0.15);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      padding:0;
+      color:var(--text);
+      background-attachment:fixed;
+    }
+
+    /* Header */
+    .app-header {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white;
+      padding:15px 18px;
+      position:sticky;
+      top:0;
+      z-index:100;
+      box-shadow:0 3px 15px rgba(20,60,160,0.3);
+    }
+    .app-header::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.25); pointer-events:none;
+    }
+    .header-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      position:relative;
+    }
+    .header-title {
+      font-size:1.3em;
+      font-weight:900;
+    }
+    .header-back {
+      background:rgba(255,255,255,.2);
+      border:1px solid rgba(255,255,255,.4);
+      color:white;
+      border-radius:50px;
+      padding:7px 14px;
+      font-weight:800;
+      font-size:13px;
+      cursor:pointer;
+      text-decoration:none;
+    }
+
+    /* Table sélecteur */
+    .table-selector {
+      padding:15px 18px;
+      background:rgba(255,255,255,.75);
+      border-bottom:1px solid var(--border2);
+    }
+    .table-selector label {
+      font-weight:800;
+      font-size:13px;
+      color:var(--text2);
+      display:block;
+      margin-bottom:8px;
+    }
+    .table-select-btn {
+      width:100%;
+      padding:13px 15px;
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(215,238,255,.85));
+      border:2px solid var(--border);
+      border-radius:var(--radius-lg);
+      font-size:15px;
+      font-weight:800;
+      color:var(--text);
+      cursor:pointer;
+      text-align:left;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .table-select-btn.selected {
+      border-color:var(--green);
+      background:var(--green-pale);
+      color:var(--green2);
+    }
+
+    /* Categories */
+    .categories-bar {
+      display:flex;
+      gap:8px;
+      padding:12px 15px;
+      flex-wrap:wrap;
+      background:rgba(255,255,255,.6);
+      border-bottom:1px solid var(--border2);
+    }
+    .cat-btn {
+      padding:8px 16px;
+      border-radius:50px;
+      border:none;
+      font-weight:800;
+      font-size:13px;
+      cursor:pointer;
+      color:white;
+      opacity:0.7;
+      transition:all 0.2s;
+    }
+    .cat-btn.active {
+      opacity:1;
+      transform:scale(1.05);
+      box-shadow:0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    /* Articles grid */
+    .articles-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+      gap:10px;
+      padding:15px;
+    }
+    @media (max-width: 480px) {
+      .articles-grid { grid-template-columns:repeat(2,1fr); gap:8px; padding:10px; }
+    }
+    .article-btn {
+      background:rgba(255,255,255,.85);
+      border:2px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:14px 10px;
+      cursor:pointer;
+      text-align:center;
+      transition:all 0.15s;
+      position:relative;
+      box-shadow:0 2px 8px var(--shadow);
+    }
+    .article-btn:active { transform:scale(0.93); }
+    .article-btn.in-cart {
+      border-color:var(--green);
+      background:var(--green-pale);
+    }
+    .article-btn-name {
+      font-weight:800;
+      font-size:14px;
+      color:var(--text);
+      margin-bottom:5px;
+      line-height:1.2;
+    }
+    .article-btn-price {
+      font-weight:700;
+      font-size:13px;
+      color:var(--orange);
+    }
+    .article-btn-badge {
+      position:absolute;
+      top:-7px;
+      right:-7px;
+      background:linear-gradient(135deg,#84d47c,#4a9422);
+      color:white;
+      border-radius:50%;
+      width:24px;
+      height:24px;
+      font-size:12px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:2px solid white;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    /* Panier sticky bottom */
+    .cart-bar {
+      position:fixed;
+      bottom:0;
+      left:0;
+      right:0;
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white;
+      padding:14px 18px;
+      z-index:200;
+      box-shadow:0 -4px 20px rgba(20,60,160,0.3);
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .cart-bar::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.2); pointer-events:none;
+    }
+    .cart-info {
+      flex:1;
+      position:relative;
+    }
+    .cart-count {
+      font-size:13px;
+      font-weight:700;
+      opacity:0.85;
+    }
+    .cart-total {
+      font-size:1.3em;
+      font-weight:900;
+    }
+    .cart-send-btn {
+      background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+      color:white;
+      border:1px solid #2d6a1a;
+      border-radius:50px;
+      padding:13px 22px;
+      font-size:15px;
+      font-weight:900;
+      cursor:pointer;
+      transition:all 0.2s;
+      position:relative;
+    }
+    .cart-send-btn:active { transform:scale(0.95); }
+
+    /* Panier modal */
+    .overlay {
+      display:none;
+      position:fixed;
+      top:0; left:0; width:100%; height:100%;
+      background:rgba(10,40,90,.45);
+      backdrop-filter:blur(8px);
+      z-index:300;
+    }
+    .cart-modal {
+      display:none;
+      position:fixed;
+      bottom:0; left:0; right:0;
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+      border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+      padding:20px;
+      z-index:400;
+      max-height:85vh;
+      overflow-y:auto;
+      box-shadow:0 -5px 30px rgba(20,60,180,.25);
+    }
+    .modal-handle {
+      width:40px; height:5px;
+      background:var(--border);
+      border-radius:3px;
+      margin:0 auto 15px;
+    }
+    .cart-item {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px;
+      background:rgba(255,255,255,.8);
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      margin-bottom:8px;
+    }
+    .cart-item-name {
+      flex:1;
+      font-weight:800;
+      font-size:14px;
+    }
+    .cart-item-price {
+      font-weight:700;
+      color:var(--orange);
+      font-size:13px;
+      min-width:55px;
+      text-align:right;
+    }
+    .qty-btn {
+      width:30px; height:30px;
+      border-radius:50%;
+      border:none;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .qty-minus { background:var(--red-pale); color:var(--red); }
+    .qty-plus { background:var(--green-pale); color:var(--green2); }
+    .qty-num {
+      min-width:24px;
+      text-align:center;
+      font-weight:900;
+      font-size:16px;
+    }
+
+    /* Note */
+    .note-input {
+      width:100%;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      font-family:'Nunito',sans-serif;
+      font-size:14px;
+      resize:none;
+      margin:12px 0;
+      background:rgba(255,255,255,.9);
+    }
+
+    /* Table popup */
+    .table-popup {
+      display:none;
+      position:fixed;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+      border-radius:var(--radius-xl);
+      padding:20px;
+      z-index:600;
+      width:90%;
+      max-width:400px;
+      max-height:80vh;
+      overflow-y:auto;
+      box-shadow:0 20px 60px rgba(20,60,180,.3);
+    }
+    .table-popup h3 {
+      color:var(--blue3);
+      font-weight:900;
+      margin-bottom:14px;
+      font-size:1.2em;
+    }
+    .tables-popup-grid {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:7px;
+    }
+    .table-popup-btn {
+      padding:10px 5px;
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.8);
+      font-weight:800;
+      font-size:12px;
+      cursor:pointer;
+      text-align:center;
+      transition:0.2s;
+    }
+    .table-popup-btn:hover { background:var(--blue-pale); border-color:var(--blue); }
+    .table-popup-btn.occupied {
+      background:linear-gradient(180deg,#faa,#f44336);
+      color:white;
+      border-color:#c62828;
+    }
+
+    /* Toast */
+    .toast {
+      position:fixed;
+      top:80px;
+      left:50%;
+      transform:translateX(-50%);
+      padding:12px 22px;
+      border-radius:50px;
+      font-weight:800;
+      font-size:14px;
+      color:white;
+      z-index:9999;
+      animation:toastIn 0.3s ease;
+      text-align:center;
+      box-shadow:0 5px 20px rgba(0,0,0,0.25);
+    }
+    @keyframes toastIn {
+      from { opacity:0; transform:translateX(-50%) translateY(-10px); }
+      to { opacity:1; transform:translateX(-50%) translateY(0); }
+    }
+
+    .send-modal {
+      display:none;
+      position:fixed;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+      border-radius:var(--radius-xl);
+      padding:25px;
+      z-index:700;
+      width:90%;
+      max-width:380px;
+      text-align:center;
+      box-shadow:0 20px 60px rgba(20,60,180,.3);
+    }
+    .send-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,40,90,.5); z-index:650; }
+
+    /* Bottom padding for cart bar */
+    .bottom-pad { height:80px; }
+
+    /* ===== CLAVIER VIRTUEL ===== */
+    #vKeyboard {
+      display:none;
+      position:fixed;
+      bottom:0; left:0; right:0;
+      background:linear-gradient(180deg,#e8f2fc,#d0e6f8);
+      border-top:2px solid var(--border);
+      border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+      padding:8px 6px max(10px, env(safe-area-inset-bottom));
+      z-index:9000;
+      box-shadow:0 -6px 30px rgba(20,60,180,.2);
+      user-select:none;
+      max-height:52vh;
+      overflow:hidden;
+      box-sizing:border-box;
+    }
+    #vKeyboard.active { display:block; }
+    .vkb-topbar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:8px;
+      padding:0 4px;
+    }
+    .vkb-label {
+      font-size:12px;
+      font-weight:800;
+      color:var(--text2);
+    }
+    .vkb-close {
+      background:linear-gradient(180deg,#f08080,#c0392b);
+      color:white;
+      border:none;
+      border-radius:50px;
+      padding:5px 13px;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .vkb-preview {
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:5px 10px;
+      margin-bottom:5px;
+      font-size:14px;
+      font-weight:700;
+      color:var(--text);
+      min-height:30px;
+      display:flex;
+      align-items:center;
+      gap:2px;
+    }
+    .vkb-preview-text { flex:1; }
+    .vkb-cursor {
+      width:2px; height:18px;
+      background:var(--blue);
+      animation:blink .8s infinite;
+      flex-shrink:0;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .vkb-rows { display:flex; flex-direction:column; gap:3px; }
+    .vkb-row {
+      display:flex;
+      gap:3px;
+      justify-content:center;
+    }
+    .vkb-key {
+      background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(220,235,255,.85));
+      border:1px solid var(--border);
+      border-bottom:2px solid #a0bcd8;
+      border-radius:7px;
+      min-width:28px;
+      height:36px;
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 4px;
+      transition:all 0.08s;
+      flex:1;
+      max-width:44px;
+      font-family:'Nunito',sans-serif;
+    }
+    .vkb-key:active {
+      transform:scale(0.9);
+      background:var(--blue-pale);
+      border-color:var(--blue);
+    }
+    .vkb-key.wide { flex:1.6; max-width:70px; font-size:13px; }
+    .vkb-key.wider { flex:3; max-width:none; font-size:13px; }
+    .vkb-key.action {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white;
+      border-color:#0d4f9a;
+      border-bottom-color:#0a3570;
+      font-size:13px;
+    }
+    .vkb-key.delete {
+      background:linear-gradient(180deg,#faa,#e74c3c);
+      color:white;
+      border-color:#c0392b;
+      border-bottom-color:#922b21;
+    }
+    .vkb-key.shift-active {
+      background:linear-gradient(180deg,#fff8dc,#e8a800);
+      color:var(--text);
+      border-color:var(--yellow);
+    }
+
+    /* MODALE DEBUG FERMABLE */
+    .debug-modal-overlay {
+      display:none;
+      position:fixed;
+      top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.7);
+      backdrop-filter:blur(5px);
+      z-index:9998;
+    }
+    .debug-modal {
+      display:none;
+      position:fixed;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      background:linear-gradient(160deg,rgba(30,30,40,0.98),rgba(20,20,30,0.98));
+      border:2px solid #00ff00;
+      border-radius:var(--radius-xl);
+      padding:20px;
+      z-index:9999;
+      width:90%;
+      max-width:400px;
+      max-height:80vh;
+      overflow-y:auto;
+      color:#00ff00;
+      font-family:monospace;
+      font-size:12px;
+      box-shadow:0 0 30px rgba(0,255,0,0.3);
+    }
+    .debug-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:15px;
+      padding-bottom:10px;
+      border-bottom:1px solid #00ff00;
+    }
+    .debug-title {
+      font-weight:900;
+      font-size:16px;
+      color:#00ff00;
+    }
+    .debug-close {
+      background:#ff0000;
+      color:white;
+      border:none;
+      border-radius:50%;
+      width:30px;
+      height:30px;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .debug-content {
+      white-space:pre-wrap;
+      word-break:break-all;
+      line-height:1.5;
+    }
+    .debug-show-btn {
+      position:fixed;
+      bottom:100px;
+      right:10px;
+      background:#00ff00;
+      color:black;
+      border:none;
+      border-radius:50px;
+      padding:10px 15px;
+      font-weight:900;
+      font-size:14px;
+      cursor:pointer;
+      z-index:9997;
+      box-shadow:0 0 20px #00ff00;
+    }
+    /* ===== MODALE CUSTOM (alert / confirm) ===== */
+    #customModalOverlay {
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(10,40,90,.55); backdrop-filter:blur(6px);
+      z-index:19000;
+    }
+    #customModal {
+      display:none; position:fixed; top:50%; left:50%;
+      transform:translate(-50%,-50%) scale(.92);
+      background:linear-gradient(160deg,rgba(255,255,255,.98),rgba(215,238,255,.96));
+      border-radius:var(--radius-xl); padding:28px 22px 20px;
+      z-index:19001; width:88%; max-width:360px;
+      box-shadow:0 20px 60px rgba(20,60,180,.3);
+      text-align:center;
+      transition:transform .2s cubic-bezier(.34,1.56,.64,1), opacity .15s;
+      opacity:0;
+    }
+    #customModal.visible {
+      transform:translate(-50%,-50%) scale(1);
+      opacity:1;
+    }
+    #customModal .cm-icon  { font-size:3em; margin-bottom:10px; line-height:1; }
+    #customModal .cm-title { font-size:1.15em; font-weight:900; color:var(--text); margin-bottom:8px; }
+    #customModal .cm-msg   { font-size:14px; font-weight:600; color:var(--text2); margin-bottom:22px; line-height:1.5; }
+    #customModal .cm-btns  { display:flex; gap:10px; flex-direction:column; }
+    #customModal .cm-btn {
+      width:100%; padding:14px; border:none; border-radius:var(--radius-lg);
+      font-size:15px; font-weight:900; cursor:pointer;
+      font-family:'Nunito',sans-serif; transition:transform .1s;
+    }
+    #customModal .cm-btn:active { transform:scale(.96); }
+    #customModal .cm-btn.primary { background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white; }
+    #customModal .cm-btn.danger  { background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; }
+    #customModal .cm-btn.success { background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); color:white; }
+    #customModal .cm-btn.cancel  { background:rgba(255,255,255,.85); border:1px solid var(--border); color:var(--text2); }
+  </style>
+</head>
+<body>
+
+  <!-- ===== ÉCRAN DE CONNEXION COMMANDE ===== -->
+  <div id="loginScreen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%); z-index:99999; overflow-y:auto; padding:30px 20px;">
+    <div style="max-width:380px; margin:0 auto;">
+      <div style="text-align:center; margin-bottom:28px;">
+        <div style="font-size:3em; margin-bottom:8px;">📱</div>
+        <div style="font-size:1.5em; font-weight:900; color:var(--blue3);">Prise de commande</div>
+        <div style="font-size:14px; font-weight:600; color:var(--text2); margin-top:4px;">Qui utilise la caisse ?</div>
+      </div>
+      <!-- Step 1: choix utilisateur -->
+      <div id="lsStep1">
+        <div id="lsUserList" style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-bottom:20px;"></div>
+      </div>
+      <!-- Step 2: saisie PIN -->
+      <div id="lsStep2" style="display:none; background:rgba(255,255,255,.88); border-radius:22px; padding:22px; box-shadow:0 8px 30px rgba(20,60,160,.15);">
+        <div style="text-align:center; margin-bottom:14px;">
+          <div id="lsSelAvatar" style="width:62px; height:62px; border-radius:50%; background:linear-gradient(135deg,#7cc4f8,#2a7fd4); color:white; font-size:26px; font-weight:900; display:flex; align-items:center; justify-content:center; margin:0 auto 8px;"></div>
+          <div id="lsSelName" style="font-size:1.1em; font-weight:900; color:var(--blue3);"></div>
+          <div style="font-size:13px; color:var(--text2); margin-top:3px;">Entrez votre code PIN</div>
+        </div>
+        <div id="lsPinDisplay" style="width:100%; padding:14px; border:2px solid var(--border); border-radius:12px; font-size:24px; letter-spacing:10px; text-align:center; min-height:54px; background:rgba(255,255,255,.9); color:var(--text); margin-bottom:14px; font-family:monospace; font-weight:700;">—</div>
+        <div id="lsMsg" style="min-height:22px; text-align:center; font-size:13px; font-weight:700; color:var(--red); margin-bottom:10px;"></div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+          <button class="lsNumKey" data-v="1" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">1</button>
+          <button class="lsNumKey" data-v="2" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">2</button>
+          <button class="lsNumKey" data-v="3" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">3</button>
+          <button class="lsNumKey" data-v="4" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">4</button>
+          <button class="lsNumKey" data-v="5" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">5</button>
+          <button class="lsNumKey" data-v="6" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">6</button>
+          <button class="lsNumKey" data-v="7" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">7</button>
+          <button class="lsNumKey" data-v="8" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">8</button>
+          <button class="lsNumKey" data-v="9" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">9</button>
+          <button onclick="lsPinDelete()" style="padding:16px; font-size:18px; font-weight:800; border:1px solid var(--red); border-radius:12px; background:#fff0f0; cursor:pointer; font-family:'Nunito',sans-serif; color:var(--red);">⌫</button>
+          <button class="lsNumKey" data-v="0" style="padding:16px; font-size:20px; font-weight:800; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.85); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2);">0</button>
+          <button onclick="lsPinValidate()" style="padding:16px; font-size:16px; font-weight:900; border:none; border-radius:12px; background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); cursor:pointer; font-family:'Nunito',sans-serif; color:white;">✓</button>
+        </div>
+        <button onclick="lsBack()" style="width:100%; margin-top:14px; padding:11px; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.7); font-size:14px; font-weight:800; cursor:pointer; color:var(--text2); font-family:'Nunito',sans-serif;">← Changer d'utilisateur</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODALE CUSTOM ===== -->
+  <div id="customModalOverlay"></div>
+  <div id="customModal">
+    <div class="cm-icon"  id="cmIcon"></div>
+    <div class="cm-title" id="cmTitle"></div>
+    <div class="cm-msg"   id="cmMsg"></div>
+    <div class="cm-btns"  id="cmBtns"></div>
+  </div>
+
+  <!-- Bouton pour afficher la modale debug -->
+  <button class="debug-show-btn" id="debugShowBtn" onclick="openDebugModal()">🐞 Debug</button>
+
+  <!-- MODALE DEBUG FERMABLE -->
+  <div class="debug-modal-overlay" id="debugOverlay" onclick="closeDebugModal()"></div>
+  <div class="debug-modal" id="debugModal">
+    <div class="debug-header">
+      <span class="debug-title">🔍 DEBUG</span>
+      <button class="debug-close" onclick="closeDebugModal()">✕</button>
+    </div>
+    <div class="debug-content" id="debugContent"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="app-header">
+    <div class="header-row">
+      <span class="header-title">📱 Prise de commande</span>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <span id="serverStatusBadge" style="font-size:11px; font-weight:800; padding:4px 10px; border-radius:50px; background:rgba(255,255,255,.15); color:rgba(255,255,255,.6);">⏳ …</span>
+        <span id="headerUserBadge" style="display:none; font-size:12px; font-weight:800; padding:5px 11px; border-radius:50px; background:rgba(255,255,255,.25); color:white; align-items:center; gap:6px;"></span>
+        <button onclick="openMembreModal()" style="background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.5); color:white; border-radius:50px; padding:7px 14px; font-weight:800; font-size:13px; cursor:pointer;">👤 Membres</button>
+        <button id="btnSleepCommande" onclick="commandeSleep()" style="display:none; background:rgba(255,165,0,.3); border:1px solid rgba(255,165,0,.6); color:white; border-radius:50px; padding:7px 14px; font-weight:800; font-size:13px; cursor:pointer;" title="Mise en veille">😴 Veille</button>
+        <button id="btnLogoutCommande" onclick="commandeLogout()" style="display:none; background:rgba(192,57,43,.35); border:1px solid rgba(255,100,80,.5); color:white; border-radius:50px; padding:7px 14px; font-weight:800; font-size:13px; cursor:pointer;" title="Déconnexion">🔓 Quitter</button>
+        <a href="commande.html?mode=serveur" class="header-back">⬅️ Actualiser</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sélecteur de table -->
+  <div class="table-selector">
+    <label>🍽️ Table à servir</label>
+    <button class="table-select-btn" id="tableSelectBtn" onclick="openTablePopup()">
+      <span id="tableSelectText">Sélectionner une table...</span>
+      <span>▾</span>
+    </button>
+  </div>
+
+  <!-- Categories -->
+  <div class="categories-bar" id="categoriesBar"></div>
+
+  <!-- Articles -->
+  <div class="articles-grid" id="articlesGrid"></div>
+
+  <div class="bottom-pad"></div>
+
+  <!-- Barre panier -->
+  <div class="cart-bar" id="cartBar" style="display:none;">
+    <div class="cart-info">
+      <div class="cart-count" id="cartCount">0 article(s)</div>
+      <div class="cart-total" id="cartTotalBar">0.00 €</div>
+    </div>
+    <button class="cart-send-btn" onclick="openCartModal()">🛒 Voir commande</button>
+  </div>
+
+  <!-- Modal Panier -->
+  <div class="overlay" id="cartOverlay" onclick="closeCartModal()"></div>
+  <div class="cart-modal" id="cartModal">
+    <div class="modal-handle"></div>
+    <h3 style="font-weight:900; color:var(--blue3); margin-bottom:14px;">🛒 Ma commande</h3>
+    <div id="cartItems"></div>
+    <textarea class="note-input" id="orderNote" placeholder="📝 Note ou remarque pour la cuisine..." rows="2"></textarea>
+    <div style="background:var(--orange-pale); border:1px solid var(--orange); border-radius:var(--radius); padding:12px; margin-bottom:14px; font-weight:800; font-size:15px; color:var(--orange); text-align:center;">
+      Total : <span id="cartTotalModal">0.00 €</span>
+    </div>
+    <button onclick="sendOrder()" style="width:100%; padding:15px; background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); color:white; border:1px solid #2d6a1a; border-radius:var(--radius-lg); font-size:16px; font-weight:900; cursor:pointer; margin-bottom:10px;">
+      ✅ Envoyer la commande
+    </button>
+    <button onclick="closeCartModal()" style="width:100%; padding:12px; background:rgba(255,255,255,.8); border:1px solid var(--border); border-radius:var(--radius-lg); font-size:14px; font-weight:800; cursor:pointer; color:var(--text2); margin-bottom:8px;">
+      Continuer à commander
+    </button>
+    <button onclick="cancelOrder()" style="width:100%; padding:12px; background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border:1px solid #922b21; border-radius:var(--radius-lg); font-size:14px; font-weight:900; cursor:pointer;">
+      🗑️ Annuler la commande
+    </button>
+  </div>
+
+  <!-- Popup sélection table -->
+  <div class="overlay" id="tableOverlay" onclick="closeTablePopup()"></div>
+  <div class="table-popup" id="tablePopup">
+    <h3>🍽️ Choisir une table</h3>
+    <div class="tables-popup-grid" id="tablesPopupGrid"></div>
+    <button onclick="closeTablePopup()" style="width:100%; margin-top:14px; padding:11px; background:linear-gradient(180deg,#f08080,#c0392b); color:white; border:none; border-radius:var(--radius); font-weight:800; cursor:pointer;">Annuler</button>
+  </div>
+
+  <!-- Modal confirmation envoi -->
+  <div id="sendOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,40,90,.5); z-index:650;"></div>
+  <div class="send-modal" id="sendModal">
+    <div style="font-size:4em; margin-bottom:10px;">✅</div>
+    <h3 style="color:var(--green2); font-weight:900; margin-bottom:8px;">Commande envoyée !</h3>
+    <p id="sendModalText" style="color:var(--text2); font-weight:600; margin-bottom:20px;"></p>
+    <button onclick="closeSendModal()" style="width:100%; padding:13px; background:linear-gradient(180deg,#84d47c,#4a9422); color:white; border:none; border-radius:var(--radius-lg); font-size:15px; font-weight:900; cursor:pointer;">Nouvelle commande</button>
+  </div>
+
+  <script>
+    // ============ MODALES CUSTOM (remplace alert/confirm) ============
+    function _cmClose() {
+      const m = document.getElementById('customModal');
+      const o = document.getElementById('customModalOverlay');
+      m.classList.remove('visible');
+      setTimeout(() => { m.style.display='none'; o.style.display='none'; }, 200);
+    }
+
+    function showAlert(opts) {
+      // opts: { icon, title, msg, btnLabel, btnClass, onOk }
+      const m = document.getElementById('customModal');
+      const o = document.getElementById('customModalOverlay');
+      document.getElementById('cmIcon').textContent  = opts.icon  || 'ℹ️';
+      document.getElementById('cmTitle').textContent = opts.title || '';
+      document.getElementById('cmMsg').textContent   = opts.msg   || '';
+      const btns = document.getElementById('cmBtns');
+      btns.innerHTML = '';
+      const b = document.createElement('button');
+      b.className = 'cm-btn ' + (opts.btnClass || 'primary');
+      b.textContent = opts.btnLabel || 'OK';
+      b.onclick = () => { _cmClose(); if (opts.onOk) opts.onOk(); };
+      btns.appendChild(b);
+      o.style.display = 'block';
+      m.style.display = 'block';
+      requestAnimationFrame(() => requestAnimationFrame(() => m.classList.add('visible')));
+    }
+
+    function showConfirm(opts) {
+      // opts: { icon, title, msg, confirmLabel, confirmClass, cancelLabel, onConfirm }
+      const m = document.getElementById('customModal');
+      const o = document.getElementById('customModalOverlay');
+      document.getElementById('cmIcon').textContent  = opts.icon  || '❓';
+      document.getElementById('cmTitle').textContent = opts.title || '';
+      document.getElementById('cmMsg').textContent   = opts.msg   || '';
+      const btns = document.getElementById('cmBtns');
+      btns.innerHTML = '';
+      const bOk = document.createElement('button');
+      bOk.className = 'cm-btn ' + (opts.confirmClass || 'danger');
+      bOk.textContent = opts.confirmLabel || 'Confirmer';
+      bOk.onclick = () => { _cmClose(); if (opts.onConfirm) opts.onConfirm(); };
+      const bCancel = document.createElement('button');
+      bCancel.className = 'cm-btn cancel';
+      bCancel.textContent = opts.cancelLabel || 'Annuler';
+      bCancel.onclick = _cmClose;
+      btns.appendChild(bOk);
+      btns.appendChild(bCancel);
+      o.style.display = 'block';
+      m.style.display = 'block';
+      requestAnimationFrame(() => requestAnimationFrame(() => m.classList.add('visible')));
+    }
+
+    // ============ FORCER LE MODE SERVEUR DEPUIS L'URL ============
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceMode = urlParams.get('mode');
+    
+    let IS_SERVER;
+    let SERVER_IP = 'localhost';
+    let debugMessages = [];
+    
+    if (forceMode === 'serveur') {
+        IS_SERVER = true;
+        if (window.location.hostname && window.location.hostname !== '') {
+            SERVER_IP = window.location.hostname;
+        }
+    } else {
+        // Détection automatique : tout accès via http:// (localhost OU IP réseau) = mode serveur
+        IS_SERVER = window.location.protocol === "http:";
+        if (window.location.hostname && window.location.hostname !== '') {
+            SERVER_IP = window.location.hostname;
+        }
+    }
+
+    // Construction des URLs API — toujours basé sur l'hôte courant
+    const API_BASE = IS_SERVER
+        ? `${window.location.protocol}//${window.location.host}`
+        : null;
+    const API = API_BASE ? `${API_BASE}/api` : null;
+    
+    // Debug panel
+    function debugLog(msg) {
+      const time = new Date().toLocaleTimeString();
+      const logMsg = `${time} - ${msg}`;
+      debugMessages.push(logMsg);
+      if (debugMessages.length > 50) debugMessages.shift();
+      
+      const content = document.getElementById('debugContent');
+      if (content) {
+        content.innerHTML = debugMessages.map(m => `<div>${m}</div>`).join('');
+      }
+      console.log('🔍', msg);
+    }
+
+    // Ouvrir/fermer modale debug
+    function openDebugModal() {
+      document.getElementById('debugOverlay').style.display = 'block';
+      document.getElementById('debugModal').style.display = 'block';
+    }
+    
+    function closeDebugModal() {
+      document.getElementById('debugOverlay').style.display = 'none';
+      document.getElementById('debugModal').style.display = 'none';
+    }
+
+    // Afficher les infos de démarrage
+    debugLog(`🌐 Mode: ${IS_SERVER ? 'Serveur' : 'Local'} ${forceMode ? '(forcé)' : ''}`);
+    if (IS_SERVER) {
+        debugLog(`📡 API: ${API}`);
+        debugLog(`🔗 IP: ${SERVER_IP}`);
+    } else {
+        debugLog(`📁 Mode fichier local - utilise localStorage`);
+        debugLog(`💡 Astuce: Ajoute ?mode=serveur dans l'URL pour forcer le mode serveur`);
+    }
+
+    // ---- DATA ----
+    let tables = [];
+    let categories = [];
+    let articles = [];
+    let membres = [];
+    let selectedTable = null;
+    let activeCategory = null;
+    let cart = {};
+
+    // ---- INIT ----
+    async function init() {
+      debugLog('🔄 Initialisation...');
+      
+      if (IS_SERVER) {
+        // ── Mode serveur : charge depuis l'API ──
+        debugLog("🔄 Connexion au serveur...");
+        try {
+          debugLog(`📡 Tentative de chargement depuis ${API}/data`);
+          const res  = await fetch(`${API}/data?t=${Date.now()}`); // Cache busting
+          
+          if (!res.ok) {
+            debugLog(`❌ HTTP ${res.status} - ${res.statusText}`);
+            throw new Error(`HTTP ${res.status}`);
+          }
+          
+          const data = await res.json();
+          debugLog(`✅ Données reçues du serveur`);
+          
+          // Debug: afficher ce qu'on a reçu
+          tables     = data.tables      || [];
+          const ad   = data.articlesData || { categories:[], articles:[] };
+          categories = ad.categories    || [];
+          articles   = ad.articles      || [];
+          membres    = data.membres      || [];
+          // Stocker users et adminPassword depuis le serveur
+          if (data.users !== undefined)         window._serverUsers        = data.users;
+          if (data.adminPassword !== undefined) window._serverAdminPassword = data.adminPassword;
+          
+          debugLog(`📊 Tables: ${tables.length}`);
+          debugLog(`📊 Catégories: ${categories.length}`);
+          debugLog(`📊 Articles: ${articles.length}`);
+          debugLog(`📊 Membres: ${membres.length}`);
+          
+          // Afficher la première catégorie pour vérifier
+          if (categories.length > 0) {
+            debugLog(`📁 Première catégorie: ${categories[0].nom}`);
+          }
+          
+          debugLog("✅ Connecté au serveur");
+
+          // Rafraîchir l'écran de login avec les users du serveur (s'il est affiché)
+          if (window._loginInit) window._loginInit();
+          
+        } catch(e) {
+          debugLog(`❌ Erreur: ${e.message}`);
+          debugLog("❌ Serveur inaccessible — fallback localStorage");
+          
+          // Fallback sur localStorage
+          const ad   = JSON.parse(localStorage.getItem("articlesData") || '{"categories":[],"articles":[]}');
+          tables     = JSON.parse(localStorage.getItem("tables")  || "[]");
+          categories = ad.categories || [];
+          articles   = ad.articles   || [];
+          membres    = JSON.parse(localStorage.getItem("membres") || "[]");
+          
+          debugLog(`📊 Tables (local): ${tables.length}`);
+          debugLog(`📊 Catégories (local): ${categories.length}`);
+          debugLog(`📊 Articles (local): ${articles.length}`);
+          debugLog(`📊 Membres (local): ${membres.length}`);
+        }
+      } else {
+        // ── Mode local : charge depuis localStorage ──
+        debugLog('📁 Chargement depuis localStorage');
+        const ad   = JSON.parse(localStorage.getItem("articlesData") || '{"categories":[],"articles":[]}');
+        tables     = JSON.parse(localStorage.getItem("tables")  || "[]");
+        categories = ad.categories || [];
+        articles   = ad.articles   || [];
+        membres    = JSON.parse(localStorage.getItem("membres") || "[]");
+        
+        debugLog(`📊 Tables: ${tables.length}`);
+        debugLog(`📊 Catégories: ${categories.length}`);
+        debugLog(`📊 Articles: ${articles.length}`);
+        debugLog(`📊 Membres: ${membres.length}`);
+      }
+
+      // Vérifier qu'on a des données
+      if (categories.length === 0) {
+        debugLog('⚠️ Aucune catégorie trouvée !');
+      } else {
+        debugLog(`✅ ${categories.length} catégories chargées`);
+      }
+
+      renderCategories();
+      if (categories.length) {
+        activeCategory = categories[0].nom;
+        debugLog(`🎯 Catégorie active: ${activeCategory}`);
+        renderArticles();
+      } else {
+        document.getElementById("articlesGrid").innerHTML = 
+          '<div style="grid-column:1/-1; text-align:center; color:#aaa; padding:40px; font-weight:600;">📭 Aucune catégorie — va dans "Articles" pour en créer</div>';
+      }
+    }
+
+    // ---- CATEGORIES ----
+    function renderCategories() {
+      const bar = document.getElementById("categoriesBar");
+      bar.innerHTML = "";
+      
+      if (categories.length === 0) {
+        bar.innerHTML = '<div style="color:#aaa; padding:10px; font-weight:600;">Aucune catégorie</div>';
+        return;
+      }
+      
+      categories.forEach((c, i) => {
+        const btn = document.createElement("button");
+        btn.className = "cat-btn" + (i === 0 ? " active" : "");
+        btn.textContent = c.nom;
+        btn.style.background = c.couleur || "#2a7fd4";
+        btn.onclick = () => {
+          document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeCategory = c.nom;
+          renderArticles();
+        };
+        bar.appendChild(btn);
+      });
+    }
+
+    // ---- ARTICLES ----
+    function renderArticles() {
+      const grid = document.getElementById("articlesGrid");
+      grid.innerHTML = "";
+      
+      if (!activeCategory) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#aaa; padding:40px; font-weight:600;">Sélectionne une catégorie</div>';
+        return;
+      }
+      
+      const filtered = articles.filter(a => a.categorie === activeCategory);
+      debugLog(`🔍 Articles pour "${activeCategory}": ${filtered.length} trouvés`);
+      
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#aaa; padding:40px; font-weight:600;">Aucun article dans "${activeCategory}"</div>`;
+        return;
+      }
+      
+      filtered.forEach(a => {
+        const btn = document.createElement("div");
+        btn.className = "article-btn" + (cart[a.id] ? " in-cart" : "");
+        btn.style.borderTopColor = a.couleur || "#2a7fd4";
+        btn.style.borderTopWidth = "3px";
+        const qte = cart[a.id] ? cart[a.id].qte : 0;
+        btn.innerHTML = `
+          ${qte > 0 ? `<div class="article-btn-badge">${qte}</div>` : ""}
+          <div class="article-btn-name">${a.nom}</div>
+          <div class="article-btn-price">${parseFloat(a.prixTVAC).toFixed(2)} €</div>
+        `;
+        btn.onclick = () => addToCart(a);
+        grid.appendChild(btn);
+      });
+    }
+
+    // ---- PANIER ----
+    function addToCart(article) {
+      if (!selectedTable) {
+      showAlert({ icon:'⚠️', title:'Table manquante', msg:"Choisissez d'abord une table avant d'ajouter un article.", btnLabel:'OK, je choisis', btnClass:'primary', onOk: openTablePopup });
+        openTablePopup();
+        return;
+      }
+      if (cart[article.id]) {
+        cart[article.id].qte++;
+      } else {
+        cart[article.id] = { ...article, qte: 1, prix: parseFloat(article.prixTVAC) };
+      }
+      updateCartUI();
+      renderArticles();
+    }
+
+    function updateCartUI() {
+      const items = Object.values(cart);
+      const totalQte = items.reduce((s, a) => s + a.qte, 0);
+      const total = items.reduce((s, a) => s + a.prix * a.qte, 0);
+
+      document.getElementById("cartCount").textContent = `${totalQte} article${totalQte > 1 ? "s" : ""}`;
+      document.getElementById("cartTotalBar").textContent = total.toFixed(2) + " €";
+      document.getElementById("cartTotalModal").textContent = total.toFixed(2) + " €";
+      document.getElementById("cartBar").style.display = totalQte > 0 ? "flex" : "none";
+
+      renderCartItems();
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById("cartItems");
+      const items = Object.values(cart);
+      if (items.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#aaa; padding:20px; font-weight:600;">Panier vide</div>';
+        return;
+      }
+      container.innerHTML = "";
+      items.forEach(a => {
+        const div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `
+          <div class="cart-item-name">${a.nom}</div>
+          <button class="qty-btn qty-minus" onclick="changeQty('${a.id}', -1)">−</button>
+          <span class="qty-num">${a.qte}</span>
+          <button class="qty-btn qty-plus" onclick="changeQty('${a.id}', +1)">+</button>
+          <span class="cart-item-price">${(a.prix * a.qte).toFixed(2)} €</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function changeQty(id, delta) {
+      if (!cart[id]) return;
+      cart[id].qte += delta;
+      if (cart[id].qte <= 0) delete cart[id];
+      updateCartUI();
+      renderArticles();
+    }
+
+    function openCartModal() {
+      renderCartItems();
+      document.getElementById("cartOverlay").style.display = "block";
+      document.getElementById("cartModal").style.display = "block";
+      if (window.commandeSetOccupee) window.commandeSetOccupee("commande");
+    }
+
+    function closeCartModal() {
+      document.getElementById("cartOverlay").style.display = "none";
+      document.getElementById("cartModal").style.display = "none";
+      if (window.commandeClearOccupee) window.commandeClearOccupee();
+    }
+
+    // ---- TABLE POPUP ----
+    async function openTablePopup() {
+      if (IS_SERVER) {
+        try {
+          const res = await fetch(`${API}/tables?t=${Date.now()}`);
+          if (res.ok) {
+            tables = await res.json();
+            debugLog(`📊 Tables rafraîchies: ${tables.length}`);
+          }
+        } catch(e) { 
+          debugLog(`⚠️ Erreur chargement tables: ${e.message}`);
+          tables = JSON.parse(localStorage.getItem("tables") || "[]");
+        }
+      } else {
+        tables = JSON.parse(localStorage.getItem("tables") || "[]");
+      }
+      
+      const grid = document.getElementById("tablesPopupGrid");
+      grid.innerHTML = "";
+      tables.forEach(t => {
+        const wrap = document.createElement("div");
+        wrap.style.cssText = "position:relative; display:flex; flex-direction:column; gap:4px;";
+
+        const btn = document.createElement("button");
+        btn.className = "table-popup-btn" + (t.ticketId ? " occupied" : "");
+        btn.textContent = t.nom;
+        btn.onclick = () => selectTable(t);
+
+        const renBtn = document.createElement("button");
+        renBtn.textContent = "✏️";
+        renBtn.title = "Renommer / assigner un membre";
+        renBtn.style.cssText = "font-size:11px; padding:3px 0; background:rgba(255,255,255,.7); border:1px solid var(--border); border-radius:8px; cursor:pointer; font-family:'Nunito',sans-serif; font-weight:800; color:var(--text2); width:100%;";
+        renBtn.onclick = (e) => { e.stopPropagation(); openRenameTableModal(t); };
+
+        wrap.appendChild(btn);
+        wrap.appendChild(renBtn);
+        grid.appendChild(wrap);
+      });
+      document.getElementById("tableOverlay").style.display = "block";
+      document.getElementById("tablePopup").style.display = "block";
+      if (window.commandeSetOccupee) window.commandeSetOccupee("commande");
+    }
+
+    function closeTablePopup() {
+      document.getElementById("tableOverlay").style.display = "none";
+      document.getElementById("tablePopup").style.display = "none";
+      if (window.commandeClearOccupee) window.commandeClearOccupee();
+    }
+
+    function selectTable(table) {
+      selectedTable = table;
+      selectedTable._newNom = null; // reset renommage en attente
+      const btn = document.getElementById("tableSelectBtn");
+      btn.classList.add("selected");
+      document.getElementById("tableSelectText").textContent = `✅ ${table.nom}${table.ticketId ? " (occupée)" : " (libre)"}`;
+      closeTablePopup();
+    }
+
+    // ---- ENVOI ----
+    async function sendOrder() {
+      await _checkPresence("envoyer commande");
+      if (!selectedTable) {
+        showAlert({ icon:'⚠️', title:'Table manquante', msg:'Sélectionnez une table avant d\'envoyer la commande.', btnLabel:'Choisir une table', btnClass:'primary', onOk: openTablePopup });
+        return;
+      }
+      const items = Object.values(cart);
+      if (items.length === 0) {
+        showAlert({ icon:'🛒', title:'Panier vide', msg:'Ajoutez au moins un article avant d\'envoyer.', btnLabel:'OK', btnClass:'primary' });
+        return;
+      }
+
+      const total = items.reduce((s, a) => s + a.prix * a.qte, 0);
+      const note  = document.getElementById("orderNote").value.trim();
+      const order = {
+        id:          Date.now(),
+        tableId:     selectedTable.id,
+        tableNom:    selectedTable.nom,
+        tableNewNom: selectedTable._newNom || null,
+        articles:    items.map(a => ({ id: a.id, nom: a.nom, prix: a.prix, qte: a.qte })),
+        total:       total,
+        note:        note,
+        createdAt:   new Date().toISOString()
+      };
+
+      if (IS_SERVER) {
+        try {
+          debugLog("📡 Envoi de la commande...");
+          const res = await fetch(`${API}/order`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(order)
+          });
+          const data = await res.json();
+          if (!data.ok) throw new Error("Erreur serveur");
+          debugLog(`✅ Commande envoyée: ${items.length} articles`);
+        } catch(e) {
+          debugLog(`❌ Erreur envoi: ${e.message}`);
+          // Fallback localStorage
+          let pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+          pendingOrders.push(order);
+          localStorage.setItem("pendingOrders", JSON.stringify(pendingOrders));
+        }
+      } else {
+        let pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+        pendingOrders.push(order);
+        localStorage.setItem("pendingOrders", JSON.stringify(pendingOrders));
+        debugLog(`✅ Commande en local: ${items.length} articles`);
+      }
+
+      // Afficher confirmation
+      closeCartModal();
+      document.getElementById("sendModalText").textContent = `${items.reduce((s,a)=>s+a.qte,0)} article(s) pour ${selectedTable.nom} — ${total.toFixed(2)} €`;
+      document.getElementById("sendOverlay").style.display = "block";
+      document.getElementById("sendModal").style.display = "block";
+    }
+
+    function closeSendModal() {
+      cart = {};
+      selectedTable = null;
+      document.getElementById("tableSelectBtn").classList.remove("selected");
+      document.getElementById("tableSelectText").textContent = "Sélectionner une table...";
+      document.getElementById("orderNote").value = "";
+      document.getElementById("sendOverlay").style.display = "none";
+      document.getElementById("sendModal").style.display = "none";
+      updateCartUI();
+      renderArticles();
+    }
+
+    // ============ GESTION MEMBRES ============
+
+    function generateMembreId() {
+      // ID temporaire local — le serveur Python (serveur.py) l'écrasera
+      // avec son propre compteur séquentiel (1, 2, 3...) via lastMembreId
+      // Ce n'est utilisé qu'en mode hors-ligne (fallback localStorage)
+      let lastId = parseInt(localStorage.getItem("lastMembreId") || "0");
+      lastId++;
+      localStorage.setItem("lastMembreId", String(lastId));
+      return String(lastId);
+    }
+
+    function statutBadge(statut) {
+      const map = {
+        benevole: { bg:"#d1fae5", color:"#065f46", label:"🤝 Benevole" },
+        admin:    { bg:"#e0e7ff", color:"#3730a3", label:"🛡️ Admin" },
+        inactif:  { bg:"#f1f5f9", color:"#64748b", label:"⚫ Inactif" },
+      };
+      const s = map[statut] || map.inactif;
+      return '<span style="background:'+s.bg+'; color:'+s.color+'; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:800;">'+s.label+'</span>';
+    }
+
+    // --- Chargement membres ---
+    async function chargerMembres() {
+      if (IS_SERVER) {
+        try {
+          const res = await fetch(API + '/membres?t=' + Date.now());
+          if (res.ok) { membres = await res.json(); return; }
+        } catch(e) {}
+      }
+      membres = JSON.parse(localStorage.getItem("membres") || "[]");
+    }
+
+    // --- Ouvrir / fermer le modal membres ---
+    async function openMembreModal() {
+      await chargerMembres();
+      document.getElementById("membreOverlay").style.display = "block";
+      document.getElementById("membreModal").style.display = "block";
+      afficherOnglet("list");
+      window._currentPageLabel = "membres";
+      // Mettre à jour le flag occupé
+      if (window.commandeSetOccupee) window.commandeSetOccupee("membres");
+    }
+
+    function closeMembreModal() {
+      document.getElementById("membreOverlay").style.display = "none";
+      document.getElementById("membreModal").style.display = "none";
+      resetFormulaireM();
+      window._currentPageLabel = "commande";
+      if (window.commandeClearOccupee) window.commandeClearOccupee();
+    }
+
+    function afficherOnglet(tab) {
+      var isList = tab === "list";
+      document.getElementById("tabListContent").style.display = isList ? "block" : "none";
+      document.getElementById("tabAddContent").style.display  = isList ? "none"  : "block";
+      document.getElementById("tabListBtn").style.background  = isList ? "linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0)" : "rgba(255,255,255,.75)";
+      document.getElementById("tabListBtn").style.color       = isList ? "white" : "var(--text2)";
+      document.getElementById("tabListBtn").style.border      = isList ? "none"  : "1px solid var(--border)";
+      document.getElementById("tabAddBtn").style.background   = !isList ? "linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a)" : "rgba(255,255,255,.75)";
+      document.getElementById("tabAddBtn").style.color        = !isList ? "white" : "var(--text2)";
+      document.getElementById("tabAddBtn").style.border       = !isList ? "none"  : "1px solid var(--border)";
+      if (isList) afficherListeMembres(membres);
+    }
+
+    // --- Liste membres ---
+    var MEMBRES_PER_PAGE = 8;
+    var membreCurrentPage = 1;
+    var membreListFiltered = [];
+
+    function afficherListeMembres(list) {
+      membreListFiltered = list || [];
+      membreCurrentPage = 1;
+      afficherPageMembres();
+    }
+
+    function afficherPageMembres() {
+      var container = document.getElementById("membreListContainer");
+      container.innerHTML = "";
+
+      if (membreListFiltered.length === 0) {
+        container.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px 20px;font-weight:600;font-size:15px;">😶 Aucun membre enregistre</div>';
+        return;
+      }
+
+      var totalPages = Math.max(1, Math.ceil(membreListFiltered.length / MEMBRES_PER_PAGE));
+      if (membreCurrentPage > totalPages) membreCurrentPage = totalPages;
+      var start = (membreCurrentPage - 1) * MEMBRES_PER_PAGE;
+      var page  = membreListFiltered.slice(start, start + MEMBRES_PER_PAGE);
+
+      page.forEach(function(m) {
+        var div = document.createElement("div");
+        div.style.cssText = "display:flex;align-items:center;gap:12px;padding:14px;background:rgba(255,255,255,.9);border:1px solid #b0cce8;border-radius:16px;margin-bottom:10px;";
+
+        var av = document.createElement("div");
+        av.style.cssText = "width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#7cc4f8,#2a7fd4);color:white;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;";
+        av.textContent = (m.prenom ? m.prenom[0] : "?").toUpperCase();
+
+        var info = document.createElement("div");
+        info.style.cssText = "flex:1;min-width:0;";
+        var sub = [];
+        if (m.telephone && m.telephone !== "anonyme") sub.push(m.telephone);
+        if (m.email && m.email !== "anonyme") sub.push(m.email);
+        info.innerHTML = '<div style="font-weight:800;font-size:15px;color:#1a2b4a;">' + (m.prenom||"") + " " + (m.nom||"") + "</div>"
+          + '<div style="margin-top:3px;">' + statutBadge(m.statut) + "</div>"
+          + (sub.length ? '<div style="font-size:11px;color:#7a98b8;font-weight:600;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + sub.join(" · ") + "</div>" : "");
+
+        var btn = document.createElement("button");
+        btn.textContent = "✏️";
+        btn.style.cssText = "background:#deeefb;border:1px solid #b0cce8;border-radius:10px;padding:12px 16px;font-size:18px;cursor:pointer;flex-shrink:0;touch-action:manipulation;";
+        (function(membId) {
+          btn.ontouchend = function(e) { e.preventDefault(); e.stopPropagation(); ouvrirDetailMembre(membId); };
+          btn.onclick    = function(e) { e.stopPropagation(); ouvrirDetailMembre(membId); };
+        })(m.id);
+
+        div.appendChild(av);
+        div.appendChild(info);
+        div.appendChild(btn);
+        container.appendChild(div);
+      });
+
+      // Pagination
+      if (totalPages > 1) {
+        var pag = document.createElement("div");
+        pag.style.cssText = "display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;flex-wrap:wrap;";
+
+        var info = document.createElement("div");
+        info.style.cssText = "width:100%;text-align:center;font-size:12px;color:#7a98b8;font-weight:700;margin-bottom:4px;";
+        info.textContent = membreListFiltered.length + " membre" + (membreListFiltered.length > 1 ? "s" : "") + " · page " + membreCurrentPage + " / " + totalPages;
+        pag.appendChild(info);
+
+        var btnPrev = document.createElement("button");
+        btnPrev.textContent = "◀";
+        btnPrev.disabled = membreCurrentPage === 1;
+        btnPrev.style.cssText = "padding:9px 16px;border-radius:10px;border:1px solid #b0cce8;background:rgba(255,255,255,.85);font-weight:800;cursor:pointer;font-size:14px;opacity:" + (membreCurrentPage === 1 ? "0.4" : "1") + ";touch-action:manipulation;";
+        btnPrev.onclick = function() { membreCurrentPage--; afficherPageMembres(); };
+        pag.appendChild(btnPrev);
+
+        for (var i = 1; i <= totalPages; i++) {
+          (function(p) {
+            var b = document.createElement("button");
+            b.textContent = p;
+            var active = p === membreCurrentPage;
+            b.style.cssText = "padding:9px 14px;border-radius:10px;border:1px solid " + (active ? "#2a7fd4" : "#b0cce8") + ";background:" + (active ? "linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0)" : "rgba(255,255,255,.85)") + ";color:" + (active ? "white" : "#4a6080") + ";font-weight:" + (active ? "900" : "700") + ";cursor:pointer;font-size:14px;touch-action:manipulation;";
+            b.onclick = function() { membreCurrentPage = p; afficherPageMembres(); };
+            pag.appendChild(b);
+          })(i);
+        }
+
+        var btnNext = document.createElement("button");
+        btnNext.textContent = "▶";
+        btnNext.disabled = membreCurrentPage === totalPages;
+        btnNext.style.cssText = "padding:9px 16px;border-radius:10px;border:1px solid #b0cce8;background:rgba(255,255,255,.85);font-weight:800;cursor:pointer;font-size:14px;opacity:" + (membreCurrentPage === totalPages ? "0.4" : "1") + ";touch-action:manipulation;";
+        btnNext.onclick = function() { membreCurrentPage++; afficherPageMembres(); };
+        pag.appendChild(btnNext);
+
+        container.appendChild(pag);
+      }
+    }
+
+    function filtrerMembres() {
+      var q = document.getElementById("membreSearchFilter").value.toLowerCase();
+      var filtered = membres.filter(function(m) {
+        return (m.prenom||"").toLowerCase().includes(q)
+          || (m.nom||"").toLowerCase().includes(q)
+          || (m.email||"").toLowerCase().includes(q)
+          || (m.telephone||"").includes(q)
+          || (m.localite||"").toLowerCase().includes(q);
+      });
+      afficherListeMembres(filtered);
+    }
+
+    // --- Formulaire ajout/modif ---
+    function resetFormulaireM() {
+      document.getElementById("editMembreId").value  = "";
+      document.getElementById("newPrenom").value     = "";
+      document.getElementById("newNom").value        = "";
+      document.getElementById("newEmail").value      = "";
+      document.getElementById("newTel").value        = "";
+      document.getElementById("newAdresse").value    = "";
+      document.getElementById("newLocalite").value   = "";
+      document.getElementById("newStatut").value     = "inactif";
+      document.getElementById("editBanner").style.display = "none";
+    }
+
+    async function saveMembre() {
+      var prenom = document.getElementById("newPrenom").value.trim();
+      var nom    = document.getElementById("newNom").value.trim();
+      if (!prenom) { showAlert({ icon:'⚠️', title:'Prenom manquant', msg:'Le prenom est obligatoire.', btnLabel:'OK', btnClass:'primary' }); return; }
+      if (!nom)    { showAlert({ icon:'⚠️', title:'Nom manquant',    msg:'Le nom est obligatoire.',    btnLabel:'OK', btnClass:'primary' }); return; }
+
+      var editId = document.getElementById("editMembreId").value;
+      var anon   = function(v) { return (v || "").trim() || "anonyme"; };
+
+      var membreData = {
+        prenom: prenom,
+        nom: nom,
+        adresse:   anon(document.getElementById("newAdresse").value),
+        localite:  anon(document.getElementById("newLocalite").value),
+        email:     anon(document.getElementById("newEmail").value),
+        telephone: anon(document.getElementById("newTel").value),
+        statut:    document.getElementById("newStatut").value,
+        dateAdhesion: new Date().toLocaleDateString()
+      };
+
+      if (editId) {
+        membreData.id = editId;
+        var existing = membres.find(function(m){ return m.id === editId; });
+        if (existing && existing.dateAdhesion) membreData.dateAdhesion = existing.dateAdhesion;
+      }
+      // Nouveau membre : pas d'ID local — le serveur attribue l'ID définitif
+
+      if (IS_SERVER) {
+        try {
+          const res = await fetch(API + '/membre', {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(membreData)
+          });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+
+          // Recharger la liste complète depuis le serveur (source de vérité)
+          const r2 = await fetch(API + '/membres?t=' + Date.now());
+          if (r2.ok) {
+            membres = await r2.json();
+            localStorage.setItem("membres", JSON.stringify(membres));
+            if (membres.length > 0) {
+              var maxId = Math.max.apply(null, membres.map(function(m){ return parseInt(m.id) || 0; }));
+              localStorage.setItem("lastMembreId", String(maxId));
+            }
+            debugLog("✅ Liste membres rechargée: " + membres.length + " membres");
+          }
+        } catch(e) {
+          debugLog("⚠️ Serveur injoignable: " + e.message + " — sauvegarde locale");
+          var memLocal = JSON.parse(localStorage.getItem("membres") || "[]");
+          if (editId) {
+            var idx = memLocal.findIndex(function(m){ return m.id === editId; });
+            if (idx !== -1) memLocal[idx] = membreData; else memLocal.push(membreData);
+          } else {
+            membreData.id = generateMembreId();
+            memLocal.push(membreData);
+          }
+          membres = memLocal;
+          localStorage.setItem("membres", JSON.stringify(membres));
+        }
+      } else {
+        var memLocal = JSON.parse(localStorage.getItem("membres") || "[]");
+        if (editId) {
+          var idx = memLocal.findIndex(function(m){ return m.id === editId; });
+          if (idx !== -1) memLocal[idx] = membreData; else memLocal.push(membreData);
+        } else {
+          membreData.id = generateMembreId();
+          memLocal.push(membreData);
+        }
+        membres = memLocal;
+        localStorage.setItem("membres", JSON.stringify(membres));
+      }
+
+      resetFormulaireM();
+      afficherOnglet("list");
+    }
+
+    // --- Detail membre ---
+    function ouvrirDetailMembre(id) {
+      var m = membres.find(function(x){ return x.id === id; });
+      if (!m) {
+        var local = JSON.parse(localStorage.getItem("membres") || "[]");
+        m = local.find(function(x){ return x.id === id; });
+      }
+      if (!m) return;
+
+      document.getElementById("mdAvatar").textContent = (m.prenom ? m.prenom[0] : "?").toUpperCase();
+      document.getElementById("mdNom").textContent    = (m.prenom||"") + " " + (m.nom||"");
+      document.getElementById("mdBadge").innerHTML    = statutBadge(m.statut);
+
+      var infos = [];
+      if (m.email     && m.email     !== "anonyme") infos.push({i:"📧", l:"Email",    v:m.email});
+      if (m.telephone && m.telephone !== "anonyme") infos.push({i:"📞", l:"Tel",      v:m.telephone});
+      if (m.adresse   && m.adresse   !== "anonyme") infos.push({i:"🏠", l:"Adresse",  v:m.adresse});
+      if (m.localite  && m.localite  !== "anonyme") infos.push({i:"📍", l:"Localite", v:m.localite});
+      if (m.dateAdhesion) infos.push({i:"📅", l:"Adhesion", v:m.dateAdhesion});
+      infos.push({i:"🆔", l:"ID", v:"#"+m.id});
+
+      document.getElementById("mdInfos").innerHTML = infos.map(function(r){
+        return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #d0e4f4;font-size:13px;">'
+          + '<span style="color:#4a6080;font-weight:700;">'+r.i+' '+r.l+'</span>'
+          + '<span style="font-weight:800;color:#1a2b4a;text-align:right;max-width:60%;word-break:break-all;">'+r.v+'</span></div>';
+      }).join("");
+
+      // Stocker l'id membre courant
+      document.getElementById("mdModal").dataset.membreId = id;
+
+      // Afficher le modal
+      document.getElementById("mdModal").style.display = "block";
+      document.getElementById("mdOverlay").style.display = "block";
+    }
+
+    function fermerDetailMembre() {
+      document.getElementById("mdModal").style.display  = "none";
+      document.getElementById("mdOverlay").style.display = "none";
+    }
+
+    function modifierMembreCourant() {
+      var id = document.getElementById("mdModal").dataset.membreId;
+      fermerDetailMembre();
+      var m = membres.find(function(x){ return x.id === id; });
+      if (!m) return;
+
+      // Remplir le formulaire sans toucher au readonly (le clavier gere ca)
+      document.getElementById("editMembreId").value = m.id;
+      document.getElementById("newPrenom").value    = m.prenom || "";
+      document.getElementById("newNom").value       = m.nom    || "";
+      document.getElementById("newEmail").value     = (m.email     && m.email     !== "anonyme") ? m.email     : "";
+      document.getElementById("newTel").value       = (m.telephone && m.telephone !== "anonyme") ? m.telephone : "";
+      document.getElementById("newAdresse").value   = (m.adresse   && m.adresse   !== "anonyme") ? m.adresse   : "";
+      document.getElementById("newLocalite").value  = (m.localite  && m.localite  !== "anonyme") ? m.localite  : "";
+      document.getElementById("newStatut").value    = m.statut || "inactif";
+
+      document.getElementById("editBanner").style.display = "block";
+      document.getElementById("editBannerNom").textContent = (m.prenom||"") + " " + (m.nom||"");
+
+      afficherOnglet("add");
+    }
+
+    function supprimerMembreCourant() {
+      var id = document.getElementById("mdModal").dataset.membreId;
+      var m  = membres.find(function(x){ return x.id === id; });
+      if (!m) return;
+      showConfirm({
+        icon: '🗑️',
+        title: 'Supprimer ce membre ?',
+        msg: (m.prenom||"") + " " + (m.nom||"") + " sera definitivement supprime.",
+        confirmLabel: '🗑️ Oui, supprimer',
+        confirmClass: 'danger',
+        cancelLabel: 'Annuler',
+        onConfirm: async function() {
+          membres = membres.filter(function(x){ return x.id !== id; });
+          localStorage.setItem("membres", JSON.stringify(membres));
+          if (IS_SERVER) {
+            try { await fetch(API+'/membre/delete',{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:id})}); } catch(e){}
+          }
+          fermerDetailMembre();
+          afficherListeMembres(membres);
+        }
+      });
+    }
+
+    // ============ FIN MEMBRES ============
+
+    function cancelOrder() {
+      showConfirm({
+        icon: '🗑️',
+        title: 'Annuler la commande ?',
+        msg: 'Tous les articles du panier seront supprimés.',
+        confirmLabel: '🗑️ Oui, annuler',
+        confirmClass: 'danger',
+        cancelLabel: 'Non, garder',
+        onConfirm: () => {
+          cart = {};
+          selectedTable = null;
+          document.getElementById("tableSelectBtn").classList.remove("selected");
+          document.getElementById("tableSelectText").textContent = "Sélectionner une table...";
+          document.getElementById("orderNote").value = "";
+          closeCartModal();
+          updateCartUI();
+          renderArticles();
+          const t = document.createElement("div");
+          t.className = "toast";
+          t.style.background = "linear-gradient(135deg,#e74c3c,#c0392b)";
+          t.textContent = "🗑️ Commande annulée";
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 2500);
+        }
+      });
+    }
+
+    // ---- Badge statut serveur ----
+    function updateServerBadge(ok) {
+      const badge = document.getElementById("serverStatusBadge");
+      if (!badge) return;
+      if (ok) {
+        badge.style.background = "rgba(90,173,46,.35)";
+        badge.style.color = "#d4f7b0";
+        badge.textContent = "🟢 Serveur OK";
+      } else {
+        badge.style.background = "rgba(192,57,43,.35)";
+        badge.style.color = "#ffd6d0";
+        badge.textContent = "🔴 Hors ligne";
+      }
+    }
+
+    // ---- START ----
+    init().then(function() {
+      // Tester la connexion serveur et mettre à jour le badge
+      if (IS_SERVER && API) {
+        fetch(API + '/membres?t=' + Date.now())
+          .then(function(r) { updateServerBadge(r.ok); })
+          .catch(function()  { updateServerBadge(false); });
+      } else {
+        updateServerBadge(false);
+      }
+    });
+  </script>
+
+  <!-- Modal Membres -->
+  <div id="membreOverlay" onclick="closeMembreModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,40,90,.5); z-index:690;"></div>
+
+  <!-- MODAL MEMBRES (plein écran) -->
+  <div id="membreModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:710; overflow-y:auto; padding:20px 18px 30px; background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));">
+
+    <!-- Header sticky -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; position:sticky; top:0; background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95)); padding:10px 0 12px; z-index:10; border-bottom:1px solid var(--border2);">
+      <h3 style="font-weight:900; color:var(--blue3); font-size:1.3em;">👤 Membres</h3>
+      <button onclick="closeMembreModal()" style="background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border:none; border-radius:50px; padding:8px 16px; font-weight:800; cursor:pointer; font-size:13px;">✕ Fermer</button>
+    </div>
+
+    <!-- Onglets -->
+    <div style="display:flex; gap:8px; margin-bottom:18px;">
+      <button id="tabListBtn" onclick="afficherOnglet('list')" style="flex:1; padding:11px; border-radius:var(--radius); border:none; font-weight:800; font-size:14px; cursor:pointer; transition:all .2s;">📋 Liste</button>
+      <button id="tabAddBtn"  onclick="afficherOnglet('add')"  style="flex:1; padding:11px; border-radius:var(--radius); border:none; font-weight:800; font-size:14px; cursor:pointer; transition:all .2s;">➕ Ajouter</button>
+    </div>
+
+    <!-- ── TAB LISTE ── -->
+    <div id="tabListContent">
+      <input type="text" id="membreSearchFilter" placeholder="🔍 Rechercher par nom, prénom, email..." oninput="filtrerMembres()"
+        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Nunito',sans-serif; font-size:14px; margin-bottom:12px; background:rgba(255,255,255,.9);">
+      <div id="membreListContainer"></div>
+    </div>
+
+    <!-- ── TAB AJOUTER / MODIFIER ── -->
+    <div id="tabAddContent" style="display:none;">
+      <input type="hidden" id="editMembreId">
+      <div id="editBanner" style="display:none; background:var(--yellow-pale); border:1px solid var(--yellow); border-radius:var(--radius); padding:10px 14px; margin-bottom:14px; font-weight:800; color:var(--orange); font-size:13px;">
+        ✏️ Mode modification — <span id="editBannerNom"></span>
+      </div>
+      <div style="background:rgba(255,255,255,.85); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px; display:flex; flex-direction:column; gap:13px;">
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div>
+            <label style="display:block; font-weight:800; font-size:12px; color:var(--text2); margin-bottom:5px;">Prénom *</label>
+            <input type="text" id="newPrenom" placeholder="Prénom" style="width:100%; padding:11px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Nunito',sans-serif; font-size:14px; background:rgba(255,255,255,.95);">
+          </div>
+          <div>
+            <label style="display:block; font-weight:800; font-size:12px; color:var(--text2); margin-bottom:5px;">Nom *</label>
+            <input type="text" id="newNom" placeholder="Nom" style="width:100%; padding:11px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Nunito',sans-serif; font-size:14px; background:rgba(255,255,255,.95);">
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block; font-weight:800; font-size:12px; color:var(--text2); margin-bottom:5px;">📧 Email</label>
+          <input type="email" id="newEmail" placeholder="exemple@email.com" style="width:100%; padding:11px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Nunito',sans-serif; font-size:14px; background:rgba(255,255,255,.95);">
+        </div>
+
+        <div>
+          <label style="display:block; font-weight:800; font-size:12px; color:var(--text2); margin-bottom:5px;">📞 Téléphone</label>
+          <input type="tel" id="newTel" placeholder="+32 XXX XX XX XX" style="width:100%; padding:11px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Nunito',sans-serif; font-size:14px; background:rgba(255,255,255,.95);">
+        </div>
+
+        <div>
+          <label style="display:block; font-weight:800; font-size:12px; color:var(--text2); margin-bottom:5px;">🏠 Adresse</label>
+          <input type="text" id="newAdresse" placeholder="Rue, numéro..." style="width:100%; padding:11px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Nunito',sans-serif; font-size:14px; background:rgba(255,255,255,.95);">
+        </div>
+
+        <div>
+          <label style="display:block; font-weight:800; font-size:12px; color:var(--text2); margin-bottom:5px;">📍 Localité</label>
+          <input type="text" id="newLocalite" placeholder="Ville, Code postal" style="width:100%; padding:11px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Nunito',sans-serif; font-size:14px; background:rgba(255,255,255,.95);">
+        </div>
+
+        <div>
+          <label style="display:block; font-weight:800; font-size:12px; color:var(--text2); margin-bottom:5px;">🏷️ Statut</label>
+          <select id="newStatut" style="width:100%; padding:11px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Nunito',sans-serif; font-size:14px; background:rgba(255,255,255,.95); font-weight:700;">
+            <option value="inactif">⚫ Inactif</option>
+            <option value="benevole">🤝 Bénévole</option>
+            <option value="admin">🛡️ Admin</option>
+          </select>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:4px;">
+          <button onclick="saveMembre()" style="flex:1; padding:14px; background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); color:white; border:1px solid #2d6a1a; border-radius:var(--radius-lg); font-size:15px; font-weight:900; cursor:pointer;">
+            ✅ Enregistrer
+          </button>
+          <button onclick="resetFormulaireM()" style="padding:14px 16px; background:rgba(255,255,255,.8); border:1px solid var(--border); border-radius:var(--radius-lg); font-size:14px; font-weight:800; cursor:pointer; color:var(--text2);">
+            🔄
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CLAVIER VIRTUEL ===== -->
+  <div id="vKeyboard">
+    <div class="vkb-topbar">
+      <span class="vkb-label" id="vkbLabel">⌨️ Clavier</span>
+      <button class="vkb-close" onclick="vkbClose()">✕ Fermer</button>
+    </div>
+    <div class="vkb-preview">
+      <span class="vkb-preview-text" id="vkbPreview"></span>
+      <span class="vkb-cursor"></span>
+    </div>
+    <div class="vkb-rows" id="vkbRows"></div>
+  </div>
+
+  <script>
+  (function(){
+    /* ---- config ---- */
+    const LAYOUTS = {
+      text: {
+        normal: [
+          ['a','z','e','r','t','y','u','i','o','p'],
+          ['q','s','d','f','g','h','j','k','l','m'],
+          ['SHIFT','w','x','c','v','b','n','⌫'],
+          ['123','@','.','ESPACE','_','-','OK']
+        ],
+        shifted: [
+          ['A','Z','E','R','T','Y','U','I','O','P'],
+          ['Q','S','D','F','G','H','J','K','L','M'],
+          ['SHIFT','W','X','C','V','B','N','⌫'],
+          ['123','@','.','ESPACE','_','-','OK']
+        ],
+        num: [
+          ['1','2','3','4','5','6','7','8','9','0'],
+          ['-','_','@','.','com','.be','.fr','⌫'],
+          ['ABC','(',')','/','\\','\'','"','OK']
+        ]
+      },
+      tel: {
+        normal: [
+          ['1','2','3'],
+          ['4','5','6'],
+          ['7','8','9'],
+          ['+','0','⌫'],
+          ['ESPACE','(',')','-'],
+          ['OK']
+        ]
+      },
+      email: {
+        normal: [
+          ['1','2','3','4','5','6','7','8','9','0'],
+          ['a','z','e','r','t','y','u','i','o','p'],
+          ['q','s','d','f','g','h','j','k','l','m'],
+          ['w','x','c','v','b','n','-','_','.','⌫'],
+          ['@','gmail','hotmail','yahoo','OK']
+        ]
+      }
+    };
+
+    let activeInput = null;
+    let currentLayout = 'text';
+    let currentLayer = 'normal';
+    let shiftOn = false;
+
+    function getRows() {
+      const layout = LAYOUTS[currentLayout] || LAYOUTS.text;
+      return layout[currentLayer] || layout['normal'];
+    }
+
+    function render() {
+      const rows = getRows();
+      const container = document.getElementById('vkbRows');
+      container.innerHTML = '';
+      rows.forEach(row => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'vkb-row';
+        row.forEach(key => {
+          const btn = document.createElement('button');
+          btn.className = 'vkb-key';
+          btn.type = 'button';
+          const isAction = ['SHIFT','⌫','OK','123','ABC','ESPACE'].includes(key) || key.includes('@') && key.length > 1 || ['gmail','hotmail','yahoo','com','.be','.fr'].includes(key);
+          if (key === 'ESPACE') {
+            btn.className += ' wider';
+            btn.textContent = '␣ espace';
+          } else if (key === 'OK') {
+            btn.className += ' wide action';
+            btn.textContent = '✓ OK';
+          } else if (key === '⌫') {
+            btn.className += ' wide delete';
+            btn.textContent = '⌫';
+          } else if (key === 'SHIFT') {
+            btn.className += ' wide' + (shiftOn ? ' shift-active' : '');
+            btn.textContent = '⇧';
+          } else if (['123','ABC'].includes(key)) {
+            btn.className += ' wide action';
+            btn.textContent = key;
+          } else if (['gmail','hotmail','yahoo','com','.be','.fr'].includes(key)) {
+            btn.className += ' wide action';
+            btn.textContent = key.startsWith('.') ? key : '@'+key;
+          } else {
+            btn.textContent = key;
+          }
+          btn.addEventListener('mousedown', e => { e.preventDefault(); handleKey(key); });
+          btn.addEventListener('touchstart', e => { e.preventDefault(); handleKey(key); }, {passive:false});
+          rowEl.appendChild(btn);
+        });
+        container.appendChild(rowEl);
+      });
+      updatePreview();
+    }
+
+    function handleKey(key) {
+      if (!activeInput) return;
+      if (key === 'OK') { vkbClose(); return; }
+      if (key === '⌫') {
+        const v = activeInput.value;
+        const s = (activeInput.selectionStart != null) ? activeInput.selectionStart : v.length;
+        if (s > 0) {
+          activeInput.value = v.slice(0,s-1) + v.slice(s);
+          try { activeInput.selectionStart = activeInput.selectionEnd = s-1; } catch(e) {}
+        }
+        activeInput.dispatchEvent(new Event('input'));
+        updatePreview(); return;
+      }
+      if (key === 'ESPACE') { insert(' '); return; }
+      if (key === 'SHIFT') { shiftOn = !shiftOn; currentLayer = shiftOn ? 'shifted' : 'normal'; render(); return; }
+      if (key === '123') { currentLayer = 'num'; render(); return; }
+      if (key === 'ABC') { currentLayer = 'normal'; render(); return; }
+      // domaines email
+      if (['gmail','hotmail','yahoo'].includes(key)) { insert('@'+key+'.com'); return; }
+      if (['.be','.fr','com'].includes(key)) { insert(key); return; }
+      insert(key);
+      if (shiftOn) { shiftOn = false; currentLayer = 'normal'; render(); return; }
+      updatePreview();
+    }
+
+    function insert(str) {
+      if (!activeInput) return;
+      const v = activeInput.value;
+      const s = (activeInput.selectionStart != null) ? activeInput.selectionStart : v.length;
+      activeInput.value = v.slice(0,s) + str + v.slice(s);
+      try { activeInput.selectionStart = activeInput.selectionEnd = s + str.length; } catch(e) {}
+      activeInput.dispatchEvent(new Event('input'));
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const el = document.getElementById('vkbPreview');
+      if (el && activeInput) el.textContent = activeInput.value || '';
+    }
+
+    function vkbOpen(input) {
+      activeInput = input;
+      shiftOn = false;
+      currentLayer = 'normal';
+      const type = input.type;
+      if (type === 'tel') currentLayout = 'tel';
+      else if (type === 'email') currentLayout = 'email';
+      else currentLayout = 'text';
+      const label = input.closest('div')?.querySelector('label')?.textContent || '⌨️ Clavier';
+      document.getElementById('vkbLabel').textContent = '⌨️ ' + label.trim();
+      render();
+      document.getElementById('vKeyboard').classList.add('active');
+      // scroll pour que le champ soit visible
+      setTimeout(() => input.scrollIntoView({behavior:'smooth', block:'center'}), 150);
+    }
+
+    window.vkbClose = function() {
+      document.getElementById('vKeyboard').classList.remove('active');
+      if (activeInput) { activeInput.blur(); activeInput = null; }
+    };
+
+    // Attacher aux champs du formulaire membre
+    window.attachVkb = function attachVkb() {
+      const ids = ['newPrenom','newNom','newEmail','newTel','newAdresse','newLocalite'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el || el._vkbAttached) return;
+        el._vkbAttached = true;
+        el.setAttribute('readonly', 'readonly');
+        el.addEventListener('click', e => { e.preventDefault(); vkbOpen(el); });
+        el.addEventListener('focus', e => { e.preventDefault(); vkbOpen(el); });
+      });
+    }
+
+    // On observe l'ouverture du modal membres
+    document.addEventListener('DOMContentLoaded', window.attachVkb);
+    setTimeout(window.attachVkb, 800);
+  })();
+  </script>
+
+  <!-- ===== MODAL DETAIL MEMBRE (nouveau, simple et robuste) ===== -->
+  <div id="mdOverlay" onclick="fermerDetailMembre()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,40,90,.5); z-index:2000;"></div>
+  <div id="mdModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:92%; max-width:400px; max-height:88vh; overflow-y:auto; background:linear-gradient(160deg,#fff,#deeefb); border-radius:22px; padding:22px; z-index:2001; box-shadow:0 20px 60px rgba(20,60,180,.35);">
+    <!-- Avatar + Nom -->
+    <div style="text-align:center; margin-bottom:16px;">
+      <div id="mdAvatar" style="width:62px; height:62px; border-radius:50%; background:linear-gradient(135deg,#7cc4f8,#2a7fd4); color:white; font-size:26px; font-weight:900; display:flex; align-items:center; justify-content:center; margin:0 auto 10px;"></div>
+      <div id="mdNom"    style="font-size:1.15em; font-weight:900; color:#0d4f9a;"></div>
+      <div id="mdBadge"  style="margin-top:6px;"></div>
+    </div>
+    <!-- Infos -->
+    <div id="mdInfos" style="background:rgba(255,255,255,.75); border:1px solid #b0cce8; border-radius:12px; padding:12px 14px; margin-bottom:16px;"></div>
+    <!-- Boutons action -->
+    <button id="mdBtnEdit" onclick="modifierMembreCourant()" style="display:block; width:100%; padding:14px; margin-bottom:10px; background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); color:white; border:none; border-radius:14px; font-size:15px; font-weight:900; cursor:pointer; font-family:'Nunito',sans-serif; touch-action:manipulation;">✏️ Modifier ce membre</button>
+    <button id="mdBtnDel" onclick="supprimerMembreCourant()" style="display:block; width:100%; padding:14px; margin-bottom:10px; background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white; border:1px solid #922b21; border-radius:14px; font-size:15px; font-weight:900; cursor:pointer; font-family:'Nunito',sans-serif; touch-action:manipulation;">🗑️ Supprimer ce membre</button>
+    <button id="mdBtnClose" onclick="fermerDetailMembre()" style="display:block; width:100%; padding:12px; background:rgba(255,255,255,.85); border:1px solid #b0cce8; border-radius:14px; font-size:14px; font-weight:800; cursor:pointer; color:#4a6080; font-family:'Nunito',sans-serif; touch-action:manipulation;">✕ Fermer</button>
+  </div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// SYSTÈME DE CONNEXION COMMANDE
+// ══════════════════════════════════════════════════════
+(function() {
+  const LS_SESSION = "commandeSession";   // { user, avatar, depuis }
+  const LS_OCCUPE  = "commandeOccupee";  // { user, depuis, page }
+
+  // ─── Helpers avatar ───
+  function avatarHTML(avatar, size) {
+    size = size || 44;
+    if (!avatar) return "<span style='font-size:"+(size*.6)+"px'>👩‍💻</span>";
+    if (typeof avatar === 'string' && avatar.startsWith('data:'))
+      return "<img src='"+avatar+"' style='width:"+size+"px;height:"+size+"px;border-radius:50%;object-fit:cover;'>";
+    return "<span style='font-size:"+(size*.6)+"px'>"+avatar+"</span>";
+  }
+
+  // ─── Récupérer les users depuis admin ───
+  function getUsers() {
+    try {
+      // En mode serveur, on utilise les données reçues de l'API (chargées dans init())
+      // En mode local, on lit depuis localStorage
+      var users, adminPwd;
+      if (typeof IS_SERVER !== 'undefined' && IS_SERVER) {
+        users    = window._serverUsers         || JSON.parse(localStorage.getItem("users") || "[]");
+        adminPwd = window._serverAdminPassword || localStorage.getItem("adminPassword") || "admin";
+      } else {
+        users    = JSON.parse(localStorage.getItem("users") || "[]");
+        adminPwd = localStorage.getItem("adminPassword") || "admin";
+      }
+      var admin = { username: "Admin", password: adminPwd, avatar: "🛡️", isAdmin: true };
+      return [admin].concat(users);
+    } catch(e) { return [{ username:"Admin", password:"admin", avatar:"🛡️", isAdmin:true }]; }
+  }
+
+  // ─── Session courante ───
+  function getSession() {
+    try { return JSON.parse(localStorage.getItem(LS_SESSION) || "null"); } catch(e) { return null; }
+  }
+  function setSession(user) {
+    if (user) {
+      const s = { user: user.username, avatar: user.avatar || "👩‍💻", depuis: new Date().toISOString() };
+      localStorage.setItem(LS_SESSION, JSON.stringify(s));
+      // NE PAS poser commandeOccupee ici — seulement quand on fait une vraie action
+      // Mettre aussi dans loginHistory pour compatibilité présence
+      try {
+        const h = JSON.parse(localStorage.getItem("loginHistory") || "[]");
+        h.push({ date: new Date().toLocaleString(), iso: new Date().toISOString(), user: user.username });
+        localStorage.setItem("loginHistory", JSON.stringify(h));
+      } catch(e) {}
+    } else {
+      localStorage.removeItem(LS_SESSION);
+      localStorage.removeItem(LS_OCCUPE);
+    }
+  }
+
+  // ─── Mise à jour header ───
+  function updateHeader(session) {
+    const badge = document.getElementById("headerUserBadge");
+    const btnSleep = document.getElementById("btnSleepCommande");
+    const btnLogout = document.getElementById("btnLogoutCommande");
+    if (!badge) return;
+    if (session) {
+      badge.style.display = "inline-flex";
+      badge.innerHTML = avatarHTML(session.avatar, 22) + " <span>" + session.user + "</span>";
+      if (btnSleep) btnSleep.style.display = "inline-block";
+      if (btnLogout) btnLogout.style.display = "inline-block";
+    } else {
+      badge.style.display = "none";
+      if (btnSleep) btnSleep.style.display = "none";
+      if (btnLogout) btnLogout.style.display = "none";
+    }
+  }
+
+  // ─── Afficher / cacher l'écran de login ───
+  function showLogin() {
+    const screen = document.getElementById("loginScreen");
+    if (!screen) return;
+    screen.style.display = "block";
+    renderUserList();
+  }
+  function hideLogin() {
+    const screen = document.getElementById("loginScreen");
+    if (screen) screen.style.display = "none";
+  }
+
+  // ─── Step 1 : liste des utilisateurs ───
+  function renderUserList() {
+    const list = document.getElementById("lsUserList");
+    if (!list) return;
+    list.innerHTML = "";
+    const users = getUsers();
+    users.forEach(function(u) {
+      const card = document.createElement("div");
+      card.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:14px 18px;border-radius:16px;border:2px solid var(--border2);background:rgba(255,255,255,.82);transition:all .2s;min-width:90px;box-shadow:0 3px 12px rgba(30,80,160,.1);";
+      card.innerHTML = "<div style='width:58px;height:58px;border-radius:50%;background:rgba(220,238,255,.7);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;overflow:hidden;'>"
+        + avatarHTML(u.avatar, 46)
+        + "</div><div style='font-weight:800;font-size:13px;color:var(--text);text-align:center;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'>" + u.username + "</div>";
+      if (u.isAdmin) card.innerHTML += "<span style='font-size:10px;background:linear-gradient(135deg,#ffd84d,#e8a800);color:#5a3800;padding:2px 8px;border-radius:50px;font-weight:900;'>ADMIN</span>";
+      card.addEventListener("click", function() { lsSelectUser(u); });
+      list.appendChild(card);
+    });
+  }
+
+  // ─── Step 2 : PIN ───
+  var _lsSelectedUser = null;
+  var _lsPin = "";
+
+  window.lsSelectUser = function(u) {
+    _lsSelectedUser = u;
+    _lsPin = "";
+    document.getElementById("lsStep1").style.display = "none";
+    document.getElementById("lsStep2").style.display = "block";
+    var av = document.getElementById("lsSelAvatar");
+    if (av) av.innerHTML = avatarHTML(u.avatar, 44);
+    var nm = document.getElementById("lsSelName");
+    if (nm) nm.textContent = u.username;
+    updatePinDisplay();
+    document.getElementById("lsMsg").textContent = "";
+  };
+
+  window.lsBack = function() {
+    _lsPin = ""; _lsSelectedUser = null;
+    document.getElementById("lsStep1").style.display = "block";
+    document.getElementById("lsStep2").style.display = "none";
+    document.getElementById("lsMsg").textContent = "";
+  };
+
+  window.lsPinDelete = function() {
+    _lsPin = _lsPin.slice(0, -1);
+    updatePinDisplay();
+  };
+
+  window.lsPinValidate = function() {
+    if (!_lsSelectedUser) return;
+    if (_lsPin === _lsSelectedUser.password) {
+      setSession(_lsSelectedUser);
+      updateHeader(getSession());
+      hideLogin();
+      document.getElementById("lsMsg").textContent = "";
+    } else {
+      document.getElementById("lsMsg").textContent = "❌ Code incorrect !";
+      _lsPin = "";
+      updatePinDisplay();
+    }
+  };
+
+  function updatePinDisplay() {
+    var d = document.getElementById("lsPinDisplay");
+    if (!d) return;
+    if (_lsPin.length === 0) { d.textContent = "—"; d.style.color = "var(--text3)"; }
+    else { d.textContent = "●".repeat(_lsPin.length); d.style.color = "var(--text)"; }
+  }
+
+  // Touches numpad login
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".lsNumKey").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        _lsPin += btn.dataset.v;
+        updatePinDisplay();
+      });
+    });
+  });
+
+  // ─── Déconnexion / Veille ───
+  window.commandeLogout = function() {
+    if (confirm("Déconnecter " + (getSession() ? getSession().user : "") + " ?")) {
+      setSession(null);
+      updateHeader(null);
+      showLogin();
+      document.getElementById("lsStep1").style.display = "block";
+      document.getElementById("lsStep2").style.display = "none";
+      _lsPin = ""; _lsSelectedUser = null;
+    }
+  };
+
+  window.commandeSleep = function() {
+    // Mise en veille : libère la caisse ET remet le login
+    localStorage.removeItem(LS_SESSION);
+    localStorage.removeItem(LS_OCCUPE);
+    updateHeader(null);
+    showLogin();
+    document.getElementById("lsStep1").style.display = "block";
+    document.getElementById("lsStep2").style.display = "none";
+    _lsPin = ""; _lsSelectedUser = null;
+  };
+
+  // ─── Vérif inverse : tables.html est en train d'agir ? ───
+  const _tBanner = document.createElement("div");
+  _tBanner.id = "_tablesBusyBanner";
+  _tBanner.style.cssText = "display:none; position:fixed; top:0; left:0; right:0; z-index:88888; background:linear-gradient(90deg,#d97706,#b86200); color:white; padding:10px 16px; font-size:13px; font-weight:800; font-family:'Nunito',sans-serif; text-align:center; box-shadow:0 3px 12px rgba(180,100,0,.35);";
+  document.body.appendChild(_tBanner);
+
+  // Modal bloquant si tables vraiment actif
+  const _tOverlay = document.createElement("div");
+  _tOverlay.id = "_tablesOccupeeOverlay";
+  _tOverlay.style.cssText = "display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,40,90,.65); backdrop-filter:blur(8px); z-index:999990;";
+  document.body.appendChild(_tOverlay);
+
+  const _tModal = document.createElement("div");
+  _tModal.id = "_tablesOccupeeModal";
+  _tModal.style.cssText = "display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:88%; max-width:360px; background:linear-gradient(160deg,#fff,#fff8dc); border-radius:22px; padding:28px 22px 22px; z-index:999991; box-shadow:0 20px 60px rgba(180,100,0,.35); text-align:center;";
+  _tModal.innerHTML = `
+    <div style="font-size:3em; margin-bottom:10px;">🍽️</div>
+    <div style="font-size:1.1em; font-weight:900; color:#92400e; margin-bottom:8px;">Tables en cours d'utilisation</div>
+    <div id="_tablesOccMsg" style="font-size:14px; font-weight:600; color:#78350f; margin-bottom:20px; line-height:1.5;"></div>
+    <div style="font-size:12px; font-weight:600; color:#a16207;">Cette fenêtre se fermera automatiquement dès que la personne aura terminé.</div>
+  `;
+  document.body.appendChild(_tModal);
+
+  let _tablesModalVisible = false;
+
+  function _checkTablesOccupee() {
+    try {
+      const raw = localStorage.getItem("tablesOccupee");
+      if (!raw) {
+        if (_tablesModalVisible) { _tOverlay.style.display="none"; _tModal.style.display="none"; _tablesModalVisible=false; }
+        return;
+      }
+      const occ = JSON.parse(raw);
+      if (!occ || !occ.label) {
+        if (_tablesModalVisible) { _tOverlay.style.display="none"; _tModal.style.display="none"; _tablesModalVisible=false; }
+        return;
+      }
+      // Afficher modal bloquant
+      if (!_tablesModalVisible) {
+        _tOverlay.style.display = "block";
+        _tModal.style.display = "block";
+        _tablesModalVisible = true;
+      }
+      document.getElementById("_tablesOccMsg").innerHTML =
+        "Quelqu'un est en train de <strong>" + occ.label + "</strong> depuis les tables.<br><br>Patientez avant d'envoyer une commande.";
+    } catch(e) {
+      if (_tablesModalVisible) { _tOverlay.style.display="none"; _tModal.style.display="none"; _tablesModalVisible=false; }
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    _checkTablesOccupee();
+    setInterval(_checkTablesOccupee, 3000);
+  });
+  window.addEventListener("storage", function(e) {
+    if (e.key === "tablesOccupee") _checkTablesOccupee();
+  });
+
+  // ─── Init ───
+  // En mode serveur, on attend que init() ait chargé les données du serveur
+  // avant d'afficher l'écran de login (pour avoir les bons users/adminPassword)
+  window._loginInit = function() {
+    const session = getSession();
+    if (session) {
+      updateHeader(session);
+      hideLogin();
+    } else {
+      showLogin();
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function() {
+    // Si init() n'est pas encore prêt (mode serveur), on attend son signal
+    // Sinon on affiche directement (mode local)
+    if (typeof IS_SERVER !== "undefined" && IS_SERVER) {
+      // showLogin sera appelé par init() via window._loginInit() une fois les données chargées
+      // Affichage immédiat de l'écran de login avec les données du localStorage en attendant
+      const session = getSession();
+      if (session) { updateHeader(session); hideLogin(); }
+      else { showLogin(); }
+    } else {
+      const session = getSession();
+      if (session) { updateHeader(session); hideLogin(); }
+      else { showLogin(); }
+    }
+  });
+
+  // Libérer à la fermeture de la page
+  window.addEventListener("beforeunload", function() {
+    localStorage.removeItem(LS_OCCUPE);
+  });
+
+})();
+
+// Exposer la page courante pour le badge de présence (sera mis à jour par la nav)
+window._currentPageLabel = "commande";
+
+// ─── Helper global : marquer commande comme occupée lors d'une action active ───
+window.commandeSetOccupee = function(label) {
+  try {
+    const s = JSON.parse(localStorage.getItem("commandeSession") || "null");
+    if (!s) return;
+    localStorage.setItem("commandeOccupee", JSON.stringify({ user: s.user, depuis: s.depuis, page: label || "commande" }));
+  } catch(e) {}
+};
+window.commandeClearOccupee = function() {
+  try { localStorage.removeItem("commandeOccupee"); } catch(e) {}
+};
+</script>
+
+<script>
+// ── Présence temps réel ───────────────────────────────────────────────────────
+const _IS_SRV = window.location.protocol === "http:";
+const _PAPI   = window.location.origin + "/api/presence";
+const _DEVICE = localStorage.getItem("_deviceId") || (()=>{
+  const id = Math.random().toString(36).slice(2);
+  localStorage.setItem("_deviceId", id);
+  return id;
+})();
+const _PAGE   = document.title.split(' ')[0].toLowerCase()
+                || window.location.pathname.split('/').pop().replace('.html','').toLowerCase();
+
+function _getUser() {
+  try {
+    const s = JSON.parse(localStorage.getItem("commandeSession") || "null");
+    if (s && s.user) return s.user;
+    const h = JSON.parse(localStorage.getItem("loginHistory")||"[]");
+    const l = h[h.length-1];
+    return (l && (l.user||l.nom)) || "Utilisateur";
+  } catch(e) { return "Utilisateur"; }
+}
+
+const _PAGE_LABELS = {
+  tables:"Tables", commande:"Commande", membres:"Membres",
+  rapports:"Rapports", stock:"Stock", historique:"Historique",
+  articles:"Articles", paiement:"Paiement", parametres:"Paramètres"
+};
+
+// Toast de présence (non bloquant, en haut à droite)
+function _showPresenceToast(msg) {
+  let c = document.getElementById("_presenceToasts");
+  if (!c) {
+    c = document.createElement("div");
+    c.id = "_presenceToasts";
+    c.style.cssText = "position:fixed;top:16px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none;";
+    document.body.appendChild(c);
+  }
+  const t = document.createElement("div");
+  t.style.cssText = "background:rgba(30,30,40,0.88);color:#fff;padding:10px 16px;border-radius:50px;font-size:13px;font-weight:600;font-family:sans-serif;display:flex;align-items:center;gap:8px;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.15);animation:_pfadeIn .2s ease;";
+  const dot = document.createElement("span");
+  dot.style.cssText = "width:7px;height:7px;border-radius:50%;background:#facc15;flex-shrink:0;";
+  t.appendChild(dot);
+  t.appendChild(document.createTextNode(msg));
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.opacity="0"; t.style.transition="opacity .3s"; setTimeout(()=>t.remove(),350); }, 4000);
+}
+
+// Vérifier qui est actif et avertir si besoin
+async function _checkPresence(actionLabel) {
+  if (!_IS_SRV) return;
+  try {
+    // Envoyer son heartbeat
+    const res = await fetch(_PAPI, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({page:_PAGE, deviceId:_DEVICE, user:_getUser()})
+    });
+    const data = await res.json();
+    const presence = data.presence || {};
+    const me = _getUser();
+    const others = [];
+    Object.entries(presence).forEach(([page, users]) => {
+      users.forEach(u => {
+        if (u.user !== me) {
+          others.push(`${u.user} (${_PAGE_LABELS[u.page]||u.page})`);
+        }
+      });
+    });
+    if (others.length > 0) {
+      _showPresenceToast(`⚠️ ${others.join(", ")} est aussi connecté${others.length>1?"s":""}`);
+    }
+  } catch(e) {}
+}
+
+// Heartbeat silencieux toutes les 15s
+if (_IS_SRV) {
+  setInterval(()=>{
+    fetch(_PAPI,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({page:_PAGE,deviceId:_DEVICE,user:_getUser()})
+    }).catch(()=>{});
+  }, 15000);
+  // Premier heartbeat
+  setTimeout(()=>{
+    fetch(_PAPI,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({page:_PAGE,deviceId:_DEVICE,user:_getUser()})
+    }).catch(()=>{});
+  }, 1000);
+}
+// ─────────────────────────────────────────────────────────────────────────────
+</script>
+
+<!-- ===== MODAL RENOMMAGE TABLE (depuis commande) ===== -->
+<div id="renTableOverlay" onclick="closeRenameTableModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,40,90,.5); backdrop-filter:blur(6px); z-index:700;"></div>
+<div id="renTableModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:94%; max-width:420px; max-height:92vh; overflow-y:auto; background:linear-gradient(160deg,#fff,#deeefb); border-radius:22px; padding:20px; z-index:701; box-shadow:0 20px 60px rgba(20,60,180,.35);">
+
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+    <div style="font-size:1.1em; font-weight:900; color:var(--blue3);">✏️ Renommer <span id="renTableTitre" style="color:var(--blue);"></span></div>
+    <button onclick="closeRenameTableModal()" style="background:var(--red-pale); border:none; border-radius:50%; width:32px; height:32px; font-size:16px; cursor:pointer; color:var(--red);">✕</button>
+  </div>
+
+  <!-- Affichage du nom courant -->
+  <div id="renTableDisplay" style="width:100%; padding:13px 14px; background:rgba(255,255,255,.9); border:2px solid var(--border); border-radius:12px; font-size:17px; font-weight:800; color:var(--text); margin-bottom:12px; min-height:48px; word-break:break-all;">Tapez...</div>
+
+  <!-- Recherche membre -->
+  <div style="margin-bottom:12px;">
+    <div style="font-size:12px; font-weight:800; color:var(--text2); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em;">👤 Assigner un membre</div>
+    <input id="renMembreSearch" type="text" placeholder="Rechercher prénom / nom..." oninput="renFilterMembres()"
+      style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:14px; font-family:'Nunito',sans-serif; font-weight:600; background:rgba(255,255,255,.9); color:var(--text); margin-bottom:6px;">
+    <div id="renMembreList" style="max-height:200px; overflow-y:auto; background:rgba(255,255,255,.75); border:1px solid var(--border2); border-radius:10px;"></div>
+  </div>
+
+  <!-- Clavier virtuel AZERTY -->
+  <div style="font-size:12px; font-weight:800; color:var(--text2); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em;">⌨️ Clavier</div>
+  <div id="renKeyboard" style="display:flex; flex-direction:column; gap:5px; margin-bottom:14px;"></div>
+
+  <!-- Boutons action -->
+  <div style="display:flex; gap:8px;">
+    <button onclick="renTableClear()" style="flex:1; padding:11px; background:rgba(255,255,255,.8); border:1px solid var(--border); border-radius:12px; font-size:14px; font-weight:800; cursor:pointer; color:var(--text2); font-family:'Nunito',sans-serif;">🗑️ Effacer</button>
+    <button onclick="renTableBack()" style="flex:1; padding:11px; background:rgba(255,255,255,.8); border:1px solid var(--border); border-radius:12px; font-size:14px; font-weight:800; cursor:pointer; color:var(--text2); font-family:'Nunito',sans-serif;">⌫ Suppr</button>
+    <button onclick="renTableValidate()" style="flex:2; padding:11px; background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); color:white; border:none; border-radius:12px; font-size:14px; font-weight:900; cursor:pointer; font-family:'Nunito',sans-serif;">✅ Valider</button>
+  </div>
+</div>
+
+<script>
+// ===== RENOMMAGE TABLE DEPUIS COMMANDE =====
+(function() {
+  let _renTable = null;    // table en cours de renommage
+  let _renName  = "";      // nom en cours de saisie
+
+  const ROWS = [
+    ['A','Z','E','R','T','Y','U','I','O','P'],
+    ['Q','S','D','F','G','H','J','K','L','M'],
+    ['W','X','C','V','B','N','1','2','3','4'],
+    ['5','6','7','8','9','0','-','\'','ESPACE'],
+  ];
+
+  // Construire le clavier
+  function buildKeyboard() {
+    const kb = document.getElementById("renKeyboard");
+    if (!kb || kb.children.length > 0) return;
+    ROWS.forEach(row => {
+      const rowEl = document.createElement("div");
+      rowEl.style.cssText = "display:flex; gap:4px; justify-content:center;";
+      row.forEach(key => {
+        const btn = document.createElement("button");
+        btn.textContent = key === 'ESPACE' ? '⎵' : key;
+        const isWide = key === 'ESPACE';
+        btn.style.cssText = `flex:${isWide ? 2.5 : 1}; padding:10px 2px; font-size:${isWide ? 13 : 15}px; font-weight:800; border:1px solid var(--border); border-bottom:2px solid #a0bcd8; border-radius:8px; background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(220,235,255,.85)); cursor:pointer; font-family:'Nunito',sans-serif; color:var(--text2); min-width:0; touch-action:manipulation;`;
+        btn.addEventListener("mousedown", e => { e.preventDefault(); renTypeKey(key); });
+        btn.addEventListener("touchstart", e => { e.preventDefault(); renTypeKey(key); }, {passive:false});
+        rowEl.appendChild(btn);
+      });
+      kb.appendChild(rowEl);
+    });
+  }
+
+  function renTypeKey(key) {
+    if (key === 'ESPACE') _renName += ' ';
+    else _renName += key;
+    updateDisplay();
+  }
+
+  function updateDisplay() {
+    const d = document.getElementById("renTableDisplay");
+    if (d) d.textContent = _renName || "Tapez...";
+  }
+
+  // Exposer les fonctions globales
+  window.openRenameTableModal = function(table) {
+    _renTable = table;
+    _renName  = table.nom || "";
+    document.getElementById("renTableTitre").textContent = table.nom;
+    updateDisplay();
+    // Charger les membres
+    const memb = JSON.parse(localStorage.getItem("membres") || "[]");
+    renRenderMembres(memb);
+    document.getElementById("renMembreSearch").value = "";
+    // Construire clavier
+    buildKeyboard();
+    // Afficher
+    document.getElementById("renTableOverlay").style.display = "block";
+    document.getElementById("renTableModal").style.display   = "block";
+  };
+
+  window.closeRenameTableModal = function() {
+    document.getElementById("renTableOverlay").style.display = "none";
+    document.getElementById("renTableModal").style.display   = "none";
+    _renTable = null; _renName = "";
+  };
+
+  window.renTableClear = function() { _renName = ""; updateDisplay(); };
+  window.renTableBack  = function() { _renName = _renName.slice(0,-1); updateDisplay(); };
+
+  window.renFilterMembres = function() {
+    const q = document.getElementById("renMembreSearch").value.toLowerCase();
+    const memb = JSON.parse(localStorage.getItem("membres") || "[]");
+    renRenderMembres(memb.filter(m =>
+      (m.prenom||"").toLowerCase().includes(q) || (m.nom||"").toLowerCase().includes(q)
+    ));
+  };
+
+  const REN_PER_PAGE = 5;
+  let _renMembrePage = 1;
+  let _renMembreList = [];
+
+  function renRenderMembres(list) {
+    _renMembreList = list;
+    _renMembrePage = 1;
+    renRenderPage();
+  }
+
+  function renRenderPage() {
+    const el = document.getElementById("renMembreList");
+    if (!el) return;
+    el.innerHTML = "";
+
+    if (_renMembreList.length === 0) {
+      el.innerHTML = '<div style="padding:10px; text-align:center; color:#aaa; font-size:13px; font-weight:600;">Aucun membre trouvé</div>';
+      return;
+    }
+
+    const total = _renMembreList.length;
+    const totalPages = Math.max(1, Math.ceil(total / REN_PER_PAGE));
+    if (_renMembrePage > totalPages) _renMembrePage = totalPages;
+    const start = (_renMembrePage - 1) * REN_PER_PAGE;
+    const page  = _renMembreList.slice(start, start + REN_PER_PAGE);
+
+    page.forEach(m => {
+      const div = document.createElement("div");
+      const nom = ((m.prenom||"") + " " + (m.nom||"")).trim().toUpperCase();
+      div.textContent = nom;
+      div.style.cssText = "padding:10px 12px; font-size:14px; font-weight:700; color:var(--text); cursor:pointer; border-bottom:1px solid var(--border2); transition:background .15s;";
+      div.onmouseenter = () => div.style.background = "rgba(210,238,255,.7)";
+      div.onmouseleave = () => div.style.background = "";
+      div.onclick = () => {
+        _renName = nom; updateDisplay();
+        document.getElementById("renMembreSearch").value = "";
+        renRenderMembres(JSON.parse(localStorage.getItem("membres")||"[]"));
+      };
+      el.appendChild(div);
+    });
+
+    // Pagination si besoin
+    if (totalPages > 1) {
+      const pag = document.createElement("div");
+      pag.style.cssText = "display:flex; align-items:center; justify-content:space-between; padding:6px 8px; background:rgba(255,255,255,.5); border-top:1px solid var(--border2); gap:6px;";
+
+      const info = document.createElement("span");
+      info.style.cssText = "font-size:11px; font-weight:700; color:var(--text3); flex:1; text-align:center;";
+      info.textContent = `${start+1}–${Math.min(start+REN_PER_PAGE, total)} / ${total}`;
+
+      const mkBtn = (label, disabled, fn) => {
+        const b = document.createElement("button");
+        b.textContent = label;
+        b.disabled = disabled;
+        b.style.cssText = `padding:5px 12px; font-size:13px; font-weight:800; border:1px solid var(--border); border-radius:8px; background:${disabled?"rgba(255,255,255,.4)":"rgba(255,255,255,.85)"}; cursor:${disabled?"default":"pointer"}; opacity:${disabled?".4":"1"}; font-family:'Nunito',sans-serif; color:var(--text2);`;
+        if (!disabled) b.onclick = fn;
+        return b;
+      };
+
+      pag.appendChild(mkBtn("◀", _renMembrePage === 1, () => { _renMembrePage--; renRenderPage(); }));
+      pag.appendChild(info);
+      pag.appendChild(mkBtn("▶", _renMembrePage === totalPages, () => { _renMembrePage++; renRenderPage(); }));
+      el.appendChild(pag);
+    }
+  }
+
+  window.renTableValidate = async function() {
+    if (!_renTable || !_renName.trim()) {
+      alert("Le nom ne peut pas être vide !");
+      return;
+    }
+    const newNom = _renName.trim();
+
+    // Modifier dans localStorage
+    const allTables = JSON.parse(localStorage.getItem("tables") || "[]");
+    const idx = allTables.findIndex(t => t.id === _renTable.id);
+    if (idx !== -1) {
+      allTables[idx].nom = newNom;
+      localStorage.setItem("tables", JSON.stringify(allTables));
+    }
+
+    // Si c'est la table actuellement sélectionnée pour commander → màj aussi selectedTable
+    if (typeof selectedTable !== 'undefined' && selectedTable && selectedTable.id === _renTable.id) {
+      selectedTable.nom    = newNom;
+      selectedTable._newNom = newNom;
+      // Mettre à jour le bouton de sélection dans le header
+      const tbtn = document.getElementById("tableSelectBtn");
+      if (tbtn) {
+        tbtn.classList.add("selected");
+        document.getElementById("tableSelectText").textContent = `✅ ${newNom}${selectedTable.ticketId ? " (occupée)" : " (libre)"}`;
+      }
+    }
+
+    // Sync serveur si dispo
+    if (typeof IS_SERVER !== 'undefined' && IS_SERVER && typeof API !== 'undefined' && API) {
+      try {
+        const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+        const membres = JSON.parse(localStorage.getItem("membres") || "[]");
+        await fetch(API_BASE + "/sync", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ tables: allTables, tickets, membres })
+        });
+        debugLog && debugLog(`✅ Table "${newNom}" synced`);
+      } catch(e) { debugLog && debugLog("⚠️ Sync rename failed: " + e.message); }
+    }
+
+    // Feedback toast
+    const t = document.createElement("div");
+    t.style.cssText = "position:fixed; top:80px; left:50%; transform:translateX(-50%); background:linear-gradient(180deg,#84d47c,#4a9422); color:white; padding:12px 22px; border-radius:50px; font-weight:800; font-size:14px; z-index:9999; box-shadow:0 5px 20px rgba(0,0,0,.2);";
+    t.textContent = `✅ Table renommée en "${newNom}"`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+
+    // Fermer le modal de renommage et rafraîchir le popup des tables
+    closeRenameTableModal();
+    openTablePopup();
+  };
+})();
+</script>
+</body>
+</html>

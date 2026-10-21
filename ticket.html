@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ticket - Caisse Moderne</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#7c3aed; --purple-pale:#f5f3ff;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --cyan:#0891b2; --cyan-pale:#ecfeff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --glass:rgba(255,255,255,0.82);
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      font-size:13px;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      display:flex;
+      height:100vh;
+      overflow:hidden;
+      position:relative;
+    }
+
+    body::before {
+      content:''; position:fixed; top:-150px; left:-150px;
+      width:550px; height:550px;
+      background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+    body::after {
+      content:''; position:fixed; bottom:-100px; right:5%;
+      width:450px; height:450px;
+      background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+      pointer-events:none; z-index:0; border-radius:50%;
+    }
+
+    /* Panel Ticket */
+    .ticket-panel {
+      width:45%;
+      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+      border:1px solid rgba(255,255,255,.95);
+      backdrop-filter:blur(10px);
+      padding:15px;
+      display:flex;
+      flex-direction:column;
+      box-shadow:5px 0 20px var(--shadow);
+      position:relative;
+      z-index:2;
+    }
+
+    .ticket-panel::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:5px;
+      background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));
+    }
+
+    .ticket-header {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white;
+      padding:12px 15px;
+      border-radius:var(--radius-lg);
+      margin-bottom:12px;
+      box-shadow:0 4px 15px rgba(42,127,212,0.3);
+      position:relative; overflow:hidden;
+    }
+    .ticket-header::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+    }
+
+    .ticket-header h2 {
+      font-size:1.3em;
+      font-weight:900;
+      margin-bottom:4px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .ticket-header p {
+      opacity:0.95;
+      font-size:0.85em;
+      font-weight:600;
+    }
+
+    .ticket-total {
+      background:linear-gradient(180deg,#ffc870,var(--orange),#b86200);
+      color:white;
+      padding:12px 15px;
+      border-radius:var(--radius-lg);
+      font-size:1.5em;
+      font-weight:900;
+      text-align:right;
+      margin-bottom:12px;
+      box-shadow:0 4px 15px rgba(200,120,0,0.3);
+      transition:transform 0.2s;
+      border:1px solid #a05800;
+      position:relative; overflow:hidden;
+    }
+    .ticket-total::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+    }
+    .ticket-total:hover {
+      transform:scale(1.02);
+    }
+
+    .ticket-lines {
+      flex:1;
+      overflow-y:auto;
+      background:rgba(255,255,255,.7);
+      border-radius:var(--radius-lg);
+      padding:10px;
+      box-shadow:inset 0 2px 10px var(--shadow2);
+      border:1px solid var(--border);
+    }
+
+    .ticket-lines::-webkit-scrollbar {
+      width:6px;
+    }
+    .ticket-lines::-webkit-scrollbar-track {
+      background:rgba(200,220,240,.3);
+      border-radius:10px;
+    }
+    .ticket-lines::-webkit-scrollbar-thumb {
+      background:var(--blue-light);
+      border-radius:10px;
+    }
+
+    .ticket-lines table {
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 4px;
+    }
+
+    .ticket-lines th {
+      text-align:left;
+      padding:6px 8px;
+      color:var(--blue3);
+      font-weight:800;
+      border-bottom:2px solid var(--blue);
+      font-size:0.9em;
+    }
+
+    .ticket-lines tr {
+      background:rgba(255,255,255,.7);
+      transition:all 0.3s;
+      border-radius:var(--radius);
+    }
+
+    .ticket-lines tr.ligne-offert {
+      background:var(--yellow-pale);
+    }
+
+    .ticket-lines tr:hover {
+      background:var(--blue-pale);
+      transform:translateX(5px);
+    }
+    .ticket-lines tr.ligne-offert:hover {
+      background:var(--yellow-light);
+    }
+
+    .ticket-lines td {
+      padding:8px 6px;
+      vertical-align:middle;
+      font-size:0.9em;
+      font-weight:600;
+      color:var(--text2);
+    }
+    .ticket-lines tr td:first-child { border-radius:var(--radius) 0 0 var(--radius); }
+    .ticket-lines tr td:last-child { border-radius:0 var(--radius) var(--radius) 0; }
+
+    .offert-indicator {
+      display:inline-block;
+      margin-left:5px;
+      font-size:1.1em;
+      color:var(--orange);
+    }
+
+    .ticket-lines .actions button {
+      margin:0 2px;
+      padding:4px 8px;
+      border:none;
+      border-radius:var(--radius);
+      cursor:pointer;
+      font-size:0.95em;
+      transition:all 0.2s;
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+      border:1px solid var(--border);
+      color:var(--text2);
+      font-weight:800;
+      box-shadow:0 2px 6px var(--shadow2);
+      position:relative; overflow:hidden;
+    }
+    .ticket-lines .actions button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.4); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+    }
+    .ticket-lines .actions button:hover {
+      background:linear-gradient(180deg,#fff,#d0e4f8);
+      color:var(--blue3);
+      transform:translateY(-2px);
+      box-shadow:0 4px 12px var(--shadow);
+    }
+    .ticket-lines .actions button:active {
+      transform:translateY(0);
+    }
+
+    .footer-buttons {
+      margin-top:12px;
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:8px;
+    }
+
+    .footer-buttons button {
+      padding:10px 12px;
+      border:none;
+      border-radius:var(--radius-lg);
+      font-size:0.9em;
+      font-weight:800;
+      cursor:pointer;
+      color:white;
+      transition:all 0.2s;
+      box-shadow:0 4px 15px rgba(0,0,0,0.2);
+      position:relative;
+      overflow:hidden;
+    }
+    .footer-buttons button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+    }
+    .footer-buttons button:hover {
+      transform:translateY(-3px);
+      box-shadow:0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .footer-buttons button:nth-child(1) { background:linear-gradient(180deg,#ffc870,var(--orange),#b86200); border:1px solid #a05800; }
+    .footer-buttons button:nth-child(2) { background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); border:1px solid #2d6a1a; }
+    .footer-buttons button:nth-child(3) { background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); border:1px solid #1558b0; }
+
+    /* Panel Articles */
+    .articles-panel {
+      flex:1;
+      padding:15px;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      position:relative;
+      z-index:2;
+    }
+
+    .articles-panel h3 {
+      color:var(--blue3);
+      font-size:1.2em;
+      margin-bottom:10px;
+      font-weight:900;
+      text-shadow:0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .categories {
+      margin-bottom:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .categories button {
+      padding:4px 12px;
+      border:none;
+      border-radius:50px;
+      color:white;
+      cursor:pointer;
+      font-weight:800;
+      font-size:0.85em;
+      transition:all 0.2s;
+      box-shadow:0 4px 15px rgba(0,0,0,0.2);
+      height:28px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      position:relative; overflow:hidden;
+    }
+    .categories button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:50px 50px 0 0; pointer-events:none;
+    }
+    .categories button:hover {
+      transform:scale(1.05);
+      box-shadow:0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .articles-list {
+      flex:1;
+      overflow-y:auto;
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));
+      grid-auto-rows:min-content;
+      gap:8px;
+      padding:8px;
+      background:rgba(255,255,255,.1);
+      border-radius:var(--radius-lg);
+      backdrop-filter:blur(10px);
+      align-content:start;
+      border:1px solid rgba(255,255,255,.3);
+    }
+
+    .articles-list::-webkit-scrollbar {
+      width:8px;
+    }
+    .articles-list::-webkit-scrollbar-track {
+      background:rgba(255,255,255,0.2);
+      border-radius:10px;
+    }
+    .articles-list::-webkit-scrollbar-thumb {
+      background:rgba(255,255,255,0.5);
+      border-radius:10px;
+    }
+
+    .articles-list button {
+      padding:12px;
+      border:none;
+      border-radius:var(--radius-lg);
+      color:white;
+      font-weight:800;
+      font-size:0.85em;
+      cursor:pointer;
+      transition:all 0.2s;
+      box-shadow:0 4px 15px rgba(0,0,0,0.2);
+      white-space:pre-line;
+      text-align:center;
+      line-height:1.3;
+      min-height:60px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .articles-list button::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 0 0; pointer-events:none;
+    }
+    .articles-list button:hover {
+      transform:scale(1.05);
+      box-shadow:0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Messages */
+    .status-message {
+      position:fixed;
+      top:20px;
+      right:20px;
+      padding:15px 25px;
+      border-radius:var(--radius-lg);
+      color:white;
+      font-weight:800;
+      box-shadow:0 4px 20px rgba(0,0,0,0.2);
+      z-index:10000;
+      animation:slideIn 0.3s ease-out;
+      border:1px solid rgba(255,255,255,.85);
+      position:relative; overflow:hidden;
+    }
+    .status-message::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:45%;
+      background:rgba(255,255,255,.3); border-radius:var(--radius-lg) var(--radius-lg) 60% 60%;
+      pointer-events:none;
+    }
+
+    .status-success {
+      background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(210,245,185,.9));
+      color:var(--green2);
+      border-left:4px solid var(--green);
+    }
+    .status-error {
+      background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,220,220,.9));
+      color:var(--red);
+      border-left:4px solid var(--red);
+    }
+
+    @keyframes slideIn {
+      from { transform:translateX(400px); opacity:0; }
+      to { transform:translateX(0); opacity:1; }
+    }
+
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:rgba(200,220,240,.3); }
+    ::-webkit-scrollbar-thumb { background:var(--blue-light); border-radius:3px; }
+
+    /* Modale "Qui pointe ?" */
+    .popup-overlay {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(10,40,90,.45); backdrop-filter:blur(8px);
+      display:none; justify-content:center; align-items:center; z-index:2000;
+    }
+    .popup-content {
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+      border:1px solid rgba(255,255,255,.95);
+      padding:20px; border-radius:var(--radius-xl);
+      width:90%; max-width:480px; max-height:90vh; overflow-y:auto;
+      text-align:center; position:relative;
+      box-shadow:0 20px 60px rgba(20,60,180,.25),0 1px 0 rgba(255,255,255,.9) inset;
+      animation:popupFadeIn .25s ease;
+    }
+    @keyframes popupFadeIn { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
+    .popup-content h3 { color:var(--blue3); margin-bottom:6px; font-weight:900; }
+    .popup-close-btn {
+      position:absolute; top:10px; right:12px; width:30px; height:30px;
+      background:linear-gradient(180deg,#f08080,#c0392b,#922b21); color:white;
+      border:1px solid #882020; border-radius:50%; font-size:15px; font-weight:900;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.2s;
+    }
+    .popup-close-btn:hover { transform:scale(1.1); }
+    .ticket-pointeur-badge {
+      background:rgba(255,255,255,.25); padding:3px 10px; border-radius:50px;
+      font-size:.85em; font-weight:800; display:inline-flex; align-items:center; gap:5px;
+    }
+    .ticket-pointeur-change {
+      background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.5);
+      color:white; padding:3px 10px; border-radius:50px; font-size:.78em; font-weight:800;
+      cursor:pointer; transition:.2s;
+    }
+    .ticket-pointeur-change:hover { background:rgba(255,255,255,.4); }
+
+    /* Responsive */
+    @media (max-width:1024px) {
+      body { flex-direction:column; }
+      .ticket-panel { width:100%; max-height:50vh; }
+      .articles-list { grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Colonne gauche : Ticket -->
+  <div class="ticket-panel">
+    <div class="ticket-header">
+      <h2 id="ticketTitle">🎫 Ticket #</h2>
+      <p id="ticketInfo"></p>
+      <p id="ticketPointeurInfo" style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;"></p>
+    </div>
+    <div class="ticket-total" id="ticketTotal">Total: 0.00 €</div>
+    <div id="tvaSummaryTicket" style="display:none;background:rgba(255,255,255,.75);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;margin-bottom:10px;font-size:0.82em;color:var(--text2);"></div>
+
+    <div class="ticket-lines">
+      <table>
+        <thead>
+          <tr>
+            <th>Article</th>
+            <th style="text-align:center;">Qté</th>
+            <th style="text-align:right;">Prix</th>
+            <th style="text-align:right;">Total</th>
+            <th class="tva-th" style="text-align:center;display:none;">TVA</th>
+            <th style="text-align:center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="ticketDetails"></tbody>
+      </table>
+    </div>
+
+    <div class="footer-buttons">
+      <button onclick="mettreEnAttente()"><span style="position:relative;z-index:1;">🕒 En attente</span></button>
+      <button onclick="payerTicket()"><span style="position:relative;z-index:1;">💳 Paiement</span></button>
+      <button onclick="imprimerTicket()"><span style="position:relative;z-index:1;">🖨️ Impression</span></button>
+    </div>
+  </div>
+
+  <!-- Colonne droite : Articles -->
+  <div class="articles-panel">
+    <h3>📦 Catégories</h3>
+    <div class="categories" id="categoriesButtons"></div>
+    <h3 style="margin-top:10px;">🛒 Articles</h3>
+    <div class="articles-list" id="articlesButtons"></div>
+  </div>
+
+  <!-- Popup changement du pointeur -->
+  <div class="popup-overlay" id="pointeurModal" onclick="if(event.target===this)closePointeurModal()">
+    <div class="popup-content">
+      <button class="popup-close-btn" onclick="closePointeurModal()" title="Fermer">✕</button>
+      <h3>🧑‍💼 Qui pointe sur ce ticket ?</h3>
+      <p style="color:var(--text3); font-size:13px; font-weight:600; margin:-2px 0 16px;">Sélectionnez l'utilisateur qui prend la commande en ce moment.</p>
+      <div id="pointeurUserList" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;"></div>
+    </div>
+  </div>
+
+  <script>
+    (async function() {
+    // --- Données locales — toujours relire le localStorage au dernier moment ---
+    // (évite la désync avec la sync serveur qui peut réécrire localStorage après le chargement)
+    let tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+    let tables  = JSON.parse(localStorage.getItem("tables"))  || [];
+    const articlesData = JSON.parse(localStorage.getItem("articlesData")) || { categories: [], articles: [] };
+    let categories = articlesData.categories || [];
+    let articles   = articlesData.articles   || [];
+
+    const urlParams = new URLSearchParams(window.location.search);
+    // tableId peut être int ou string selon l'URL, on normalise en int
+    const tableId = parseInt(urlParams.get("tableId"));
+
+    // Chercher avec == (pas ===) pour tolérer les désynchs int/string dans localStorage
+    let currentTable = tables.find(t => parseInt(t.id) === tableId);
+    let currentTicket = currentTable ? tickets.find(t => parseInt(t.id) === parseInt(currentTable.ticketId)) : null;
+
+    // Si pas trouvé, attendre 300ms que la sync serveur finisse et réessayer une fois
+    if (!currentTable || !currentTicket) {
+      await new Promise(r => setTimeout(r, 350));
+      tables  = JSON.parse(localStorage.getItem("tables")  || "[]");
+      tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      currentTable  = tables.find(t => parseInt(t.id) === tableId);
+      currentTicket = currentTable ? tickets.find(t => parseInt(t.id) === parseInt(currentTable.ticketId)) : null;
+    }
+
+    if (!currentTable) {
+      document.getElementById("ticketTitle").textContent = "⚠️ Table introuvable";
+      document.getElementById("ticketInfo").textContent = `Table ID=${tableId} introuvable. Retournez aux tables.`;
+      throw new Error("Table introuvable tableId=" + tableId);
+    }
+    if (!currentTicket) {
+      // Cas de récupération : la table existe mais son ticketId ne matche aucun ticket
+      // → recréer un ticket vide pour ne pas bloquer la caisse
+      const ticketId = parseInt(currentTable.ticketId) || (parseInt(localStorage.getItem("lastTicketId") || "0") + 1);
+      localStorage.setItem("lastTicketId", ticketId.toString());
+      const ticketNumero = parseInt(localStorage.getItem("lastTicketNumero") || "0") + 1;
+      localStorage.setItem("lastTicketNumero", ticketNumero.toString());
+      const newTicket = {
+        id: ticketId,
+        numero: ticketNumero,
+        tableId: tableId,
+        date: new Date().toLocaleDateString(),
+        heure: new Date().toLocaleTimeString(),
+        membre: null,
+        articles: []
+      };
+      tickets.push(newTicket);
+      currentTable.ticketId = ticketId;
+      // Mettre à jour la table aussi
+      const tIdx = tables.findIndex(t => parseInt(t.id) === tableId);
+      if (tIdx >= 0) tables[tIdx] = currentTable;
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+      localStorage.setItem("tables",  JSON.stringify(tables));
+      currentTicket = newTicket;
+    }
+
+    // --- Affichage en-tête ---
+    // Utiliser .numero (séquentiel affiché) si présent, sinon fallback sur .id
+    document.getElementById("ticketTitle").textContent = `🎫 Ticket #${currentTicket.numero ?? currentTicket.id}`;
+    document.getElementById("ticketInfo").textContent =
+      `${currentTable.nom} | ${currentTicket.date} ${currentTicket.heure}`;
+
+    /* -----------------------
+       Pointeur (utilisateur qui prend la commande)
+       ----------------------- */
+    function loadPointeurMap() {
+      try { return JSON.parse(localStorage.getItem("pointeurTickets") || "{}"); } catch (e) { return {}; }
+    }
+    function savePointeurMap(map) {
+      localStorage.setItem("pointeurTickets", JSON.stringify(map));
+    }
+    let currentPointeur = loadPointeurMap()[currentTicket.id] || "Utilisateur principal";
+
+    function renderPointeurInfo() {
+      document.getElementById("ticketPointeurInfo").innerHTML =
+        `<span class="ticket-pointeur-badge">👤 Pointé par : <strong>${currentPointeur}</strong></span>` +
+        `<button type="button" class="ticket-pointeur-change" onclick="window.openPointeurModal()">🔄 Changer</button>`;
+    }
+    renderPointeurInfo();
+
+    function makePointeurAvatarHTML(avatar, size) {
+      size = size || 44;
+      if (!avatar) return "<span style='font-size:" + (size*0.6) + "px;'>👤</span>";
+      if (typeof avatar === 'string' && avatar.startsWith('data:')) {
+        return "<img src='" + avatar + "' style='width:" + size + "px;height:" + size + "px;border-radius:50%;object-fit:cover;'>";
+      }
+      return "<span style='font-size:" + (size*0.6) + "px;'>" + avatar + "</span>";
+    }
+
+    function getPointeurUsers() {
+      var list = [];
+      try {
+        var u = JSON.parse(localStorage.getItem("users")) || [];
+        list = [{ username: "Admin", avatar: "👑", isAdmin: true }].concat(u);
+      } catch (e) {
+        list = [{ username: "Admin", avatar: "👑", isAdmin: true }];
+      }
+      return list;
+    }
+
+    window.openPointeurModal = function() {
+      var list = document.getElementById('pointeurUserList');
+      list.innerHTML = '';
+      getPointeurUsers().forEach(function(u) {
+        var card = document.createElement('div');
+        card.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:12px 16px;border-radius:14px;border:2px solid var(--border);background:rgba(255,255,255,.8);transition:all .2s;min-width:80px;';
+        card.innerHTML = "<div style='width:54px;height:54px;border-radius:50%;background:rgba(220,238,255,.7);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;'>"
+          + makePointeurAvatarHTML(u.avatar, 44)
+          + "</div><div style='font-weight:800;font-size:13px;color:var(--text);text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'>" + u.username + "</div>";
+        if (u.isAdmin) {
+          card.innerHTML += "<span style='font-size:10px;background:linear-gradient(135deg,#ffd84d,#e8a800);color:#5a3800;padding:2px 8px;border-radius:50px;font-weight:900;'>ADMIN</span>";
+        }
+        card.addEventListener('mouseenter', function() { card.style.borderColor = 'var(--blue-light)'; card.style.transform = 'translateY(-3px)'; });
+        card.addEventListener('mouseleave', function() { card.style.borderColor = 'var(--border)'; card.style.transform = ''; });
+        card.addEventListener('click', function() {
+          currentPointeur = u.username;
+          const map = loadPointeurMap();
+          map[currentTicket.id] = currentPointeur;
+          savePointeurMap(map);
+          renderPointeurInfo();
+          window.closePointeurModal();
+        });
+        list.appendChild(card);
+      });
+      document.getElementById('pointeurModal').style.display = 'flex';
+    };
+
+    window.closePointeurModal = function() {
+      document.getElementById('pointeurModal').style.display = 'none';
+    };
+
+    // --- TVA helper ---
+    function getTvaSettings() {
+      try { return JSON.parse(localStorage.getItem("tvaSettings") || "null"); } catch(e) { return null; }
+    }
+    function isTvaEnabled() {
+      const s = getTvaSettings(); return s && s.enabled === true;
+    }
+    function getArticleTvaRate(articleId) {
+      // Look up tva from articlesData
+      const art = articles.find(a => a.id === articleId);
+      if (!art) return 0;
+      // tva stored as "21%" string
+      return parseFloat(art.tva) || 0;
+    }
+
+    // --- Rendu du ticket ---
+    function renderTicket() {
+      const details = document.getElementById("ticketDetails");
+      details.innerHTML = "";
+      let total = 0;
+      const tvaEnabled = isTvaEnabled();
+      // TVA accumulator: { "21": { base: 0, tva: 0 } }
+      const tvaAcc = {};
+
+      currentTicket.articles.forEach((art, idx) => {
+        const prixTotal = art.prix * art.qte;
+        total += prixTotal;
+
+        // Compute TVA for this line
+        const tvaRate = tvaEnabled ? getArticleTvaRate(art.id) : 0;
+        if (tvaEnabled && !art.offert && tvaRate > 0) {
+          const base = prixTotal / (1 + tvaRate / 100);
+          const montantTva = prixTotal - base;
+          const key = tvaRate.toFixed(0);
+          if (!tvaAcc[key]) tvaAcc[key] = { base: 0, tva: 0 };
+          tvaAcc[key].base += base;
+          tvaAcc[key].tva += montantTva;
+        }
+
+        const tr = document.createElement("tr");
+        
+        // Ajouter une classe si l'article est offert
+        if (art.offert) {
+          tr.classList.add('ligne-offert');
+        }
+        
+        // Afficher une flèche pour les articles offerts
+        const nomAffiche = art.offert 
+          ? `<strong>${art.nom}</strong> <span class="offert-indicator">⬇️ OFFERT</span>` 
+          : `<strong>${art.nom}</strong>`;
+
+        const tvaCell = `<td class="tva-td" style="text-align:center;font-size:.8em;color:var(--text3);${tvaEnabled ? '' : 'display:none;'}">${art.offert ? '—' : (tvaRate > 0 ? tvaRate + '%' : '0%')}</td>`;
+        
+        tr.innerHTML = `
+          <td>${nomAffiche}</td>
+          <td style="text-align:center;"><strong>${art.qte}</strong></td>
+          <td style="text-align:right;">${art.prix.toFixed(2)} €</td>
+          <td style="text-align:right;"><strong>${prixTotal.toFixed(2)} €</strong></td>
+          ${tvaCell}
+          <td class="actions" style="text-align:center;"></td>
+        `;
+
+        const actionsTd = tr.querySelector(".actions");
+
+        const btnPlus = document.createElement("button");
+        btnPlus.textContent = "➕";
+        btnPlus.title = "Ajouter";
+        btnPlus.onclick = () => {
+          const avant = art.qte;
+          art.qte++;
+          updateStock(art.id, -1);
+          logCtrl("QTE", art.nom, `x${avant}`, `x${art.qte}`, `+1`);
+          saveData(); renderTicket();
+        };
+
+        const btnMoins = document.createElement("button");
+        btnMoins.textContent = "➖";
+        btnMoins.title = "Retirer";
+        btnMoins.onclick = () => {
+          const avant = art.qte;
+          art.qte--;
+          updateStock(art.id, +1);
+          if (art.qte <= 0) {
+            logCtrl("SUPPR", art.nom, `x${avant}`, "—", `-${avant}`);
+            currentTicket.articles.splice(idx, 1);
+          } else {
+            logCtrl("QTE", art.nom, `x${avant}`, `x${art.qte}`, `-1`);
+          }
+          saveData(); renderTicket();
+        };
+
+        const btnGift = document.createElement("button");
+        btnGift.textContent = art.offert ? "💰" : "🎁";
+        btnGift.title = art.offert ? "Annuler l'offre" : "Offrir";
+        btnGift.onclick = () => {
+          if (!art.offert) {
+            if (art.qte > 1) {
+              // Séparer 1 unité en ligne offerte distincte
+              art.qte--;
+              const prixNormal = art.prix;
+              currentTicket.articles.splice(idx + 1, 0, {
+                id: art.id,
+                nom: art.nom,
+                prix: 0,
+                prixOriginal: prixNormal,
+                qte: 1,
+                offert: true
+              });
+              logCtrl("OFFERT", art.nom, "Normal", "Offert ✓", "→ 1 offert séparé");
+            } else {
+              // Une seule unité : on offre directement cette ligne
+              art.prixOriginal = art.prix;
+              art.offert = true;
+              art.prix = 0;
+              logCtrl("OFFERT", art.nom, "Normal", "Offert ✓", "→ Offert");
+            }
+          } else {
+            const original = articles.find(a => a.id === art.id);
+            art.prix = art.prixOriginal || parseFloat(original.prixTVAC);
+            art.offert = false;
+            delete art.prixOriginal;
+            logCtrl("OFFERT", art.nom, "Offert ✓", "Normal", "→ Annulé");
+          }
+          saveData(); renderTicket();
+        };
+
+        const btnPrice = document.createElement("button");
+        btnPrice.textContent = "💲";
+        btnPrice.title = "Modifier le prix";
+        btnPrice.onclick = () => {
+          let newPrice = prompt("Nouveau prix (€) :", art.prix);
+          if (!newPrice || isNaN(newPrice)) return;
+          newPrice = parseFloat(newPrice);
+          const prixAvant = art.prix;
+          const delta = (newPrice - prixAvant).toFixed(2);
+          logCtrl("PRIX", art.nom, prixAvant.toFixed(2) + " €", newPrice.toFixed(2) + " €", (parseFloat(delta) >= 0 ? "+" : "") + delta + " €");
+          art.prix = newPrice;
+          if (art.offert && newPrice > 0) {
+            art.offert = false;
+            delete art.prixOriginal;
+          }
+          saveData();
+          renderTicket();
+        };
+
+        actionsTd.appendChild(btnPlus);
+        actionsTd.appendChild(btnMoins);
+        actionsTd.appendChild(btnGift);
+        actionsTd.appendChild(btnPrice);
+
+        details.appendChild(tr);
+      });
+
+      document.getElementById("ticketTotal").textContent = `Total: ${total.toFixed(2)} €`;
+
+      // Afficher/masquer la colonne TVA dans le header
+      const tvaTh = document.querySelector('.tva-th');
+      if (tvaTh) tvaTh.style.display = tvaEnabled ? '' : 'none';
+
+      // TVA summary block
+      const tvaBlock = document.getElementById("tvaSummaryTicket");
+      const keys = Object.keys(tvaAcc || {});
+      if (tvaEnabled && keys.length > 0) {
+        let html = '<div style="font-weight:800;color:var(--blue3);margin-bottom:4px;">🧾 Ventilation TVA</div>';
+        html += '<table style="width:100%;border-collapse:collapse;font-size:.9em;">';
+        html += '<tr style="color:var(--text3);font-weight:700;"><td>Taux</td><td style="text-align:right;">Base HTVA</td><td style="text-align:right;">Montant TVA</td><td style="text-align:right;">Total TVAC</td></tr>';
+        let totalHTVA = 0, totalTVA = 0;
+        keys.sort((a,b) => parseFloat(a)-parseFloat(b)).forEach(k => {
+          const { base, tva } = tvaAcc[k];
+          totalHTVA += base; totalTVA += tva;
+          html += `<tr><td>${k}%</td><td style="text-align:right;">${base.toFixed(2)} €</td><td style="text-align:right;">${tva.toFixed(2)} €</td><td style="text-align:right;">${(base+tva).toFixed(2)} €</td></tr>`;
+        });
+        html += `<tr style="font-weight:800;border-top:1px solid var(--border);color:var(--text);"><td>Total</td><td style="text-align:right;">${totalHTVA.toFixed(2)} €</td><td style="text-align:right;">${totalTVA.toFixed(2)} €</td><td style="text-align:right;">${(totalHTVA+totalTVA).toFixed(2)} €</td></tr>`;
+        html += '</table>';
+        tvaBlock.innerHTML = html;
+        tvaBlock.style.display = 'block';
+      } else {
+        tvaBlock.style.display = 'none';
+      }
+    }
+
+    // --- Ajout d'article ---
+    function addArticle(article) {
+      // Chercher une ligne identique (même article, même prix, non offert)
+      let line = currentTicket.articles.find(a => 
+        a.id === article.id && 
+        !a.offert && 
+        a.prix == parseFloat(article.prixTVAC)
+      );
+      
+      if (line) {
+        const avant = line.qte;
+        line.qte++;
+        logCtrl("QTE", article.nom, `x${avant}`, `x${line.qte}`, `+1`);
+      } else {
+        currentTicket.articles.push({
+          id: article.id,
+          nom: article.nom,
+          prix: parseFloat(article.prixTVAC),
+          qte: 1,
+          offert: false
+        });
+        logCtrl("AJOUT", article.nom, "—", "x1", "+1");
+      }
+      updateStock(article.id, -1);
+      saveData(); renderTicket();
+    }
+
+    // --- Mise à jour du stock ---
+    function updateStock(articleId, delta) {
+      let stockData = JSON.parse(localStorage.getItem("stock")) || {};
+      if (!stockData[articleId]) {
+        stockData[articleId] = { stockBase: 0, ajouter: 0, retirer: 0 };
+      }
+      stockData[articleId].retirer += delta < 0 ? Math.abs(delta) : -Math.abs(delta);
+      localStorage.setItem("stock", JSON.stringify(stockData));
+    }
+
+    // --- Rendu catégories & articles ---
+    function renderCategories() {
+      const catDiv = document.getElementById("categoriesButtons");
+      catDiv.innerHTML = "";
+      categories.forEach(c => {
+        const btn = document.createElement("button");
+        btn.textContent = c.nom;
+        btn.style.background = c.couleur || "#2ecc71";
+        btn.style.color = "white";
+        btn.onclick = () => renderArticles(c.nom);
+        catDiv.appendChild(btn);
+      });
+      if (categories.length) renderArticles(categories[0].nom);
+    }
+
+    function renderArticles(catNom) {
+      const list = document.getElementById("articlesButtons");
+      list.innerHTML = "";
+      articles.filter(a => a.categorie === catNom).forEach(a => {
+        const btn = document.createElement("button");
+        btn.textContent = `${a.nom}\n${a.prixTVAC}€`;
+        btn.style.background = a.couleur || "#f39c12";
+        btn.style.color = "white";
+        btn.onclick = () => addArticle(a);
+        list.appendChild(btn);
+      });
+    }
+
+    // --- Sauvegarde ---
+    function saveData() {
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+      localStorage.setItem("tables", JSON.stringify(tables));
+    }
+
+    // --- Journal de contrôle ---
+    function logCtrl(type, article, avant, apres, delta) {
+      const now = new Date();
+      const ts  = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const dt  = now.toISOString();
+      const log = JSON.parse(localStorage.getItem("ctrl_log") || "[]");
+      log.unshift({
+        ts, dt,
+        ticketId: currentTicket.id,
+        table: currentTable.nom,
+        user: currentPointeur,
+        article, type, avant, apres, delta
+      });
+      localStorage.setItem("ctrl_log", JSON.stringify(log));
+    }
+
+    // --- Exposer les fonctions appelées par onclick sur window ---
+    // (nécessaire car elles utilisent currentTicket/currentTable définis dans l'IIFE async)
+    window.mettreEnAttente = function() {
+      saveData();
+      window.location.href = "tables.html";
+    };
+
+    window.payerTicket = function() {
+      saveData();
+      window.location.href = `paiement.html?ticketId=${currentTicket.id}`;
+    };
+
+    window.imprimerTicket = async function() {
+      try {
+        const tvaEnabled = isTvaEnabled();
+        const tvaAcc = {};
+        if (tvaEnabled) {
+          currentTicket.articles.forEach(art => {
+            if (art.offert) return;
+            const tvaRate = getArticleTvaRate(art.id);
+            if (tvaRate > 0) {
+              const prixLigne = art.prix * art.qte;
+              const base = prixLigne / (1 + tvaRate / 100);
+              const key = tvaRate.toFixed(0);
+              if (!tvaAcc[key]) tvaAcc[key] = { base: 0, tva: 0 };
+              tvaAcc[key].base += base;
+              tvaAcc[key].tva += prixLigne - base;
+            }
+          });
+        }
+        const ticketData = {
+          table: currentTable.nom,
+          date: currentTicket.date,
+          heure: currentTicket.heure,
+          articles: currentTicket.articles.map(art => ({
+            nom: art.nom,
+            qte: art.qte,
+            prix: art.prix,
+            tva: tvaEnabled ? getArticleTvaRate(art.id) : 0,
+            offert: art.offert || false
+          })),
+          tvaEnabled: tvaEnabled,
+          tvaVentilation: tvaEnabled ? Object.entries(tvaAcc).sort((a,b) => parseFloat(a[0])-parseFloat(b[0])).map(([taux, v]) => ({
+            taux: parseFloat(taux),
+            base: +v.base.toFixed(2),
+            tva: +v.tva.toFixed(2),
+            total: +(v.base + v.tva).toFixed(2)
+          })) : []
+        };
+        const response = await fetch('http://localhost:8088/print', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ticketData)
+        });
+        const result = await response.json();
+        showMessage(result.success ? '✓ Ticket imprimé avec succès !' : '✗ Erreur d\'impression', result.success ? 'success' : 'error');
+      } catch (error) {
+        console.error('Erreur:', error);
+        showMessage('✗ Serveur d\'impression non disponible', 'error');
+      }
+    };
+
+    // --- Init ---
+    renderTicket();
+    renderCategories();
+    })(); // fin IIFE async
+
+    // --- showMessage : en dehors de l'IIFE (pas besoin de currentTicket) ---
+    function showMessage(text, type) {
+      const msg = document.createElement('div');
+      msg.className = `status-message status-${type}`;
+      msg.textContent = text;
+      document.body.appendChild(msg);
+      setTimeout(() => {
+        msg.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => msg.remove(), 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

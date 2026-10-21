@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PV Manager Pro — Version Chaleureuse</title>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.278.0/dist/lucide.min.js"></script>
+<style>
+/* ══════════════════════════════════
+   VISTA DARK THEME — PV Manager Pro
+══════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap');
+
+:root{
+  --vb:#1a6bb5; --vb2:#2b88d9; --vb3:#5ba8e5;
+  --vy:#d98a00; --vy2:#f5c518;
+  --vr:#c0302a;
+  --border:rgba(91,168,229,.22);
+  --border2:rgba(91,168,229,.40);
+  --text:rgba(255,255,255,.92);
+  --text2:rgba(255,255,255,.60);
+  --text3:rgba(255,255,255,.32);
+  /* preview remains light */
+  --accent:#8b5cf6; --accent-2:#6d28d9; --muted:#7c3aed; --soft-border:#e9d5ff;
+}
+*{box-sizing:border-box}
+
+body{
+  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+  margin:0;
+  background:linear-gradient(160deg,#0a1628 0%,#0d2b52 40%,#163d6e 70%,#1a4f7a 100%);
+  min-height:100vh;
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 12% 22%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(1px 1px at 52% 62%,rgba(255,255,255,.28) 0%,transparent 100%),
+    radial-gradient(2px 2px at 80% 15%,rgba(91,168,229,.55) 0%,transparent 100%),
+    radial-gradient(1px 1px at 35% 80%,rgba(255,255,255,.2) 0%,transparent 100%),
+    radial-gradient(1px 1px at 90% 50%,rgba(255,255,255,.22) 0%,transparent 100%);
+}
+
+/* ══ TOPBAR ══ */
+.topbar{
+  position:fixed;left:0;right:0;top:0;height:70px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 24px;gap:12px;z-index:40;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  background:linear-gradient(180deg,rgba(10,22,40,0.92),rgba(13,43,82,0.85));
+  border-bottom:1.5px solid var(--border2);
+  box-shadow:0 4px 24px rgba(0,0,0,.4),inset 0 -1px 0 rgba(255,255,255,.06);
+}
+.brand{display:flex;gap:12px;align-items:center}
+.brand .logo-badge{
+  width:50px;height:50px;border-radius:16px;
+  background:linear-gradient(135deg,#1a6bb5,#5ba8e5);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(26,107,181,.5);
+  border:1.5px solid rgba(255,255,255,.2);
+}
+.brand .logo-badge svg rect{fill:rgba(91,168,229,.25)}
+.brand .logo-badge svg path{stroke:#a8d4f5}
+.brand .title{font-weight:800;font-size:16px;color:#fff;text-shadow:0 0 20px rgba(91,168,229,.7)}
+.top-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{
+  background:rgba(255,255,255,.08);border:1.5px solid var(--border);
+  padding:8px;border-radius:12px;cursor:pointer;color:var(--vb3);transition:all .2s;
+}
+.icon-btn:hover{background:rgba(91,168,229,.2);border-color:var(--vb3);color:#fff}
+
+/* ══ CONTAINER ══ */
+.container{max-width:1100px;margin:100px auto 40px;padding:18px;position:relative;z-index:1}
+
+/* ══ TABS ══ */
+.tabs{
+  display:flex;gap:10px;margin-bottom:12px;
+  background:rgba(255,255,255,.06);padding:8px;border-radius:50px;
+  backdrop-filter:blur(6px);border:1.5px solid var(--border);
+}
+.tabBtn{
+  flex:1;padding:12px 16px;
+  background:rgba(255,255,255,.05);border:1.5px solid var(--border);
+  border-radius:40px;cursor:pointer;text-align:center;
+  font-weight:700;color:var(--text2);transition:all .2s;font-family:inherit;font-size:14px;
+}
+.tabBtn:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.tabBtn.active{
+  background:linear-gradient(180deg,#3a95e8 0%,#1560b7 50%,#0e4d9a 100%);
+  color:white;border-color:transparent;
+  box-shadow:0 4px 14px rgba(26,107,181,.5);
+}
+.wrap{display:block}
+.tab{display:block}
+.hidden{display:none}
+
+/* ══ LABELS & INPUTS ══ */
+label{display:block;font-weight:600;margin-top:8px;color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+
+input[type="text"],input[type="date"],input[type="time"],
+input[type="number"],textarea,select{
+  width:100%;padding:11px 14px;border-radius:10px;
+  border:1.5px solid var(--border);background:rgba(255,255,255,.08);
+  margin-top:6px;font-size:14px;color:var(--text);transition:all .2s;
+  font-family:inherit; outline:none;
+}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--vb3);background:rgba(255,255,255,.13);
+  box-shadow:0 0 0 3px rgba(91,168,229,.2);
+}
+select option{background:#0d2b52;color:#fff}
+textarea{min-height:120px;resize:vertical}
+
+/* ══ BOUTONS ══ */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(180deg,#3a95e8 0%,#1560b7 50%,#0e4d9a 100%);
+  color:white;padding:10px 16px;border-radius:50px;border:0;
+  cursor:pointer;margin:6px 6px 0 0;font-weight:700;font-size:13px;
+  font-family:inherit;transition:all .2s;position:relative;overflow:hidden;
+  box-shadow:0 4px 14px rgba(26,107,181,.4);
+}
+.btn::after{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.12);border-radius:50px 50px 0 0}
+.btn:hover{background:linear-gradient(180deg,#5aadf0 0%,#2070c8 50%,#1560b7 100%);transform:translateY(-1px);box-shadow:0 6px 18px rgba(26,107,181,.5)}
+.btn:active{transform:translateY(2px)}
+.btn.ghost{
+  background:rgba(255,255,255,.08);color:var(--text2);
+  border:1.5px solid var(--border);box-shadow:none;
+}
+.btn.ghost::after{display:none}
+.btn.ghost:hover{background:rgba(255,255,255,.15);color:var(--text);border-color:var(--vb3)}
+
+/* ══ LAYOUT ══ */
+.row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.col{flex:1;min-width:260px}
+
+/* ══ CARDS ══ */
+.card{
+  background:linear-gradient(160deg,rgba(20,50,100,.75) 0%,rgba(10,28,62,.85) 100%);
+  border-radius:20px;padding:20px;
+  border:1.5px solid var(--border);
+  box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(8px);
+}
+.card h3,.card h4{color:var(--vb3);margin-bottom:4px;font-size:15px;display:flex;align-items:center;gap:8px}
+
+.small{font-size:13px;color:var(--text2)}
+
+/* ══ LIST & HISTORY ITEMS ══ */
+.list-item{display:flex;gap:8px;align-items:center;margin-top:8px}
+.history-item{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  padding:16px;
+  background:rgba(255,255,255,.06);
+  border-radius:14px;margin-top:8px;
+  border:1.5px solid var(--border);
+  transition:all .15s;
+}
+.history-item:hover{background:rgba(255,255,255,.1);border-color:var(--vb3)}
+
+.logo-preview{max-height:68px;object-fit:contain;border-radius:12px;border:1px solid var(--border)}
+
+/* ══ PREVIEW (reste clair pour impression) ══ */
+#previewContent{
+  background:#ffffff;padding:30px;border-radius:18px;
+  box-shadow:0 10px 40px rgba(0,0,0,.5);
+  max-width:820px;margin:14px auto;
+  border:2px solid var(--soft-border);color:#1e1b4b;
+}
+.hdr{display:flex;align-items:center;gap:18px;justify-content:space-between;border-bottom:2px solid var(--soft-border);padding-bottom:12px;margin-bottom:14px}
+.hdr-left{display:flex;gap:12px;align-items:center}
+.company-name{font-size:20px;font-weight:800;color:#6d28d9}
+.company-addr{font-size:13px;color:#7c3aed}
+.pv-title{text-align:center;font-size:18px;font-weight:800;margin:10px 0;color:#8b5cf6}
+.info-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.info-card{flex:1;min-width:200px;border-radius:14px;padding:14px;background:#faf5ff;border:2px solid #e9d5ff}
+.section{margin-top:12px;padding:14px;background:#fff;border-radius:14px;border:2px solid #f3e8ff}
+.sign-grid{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.sign-box{flex:1;min-width:160px;border-radius:12px;padding:12px;background:#fff;border:2px dashed #e9d5ff;text-align:left}
+.signature-line{margin-top:10px;border-top:1px solid #e9d5ff;height:1px}
+footer.small{font-size:12px;color:#7c3aed;text-align:center;margin-top:12px}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:10px}
+::-webkit-scrollbar-thumb{background:rgba(91,168,229,.4);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(91,168,229,.65)}
+
+/* ══ RESPONSIVE ══ */
+@media (max-width:900px){.hdr{flex-direction:column;align-items:flex-start}.topbar{height:auto;padding:12px}.container{margin:120px 12px 30px}}
+@media print{body{background:white}.topbar,.tabs,.btn,input[type=file]{display:none}#previewContent{box-shadow:none;margin:0;border-radius:0;width:auto}}
+</style>
+</head>
+<body>
+<div class="topbar" role="banner">
+<div class="brand">
+<div class="logo-badge" aria-hidden="true">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="3" y="3" width="18" height="18" rx="5" fill="rgba(91,168,229,.25)"/>
+<path d="M7 12h10" stroke="#a8d4f5" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M7 8h10" stroke="#a8d4f5" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M7 16h5" stroke="#a8d4f5" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+</div>
+<div>
+<div class="title" style="font-weight:800;color:var(--accent-2)">PV Manager Pro</div>
+<div class="small" style="color:var(--text2)">Version Violette & Élégante</div>
+</div>
+</div>
+<div class="top-actions" role="navigation" aria-label="Accès rapide">
+<button class="icon-btn" title="Formulaire" onclick="activateTab('form')"><i data-lucide="file-text"></i></button>
+<button class="icon-btn" title="Prévisualisation" onclick="activateTab('preview')"><i data-lucide="eye"></i></button>
+<button class="icon-btn" title="Historique" onclick="activateTab('history')"><i data-lucide="clock"></i></button>
+</div>
+</div>
+<div class="container">
+<div class="tabs" role="tablist">
+<button class="tabBtn active" data-tab="form"><i data-lucide="edit-3"></i> Formulaire</button>
+<button class="tabBtn" data-tab="preview"><i data-lucide="eye"></i> Prévisualisation / PDF</button>
+<button class="tabBtn" data-tab="history"><i data-lucide="archive"></i> Historique</button>
+</div>
+<div class="wrap">
+<div id="form" class="tab">
+<div class="row">
+<div class="col card">
+<h3><i data-lucide="building"></i> Informations entreprise</h3>
+<label>Nom</label><input id="companyName" type="text" placeholder="Nom de l'entreprise">
+<label>Adresse</label><input id="companyAddress" type="text" placeholder="Rue, n°">
+<label>Localité</label><input id="companyCity" type="text" placeholder="Ville">
+<label>Numéro d'entreprise</label><input id="companyNumber" type="text" placeholder="Numéro TVA / entreprise">
+<label>Logo (fichier)</label>
+<input id="companyLogoFile" type="file" accept="image/*">
+<div class="small" style="color:var(--text3)">Le logo sera converti en base64 et sauvegardé localement.</div>
+<img id="logoPreview" class="logo-preview" alt="" style="display:none;margin-top:10px">
+</div>
+<div class="col card">
+<h3><i data-lucide="calendar"></i> Réunion</h3>
+<label>Date</label><input id="meetingDate" type="date">
+<label>Heure</label><input id="meetingTime" type="time">
+<label>Durée (minutes)</label><input id="meetingDuration" type="number" min="0" placeholder="ex: 60">
+<label>Type</label>
+<select id="meetingType">
+<option>Présentiel</option>
+<option>Visioconférence</option>
+</select>
+<div style="margin-top:12px">
+<button class="btn" onclick="addParticipant()"><i data-lucide="user-plus"></i> Ajouter participant</button>
+<button class="btn ghost" onclick="addAgenda()"><i data-lucide="list"></i> Ajouter point ordre du jour</button>
+</div>
+</div>
+</div>
+<div class="row" style="margin-top:12px">
+<div class="col card">
+<h4><i data-lucide="users"></i> Participants</h4>
+<div id="participants"></div>
+</div>
+<div class="col card">
+<h4><i data-lucide="file-list-2"></i> Ordre du jour</h4>
+<div id="agendaItems"></div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h4><i data-lucide="file-text"></i> Rapport / Compte-rendu</h4>
+<textarea id="report" placeholder="Tapez ici votre rapport..."></textarea>
+<div style="margin-top:10px">
+<button class="btn" onclick="saveLocal()"><i data-lucide="save"></i> Enregistrer localement</button>
+<button class="btn" onclick="saveHistory()"><i data-lucide="database"></i> Enregistrer dans l'historique</button>
+<button class="btn ghost" onclick="clearForm()"><i data-lucide="refresh-ccw"></i> Réinitialiser</button>
+</div>
+</div>
+</div>
+<div id="preview" class="tab hidden">
+<div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:8px">
+<button class="btn" onclick="renderPreview()"><i data-lucide="refresh-cw"></i> Actualiser aperçu</button>
+<button class="btn" onclick="generatePDF()"><i data-lucide="download"></i> Exporter PDF (multi-pages)</button>
+<button class="btn ghost" onclick="downloadPreviewPNG()"><i data-lucide="image"></i> Télécharger PNG</button>
+</div>
+<div id="previewContent" aria-live="polite"></div>
+</div>
+<div id="history" class="tab hidden">
+<div class="card" style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+<div>
+<button class="btn" onclick="exportHistory()"><i data-lucide="upload-cloud"></i> Exporter historique (JSON)</button>
+<input id="importFile" type="file" accept=".json" style="display:inline-block;margin-left:10px">
+<button class="btn" onclick="importHistory()"><i data-lucide="download-cloud"></i> Importer JSON</button>
+</div>
+<div>
+<button class="btn ghost" onclick="clearHistory()" title="Supprime tout l'historique"><i data-lucide="trash-2"></i> Vider historique</button>
+</div>
+</div>
+<div id="historyList" style="margin-top:12px"></div>
+</div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ══ UTILITAIRES ══
+function escapeHtml(s) {
+  s = s || '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function lsGet(key) { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { return null; } }
+function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+function lsRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
+
+// ══ ÉTAT GLOBAL ══
+var participants = [];
+var agendaItems = [];
+var pvHistory = lsGet('pvHistory') || [];
+
+var logoPreview = document.getElementById('logoPreview');
+var logoFileInput = document.getElementById('companyLogoFile');
+var PDF_UNIT = 'pt';
+var A4 = {w:595.28, h:841.89};
+
+// ══ TABS ══
+function activateTab(id) {
+  document.querySelectorAll('.tabBtn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.add('hidden'); });
+  var btn = Array.from(document.querySelectorAll('.tabBtn')).find(function(x){ return x.dataset.tab === id; });
+  if (btn) btn.classList.add('active');
+  var el = document.getElementById(id);
+  if (el) el.classList.remove('hidden');
+  if (id === 'preview') renderPreview();
+  if (id === 'history') renderHistory();
+}
+document.querySelectorAll('.tabBtn').forEach(function(btn) {
+  btn.addEventListener('click', function(){ activateTab(btn.dataset.tab); });
+});
+
+// ══ LOGO ══
+logoFileInput.addEventListener('change', function(e) {
+  var f = e.target.files[0];
+  if (!f) return;
+  var fr = new FileReader();
+  fr.onload = function() {
+    logoPreview.src = fr.result;
+    logoPreview.style.display = 'block';
+    var cur = lsGet('pvCurrent') || {};
+    cur.companyLogo = fr.result;
+    lsSet('pvCurrent', cur);
+  };
+  fr.readAsDataURL(f);
+});
+
+// ══ PARTICIPANTS ══
+function addParticipant(name, firstName, role) {
+  participants.push({name: name||'', firstName: firstName||'', role: role||''});
+  renderParticipants();
+}
+function removeParticipant(i) { participants.splice(i,1); renderParticipants(); }
+function renderParticipants() {
+  var c = document.getElementById('participants');
+  c.innerHTML = '';
+  participants.forEach(function(p, i) {
+    var div = document.createElement('div');
+    div.className = 'list-item';
+    div.innerHTML = '<input placeholder="Prénom" value="' + escapeHtml(p.firstName) + '" oninput="participants['+i+'].firstName=this.value" style="width:30%">' +
+      '<input placeholder="Nom" value="' + escapeHtml(p.name) + '" oninput="participants['+i+'].name=this.value" style="width:35%">' +
+      '<input placeholder="Fonction" value="' + escapeHtml(p.role) + '" oninput="participants['+i+'].role=this.value" style="width:25%">' +
+      '<button class="btn ghost" onclick="removeParticipant('+i+')" style="padding:6px 8px">Suppr</button>';
+    c.appendChild(div);
+  });
+}
+
+// ══ AGENDA ══
+function addAgenda(text) {
+  agendaItems.push({text: text||''});
+  renderAgenda();
+}
+function removeAgenda(i) { agendaItems.splice(i,1); renderAgenda(); }
+function renderAgenda() {
+  var c = document.getElementById('agendaItems');
+  c.innerHTML = '';
+  agendaItems.forEach(function(a, i) {
+    var div = document.createElement('div');
+    div.className = 'list-item';
+    div.innerHTML = '<input placeholder="Point d\'ordre du jour" value="' + escapeHtml(a.text||'') + '" oninput="agendaItems['+i+'].text=this.value" style="width:85%">' +
+      '<button class="btn ghost" onclick="removeAgenda('+i+')" style="padding:6px 8px">Suppr</button>';
+    c.appendChild(div);
+  });
+}
+
+// ══ DONNÉES FORMULAIRE ══
+function getFormData() {
+  var logo = (logoPreview.src && logoPreview.style.display !== 'none') ? logoPreview.src : ((lsGet('pvCurrent') || {}).companyLogo || '');
+  return {
+    companyName:     document.getElementById('companyName').value || '',
+    companyAddress:  document.getElementById('companyAddress').value || '',
+    companyCity:     document.getElementById('companyCity').value || '',
+    companyNumber:   document.getElementById('companyNumber').value || '',
+    companyLogo:     logo,
+    meetingDate:     document.getElementById('meetingDate').value || '',
+    meetingTime:     document.getElementById('meetingTime').value || '',
+    meetingDuration: document.getElementById('meetingDuration').value || '',
+    meetingType:     document.getElementById('meetingType').value || '',
+    participants:    participants,
+    agendaItems:     agendaItems,
+    report:          document.getElementById('report').value || ''
+  };
+}
+
+// ══ SAUVEGARDE LOCALE ══
+function saveLocal() {
+  lsSet('pvCurrent', getFormData());
+  alert('Données sauvegardées localement.');
+}
+function loadCurrentForm() {
+  return lsGet('pvCurrent') || {};
+}
+function populateFormFromCurrent() {
+  var cur = loadCurrentForm();
+  if (!cur || !Object.keys(cur).length) return;
+  document.getElementById('companyName').value     = cur.companyName || '';
+  document.getElementById('companyAddress').value  = cur.companyAddress || '';
+  document.getElementById('companyCity').value     = cur.companyCity || '';
+  document.getElementById('companyNumber').value   = cur.companyNumber || '';
+  if (cur.companyLogo) { logoPreview.src = cur.companyLogo; logoPreview.style.display = 'block'; }
+  document.getElementById('meetingDate').value     = cur.meetingDate || '';
+  document.getElementById('meetingTime').value     = cur.meetingTime || '';
+  document.getElementById('meetingDuration').value = cur.meetingDuration || '';
+  document.getElementById('meetingType').value     = cur.meetingType || 'Présentiel';
+  participants = cur.participants || [];
+  agendaItems  = cur.agendaItems || [];
+  document.getElementById('report').value = cur.report || '';
+  renderParticipants(); renderAgenda();
+}
+
+// ══ HISTORIQUE (mémoire + localStorage) ══
+function persistHistory() {
+  lsSet('pvHistory', pvHistory);
+}
+
+function saveHistory() {
+  var data = getFormData();
+  data.id = Date.now();
+  pvHistory.unshift(data);
+  persistHistory();
+  alert('Enregistré dans l\'historique !');
+  renderHistory();
+}
+
+function renderHistory() {
+  var container = document.getElementById('historyList');
+  container.innerHTML = '';
+  if (!pvHistory.length) {
+    container.innerHTML = '<div class="card small" style="color:var(--text2)">Aucun élément dans l\'historique.</div>';
+    return;
+  }
+  pvHistory.forEach(function(it, i) {
+    var d = document.createElement('div');
+    d.className = 'history-item';
+    var left = document.createElement('div');
+    left.innerHTML = '<div style="font-weight:700;color:var(--text)">' + escapeHtml(it.companyName || '(Sans nom)') + '</div>' +
+      '<div class="small">' + escapeHtml(it.meetingDate || '') + ' ' + escapeHtml(it.meetingTime || '') + '</div>';
+    var right = document.createElement('div');
+    right.style.display = 'flex';
+    right.style.gap = '6px';
+    right.style.flexWrap = 'wrap';
+    right.innerHTML =
+      '<button class="btn ghost" onclick="loadHistory('+i+')">⬇ Charger</button>' +
+      '<button class="btn" onclick="duplicateHistory('+i+')">⧉ Dupliquer</button>' +
+      '<button class="btn ghost" onclick="deleteHistory('+i+')">🗑 Suppr</button>' +
+      '<button class="btn ghost" onclick="exportSingle('+i+')">↗ Export</button>';
+    d.appendChild(left);
+    d.appendChild(right);
+    container.appendChild(d);
+  });
+}
+
+function loadHistory(index) {
+  var data = pvHistory[index];
+  if (!data) { alert('Élément introuvable.'); return; }
+  document.getElementById('companyName').value     = data.companyName || '';
+  document.getElementById('companyAddress').value  = data.companyAddress || '';
+  document.getElementById('companyCity').value     = data.companyCity || '';
+  document.getElementById('companyNumber').value   = data.companyNumber || '';
+  if (data.companyLogo) { logoPreview.src = data.companyLogo; logoPreview.style.display = 'block'; }
+  else { logoPreview.style.display = 'none'; }
+  document.getElementById('meetingDate').value     = data.meetingDate || '';
+  document.getElementById('meetingTime').value     = data.meetingTime || '';
+  document.getElementById('meetingDuration').value = data.meetingDuration || '';
+  document.getElementById('meetingType').value     = data.meetingType || 'Présentiel';
+  participants = data.participants || [];
+  agendaItems  = data.agendaItems || [];
+  document.getElementById('report').value = data.report || '';
+  renderParticipants(); renderAgenda();
+  lsSet('pvCurrent', getFormData());
+  activateTab('form');
+  alert('Historique chargé dans le formulaire.');
+}
+
+function deleteHistory(index) {
+  if (!confirm('Supprimer cet élément ?')) return;
+  pvHistory.splice(index, 1);
+  persistHistory();
+  renderHistory();
+}
+
+function duplicateHistory(index) {
+  var it = pvHistory[index];
+  if (!it) return;
+  var copy = JSON.parse(JSON.stringify(it));
+  copy.id = Date.now();
+  pvHistory.unshift(copy);
+  persistHistory();
+  renderHistory();
+}
+
+function exportHistory() {
+  if (!pvHistory.length) { alert('Historique vide.'); return; }
+  var blob = new Blob([JSON.stringify(pvHistory, null, 2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pv_history.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportSingle(index) {
+  var item = pvHistory[index];
+  if (!item) return;
+  var blob = new Blob([JSON.stringify(item, null, 2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pv_' + (item.id || index) + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importHistory() {
+  var f = document.getElementById('importFile').files[0];
+  if (!f) { alert('Choisissez un fichier JSON à importer.'); return; }
+  var fr = new FileReader();
+  fr.onload = function() {
+    try {
+      var imported = JSON.parse(fr.result);
+      if (Array.isArray(imported)) { pvHistory = imported.concat(pvHistory); }
+      else if (typeof imported === 'object') { pvHistory.unshift(imported); }
+      else { alert('Fichier JSON invalide.'); return; }
+      persistHistory();
+      renderHistory();
+      alert('Import réussi !');
+    } catch(e) { alert('Erreur : fichier JSON invalide.'); }
+  };
+  fr.readAsText(f);
+}
+
+function clearHistory() {
+  if (!confirm('Vider tout l\'historique ?')) return;
+  pvHistory = [];
+  persistHistory();
+  renderHistory();
+}
+
+// ══ RÉINITIALISER ══
+function clearForm() {
+  if (!confirm('Réinitialiser tout le formulaire ?')) return;
+  document.getElementById('companyName').value = '';
+  document.getElementById('companyAddress').value = '';
+  document.getElementById('companyCity').value = '';
+  document.getElementById('companyNumber').value = '';
+  document.getElementById('meetingDate').value = '';
+  document.getElementById('meetingTime').value = '';
+  document.getElementById('meetingDuration').value = '';
+  document.getElementById('meetingType').value = 'Présentiel';
+  document.getElementById('report').value = '';
+  participants = []; agendaItems = [];
+  renderParticipants(); renderAgenda();
+  logoPreview.style.display = 'none'; logoPreview.src = '';
+  lsRemove('pvCurrent');
+  alert('Formulaire réinitialisé.');
+}
+
+// ══ PRÉVISUALISATION ══
+function renderPreview() {
+  var d = getFormData();
+  var container = document.getElementById('previewContent');
+  var companyLogoHtml = d.companyLogo ? '<img src="' + d.companyLogo + '" alt="logo" style="max-height:70px;object-fit:contain;border-radius:8px">' : '';
+  var participantsHtml = (d.participants || []).map(function(p) {
+    return '<div style="margin-bottom:6px"><strong>' + escapeHtml(p.firstName||'') + ' ' + escapeHtml(p.name||'') + '</strong> – ' + escapeHtml(p.role||'') + '</div>';
+  }).join('') || '<div class="small">—</div>';
+  var agendaHtml = (d.agendaItems || []).map(function(a) {
+    return '<li>' + escapeHtml(a.text||'') + '</li>';
+  }).join('') || '<li class="small">—</li>';
+  var signaturesHtml = (d.participants || []).map(function(p) {
+    return '<div class="sign-box"><div style="font-weight:700">' + escapeHtml(p.firstName||'') + ' ' + escapeHtml(p.name||'') + '</div><div class="small">' + escapeHtml(p.role||'') + '</div><div class="signature-line"></div></div>';
+  }).join('') || '<div class="small">Aucun participant</div>';
+
+  container.innerHTML =
+    '<div class="hdr"><div class="hdr-left"><div>' +
+      '<div class="company-name">' + escapeHtml(d.companyName||'') + '</div>' +
+      '<div class="company-addr small">' + escapeHtml(d.companyAddress||'') + ' ' + escapeHtml(d.companyCity||'') + '</div>' +
+      (d.companyNumber ? '<div style="font-size:13px;color:#5b21b6;">N&deg; entreprise : ' + escapeHtml(d.companyNumber) + '</div>' : '') +
+    '</div></div><div style="text-align:right">' + companyLogoHtml + '</div></div>' +
+    '<div class="pv-title">📋 PV Extraordinaire — ' + escapeHtml(d.meetingType||'') + '</div>' +
+    '<div class="info-row">' +
+      '<div class="info-card">' +
+        '<div style="font-weight:800;margin-bottom:6px;color:#8b5cf6">📅 Informations réunion</div>' +
+        '<div class="small">Date · Heure · Durée</div>' +
+        '<div style="margin-top:6px">' + escapeHtml(d.meetingDate||'') + ' · ' + escapeHtml(d.meetingTime||'') + ' · ' + escapeHtml(d.meetingDuration||'') + ' min</div>' +
+      '</div>' +
+      '<div class="info-card">' +
+        '<div style="font-weight:800;margin-bottom:6px;color:#8b5cf6">👥 Participants</div>' +
+        participantsHtml +
+      '</div>' +
+    '</div>' +
+    '<div class="section" style="margin-top:14px">' +
+      '<div style="font-weight:800;margin-bottom:8px;color:#8b5cf6">📋 Ordre du jour</div>' +
+      '<ul>' + agendaHtml + '</ul>' +
+    '</div>' +
+    '<div class="section">' +
+      '<div style="font-weight:800;margin-bottom:8px;color:#8b5cf6">📄 Rapport</div>' +
+      '<div style="white-space:pre-wrap">' + escapeHtml(d.report||'') + '</div>' +
+    '</div>' +
+    '<div class="section" style="margin-top:12px">' +
+      '<div style="font-weight:800;margin-bottom:8px;color:#8b5cf6">✍ Signatures</div>' +
+      '<div class="sign-grid">' + signaturesHtml + '</div>' +
+    '</div>' +
+    '<footer class="small">✨ Document généré localement — PV Manager Pro</footer>';
+}
+
+// ══ PDF ══
+function generatePDF(event) {
+  renderPreview();
+  var el = document.getElementById('previewContent');
+  var btn = event && event.target ? event.target : null;
+  if (btn) btn.disabled = true;
+  html2canvas(el, {scale:2, useCORS:true, allowTaint:true, backgroundColor:'#ffffff'}).then(function(canvas) {
+    var imgData = canvas.toDataURL('image/png');
+    var pdf = new window.jspdf.jsPDF('p', PDF_UNIT, 'a4');
+    var imgWidth = A4.w;
+    var imgHeight = (canvas.height * imgWidth) / canvas.width;
+    if (imgHeight <= A4.h) {
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    } else {
+      var totalPages = Math.ceil(imgHeight / A4.h);
+      for (var i = 0; i < totalPages; i++) {
+        pdf.addImage(imgData, 'PNG', 0, -(i * A4.h), imgWidth, imgHeight);
+        if (i < totalPages - 1) pdf.addPage();
+      }
+    }
+    var filename = 'PV_' + (document.getElementById('companyName').value || 'document').replace(/\s+/g,'_') + '.pdf';
+    pdf.save(filename);
+    if (btn) btn.disabled = false;
+  }).catch(function(err) {
+    alert('Erreur PDF : ' + (err.message || err));
+    if (btn) btn.disabled = false;
+  });
+}
+
+function downloadPreviewPNG() {
+  renderPreview();
+  var el = document.getElementById('previewContent');
+  html2canvas(el, {scale:2, useCORS:true, backgroundColor:'#ffffff'}).then(function(canvas) {
+    var a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'pv_preview.png';
+    a.click();
+  });
+}
+
+// ══ INIT ══
+(function init() {
+  var cur = loadCurrentForm();
+  if (cur && Object.keys(cur).length) populateFormFromCurrent();
+  renderHistory();
+  if (window.lucide) lucide.replace();
+})();
+</script>
+</body>
+</html>

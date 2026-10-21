@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BisoOffice - Accueil</title>
+<link rel="stylesheet" href="all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+  --green:#5aad2e; --green2:#4a9422;
+  --yellow:#e8a800;
+  --red:#c0392b; --red-pale:#fde8e8;
+  --purple:#7c3aed;
+  --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+  --border:#b0cce8; --border2:#d0e4f4;
+  --shadow:rgba(30,80,160,0.18); --shadow2:rgba(30,80,160,0.08);
+  --radius:12px; --radius-lg:18px; --radius-xl:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body {
+  font-family:'Nunito','Segoe UI',sans-serif;
+  min-height:100vh;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:30px 20px;
+  color:var(--text);
+  transition:background 0.4s ease;
+  position:relative; overflow-x:hidden;
+}
+body::before {
+  content:''; position:fixed; top:-160px; left:-160px; width:560px; height:560px;
+  background:radial-gradient(circle,rgba(255,255,255,0.18),transparent 70%);
+  pointer-events:none; z-index:0; border-radius:50%;
+}
+body::after {
+  content:''; position:fixed; bottom:-100px; right:4%; width:460px; height:460px;
+  background:radial-gradient(circle,rgba(255,255,255,0.18),transparent 70%);
+  pointer-events:none; z-index:0; border-radius:50%;
+}
+
+.header { text-align:center; margin-bottom:50px; position:relative; z-index:2; }
+h1 { font-size:3.4em; font-weight:900; color:white; margin-bottom:10px; letter-spacing:3px; text-shadow:0 4px 16px rgba(0,0,0,0.22); }
+.subtitle { font-size:1.15em; color:rgba(255,255,255,0.9); font-weight:600; }
+
+/* ===== 4 BOUTONS PRINCIPAUX ===== */
+.main-buttons {
+  display:grid; grid-template-columns:repeat(2,1fr);
+  gap:22px; width:100%; max-width:700px; position:relative; z-index:2;
+}
+.main-btn {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:16px; padding:36px 24px;
+  border:none; border-radius:var(--radius-xl); cursor:pointer;
+  font-family:'Nunito',sans-serif; font-size:1.2em; font-weight:900;
+  color:white; letter-spacing:0.5px;
+  box-shadow:0 10px 35px var(--shadow);
+  transition:transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  position:relative; overflow:hidden;
+}
+.main-btn::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:48%;
+  background:rgba(255,255,255,0.22); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%; pointer-events:none;
+}
+.main-btn:hover { transform:translateY(-6px) scale(1.03); box-shadow:0 20px 50px var(--shadow); filter:brightness(1.07); }
+.main-btn:active { transform:translateY(-2px) scale(1.01); }
+.main-btn .btn-icon { font-size:2.6em; position:relative; z-index:2; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.2)); }
+.main-btn .btn-label { position:relative; z-index:2; text-shadow:0 2px 6px rgba(0,0,0,0.18); }
+
+#btnAdmin   { background:linear-gradient(145deg,#4f7df9,#2a50c8,#1a3ba0); }
+#btnCaisse  { background:linear-gradient(145deg,#43e97b,#22c55e,#16a34a); }
+#btnGestion { background:linear-gradient(145deg,#f97316,#ea580c,#c2410c); }
+#btnOutils  { background:linear-gradient(145deg,#a855f7,#7c3aed,#5b21b6); }
+
+/* ===== THEME PANEL ===== */
+.theme-panel { position:fixed; top:20px; right:20px; z-index:1000; }
+.theme-toggle {
+  width:50px; height:50px; border-radius:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+  border:1px solid var(--border); cursor:pointer;
+  box-shadow:0 4px 15px var(--shadow); font-size:22px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.22s ease; color:var(--text2); position:relative; overflow:hidden;
+}
+.theme-toggle::before { content:''; position:absolute; top:0; left:0; right:0; height:50%; background:rgba(255,255,255,.4); border-radius:50% 50% 0 0; pointer-events:none; }
+.theme-toggle:hover { transform:scale(1.12) rotate(180deg); }
+.theme-menu {
+  position:absolute; top:60px; right:0;
+  background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:var(--radius-xl); padding:20px; width:320px;
+  box-shadow:0 20px 60px rgba(20,60,180,.25); display:none;
+  backdrop-filter:blur(12px); overflow:hidden;
+}
+.theme-menu.active{display:block;}
+.theme-menu::before { content:''; position:absolute; top:0; left:0; right:0; height:25%; background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%; pointer-events:none; }
+.theme-menu>*{position:relative;z-index:2;}
+.theme-menu h3{margin-bottom:15px;color:var(--blue3);font-size:1.2em;font-weight:900;border-bottom:2px solid var(--border2);padding-bottom:10px;}
+.theme-section{margin-bottom:18px;}
+.theme-section label{display:block;margin-bottom:8px;font-weight:800;color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.06em;}
+.color-inputs{display:flex;gap:10px;align-items:center;}
+.color-inputs input[type="color"]{width:48px;height:48px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;padding:2px;background:white;}
+.gradient-selector{flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;background:rgba(255,255,255,.85);color:var(--text2);font-family:'Nunito',sans-serif;}
+.preset-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.preset-btn{padding:8px;border:none;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:800;color:white;transition:all 0.18s;position:relative;overflow:hidden;}
+.preset-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.28);border-radius:var(--radius) var(--radius) 0 0;pointer-events:none;}
+.preset-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px var(--shadow);}
+
+/* ===== MODAL ===== */
+.modal-backdrop {
+  position:fixed; inset:0; background:rgba(10,30,80,.5);
+  backdrop-filter:blur(10px);
+  display:none; align-items:center; justify-content:center;
+  z-index:9000; padding:20px;
+}
+.modal-backdrop.open{display:flex;}
+.modal {
+  background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+  border:1px solid rgba(255,255,255,.95);
+  padding:28px; border-radius:var(--radius-xl);
+  width:100%; max-width:500px; max-height:90vh; overflow-y:auto;
+  box-shadow:0 25px 70px rgba(20,60,180,.28);
+  position:relative;
+  animation:modalIn 0.25s cubic-bezier(0.175,.885,.32,1.275);
+}
+.modal.wide{max-width:640px;}
+@keyframes modalIn{from{transform:scale(0.88) translateY(20px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:22%;background:rgba(255,255,255,.45);border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;pointer-events:none;}
+.modal>*{position:relative;z-index:2;}
+.modal::-webkit-scrollbar{width:5px;}
+.modal::-webkit-scrollbar-thumb{background:var(--blue-light);border-radius:3px;}
+
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid var(--border2);}
+.modal-header h3{font-size:1.55em;font-weight:900;color:var(--blue3);display:flex;align-items:center;gap:10px;}
+.modal-close{width:36px;height:36px;border-radius:50%;background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.25);color:var(--red);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.18s;font-weight:900;}
+.modal-close:hover{background:var(--red);color:white;}
+
+/* BisoBOT barre modale */
+.modal-robot-bar{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;padding:12px 14px;background:linear-gradient(135deg,rgba(215,238,255,.65),rgba(245,243,255,.55));border-radius:var(--radius-lg);border:1px solid var(--border2);}
+.modal-robot-icon{flex-shrink:0;}
+.modal-robot-text{font-size:13px;font-weight:600;color:var(--text2);line-height:1.5;flex:1;}
+.modal-robot-text b{color:var(--blue3);}
+
+/* Action buttons in modals — tile grid style */
+.modal-btn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.action-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:18px 10px;
+  border:none;border-radius:var(--radius-lg);cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:12.5px;font-weight:800;
+  color:white;letter-spacing:0.2px;text-align:center;line-height:1.2;
+  box-shadow:0 4px 12px var(--shadow);
+  border:1px solid rgba(255,255,255,.95);
+  position:relative;overflow:hidden;
+  transition:transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  min-height:88px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+}
+.action-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.28);border-radius:var(--radius-lg) var(--radius-lg) 0 0;pointer-events:none;}
+.action-btn i{font-size:22px;position:relative;z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.18));}
+.action-btn span{position:relative;z-index:2;text-shadow:0 1px 4px rgba(0,0,0,0.18);}
+.action-btn:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 10px 22px var(--shadow);filter:brightness(1.08);}
+.action-btn:active{transform:translateY(-1px) scale(1.02);}
+
+.btn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.btn-grid .action-btn{margin-bottom:0;}
+
+.input-display{font-size:26px;letter-spacing:10px;padding:16px;border:1px solid var(--border);border-radius:var(--radius);text-align:center;background:rgba(255,255,255,.85);font-weight:700;margin-bottom:16px;min-height:65px;display:flex;align-items:center;justify-content:center;font-family:'Courier New',monospace;color:var(--text);}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;}
+.key{padding:17px;border-radius:var(--radius);background:rgba(255,255,255,.7);border:1px solid var(--border);cursor:pointer;font-size:22px;font-weight:800;user-select:none;text-align:center;box-shadow:0 3px 8px var(--shadow2);transition:all 0.15s;display:flex;justify-content:center;align-items:center;color:var(--text2);}
+.key:hover{background:var(--blue-pale);transform:translateY(-2px);color:var(--blue3);}
+.key:active{transform:translateY(0);}
+.controls{display:grid;grid-template-columns:1fr 1fr 2fr;gap:10px;margin-bottom:12px;}
+.controls button{padding:13px;border-radius:var(--radius);border:1px solid var(--border);background:rgba(255,255,255,.7);cursor:pointer;font-size:16px;font-weight:800;transition:all 0.15s;box-shadow:0 3px 8px var(--shadow2);display:flex;align-items:center;justify-content:center;gap:5px;color:var(--text2);position:relative;overflow:hidden;font-family:'Nunito',sans-serif;}
+.controls button::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.4);border-radius:var(--radius) var(--radius) 0 0;pointer-events:none;}
+.controls button:hover{background:var(--blue-pale);transform:translateY(-2px);color:var(--blue3);}
+.controls button:last-child{background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);color:white;border:1px solid #2d6a1a;}
+.controls button:last-child:hover{background:linear-gradient(180deg,#a4e474,#5aad2e,#3d8a18);}
+.error{color:var(--red);font-weight:800;text-align:center;min-height:24px;font-size:14px;padding:12px;border-radius:var(--radius);background:var(--red-pale);margin-top:8px;border:1px solid var(--red);}
+.error:empty{display:none;}
+.success{color:var(--green2)!important;font-size:20px!important;letter-spacing:2px!important;font-weight:900!important;}
+
+.login-user-grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:6px;}
+.login-user-card{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:12px 14px;border-radius:14px;border:2px solid var(--border2);background:rgba(255,255,255,.8);transition:all .2s;min-width:76px;}
+.login-user-card:hover{border-color:var(--blue-light);background:rgba(210,238,255,.9);transform:translateY(-3px);box-shadow:0 6px 18px var(--shadow);}
+.login-user-card .card-avatar{width:52px;height:52px;border-radius:50%;background:rgba(220,238,255,.7);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:28px;}
+.login-user-card .card-avatar img{width:52px;height:52px;border-radius:50%;object-fit:cover;}
+.login-user-card .card-name{font-weight:800;font-size:12px;color:var(--text);text-align:center;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.login-user-card .card-badge{font-size:10px;background:linear-gradient(135deg,#ffd84d,#e8a800);color:#5a3800;padding:2px 8px;border-radius:50px;font-weight:900;}
+/* PIN step */
+.login-pin-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;padding:10px 14px;background:rgba(255,255,255,.7);border-radius:var(--radius-lg);border:1px solid var(--border);}
+.login-pin-avatar{width:50px;height:50px;border-radius:50%;background:rgba(220,238,255,.8);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;overflow:hidden;}
+.login-pin-avatar img{width:50px;height:50px;border-radius:50%;object-fit:cover;}
+.login-pin-name{font-weight:900;font-size:1.05rem;color:var(--blue3);}
+.login-pin-sub{font-size:11px;color:var(--text3);font-weight:600;}
+.login-change-btn{margin-left:auto;background:rgba(255,255,255,.7);border:1px solid var(--border);border-radius:50px;padding:6px 13px;font-size:11px;font-weight:800;cursor:pointer;color:var(--text2);font-family:'Nunito',sans-serif;transition:all .15s;}
+.login-change-btn:hover{background:var(--blue-pale);color:var(--blue3);}
+
+
+
+/* Robot mascotte */
+#robot-mascot{position:fixed;bottom:28px;right:28px;z-index:8000;display:flex;flex-direction:column;align-items:flex-end;gap:10px;cursor:pointer;user-select:none;}
+#robot-bubble{background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(215,238,255,.95));border:1px solid rgba(255,255,255,.95);border-radius:20px 20px 4px 20px;padding:14px 18px;max-width:270px;font-size:13.5px;line-height:1.5;color:var(--text);box-shadow:0 8px 30px var(--shadow);position:relative;animation:bubblePop 0.28s cubic-bezier(0.175,.885,.32,1.275);transform-origin:bottom right;font-weight:600;}
+#robot-bubble::before{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:rgba(255,255,255,.38);border-radius:20px 20px 60% 60%;pointer-events:none;}
+#robot-bubble b{color:var(--blue3);}
+@keyframes bubblePop{from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+#robot-bubble.hidden{display:none;}
+#robot-body{width:68px;height:68px;position:relative;transition:transform 0.2s;filter:drop-shadow(0 5px 14px rgba(0,0,0,0.24));}
+#robot-mascot:hover #robot-body{transform:scale(1.1) rotate(-5deg);}
+@keyframes robotFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+#robot-mascot.idle #robot-body{animation:robotFloat 2.5s ease-in-out infinite;}
+@keyframes robotExcited{0%,100%{transform:rotate(0) scale(1);}25%{transform:rotate(-8deg) scale(1.05);}75%{transform:rotate(8deg) scale(1.05);}}
+#robot-mascot.excited #robot-body{animation:robotExcited 0.4s ease-in-out infinite;}
+#robot-replay{position:fixed;bottom:28px;right:28px;z-index:8000;width:54px;height:54px;border-radius:50%;background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);border:1px solid #1050a0;cursor:pointer;box-shadow:0 4px 15px var(--shadow);font-size:24px;display:none;align-items:center;justify-content:center;transition:all 0.28s;animation:pulseRobot 2s ease-in-out infinite;color:white;overflow:hidden;}
+#robot-replay::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.28);border-radius:50% 50% 0 0;pointer-events:none;}
+#robot-replay:hover{transform:scale(1.15);}
+@keyframes pulseRobot{0%,100%{box-shadow:0 4px 15px var(--shadow);}50%{box-shadow:0 4px 25px rgba(42,127,212,0.5);}}
+
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:rgba(200,220,240,.3);}
+::-webkit-scrollbar-thumb{background:var(--blue-light);border-radius:3px;}
+
+/* ===== BOUTON INSTALLATION ===== */
+.btn-install {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1em;
+  font-weight: 900;
+  color: white;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.08) 100%);
+  border: 2px solid rgba(255,255,255,0.55);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.4);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.22s cubic-bezier(0.175,.885,.32,1.275);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.btn-install::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50%;
+  background: rgba(255,255,255,0.22);
+  border-radius: 50px 50px 60% 60%;
+  pointer-events: none;
+}
+.btn-install::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  border-radius: 50px;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.btn-install:hover {
+  transform: translateY(-4px) scale(1.05);
+  border-color: rgba(255,255,255,0.85);
+  box-shadow: 0 10px 35px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.5);
+  background: linear-gradient(135deg, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.15) 100%);
+}
+.btn-install:hover::after { opacity: 1; }
+.btn-install:active { transform: translateY(-1px) scale(1.02); }
+.btn-install .icone {
+  font-size: 1.3em;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  animation: spinSlow 6s linear infinite;
+}
+.btn-install span, .btn-install small {
+  position: relative;
+  z-index: 2;
+}
+.btn-install small {
+  font-size: 0.75em !important;
+  font-weight: 600;
+  opacity: 0.85;
+  letter-spacing: 0.5px;
+  background: rgba(255,255,255,0.2);
+  padding: 2px 8px;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.3);
+  margin-left: 4px !important;
+}
+@keyframes spinSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Petite pastille pulsante */
+.btn-install .ping-dot {
+  width: 8px;
+  height: 8px;
+  background: #e8f85a;
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 0 rgba(232,248,90,0.7);
+  animation: pingDot 1.8s ease-in-out infinite;
+}
+@keyframes pingDot {
+  0%   { box-shadow: 0 0 0 0 rgba(232,248,90,0.7); }
+  70%  { box-shadow: 0 0 0 7px rgba(232,248,90,0); }
+  100% { box-shadow: 0 0 0 0 rgba(232,248,90,0); }
+}
+
+@media(max-width:540px){
+  h1{font-size:2.4em;}
+  .main-buttons{gap:14px;}
+  .main-btn{padding:26px 16px;font-size:1em;}
+  .main-btn .btn-icon{font-size:2em;}
+  .btn-grid{grid-template-columns:repeat(2,1fr);}
+  .modal-btn-grid{grid-template-columns:repeat(2,1fr);}
+  .modal{padding:22px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Thème -->
+<div class="theme-panel">
+  <button class="theme-toggle" id="themeToggle" title="Personnaliser">🎨</button>
+  <div class="theme-menu" id="themeMenu">
+    <h3>🎨 Personnalisation</h3>
+    <div class="theme-section">
+      <label>Fond (dégradé)</label>
+      <div class="color-inputs">
+        <input type="color" id="gradientColor1" value="#667eea">
+        <input type="color" id="gradientColor2" value="#764ba2">
+        <select class="gradient-selector" id="gradientDirection">
+          <option value="to right">→ Horizontal</option>
+          <option value="to bottom">↓ Vertical</option>
+          <option value="135deg" selected>↘ Diagonal</option>
+          <option value="45deg">↗ Diagonal inv.</option>
+        </select>
+      </div>
+    </div>
+    <div class="theme-section">
+      <label>Boutons des modales</label>
+      <div class="color-inputs">
+        <input type="color" id="buttonColor1" value="#667eea">
+        <input type="color" id="buttonColor2" value="#764ba2">
+      </div>
+    </div>
+    <div class="theme-section">
+      <label>Préréglages</label>
+      <div class="preset-buttons">
+        <button class="preset-btn" style="background:linear-gradient(135deg,#667eea,#764ba2)" onclick="setPreset('default')">Défaut</button>
+        <button class="preset-btn" style="background:linear-gradient(135deg,#ff6b6b,#feca57)" onclick="setPreset('sunset')">Coucher</button>
+        <button class="preset-btn" style="background:linear-gradient(135deg,#48c6ef,#6f86d6)" onclick="setPreset('ocean')">Océan</button>
+        <button class="preset-btn" style="background:linear-gradient(135deg,#f093fb,#f5576c)" onclick="setPreset('rose')">Rose</button>
+        <button class="preset-btn" style="background:linear-gradient(135deg,#4facfe,#00f2fe)" onclick="setPreset('sky')">Ciel</button>
+        <button class="preset-btn" style="background:linear-gradient(135deg,#43e97b,#38f9d7)" onclick="setPreset('green')">Forêt</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <h1>🔐 BISOOFFICE</h1>
+  <p class="subtitle">Bienvenue ! Que souhaitez-vous faire ?</p>
+  
+  <!-- Bouton installation -->
+  <button onclick="window.location.href='installation.html'" class="btn-install" style="margin-top: 18px;">
+    <span class="ping-dot"></span>
+    <span class="icone">⚙️</span>
+    <span>Installation</span>
+    <small>Configurer</small>
+  </button>
+</div>
+
+<!-- 4 boutons -->
+<div class="main-buttons">
+  <button class="main-btn" id="btnAdmin" onclick="openModal('modalAdmin')">
+    <span class="btn-icon">🛡️</span>
+    <span class="btn-label">Administration</span>
+  </button>
+  <button class="main-btn" id="btnCaisse" onclick="openModal('modalCaisse')">
+    <span class="btn-icon">💰</span>
+    <span class="btn-label">Caisse</span>
+  </button>
+  <button class="main-btn" id="btnGestion" onclick="openModal('modalGestion')">
+    <span class="btn-icon">📋</span>
+    <span class="btn-label">Gestion</span>
+  </button>
+  <button class="main-btn" id="btnOutils" onclick="openModal('modalOutils')">
+    <span class="btn-icon">🔧</span>
+    <span class="btn-label">Outils</span>
+  </button>
+</div>
+    <p style="color: #004466; margin-top: 30px; background: rgba(255,255,255,0.5); padding: 12px; border-radius: 50px;">
+        ⭐ Copyright (c) 2026 Julien Schmitz (thorankamon) voir LICENSE
+    </p>
+<!-- Robot -->
+<div id="robot-mascot" class="idle">
+  <div id="robot-bubble" class="hidden">👋 Bienvenue sur <b>BisoOffice</b> !<br>Je suis <b>BisoBOT</b>, ton guide. Clique sur un module pour commencer 😊</div>
+  <div id="robot-body">
+    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <line x1="40" y1="8" x2="40" y2="18" stroke="#1a6bbf" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="40" cy="6" r="4" fill="#e8a800" id="robot-antenna-dot"/>
+      <rect x="18" y="18" width="44" height="32" rx="10" fill="url(#rH)" stroke="#1a6bbf" stroke-width="1.5"/>
+      <ellipse cx="31" cy="31" rx="6" ry="6" fill="white"/>
+      <ellipse cx="49" cy="31" rx="6" ry="6" fill="white"/>
+      <circle cx="32" cy="31" r="3" fill="#1a2b4a" id="robot-pupil-l"/>
+      <circle cx="50" cy="31" r="3" fill="#1a2b4a" id="robot-pupil-r"/>
+      <circle cx="33" cy="30" r="1" fill="white"/>
+      <circle cx="51" cy="30" r="1" fill="white"/>
+      <path d="M 28 42 Q 40 50 52 42" stroke="#1a6bbf" stroke-width="2.5" fill="none" stroke-linecap="round" id="robot-mouth"/>
+      <rect x="22" y="52" width="36" height="22" rx="8" fill="url(#rB)" stroke="#1a6bbf" stroke-width="1.5"/>
+      <circle cx="40" cy="61" r="4" fill="#e8a800" opacity="0.8"/>
+      <circle cx="40" cy="61" r="2" fill="white" opacity="0.6"/>
+      <rect x="10" y="53" width="10" height="18" rx="5" fill="url(#rA)" stroke="#1a6bbf" stroke-width="1.5"/>
+      <rect x="60" y="53" width="10" height="18" rx="5" fill="url(#rA)" stroke="#1a6bbf" stroke-width="1.5"/>
+      <defs>
+        <linearGradient id="rH" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8b9fff"/><stop offset="100%" stop-color="#1a6bbf"/></linearGradient>
+        <linearGradient id="rB" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#2a7fd4"/></linearGradient>
+        <linearGradient id="rA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b9fff"/><stop offset="100%" stop-color="#1a6bbf"/></linearGradient>
+      </defs>
+    </svg>
+  </div>
+</div>
+<button id="robot-replay" title="Revoir BisoBOT">🤖</button>
+
+<!-- ===== MODAL ADMINISTRATION ===== -->
+<div id="modalAdmin" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-cogs"></i> Administration</h3>
+      <button class="modal-close" onclick="closeModal('modalAdmin')">✕</button>
+    </div>
+    <div class="modal-robot-bar">
+      <div class="modal-robot-icon">RSVG</div>
+      <div class="modal-robot-text" id="robotAdmin">🛡️ Bienvenue dans <b>Administration</b> ! Survole un bouton pour en savoir plus.</div>
+    </div>
+    <div class="modal-btn-grid">
+    <button class="action-btn" onclick="location.href='admin.html'" data-tip="🛡️ <b>Administration</b> : accède aux paramètres système et à la gestion des droits d'accès.">
+      <i class="fas fa-user-shield"></i><span>Administration</span>
+    </button>
+    <button class="action-btn" onclick="location.href='membres.html'" data-tip="👥 <b>Gestion des membres</b> : ajoute, modifie et supprime les comptes utilisateurs.">
+      <i class="fas fa-users"></i><span>Gestion des membres</span>
+    </button>
+    <button class="action-btn" onclick="location.href='parametres.html'" data-tip="⚙️ <b>Paramètres</b> : configure l'application selon tes préférences.">
+      <i class="fas fa-sliders-h"></i><span>Paramètres</span>
+    </button>
+    <button class="action-btn" onclick="location.href='controle.html'" data-tip="⚙️ <b>Contrôle</b> : Vérifie tout ce qui est pointé ici">
+      <i class="fas fa-sliders-h"></i><span>Contrôle</span>
+    </button>
+    <button class="action-btn" onclick="location.href='scanner-membres.html'" data-tip="📷 <b>Scanner membre</b> : scanne la carte ou le QR code d'un membre pour l'identifier rapidement.">
+      <i class="fas fa-qrcode"></i><span>Scanner membre</span>
+    </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL CAISSE (login) ===== -->
+<div id="modalCaisse" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-cash-register"></i> Entrée en Caisse</h3>
+      <button class="modal-close" onclick="closeModal('modalCaisse')">✕</button>
+    </div>
+    <div class="modal-robot-bar">
+      <div class="modal-robot-icon">RSVG</div>
+      <div class="modal-robot-text" id="robotCaisse">💰 <b>Entrée en caisse</b> : sélectionne ton compte et entre ton code PIN pour commencer à encaisser !</div>
+    </div>
+    <!-- Étape 1 : choix utilisateur -->
+    <div id="caisseStep1">
+      <p style="text-align:center;font-weight:700;color:var(--text2);margin-bottom:14px;">Qui êtes-vous ?</p>
+      <div id="caisseUserGrid" class="login-user-grid"></div>
+      <div class="error" id="modalErrorCaisse1"></div>
+    </div>
+    <!-- Étape 2 : PIN -->
+    <div id="caisseStep2" style="display:none;">
+      <div class="login-pin-header">
+        <div class="login-pin-avatar" id="caissePinAvatar"></div>
+        <div>
+          <div class="login-pin-name" id="caissePinName"></div>
+          <div class="login-pin-sub">Entrez votre code secret</div>
+        </div>
+        <button class="login-change-btn" onclick="caisseBackToUsers()">← Changer</button>
+      </div>
+      <div class="input-display" id="pwdDisplayCaisse">•••••</div>
+      <div class="keypad" id="keypadCaisse"></div>
+      <div class="controls">
+        <button id="btnClearCaisse"><i class="fas fa-times"></i> C</button>
+        <button id="btnBackCaisse"><i class="fas fa-backspace"></i></button>
+        <button id="btnOkCaisse"><i class="fas fa-check"></i> OK</button>
+      </div>
+      <div class="error" id="modalErrorCaisse"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL GESTION ===== -->
+<div id="modalGestion" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-tasks"></i> Gestion</h3>
+      <button class="modal-close" onclick="closeModal('modalGestion')">✕</button>
+    </div>
+    <div class="modal-robot-bar">
+      <div class="modal-robot-icon">RSVG</div>
+      <div class="modal-robot-text" id="robotGestion">📋 Bienvenue dans <b>Gestion</b> ! Survole un bouton pour en savoir plus.</div>
+    </div>
+    <div class="modal-btn-grid">
+    <button class="action-btn" onclick="location.href='articles.html'" data-tip="📦 <b>Articles &amp; Catégories</b> : gère tes produits, prix, descriptions et catégories.">
+      <i class="fas fa-boxes"></i><span>Articles &amp; Catégories</span>
+    </button>
+    <button class="action-btn" onclick="location.href='stock.html'" data-tip="🏭 <b>Gestion des stocks</b> : suis tes inventaires et niveaux de stock en temps réel.">
+      <i class="fas fa-warehouse"></i><span>Gestion des stocks</span>
+    </button>
+    <button class="action-btn" onclick="location.href='factureselection.html'" data-tip="🧾 <b>Facture</b> : crée et gère les factures clients facilement.">
+      <i class="fas fa-file-invoice"></i><span>Facture</span>
+    </button>
+    <button class="action-btn" onclick="location.href='historique.html'" data-tip="📋 <b>Historique tickets</b> : consulte l'historique complet de tous les tickets de caisse.">
+      <i class="fas fa-history"></i><span>Historique tickets</span>
+    </button>
+    <button class="action-btn" id="clotureBtn" data-tip="📊 <b>Clôture Z/X</b> : génère tes rapports de fin de journée et clôture la caisse.">
+      <i class="fas fa-file-alt"></i><span>Clôture Z/X</span>
+    </button>
+    <button class="action-btn" onclick="location.href='mailing.html'" data-tip="📋 <b>Promotion</b> : Envoi ta publicités">
+      <i class="fas fa-history"></i><span>Promotion</span>
+    </button>
+    <button class="action-btn" onclick="location.href='espacemembres.html'" data-tip="👤 <b>Espace membre</b> : accède à l'espace personnel des membres.">
+      <i class="fas fa-user-circle"></i><span>Espace membre</span>
+    </button>
+    <button class="action-btn" onclick="location.href='livre-recettes.html'" data-tip="📖 <b>Livre recette</b> : consulte et gère le livre de recettes.">
+      <i class="fas fa-book-open"></i><span>Livre recette</span>
+    </button>
+    <button class="action-btn" onclick="location.href='qr-generatorV3-offline.html'" data-tip="🔳 <b>Génération QR code</b> : crée des QR codes personnalisés.">
+      <i class="fas fa-qrcode"></i><span>Génération QR code</span>
+    </button>
+    <button class="action-btn" onclick="location.href='rapport-pointages.html'" data-tip="🕒 <b>Rapport de pointage</b> : consulte les rapports de pointage des membres.">
+      <i class="fas fa-clock"></i><span>Rapport de pointage</span>
+    </button>
+    <button class="action-btn" onclick="location.href='statistiques.html'" data-tip="📈 <b>Statistiques</b> : visualise les statistiques d'activité.">
+      <i class="fas fa-chart-line"></i><span>Statistiques</span>
+    </button>
+    <button class="action-btn" onclick="location.href='liste-courses.html'" data-tip="🛒 <b>Liste des courses</b> : gère la liste des courses à faire.">
+      <i class="fas fa-shopping-cart"></i><span>Liste des courses</span>
+    </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL CLÔTURE LOGIN ===== -->
+<div id="modalCloture" class="modal-backdrop" style="z-index:10000;">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📊 Connexion Clôture Z/X</h3>
+      <button class="modal-close" onclick="closeModal('modalCloture')">✕</button>
+    </div>
+    <div class="modal-robot-bar">
+      <div class="modal-robot-icon">RSVG</div>
+      <div class="modal-robot-text">📊 <b>Clôture Z/X</b> : connecte-toi pour accéder aux rapports de fin de journée.</div>
+    </div>
+    <!-- Étape 1 : choix utilisateur -->
+    <div id="clotureStep1">
+      <p style="text-align:center;font-weight:700;color:var(--text2);margin-bottom:14px;">Qui êtes-vous ?</p>
+      <div id="clotureUserGrid" class="login-user-grid"></div>
+      <div class="error" id="modalErrorCloture1"></div>
+    </div>
+    <!-- Étape 2 : PIN -->
+    <div id="clotureStep2" style="display:none;">
+      <div class="login-pin-header">
+        <div class="login-pin-avatar" id="cloturePinAvatar"></div>
+        <div>
+          <div class="login-pin-name" id="cloturePinName"></div>
+          <div class="login-pin-sub">Entrez votre code secret</div>
+        </div>
+        <button class="login-change-btn" onclick="clotureBackToUsers()">← Changer</button>
+      </div>
+      <div class="input-display" id="pwdDisplayCloture">•••••</div>
+      <div class="keypad" id="keypadCloture"></div>
+      <div class="controls">
+        <button id="btnClearCloture"><i class="fas fa-times"></i> C</button>
+        <button id="btnBackCloture"><i class="fas fa-backspace"></i></button>
+        <button id="btnOkCloture"><i class="fas fa-check"></i> OK</button>
+      </div>
+      <div class="error" id="modalErrorCloture"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL OUTILS ===== -->
+<div id="modalOutils" class="modal-backdrop">
+  <div class="modal wide">
+    <div class="modal-header">
+      <h3><i class="fas fa-toolbox"></i> Outils</h3>
+      <button class="modal-close" onclick="closeModal('modalOutils')">✕</button>
+    </div>
+    <div class="modal-robot-bar">
+      <div class="modal-robot-icon">RSVG</div>
+      <div class="modal-robot-text" id="robotOutils">🔧 Bienvenue dans <b>Outils</b> ! Survole un bouton pour en savoir plus.</div>
+    </div>
+    <div class="btn-grid">
+      <button class="action-btn" onclick="location.href='Afsca.html'" data-tip="🧹 <b>Plan de nettoyage</b> AFSCA : suis tes protocoles d'hygiène et de nettoyage.">
+        <i class="fas fa-broom"></i><span>Plan de nettoyage</span>
+      </button>
+      <button class="action-btn" onclick="location.href='PV5.html'" data-tip="📄 <b>P.V.</b> : gère tes procès-verbaux officiels et documents légaux.">
+        <i class="fas fa-file-contract"></i><span>P.V.</span>
+      </button>
+      <button class="action-btn" onclick="location.href='personnelles2.html'" data-tip="👔 <b>Gestion du personnel</b> : horaires, congés et fiches employés.">
+        <i class="fas fa-user-tie"></i><span>Gestion du personnel</span>
+      </button>
+      <button class="action-btn" onclick="location.href='Dons.html'" data-tip="🎁 <b>Dons matériels</b> : gère les entrées et sorties de donations.">
+        <i class="fas fa-gift"></i><span>Gestion des dons</span>
+      </button>
+      <button class="action-btn" onclick="location.href='envoi_cartes.html'" data-tip="📤 <b>Envoi des cartes membres</b> : gère et envoie les cartes de membres.">
+        <i class="fas fa-id-card"></i><span>Envoi cartes membres</span>
+      </button>
+      <button class="action-btn" onclick="location.href='ComptaLumia_Peppolv14.html'" data-tip="🧩 <b>Comptabilité</b> : gère tes comptes, écritures et bilans.">
+        <i class="fas fa-calculator"></i><span>Comptabilité</span>
+      </button>
+      <button class="action-btn" onclick="location.href='LumiaBridge_SyncV5.html'" data-tip="🔁 <b>Convertisseur comptable</b> : convertis tes données entre différents formats.">
+        <i class="fas fa-sync-alt"></i><span>Convertisseur comptable</span>
+      </button>
+      <button class="action-btn" onclick="location.href='donnev3.html?mode=local'" data-tip="💾 <b>Sauvegarde LOCAL</b> : sauvegarde et restaure tes données en local.">
+        <i class="fas fa-save"></i><span>Sauvegarde LOCAL</span>
+      </button>
+      <button class="action-btn" onclick="location.href='http://localhost:8000/donnev3.html?mode=serveur'" data-tip="🌐 <b>Sauvegarde SERVEUR</b> : synchronise via le serveur local.">
+        <i class="fas fa-server"></i><span>Sauvegarde SERVEUR</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Mini robot SVG réutilisable
+const ROBOT_SVG = `<svg viewBox="0 0 80 80" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+  <line x1="40" y1="8" x2="40" y2="18" stroke="#1a6bbf" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="40" cy="6" r="4" fill="#e8a800"/>
+  <rect x="18" y="18" width="44" height="32" rx="10" fill="#8b9fff" stroke="#1a6bbf" stroke-width="1.5"/>
+  <ellipse cx="31" cy="31" rx="6" ry="6" fill="white"/>
+  <ellipse cx="49" cy="31" rx="6" ry="6" fill="white"/>
+  <circle cx="32" cy="31" r="3" fill="#1a2b4a"/>
+  <circle cx="50" cy="31" r="3" fill="#1a2b4a"/>
+  <circle cx="33" cy="30" r="1" fill="white"/>
+  <circle cx="51" cy="30" r="1" fill="white"/>
+  <path d="M 28 42 Q 40 52 52 42" stroke="#1a6bbf" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <rect x="22" y="52" width="36" height="22" rx="8" fill="#7c3aed" stroke="#1a6bbf" stroke-width="1.5"/>
+</svg>`;
+document.querySelectorAll('.modal-robot-icon').forEach(el => el.innerHTML = ROBOT_SVG);
+
+// ===== MODALES =====
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'modalCaisse') initLoginCaisse();
+  if (id === 'modalCloture') initLoginCloture();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('open'); });
+});
+
+// ===== THÈME =====
+const themeToggle = document.getElementById('themeToggle');
+const themeMenu   = document.getElementById('themeMenu');
+themeToggle.addEventListener('click', () => themeMenu.classList.toggle('active'));
+document.addEventListener('click', e => {
+  if (!themeToggle.contains(e.target) && !themeMenu.contains(e.target)) themeMenu.classList.remove('active');
+});
+function applyTheme() {
+  const c1  = document.getElementById('gradientColor1').value;
+  const c2  = document.getElementById('gradientColor2').value;
+  const dir = document.getElementById('gradientDirection').value;
+  const b1  = document.getElementById('buttonColor1').value;
+  const b2  = document.getElementById('buttonColor2').value;
+  document.body.style.background = `linear-gradient(${dir},${c1},${c2})`;
+  document.querySelectorAll('.action-btn').forEach(btn => {
+    btn.style.background = `linear-gradient(${dir},${b1},${b2})`;
+  });
+  localStorage.setItem('theme', JSON.stringify({c1,c2,dir,b1,b2}));
+}
+function loadSavedTheme() {
+  const s = localStorage.getItem('theme');
+  if (s) {
+    const t = JSON.parse(s);
+    document.getElementById('gradientColor1').value = t.c1;
+    document.getElementById('gradientColor2').value = t.c2;
+    document.getElementById('gradientDirection').value = t.dir;
+    document.getElementById('buttonColor1').value = t.b1 || '#667eea';
+    document.getElementById('buttonColor2').value = t.b2 || '#764ba2';
+  }
+  // Toujours appliquer le thème (défaut ou sauvegardé) pour colorer les boutons
+  applyTheme();
+}
+window.setPreset = function(p) {
+  const m = {default:['#667eea','#764ba2'],sunset:['#ff6b6b','#feca57'],ocean:['#48c6ef','#6f86d6'],rose:['#f093fb','#f5576c'],sky:['#4facfe','#00f2fe'],green:['#43e97b','#38f9d7']};
+  const [c1,c2] = m[p]||m.default;
+  ['gradientColor1','buttonColor1'].forEach(id=>document.getElementById(id).value=c1);
+  ['gradientColor2','buttonColor2'].forEach(id=>document.getElementById(id).value=c2);
+  applyTheme();
+};
+['gradientColor1','gradientColor2','buttonColor1','buttonColor2'].forEach(id=>document.getElementById(id).addEventListener('input',applyTheme));
+document.getElementById('gradientDirection').addEventListener('change',applyTheme);
+loadSavedTheme();
+
+// ===== AVATARS =====
+const ADMIN_USER = { username: 'Admin', password: localStorage.getItem('adminPassword') || '0000', avatar: '👑', isAdmin: true };
+function getAdminUser() {
+  return { username: 'Admin', password: localStorage.getItem('adminPassword') || '0000', avatar: '👑', isAdmin: true };
+}
+function getUserAvatar(username) {
+  if (username === 'Admin') return {type:'icon', value:'👑'};
+  const users = JSON.parse(localStorage.getItem('users'))||[];
+  const u = users.find(x=>x.username===username);
+  if (!u||!u.avatar) return {type:'icon',value:'👩‍💻'};
+  return u.avatar.startsWith('data:') ? {type:'image',value:u.avatar} : {type:'icon',value:u.avatar};
+}
+function updateAvatarDisplay(selectEl, avatarEl, username) {
+  if (!username) { avatarEl.innerHTML='<div class="user-icon-preview">👤</div>'; return; }
+  const av = getUserAvatar(username);
+  const b1=document.getElementById('buttonColor1').value, b2=document.getElementById('buttonColor2').value;
+  avatarEl.innerHTML = av.type==='image'
+    ? `<img src="${av.value}" class="user-avatar-preview" alt="Avatar">`
+    : `<div class="user-icon-preview" style="background:linear-gradient(135deg,${b1},${b2})">${av.value}</div>`;
+}
+
+// ===== KEYPAD =====
+function buildKeypad(container, getPwd, setPwd, updateDisplay) {
+  container.innerHTML='';
+  ['1','2','3','4','5','6','7','8','9','0'].forEach(k=>{
+    const el=document.createElement('div');
+    el.className='key'; el.tabIndex=0; el.textContent=k;
+    const press=()=>{setPwd(getPwd()+k);updateDisplay();};
+    el.addEventListener('click',press);
+    el.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();press();}});
+    container.appendChild(el);
+  });
+}
+
+// ===== HELPER : build avatar HTML for login cards =====
+function makeCardAvatar(avatar, size) {
+  size = size || 52;
+  if (!avatar) return '<span style="font-size:28px;">👩‍💻</span>';
+  if (avatar.startsWith('data:')) return `<img src="${avatar}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;">`;
+  return `<span style="font-size:${Math.round(size*0.54)}px;">${avatar}</span>`;
+}
+
+function buildUserGrid(gridEl, onSelect) {
+  gridEl.innerHTML = '';
+  const admin = getAdminUser();
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  const allUsers = [admin, ...users];
+  const b1 = document.getElementById('buttonColor1').value;
+  const b2 = document.getElementById('buttonColor2').value;
+  allUsers.forEach(u => {
+    const card = document.createElement('div');
+    card.className = 'login-user-card';
+    const av = u.avatar && u.avatar.startsWith('data:')
+      ? `<img src="${u.avatar}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;">`
+      : `<span style="font-size:28px;">${u.avatar || '👩‍💻'}</span>`;
+    card.innerHTML = `<div class="card-avatar" style="background:linear-gradient(135deg,${b1}22,${b2}22)">${av}</div>
+      <div class="card-name">${u.username}</div>
+      ${u.isAdmin ? '<div class="card-badge">ADMIN</div>' : ''}`;
+    card.addEventListener('click', () => onSelect(u));
+    gridEl.appendChild(card);
+  });
+}
+
+// ===== LOGIN CAISSE =====
+let pwdCaisse = '';
+let selectedUserCaisse = null;
+
+function initLoginCaisse() {
+  pwdCaisse = ''; selectedUserCaisse = null;
+  document.getElementById('caisseStep1').style.display = 'block';
+  document.getElementById('caisseStep2').style.display = 'none';
+  document.getElementById('modalErrorCaisse1').textContent = '';
+  document.getElementById('modalErrorCaisse').textContent = '';
+  buildUserGrid(document.getElementById('caisseUserGrid'), u => caisseSelectUser(u));
+}
+
+function caisseSelectUser(u) {
+  selectedUserCaisse = u;
+  pwdCaisse = '';
+  document.getElementById('caissePinAvatar').innerHTML = makeCardAvatar(u.avatar, 50);
+  document.getElementById('caissePinName').textContent = u.username;
+  document.getElementById('pwdDisplayCaisse').textContent = '•••••';
+  document.getElementById('pwdDisplayCaisse').classList.remove('success');
+  document.getElementById('modalErrorCaisse').textContent = '';
+  document.getElementById('caisseStep1').style.display = 'none';
+  document.getElementById('caisseStep2').style.display = 'block';
+}
+
+function caisseBackToUsers() {
+  pwdCaisse = ''; selectedUserCaisse = null;
+  document.getElementById('modalErrorCaisse').textContent = '';
+  document.getElementById('caisseStep1').style.display = 'block';
+  document.getElementById('caisseStep2').style.display = 'none';
+}
+
+function updateDC() {
+  const d = document.getElementById('pwdDisplayCaisse');
+  d.textContent = pwdCaisse.length === 0 ? '•••••' : '•'.repeat(pwdCaisse.length);
+}
+buildKeypad(document.getElementById('keypadCaisse'), () => pwdCaisse, v => { pwdCaisse = v; }, updateDC);
+document.getElementById('btnClearCaisse').addEventListener('click', () => { pwdCaisse = ''; updateDC(); document.getElementById('modalErrorCaisse').textContent = ''; });
+document.getElementById('btnBackCaisse').addEventListener('click', () => { pwdCaisse = pwdCaisse.slice(0, -1); updateDC(); document.getElementById('modalErrorCaisse').textContent = ''; });
+document.getElementById('btnOkCaisse').addEventListener('click', () => {
+  if (!selectedUserCaisse) return;
+  const admin = getAdminUser();
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  const u = selectedUserCaisse;
+  const found = (u.username === 'Admin' && pwdCaisse === admin.password) ? admin
+    : users.find(x => x.username === u.username && x.password === pwdCaisse);
+  if (found) {
+    const history = JSON.parse(localStorage.getItem('loginHistory')) || [];
+    const now = new Date();
+    history.push({ date: now.toLocaleString(), iso: now.toISOString(), user: found.username });
+    localStorage.setItem('loginHistory', JSON.stringify(history));
+    localStorage.setItem('lastLoginISO', now.toISOString());
+    const disp = document.getElementById('pwdDisplayCaisse');
+    disp.textContent = '✓ Bonjour ' + found.username + ' !';
+    disp.classList.add('success');
+    setTimeout(() => { closeModal('modalCaisse'); disp.classList.remove('success'); window.location.href = 'tables.html'; }, 900);
+  } else {
+    document.getElementById('modalErrorCaisse').textContent = '❌ Code incorrect, réessayez.';
+    pwdCaisse = ''; updateDC();
+  }
+});
+
+// ===== LOGIN CLÔTURE =====
+let pwdCloture = '';
+let selectedUserCloture = null;
+
+function initLoginCloture() {
+  pwdCloture = ''; selectedUserCloture = null;
+  document.getElementById('clotureStep1').style.display = 'block';
+  document.getElementById('clotureStep2').style.display = 'none';
+  document.getElementById('modalErrorCloture1').textContent = '';
+  document.getElementById('modalErrorCloture').textContent = '';
+  buildUserGrid(document.getElementById('clotureUserGrid'), u => clotureSelectUser(u));
+}
+
+function clotureSelectUser(u) {
+  selectedUserCloture = u;
+  pwdCloture = '';
+  document.getElementById('cloturePinAvatar').innerHTML = makeCardAvatar(u.avatar, 50);
+  document.getElementById('cloturePinName').textContent = u.username;
+  document.getElementById('pwdDisplayCloture').textContent = '•••••';
+  document.getElementById('pwdDisplayCloture').classList.remove('success');
+  document.getElementById('modalErrorCloture').textContent = '';
+  document.getElementById('clotureStep1').style.display = 'none';
+  document.getElementById('clotureStep2').style.display = 'block';
+}
+
+function clotureBackToUsers() {
+  pwdCloture = ''; selectedUserCloture = null;
+  document.getElementById('modalErrorCloture').textContent = '';
+  document.getElementById('clotureStep1').style.display = 'block';
+  document.getElementById('clotureStep2').style.display = 'none';
+}
+
+function updateDCl() {
+  const d = document.getElementById('pwdDisplayCloture');
+  d.textContent = pwdCloture.length === 0 ? '•••••' : '•'.repeat(pwdCloture.length);
+}
+buildKeypad(document.getElementById('keypadCloture'), () => pwdCloture, v => { pwdCloture = v; }, updateDCl);
+document.getElementById('btnClearCloture').addEventListener('click', () => { pwdCloture = ''; updateDCl(); document.getElementById('modalErrorCloture').textContent = ''; });
+document.getElementById('btnBackCloture').addEventListener('click', () => { pwdCloture = pwdCloture.slice(0, -1); updateDCl(); document.getElementById('modalErrorCloture').textContent = ''; });
+document.getElementById('btnOkCloture').addEventListener('click', () => {
+  if (!selectedUserCloture) return;
+  const admin = getAdminUser();
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  const u = selectedUserCloture;
+  const found = (u.username === 'Admin' && pwdCloture === admin.password) ? admin
+    : users.find(x => x.username === u.username && x.password === pwdCloture);
+  if (found) {
+    const disp = document.getElementById('pwdDisplayCloture');
+    disp.textContent = '✓ Bonjour ' + found.username + ' !';
+    disp.classList.add('success');
+    setTimeout(() => { closeModal('modalCloture'); disp.classList.remove('success'); window.location.href = 'rapports.html'; }, 900);
+  } else {
+    document.getElementById('modalErrorCloture').textContent = '❌ Code incorrect, réessayez.';
+    pwdCloture = ''; updateDCl();
+  }
+});
+
+document.getElementById('clotureBtn').addEventListener('click',e=>{e.preventDefault();openModal('modalCloture');});
+
+// ===== BISOBOT HOVER DANS MODALES =====
+function setupModalTips(modalId, robotTextId, defaultTip) {
+  document.querySelectorAll(`#${modalId} .action-btn[data-tip]`).forEach(btn=>{
+    btn.addEventListener('mouseenter',()=>{ document.getElementById(robotTextId).innerHTML=btn.getAttribute('data-tip'); });
+    btn.addEventListener('mouseleave',()=>{ document.getElementById(robotTextId).innerHTML=defaultTip; });
+  });
+}
+setupModalTips('modalAdmin','robotAdmin','🛡️ Bienvenue dans <b>Administration</b> ! Survole un bouton pour en savoir plus.');
+setupModalTips('modalGestion','robotGestion','📋 Bienvenue dans <b>Gestion</b> ! Survole un bouton pour en savoir plus.');
+setupModalTips('modalOutils','robotOutils','🔧 Bienvenue dans <b>Outils</b> ! Survole un bouton pour en savoir plus.');
+
+// ===== ROBOT MASCOTTE PAGE =====
+const robotMascot=document.getElementById('robot-mascot');
+const robotBubble=document.getElementById('robot-bubble');
+const robotReplay=document.getElementById('robot-replay');
+const robotMouth=document.getElementById('robot-mouth');
+
+const mainTips={
+  btnAdmin: {icon:'🛡️',text:'<b>Administration</b> : gère les utilisateurs, droits et paramètres.'},
+  btnCaisse:{icon:'💰',text:'<b>Caisse</b> : connecte-toi pour commencer à encaisser !'},
+  btnGestion:{icon:'📋',text:'<b>Gestion</b> : articles, stocks, factures, historique et clôture.'},
+  btnOutils:{icon:'🔧',text:'<b>Outils</b> : personnel, comptabilité, sauvegardes et plus encore.'},
+};
+const tutSteps=[
+  {icon:'👋',text:'Salut ! Je suis <b>BisoBOT</b>, ton guide BisoOffice !<br>Clique sur un des 4 modules pour commencer 😊'},
+  {icon:'🎨',text:'Tu peux changer les couleurs via le bouton <b>🎨</b> en haut à droite !'},
+  {icon:'💡',text:'4 modules : <b>Administration</b>, <b>Caisse</b>, <b>Gestion</b> et <b>Outils</b>. Tout est organisé pour toi !'},
+  {icon:'🤖',text:'Clique sur moi pour me réduire, et sur <b>🤖</b> pour me revoir. Bonne journée !'},
+];
+let tutStep=0,tutTimer=null;
+
+function showBubble(html){
+  robotBubble.innerHTML=html;robotBubble.classList.remove('hidden');
+  robotBubble.style.animation='none';robotBubble.offsetHeight;robotBubble.style.animation='';
+  robotMascot.classList.remove('idle');robotMascot.classList.add('excited');
+  robotMouth.setAttribute('d','M 28 42 Q 40 52 52 42');
+  setTimeout(()=>{robotMascot.classList.remove('excited');robotMascot.classList.add('idle');robotMouth.setAttribute('d','M 28 42 Q 40 50 52 42');},600);
+}
+function hideBubble(){robotBubble.classList.add('hidden');}
+function runTutorial(){
+  if(tutStep>=tutSteps.length){hideBubble();return;}
+  const s=tutSteps[tutStep];showBubble(s.icon+' '+s.text);tutStep++;
+  tutTimer=setTimeout(runTutorial,3500);
+}
+function startTutorial(){clearTimeout(tutTimer);tutStep=0;runTutorial();}
+setTimeout(startTutorial,900);
+
+document.querySelectorAll('.main-btn').forEach(btn=>{
+  btn.addEventListener('mouseenter',()=>{clearTimeout(tutTimer);const t=mainTips[btn.id];if(t)showBubble(t.icon+' '+t.text);});
+  btn.addEventListener('mouseleave',hideBubble);
+});
+robotMascot.addEventListener('click',()=>{clearTimeout(tutTimer);robotMascot.style.display='none';robotReplay.style.display='flex';});
+robotReplay.addEventListener('click',()=>{robotReplay.style.display='none';robotMascot.style.display='flex';startTutorial();});
+</script>
+</body>
+</html>

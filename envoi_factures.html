@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Envoi des Factures</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --glass-bg: rgba(255,255,255,0.72);
+      --glass-border: rgba(255,255,255,0.6);
+      --glass-shadow: 0 8px 40px rgba(31,80,135,0.13);
+      --primary: #2a7faa;
+      --primary-light: #5bb3d4;
+      --primary-dark: #145f8a;
+      --primary-glow: rgba(42,127,170,0.18);
+      --accent: #e8a838;
+      --success: #38a86a;
+      --success-light: #e6f7ed;
+      --warning: #e8830a;
+      --warning-light: #fff4e5;
+      --danger: #d94040;
+      --danger-light: #fdeaea;
+      --text: #1e3048;
+      --text-light: #5a7a96;
+      --border: #ccdde8;
+      --radius-sm: 14px;
+      --radius-md: 22px;
+      --radius-lg: 32px;
+      --radius-xl: 44px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      background: linear-gradient(145deg, #b8daf5 0%, #ddeef8 30%, #eef5fb 65%, #fdf6e8 100%);
+      min-height: 100vh;
+      padding: 28px 20px;
+      color: var(--text);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: ''; position: fixed; top: -180px; right: -180px;
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(168,210,255,0.35) 0%, transparent 65%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: ''; position: fixed; bottom: -220px; left: -220px;
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, rgba(232,168,56,0.12) 0%, transparent 65%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    .vista-orb {
+      position: fixed; top: 40%; left: -100px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(91,179,212,0.2) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+
+    .page-wrap {
+      position: relative; z-index: 1;
+      max-width: 1400px; margin: 0 auto;
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* Header */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+    }
+    .back-btn {
+      background: var(--glass-bg);
+      backdrop-filter: blur(14px);
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 11px 24px;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700; font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: var(--glass-shadow);
+      transition: all 0.3s ease;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .back-btn:hover { transform: translateX(-4px); background: white; border-color: var(--primary-light); }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9em; font-weight: 700; color: var(--primary-dark);
+      background: var(--glass-bg); backdrop-filter: blur(14px);
+      border: 1.5px solid var(--glass-border);
+      padding: 13px 36px; border-radius: var(--radius-xl);
+      box-shadow: var(--glass-shadow);
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      justify-content: center; width: 100%; margin-bottom: 20px;
+    }
+    input[type="text"].search {
+      padding: 12px 20px; border-radius: var(--radius-xl);
+      border: 1.5px solid var(--border); min-width: 300px;
+      font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
+      background: rgba(255,255,255,0.85); color: var(--text);
+      box-shadow: 0 2px 10px rgba(31,80,135,0.07); transition: all 0.2s;
+    }
+    input[type="text"].search:focus {
+      outline: none; border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .btn {
+      padding: 11px 20px; border: none; border-radius: var(--radius-xl);
+      font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px;
+      cursor: pointer; transition: all 0.25s ease;
+      display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(31,80,135,0.15);
+    }
+    .btn-primary {
+      background: linear-gradient(145deg, var(--primary-light), var(--primary-dark));
+      color: white;
+    }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.06); }
+    .btn-secondary {
+      background: var(--glass-bg); backdrop-filter: blur(10px);
+      border: 1.5px solid var(--glass-border); color: var(--text);
+    }
+    .btn-secondary:hover { background: white; border-color: var(--primary-light); transform: translateY(-2px); }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .btn-filter {
+      background: rgba(255,255,255,0.65);
+      border: 1.5px solid var(--border); border-radius: var(--radius-xl);
+      color: var(--text-light); padding: 8px 16px;
+      cursor: pointer; font-family: 'Nunito', sans-serif;
+      font-weight: 700; font-size: 13px; transition: all 0.2s;
+    }
+    .btn-filter.active {
+      background: linear-gradient(145deg, var(--primary-light), var(--primary-dark));
+      color: white; border-color: var(--primary-dark);
+      box-shadow: 0 4px 12px rgba(42,127,170,0.3);
+    }
+    .btn-filter:hover:not(.active) { background: rgba(91,179,212,0.12); border-color: var(--primary-light); color: var(--primary-dark); }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex; gap: 10px; justify-content: center;
+      margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .stat-item {
+      background: rgba(255,255,255,0.6); backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(255,255,255,0.7);
+      padding: 7px 16px; border-radius: var(--radius-xl);
+      font-weight: 600; color: var(--text-light); font-size: 13px;
+    }
+    .stat-item strong { color: var(--primary-dark); font-size: 1.1em; margin-right: 4px; }
+
+    /* Card */
+    .card {
+      background: rgba(240,249,255,0.85);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.75);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: 0 12px 50px rgba(31,80,135,0.12);
+      width: 100%; max-width: 1300px;
+      margin-bottom: 20px;
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+      background: linear-gradient(90deg, var(--primary-dark), var(--primary-light), var(--accent));
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    /* Options Panel */
+    .options-panel {
+      background: rgba(240,249,255,0.85); backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.75);
+      border-radius: var(--radius-xl); padding: 26px;
+      width: 100%; max-width: 1300px; margin-bottom: 20px;
+      position: relative; overflow: hidden;
+    }
+    .options-panel::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+      background: linear-gradient(90deg, var(--primary-dark), var(--primary-light), var(--accent));
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+    .options-panel h3 {
+      color: var(--primary-dark); font-family: 'Playfair Display', serif;
+      font-size: 1.1em; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+    }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .options-grid { grid-template-columns: 1fr; } }
+
+    label {
+      display: block; margin-bottom: 6px;
+      color: var(--text-light); font-weight: 700; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    #mailSubject, #mailBody {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
+      background: rgba(255,255,255,0.85); color: var(--text); transition: all 0.2s;
+    }
+    #mailSubject:focus, #mailBody:focus {
+      outline: none; border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    #mailBody { resize: vertical; min-height: 120px; }
+
+    .vars-hint {
+      background: rgba(42,127,170,0.06); border: 1px solid rgba(42,127,170,0.18);
+      border-radius: var(--radius-sm); padding: 12px 16px; font-size: 12px; color: var(--text-light);
+      margin-top: 10px; line-height: 1.7;
+    }
+    .vars-hint code {
+      background: rgba(42,127,170,0.12); color: var(--primary-dark);
+      padding: 1px 6px; border-radius: 6px; font-family: monospace; font-size: 11px;
+    }
+
+    #btnSaveOptions {
+      margin-top: 16px;
+      background: linear-gradient(145deg, #4dc483, var(--success));
+      color: white; border: none; padding: 11px 24px;
+      border-radius: var(--radius-xl); font-family: 'Nunito', sans-serif;
+      font-weight: 700; cursor: pointer; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(56,168,106,0.3);
+    }
+    #btnSaveOptions:hover { transform: translateY(-2px); filter: brightness(1.06); }
+
+    /* Table */
+    table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      border-radius: var(--radius-md); overflow: hidden;
+      border: 1.5px solid var(--border); margin-top: 4px;
+    }
+    thead tr { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); }
+    th {
+      color: white; padding: 13px 14px;
+      font-weight: 700; font-size: 0.85em;
+      text-align: left; letter-spacing: 0.3px;
+    }
+    th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+    th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+    td {
+      background: rgba(255,255,255,0.75); padding: 11px 14px;
+      border-bottom: 1px solid rgba(204,221,232,0.5);
+      color: var(--text); font-weight: 600; font-size: 0.88em;
+      vertical-align: middle;
+    }
+    tbody tr:nth-child(even) td { background: rgba(42,127,170,0.03); }
+    tbody tr:hover td { background: rgba(91,179,212,0.08); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--radius-sm); }
+    tbody tr:last-child td:last-child { border-radius: 0 0 var(--radius-sm) 0; }
+
+    .montant { font-weight: 800; color: var(--primary-dark); font-family: 'Playfair Display', serif; }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-block; padding: 4px 12px; border-radius: var(--radius-xl);
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .status-paye { background: var(--success-light); color: var(--success); border: 1.5px solid rgba(56,168,106,0.3); }
+    .status-impaye { background: var(--danger-light); color: var(--danger); border: 1.5px solid rgba(217,64,64,0.3); }
+    .status-encaisser { background: var(--warning-light); color: var(--warning); border: 1.5px solid rgba(232,131,10,0.3); }
+    .status-envoye { background: rgba(42,127,170,0.1); color: var(--primary-dark); border: 1.5px solid rgba(42,127,170,0.25); }
+
+    /* Send buttons */
+    .btn-send {
+      padding: 7px 14px; border-radius: var(--radius-md);
+      font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; border: none;
+      display: inline-flex; align-items: center; gap: 6px; color: white;
+    }
+    .btn-send:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.08); }
+    .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-send-paye { background: linear-gradient(135deg, #4dc483, var(--success)); box-shadow: 0 3px 10px rgba(56,168,106,0.3); }
+    .btn-send-impaye { background: linear-gradient(135deg, #e35050, var(--danger)); box-shadow: 0 3px 10px rgba(217,64,64,0.3); }
+    .btn-send-encaisser { background: linear-gradient(135deg, #f0a030, var(--warning)); box-shadow: 0 3px 10px rgba(232,131,10,0.3); }
+    .btn-send-default { background: linear-gradient(135deg, var(--primary-light), var(--primary-dark)); box-shadow: 0 3px 10px rgba(42,127,170,0.3); }
+
+    /* Pagination */
+    .pagination {
+      margin-top: 20px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+    }
+    .pagination button {
+      background: rgba(255,255,255,0.7); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-light);
+      padding: 8px 14px; cursor: pointer; font-family: 'Nunito', sans-serif;
+      font-weight: 700; font-size: 13px; transition: all 0.2s;
+    }
+    .pagination button.active {
+      background: linear-gradient(145deg, var(--primary-light), var(--primary-dark));
+      color: white; border-color: var(--primary-dark);
+      box-shadow: 0 3px 10px rgba(42,127,170,0.3);
+    }
+    .pagination button:hover:not(:disabled):not(.active) {
+      background: rgba(91,179,212,0.12); border-color: var(--primary-light);
+      color: var(--primary-dark); transform: translateY(-2px);
+    }
+    .pagination button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Highlight ticket */
+    .ticket-highlight td { background: rgba(42,127,170,0.1) !important; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 30px; right: 30px;
+      background: linear-gradient(145deg, var(--primary-light), var(--primary-dark));
+      color: white; padding: 14px 26px; border-radius: var(--radius-xl);
+      opacity: 0; transition: opacity 0.3s ease; font-size: 14px; font-weight: 700;
+      z-index: 9999; box-shadow: 0 10px 30px rgba(31,80,135,0.25);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .toast.show { opacity: 1; }
+
+    /* Loading Modal */
+    .modal-loading {
+      position: fixed; inset: 0;
+      background: rgba(15,35,65,0.4); backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2000; padding: 20px;
+    }
+    .modal-loading-content {
+      background: rgba(240,249,255,0.96); backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(255,255,255,0.8);
+      width: 100%; max-width: 380px; border-radius: var(--radius-xl);
+      box-shadow: 0 30px 80px rgba(20,60,100,0.22);
+      text-align: center; padding: 36px;
+      animation: modalIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.88) translateY(30px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid rgba(42,127,170,0.2); border-top-color: var(--primary);
+      border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .modal-loading-content p { font-size: 1.05rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 5px; }
+    .modal-loading-content small { color: var(--text-light); font-weight: 600; }
+
+    /* Facture manquante Modal */
+    .modal-facture {
+      position: fixed; inset: 0;
+      background: rgba(15,35,65,0.4); backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2000; padding: 20px;
+    }
+    .modal-facture-content {
+      background: rgba(240,249,255,0.96); backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(255,255,255,0.8);
+      width: 100%; max-width: 480px; border-radius: var(--radius-xl);
+      box-shadow: 0 30px 80px rgba(20,60,100,0.22); overflow: hidden;
+      animation: modalIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    .modal-facture-header {
+      background: linear-gradient(135deg, var(--danger-light), rgba(255,255,255,0.9));
+      border-bottom: 1.5px solid rgba(255,255,255,0.7);
+      padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-facture-header h3 {
+      font-family: 'Playfair Display', serif; font-size: 1.1rem;
+      color: var(--danger); display: flex; align-items: center; gap: 10px;
+    }
+    .close-modal {
+      background: var(--danger); border: none; color: white;
+      width: 30px; height: 30px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; transition: all 0.2s;
+    }
+    .close-modal:hover { transform: rotate(90deg); background: #b03030; }
+    .modal-facture-body { padding: 26px; text-align: center; }
+    .modal-facture-icon { font-size: 2.8rem; color: var(--warning); margin-bottom: 14px; }
+    .modal-facture-body p { font-size: 0.95rem; color: var(--text); margin-bottom: 10px; font-weight: 600; line-height: 1.6; }
+    .ticket-info { font-size: 1.1rem; font-weight: 800; color: var(--primary-dark); margin: 10px 0; font-family: 'Playfair Display', serif; }
+    .modal-facture-footer { padding: 0 24px 24px; display: flex; justify-content: center; gap: 12px; }
+    .btn-modal {
+      padding: 11px 22px; border-radius: var(--radius-xl);
+      font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      transition: all 0.2s ease; border: none;
+    }
+    .btn-modal-primary {
+      background: linear-gradient(145deg, var(--primary-light), var(--primary-dark)); color: white;
+      box-shadow: 0 4px 14px rgba(42,127,170,0.3);
+    }
+    .btn-modal-primary:hover { transform: translateY(-2px); filter: brightness(1.06); }
+    .btn-modal-secondary {
+      background: var(--glass-bg); backdrop-filter: blur(10px);
+      border: 1.5px solid var(--border) !important; color: var(--text);
+    }
+    .btn-modal-secondary:hover { background: white; transform: translateY(-2px); }
+
+    td[colspan] { text-align: center; padding: 50px; color: var(--text-light); font-weight: 600; }
+
+    .tab-statut {
+      padding: 9px 20px; border-radius: var(--radius-xl);
+      border: 1.5px solid var(--border); background: rgba(255,255,255,0.65);
+      font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px;
+      cursor: pointer; transition: all 0.2s; color: var(--text-light);
+    }
+    .tab-statut.active {
+      background: linear-gradient(145deg, var(--primary-light), var(--primary-dark));
+      color: white; border-color: var(--primary-dark);
+      box-shadow: 0 4px 12px rgba(42,127,170,0.3);
+    }
+    .tab-statut[data-statut="paye"].active { background: linear-gradient(145deg, #4dc483, var(--success)); border-color: var(--success); box-shadow: 0 4px 12px rgba(56,168,106,0.3); }
+    .tab-statut[data-statut="impaye"].active { background: linear-gradient(145deg, #e35050, var(--danger)); border-color: var(--danger); box-shadow: 0 4px 12px rgba(217,64,64,0.3); }
+    .tab-statut:hover:not(.active) { background: rgba(91,179,212,0.1); border-color: var(--primary-light); color: var(--primary-dark); }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(200,220,240,0.3); }
+    ::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 3px; }
+
+    @media (max-width: 768px) {
+      .toolbar { flex-direction: column; align-items: stretch; }
+      input[type="text"].search { width: 100%; min-width: unset; }
+      th, td { padding: 8px 10px; font-size: 12px; }
+      .page-header { flex-direction: column; align-items: center; }
+      .page-title { font-size: 1.3em; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<div class="vista-orb"></div>
+<div class="page-wrap">
+
+  <div class="page-header">
+    <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i> Retour</button>
+    <div class="page-title">📧 Envoi des Factures</div>
+    <div style="width:130px;"></div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="searchInput" class="search" placeholder="🔍 Rechercher (ticket, membre, email...)">
+    <button id="btnOptions" class="btn btn-secondary"><i class="fas fa-cog"></i> Options d'envoi</button>
+  </div>
+
+  <!-- Options Panel -->
+  <div id="optionsPanel" class="options-panel" style="display:none;">
+    <h3><i class="fas fa-sliders-h"></i> Paramètres d'envoi — messages par statut</h3>
+
+    <!-- Sélecteur de statut à éditer -->
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="tab-statut active" data-statut="encaisser" onclick="changerTabStatut('encaisser')">⏳ À encaisser</button>
+      <button class="tab-statut" data-statut="paye" onclick="changerTabStatut('paye')">✅ Payé</button>
+      <button class="tab-statut" data-statut="impaye" onclick="changerTabStatut('impaye')">⚠️ Impayé</button>
+    </div>
+
+    <div class="options-grid">
+      <div>
+        <label>Objet du mail</label>
+        <input id="mailSubject" type="text" placeholder="Ex: Votre facture Le Cube Club">
+        <div style="margin-top:8px;">
+          <label>Corps du message</label>
+          <textarea id="mailBody" rows="7"></textarea>
+        </div>
+        <div class="vars-hint" style="margin-top:8px;">
+          Variables : <code>{{prenom}}</code> <code>{{nom}}</code> <code>{{ticketId}}</code> <code>{{montant}}</code> <code>{{statut}}</code>
+        </div>
+      </div>
+      <div>
+        <label>Aperçu du message</label>
+        <div id="mailPreview" style="background:white;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;line-height:1.7;color:var(--text);min-height:180px;white-space:pre-wrap;overflow-y:auto;max-height:260px;"></div>
+        <div id="impayeNote" style="display:none;margin-top:10px;background:var(--danger-light);border:1.5px solid rgba(217,64,64,0.3);border-radius:var(--radius-sm);padding:12px 14px;font-size:12px;color:var(--danger);font-weight:700;">
+          ⚖️ <strong>Mise en demeure jointe automatiquement</strong> pour les factures impayées — elle sera envoyée en pièce jointe avec la facture.
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap;">
+      <button id="btnSaveOptions"><i class="fas fa-save"></i> Sauvegarder ce modèle</button>
+      <button onclick="resetTemplate()" style="background:rgba(255,255,255,0.7);border:1.5px solid var(--border);border-radius:var(--radius-xl);padding:10px 18px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;font-size:13px;color:var(--text-light);">🔄 Réinitialiser</button>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+    <div class="filter-bar">
+      <button class="btn-filter active" data-filter="all" onclick="filterTickets('all')">Tous</button>
+      <button class="btn-filter" data-filter="encaisser" onclick="filterTickets('encaisser')">⏳ À encaisser</button>
+      <button class="btn-filter" data-filter="paye" onclick="filterTickets('paye')">✅ Payés</button>
+      <button class="btn-filter" data-filter="impaye" onclick="filterTickets('impaye')">⚠️ Impayés</button>
+      <button class="btn-filter" data-filter="envoye" onclick="filterTickets('envoye')">📧 Envoyés</button>
+    </div>
+
+    <div class="stats-bar" id="statsBar"></div>
+
+    <table id="facturesTable">
+      <thead>
+        <tr>
+          <th>Ticket #</th>
+          <th>Membre</th>
+          <th>Email</th>
+          <th>Date</th>
+          <th>Montant</th>
+          <th>Statut</th>
+          <th>Action</th>
+          <th>Dernier envoi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- Modal erreur serveur -->
+<div id="erreurModal" class="modal-loading" style="display:none;">
+  <div class="modal-loading-content" style="border-top:5px solid var(--danger);">
+    <div style="font-size:2.5rem;margin-bottom:16px;">❌</div>
+    <p style="color:var(--danger);">Serveur non accessible</p>
+    <small id="erreurDetail" style="color:var(--text-light);display:block;margin-bottom:18px;"></small>
+    <div style="background:var(--warning-light);border:1.5px solid rgba(232,131,10,0.3);border-radius:var(--radius-sm);padding:12px 16px;font-size:12px;color:var(--warning);font-weight:700;text-align:left;margin-bottom:16px;">
+      💡 <strong>Pour lancer le serveur :</strong><br>
+      Double-clique sur <code style="background:rgba(232,131,10,0.15);padding:1px 6px;border-radius:4px;">serveurmail.sh</code><br>
+      ou dans un terminal : <code style="background:rgba(232,131,10,0.15);padding:1px 6px;border-radius:4px;">bash serveurmail.sh</code>
+    </div>
+    <button onclick="document.getElementById('erreurModal').style.display='none'" 
+            style="background:linear-gradient(145deg,var(--primary-light),var(--primary-dark));color:white;border:none;padding:11px 28px;border-radius:var(--radius-xl);font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;font-size:14px;">
+      OK, compris
+    </button>
+  </div>
+</div>
+
+<!-- Modal chargement -->
+<div id="loadingModal" class="modal-loading" style="display:none;">
+  <div class="modal-loading-content">
+    <div class="spinner"></div>
+    <p>Envoi en cours...</p>
+    <small id="loadingTicketInfo"></small>
+  </div>
+</div>
+
+<!-- Modal facture manquante -->
+<div id="factureMissingModal" class="modal-facture" style="display:none;">
+  <div class="modal-facture-content">
+    <div class="modal-facture-header">
+      <h3><i class="fas fa-exclamation-triangle"></i> Facture non générée</h3>
+      <button class="close-modal" onclick="closeFactureModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-facture-body">
+      <div class="modal-facture-icon"><i class="fas fa-file-invoice"></i></div>
+      <p>La facture pour ce ticket n'a pas encore été générée.</p>
+      <div id="missingTicketInfo" class="ticket-info"></div>
+      <p style="font-size:0.88rem;color:var(--text-light);">Veuillez d'abord générer la facture dans la gestion des tickets.</p>
+    </div>
+    <div class="modal-facture-footer">
+      <button class="btn-modal btn-modal-secondary" onclick="closeFactureModal()"><i class="fas fa-times"></i> Fermer</button>
+      <button class="btn-modal btn-modal-primary" onclick="goToTicketSelection()"><i class="fas fa-ticket-alt"></i> Générer la facture</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const _baseUrl = (JSON.parse(localStorage.getItem("serverConfig") || "{}").serverUrl || "http://localhost:3000").replace(/\/+$/, "");
+  const API_URL = _baseUrl + "/send-email-facture";
+
+  let tickets = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+  let membres = JSON.parse(localStorage.getItem("membres")) || [];
+  let historiqueFactures = JSON.parse(localStorage.getItem("historiqueFactures")) || [];
+  let parametres = JSON.parse(localStorage.getItem("companySettings")) || {};
+
+  const tbody = document.querySelector("#facturesTable tbody");
+  const toast = document.getElementById("toast");
+  const paginationDiv = document.getElementById("pagination");
+  const searchInput = document.getElementById("searchInput");
+  const loadingModal = document.getElementById("loadingModal");
+  const loadingTicketInfo = document.getElementById("loadingTicketInfo");
+  const factureModal = document.getElementById("factureMissingModal");
+  const missingTicketInfo = document.getElementById("missingTicketInfo");
+  const statsBar = document.getElementById("statsBar");
+
+  const itemsPerPage = 10;
+  let currentPage = 1;
+  let filteredTickets = [];
+  let currentFilter = 'all';
+  let pendingTicket = null;
+
+  // Venir de factures.html avec un ticket à envoyer
+  const factureAEnvoyer = JSON.parse(localStorage.getItem("factureAEnvoyer"));
+  if (factureAEnvoyer) {
+    localStorage.removeItem("factureAEnvoyer");
+    window.ticketAEnvoyer = factureAEnvoyer;
+  }
+
+  // ==================== UTILS ====================
+  function showToast(message, type = "info") {
+    toast.textContent = message;
+    toast.style.background =
+      type === "error"   ? "linear-gradient(145deg, #e35050, #d94040)" :
+      type === "success" ? "linear-gradient(145deg, #4dc483, #38a86a)" :
+                           "linear-gradient(145deg, #5bb3d4, #145f8a)";
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  }
+
+  function showLoadingModal(ticket) {
+    loadingTicketInfo.textContent = `Ticket #${ticket.id} — ${ticket.membrePrenom || ''} ${ticket.membreNom || ''}`;
+    loadingModal.style.display = "flex";
+  }
+  function hideLoadingModal() { loadingModal.style.display = "none"; }
+
+  function getMembreEmail(ticket) {
+    if (!ticket.membreId) return null;
+    const m = membres.find(m => m.id === ticket.membreId);
+    return m?.email && m.email !== "anonyme" ? m.email : null;
+  }
+
+  function getStatutFacture(ticketId) {
+    const h = historiqueFactures.find(h => String(h.ticketId) === String(ticketId));
+    return h ? h.statut : null;
+  }
+
+  function getDateEnvoi(ticketId) {
+    const h = historiqueFactures.find(h => String(h.ticketId) === String(ticketId));
+    return h?.savedAt ? new Date(h.savedAt) : null;
+  }
+
+  function calculerTotal(ticket) {
+    return (ticket.articles || []).reduce((sum, a) => sum + (a.prix * a.qte), 0);
+  }
+
+  // Normalise les statuts (gère paye/payé, impaye/impayé)
+  function normaliserStatut(s) {
+    if (!s) return '';
+    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
+
+  function getStatutBadgeClass(statut) {
+    const s = normaliserStatut(statut);
+    if (s === 'paye') return 'status-paye';
+    if (s === 'impaye') return 'status-impaye';
+    if (s === 'encaisser') return 'status-encaisser';
+    if (s === 'envoye' || s === 'success') return 'status-envoye';
+    return '';
+  }
+
+  function getBoutonClass(statut) {
+    const s = normaliserStatut(statut);
+    if (s === 'paye') return 'btn-send-paye';
+    if (s === 'impaye') return 'btn-send-impaye';
+    if (s === 'encaisser') return 'btn-send-encaisser';
+    return 'btn-send-default';
+  }
+
+  function formatStatutLabel(statut) {
+    const s = normaliserStatut(statut);
+    if (s === 'paye') return '✅ Payé';
+    if (s === 'impaye') return '⚠️ Impayé';
+    if (s === 'encaisser') return '⏳ À encaisser';
+    if (s === 'envoye' || s === 'success') return '📧 Envoyé';
+    return statut || '—';
+  }
+
+  // ==================== FILTRES ====================
+  function filterTickets(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+    appliquerFiltresEtRecherche();
+  }
+
+  function appliquerFiltresEtRecherche() {
+    const q = searchInput.value.toLowerCase();
+    let filtered = [...tickets];
+
+    if (q) {
+      filtered = filtered.filter(t =>
+        (t.id?.toString() || '').includes(q) ||
+        (t.membreNom || '').toLowerCase().includes(q) ||
+        (t.membrePrenom || '').toLowerCase().includes(q) ||
+        (getMembreEmail(t) || '').toLowerCase().includes(q)
+      );
+    }
+
+    if (currentFilter !== 'all') {
+      if (currentFilter === 'envoye') {
+        filtered = filtered.filter(t => historiqueFactures.some(h => String(h.ticketId) === String(t.id) && h.status === 'success'));
+      } else {
+        filtered = filtered.filter(t => normaliserStatut(getStatutFacture(t.id)) === currentFilter);
+      }
+    }
+
+    filteredTickets = filtered;
+    currentPage = 1;
+    mettreAJourStats();
+    renderTable();
+  }
+
+  // ==================== STATS ====================
+  function mettreAJourStats() {
+    const total = tickets.length;
+    const envoyes = historiqueFactures.filter(h => h.status === 'success').length;
+    const payes = historiqueFactures.filter(h => normaliserStatut(h.statut) === 'paye').length;
+    const impayes = historiqueFactures.filter(h => normaliserStatut(h.statut) === 'impaye').length;
+    const aEncaisser = historiqueFactures.filter(h => normaliserStatut(h.statut) === 'encaisser').length;
+
+    statsBar.innerHTML = `
+      <span class="stat-item"><strong>${total}</strong> tickets</span>
+      <span class="stat-item"><strong>${envoyes}</strong> envoyées</span>
+      <span class="stat-item"><strong>${payes}</strong> payées ✅</span>
+      <span class="stat-item"><strong>${impayes}</strong> impayées ⚠️</span>
+      <span class="stat-item"><strong>${aEncaisser}</strong> à encaisser ⏳</span>
+    `;
+  }
+
+  // ==================== GÉNÉRATION HTML FACTURE (responsive mobile) ====================
+function genererFactureHtml(ticket, statut, showIban, franchise) {
+    // franchise peut être passé directement (depuis sendFacture) ou lu depuis localStorage
+    if (franchise === undefined) {
+      historiqueFactures = JSON.parse(localStorage.getItem("historiqueFactures")) || [];
+      franchise = (historiqueFactures.find(h => String(h.ticketId) === String(ticket.id)) || {}).franchise === true;
+    }
+    const societe = {
+      nom:      parametres.companyName     || '',
+      adresse:  parametres.companyAddress  || '',
+      localite: parametres.companyLocality || '',
+      numero:   parametres.companyNumber   || '',
+      iban:     parametres.bankIban        || '',
+      logo:     parametres.companyLogo     || ''
+    };
+    const total = calculerTotal(ticket);
+    
+    // IMPORTANT: Pour les franchisés, on n'affiche QUE le prix TTC
+    // Le prix TTC est déjà le prix de vente (pas de TVA à ajouter)
+    
+    const today = new Date();
+    const dateEch = new Date(); dateEch.setDate(dateEch.getDate() + 30);
+
+    const statutTexte = { paye:'✅ PAYÉE', impaye:'⚠️ IMPAYÉE', encaisser:'⏳ À ENCAISSER' }[normaliserStatut(statut)] || statut;
+    const statutCoul  = { paye:'#38a86a', impaye:'#d94040', encaisser:'#e8830a' }[normaliserStatut(statut)] || '#145f8a';
+
+    // Pour les franchisés : on affiche directement le prix TTC dans le tableau
+    const lignes = (ticket.articles || []).map(a => {
+      // Pour un franchisé, le prix affiché est le prix TTC (pas de distinction HT/TTC)
+      return `<tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #e0eaf0;word-break:break-word;">${a.nom}${a.offert ? ' 🎁' : ''}</td>
+        <td style="padding:10px 8px;border-bottom:1px solid #e0eaf0;text-align:center;white-space:nowrap;">${a.qte}</td>
+        <td style="padding:10px 8px;border-bottom:1px solid #e0eaf0;text-align:right;white-space:nowrap;">${a.prix.toFixed(2)} €</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #e0eaf0;text-align:right;white-space:nowrap;font-weight:700;">${(a.prix * a.qte).toFixed(2)} €</td>
+      </tr>`;
+    }).join('');
+
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facture FAC-${ticket.id}</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Nunito',Arial,sans-serif; background:#f0f4f8; color:#1e3048; min-height:100vh; padding:16px; }
+  .wrap { max-width:680px; margin:0 auto; background:white; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(31,80,135,0.12); }
+  .top-bar { height:7px; background:linear-gradient(90deg,#145f8a,#5bb3d4,#e8a838); }
+  .inner { padding:24px 20px; }
+  /* Header société */
+  .header { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:start; padding-bottom:20px; border-bottom:2px solid #ccdde8; margin-bottom:20px; }
+  .company-name { font-size:17px; font-weight:800; color:#145f8a; line-height:1.3; }
+  .company-sub { color:#5a7a96; font-size:12px; margin-top:3px; line-height:1.5; }
+  .company-num { display:inline-block; background:#145f8a; color:white; padding:3px 10px; border-radius:50px; font-size:10px; font-weight:700; margin-top:6px; }
+  .statut-badge { display:inline-block; background:${statutCoul}; color:white; padding:7px 14px; border-radius:50px; font-size:11px; font-weight:800; white-space:nowrap; }
+  /* Chips refs */
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+  .chip { background:#f0f8ff; border:1.5px solid #ccdde8; border-radius:10px; padding:6px 12px; font-size:12px; font-weight:700; color:#145f8a; }
+  .chip span { color:#5a7a96; font-weight:600; }
+  /* Destinataire */
+  .destinataire { background:#f5f9fd; border:1.5px solid #ccdde8; border-radius:12px; padding:12px 16px; margin-bottom:18px; }
+  .destinataire-label { font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:#2a7faa; font-weight:800; margin-bottom:5px; }
+  /* Table articles */
+  .articles-table { width:100%; border-collapse:collapse; border-radius:12px; overflow:hidden; border:1.5px solid #ccdde8; margin-bottom:18px; font-size:13px; }
+  .articles-table thead tr { background:linear-gradient(135deg,#145f8a,#2a7faa); }
+  .articles-table th { color:white; padding:10px 12px; font-weight:700; font-size:12px; }
+  .articles-table th:first-child { text-align:left; }
+  .articles-table th:nth-child(2) { text-align:center; }
+  .articles-table th:nth-child(3) { text-align:right; }
+  .articles-table th:nth-child(4) { text-align:right; }
+  /* Total */
+  .total-box { background:linear-gradient(135deg,#145f8a,#2a7faa); color:white; border-radius:14px; padding:16px 20px; text-align:right; margin-bottom:14px; }
+  .total-label { font-size:11px; opacity:0.75; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+  .total-amount { font-size:26px; font-weight:800; font-family:'Playfair Display',serif; }
+  /* Franchise */
+  .franchise-note { background:linear-gradient(135deg,#145f8a,#2a7faa); color:white; padding:10px 14px; border-radius:12px; text-align:center; font-weight:700; font-size:12px; margin-bottom:12px; }
+  .iban-note { background:#e6f7ed; border:1.5px solid rgba(56,168,106,0.3); border-radius:12px; padding:12px 16px; font-size:13px; line-height:1.6; }
+  .unpaid-note { background:#fdeaea; border:1.5px solid rgba(217,64,64,0.3); border-radius:12px; padding:12px 16px; font-size:13px; color:#d94040; font-weight:700; margin-bottom:12px; }
+  /* Logo */
+  .company-logo { max-height:44px; max-width:120px; border-radius:8px; margin-bottom:8px; display:block; }
+  /* Mobile */
+  @media (max-width:480px) {
+    body { padding:8px; }
+    .inner { padding:16px 14px; }
+    .header { grid-template-columns:1fr; }
+    .statut-badge { margin-top:4px; }
+    .articles-table th:nth-child(3) { display:none; }
+    .articles-table td:nth-child(3) { display:none; }
+    .total-amount { font-size:22px; }
+    .chip { font-size:11px; padding:5px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-bar"></div>
+  <div class="inner">
+
+    <!-- Header -->
+    <div class="header">
+      <div>
+        ${societe.logo ? `<img src="${societe.logo}" class="company-logo">` : ''}
+        <div class="company-name">${societe.nom}</div>
+        <div class="company-sub">
+          ${societe.adresse ? societe.adresse + '<br>' : ''}${societe.localite || ''}
+        </div>
+        ${societe.numero ? `<span class="company-num">N° ${societe.numero}</span>` : ''}
+      </div>
+      <div>
+        <span class="statut-badge">${statutTexte}</span>
+      </div>
+    </div>
+
+    <!-- Chips références -->
+    <div class="chips">
+      <div class="chip">N° facture <span>FAC-${ticket.id}</span></div>
+      <div class="chip">Date <span>${today.toLocaleDateString('fr-BE')}</span></div>
+      <div class="chip">Échéance <span>${dateEch.toLocaleDateString('fr-BE')}</span></div>
+    </div>
+
+    <!-- Destinataire -->
+    ${ticket.membreNom ? `<div class="destinataire">
+      <div class="destinataire-label">👤 Destinataire</div>
+      <strong>${ticket.membrePrenom||''} ${ticket.membreNom}</strong>
+    </div>` : ''}
+
+    <!-- Articles -->
+    <table class="articles-table">
+      <thead>
+        <tr>
+          <th>Article</th>
+          <th>Qté</th>
+          <th>Prix unitaire</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>${lignes}</tbody>
+    </table>
+
+    <!-- Total TTC uniquement -->
+    <div class="total-box">
+      <div class="total-label">Total TTC</div>
+      <div class="total-amount">${total.toFixed(2)} €</div>
+    </div>
+
+    <!-- Mention franchise TVA -->
+    ${franchise ? `<div class="franchise-note">🏷️ TVA non applicable - article 56bis du Code de la TVA belge (régime franchise)</div>` : ''}
+
+    <!-- Impayé -->
+    ${normaliserStatut(statut) === 'impaye' ? `<div class="unpaid-note">⚠️ Cette facture est impayée. Merci de régulariser avant le ${dateEch.toLocaleDateString('fr-BE')}.</div>` : ''}
+
+    <!-- IBAN -->
+    ${showIban && societe.iban ? `<div class="iban-note">💳 <strong>Virement :</strong> ${societe.iban}<br><span style="color:#5a7a96;font-size:12px;">Communication : FAC-${ticket.id}</span></div>` : ''}
+
+  </div>
+</div>
+</body></html>`;
+  }
+
+  // ==================== GÉNÉRATION MISE EN DEMEURE (responsive mobile) ====================
+  function genererLettreHtml(ticket) {
+    const societe = {
+      nom:      parametres.companyName     || 'Le Cube Club Karaoké ASBL',
+      adresse:  parametres.companyAddress  || '',
+      localite: parametres.companyLocality || '',
+      numero:   parametres.companyNumber   || '',
+      iban:     parametres.bankIban        || ''
+    };
+    const total = calculerTotal(ticket);
+    const today = new Date();
+    const dateEch = new Date(); dateEch.setDate(today.getDate() + 8);
+    const nomMembre = `${ticket.membrePrenom || ''} ${ticket.membreNom || ''}`.trim();
+    const dateStr = today.toLocaleDateString('fr-BE', { day:'numeric', month:'long', year:'numeric' });
+    const dateEchStr = dateEch.toLocaleDateString('fr-BE', { day:'numeric', month:'long', year:'numeric' });
+
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mise en demeure FAC-${ticket.id}</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Georgia',serif; background:#f5f5f5; color:#1a1a1a; min-height:100vh; padding:16px; font-size:14px; line-height:1.75; }
+  .wrap { max-width:680px; margin:0 auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.08); }
+  .top-bar { height:6px; background:linear-gradient(90deg,#8b0000,#c0392b,#e74c3c); }
+  .inner { padding:32px 28px; }
+  .header { display:grid; grid-template-columns:1fr auto; gap:16px; padding-bottom:20px; border-bottom:2px solid #1a1a1a; margin-bottom:28px; }
+  .society-name { font-size:15px; font-weight:700; }
+  .society-sub { font-size:12px; color:#555; margin-top:4px; line-height:1.5; }
+  .doc-title { font-size:14px; font-weight:700; text-align:right; }
+  .doc-meta { font-size:12px; color:#555; text-align:right; margin-top:4px; line-height:1.6; }
+  .destinataire { margin-bottom:24px; font-size:13px; }
+  .objet { background:#fff3f3; border-left:4px solid #c0392b; padding:12px 16px; border-radius:0 8px 8px 0; margin-bottom:24px; font-size:13px; }
+  .titre { font-size:17px; font-weight:700; text-align:center; text-decoration:underline; margin-bottom:24px; letter-spacing:0.5px; }
+  .corps p { margin-bottom:14px; font-size:13px; }
+  .avertissement { background:#fff3f3; border:2px solid #c0392b; border-radius:10px; padding:14px 16px; margin:20px 0; font-size:13px; font-weight:700; color:#8b0000; }
+  .iban-box { background:#f5f5f5; border-left:4px solid #333; padding:12px 16px; border-radius:0 8px 8px 0; margin:16px 0; font-size:13px; }
+  .signature { margin-top:40px; padding-top:16px; border-top:1px solid #ccc; font-size:13px; }
+  .legal-note { margin-top:28px; padding:12px 16px; background:#f9f9f9; border:1px solid #ddd; border-radius:8px; font-size:11px; color:#777; font-style:italic; line-height:1.6; }
+  @media (max-width:480px) {
+    .inner { padding:20px 16px; }
+    .header { grid-template-columns:1fr; }
+    .doc-title { text-align:left; }
+    .doc-meta { text-align:left; }
+    body { font-size:13px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-bar"></div>
+  <div class="inner">
+
+    <div class="header">
+      <div>
+        <div class="society-name">${societe.nom}</div>
+        <div class="society-sub">
+          ${societe.adresse ? societe.adresse + '<br>' : ''}
+          ${societe.localite || ''}
+          ${societe.numero ? '<br>N° entreprise : ' + societe.numero : ''}
+        </div>
+      </div>
+      <div>
+        <div class="doc-title">MISE EN DEMEURE</div>
+        <div class="doc-meta">Le ${dateStr}<br>Réf. : FAC-${ticket.id}</div>
+      </div>
+    </div>
+
+    <div class="destinataire">
+      <strong>${nomMembre}</strong>
+    </div>
+
+    <div class="objet">
+      <strong>Objet : Mise en demeure de payer</strong><br>
+      Réf. Facture : FAC-${ticket.id} — Montant réclamé : <strong style="color:#c0392b;">${total.toFixed(2)} €</strong>
+    </div>
+
+    <div class="titre">MISE EN DEMEURE</div>
+
+    <div class="corps">
+      <p>Madame, Monsieur,</p>
+      <p>Sauf erreur ou omission de notre part, nous constatons que la facture n°<strong>FAC-${ticket.id}</strong> d'un montant de <strong>${total.toFixed(2)} €</strong>, émise par <strong>${societe.nom}</strong>, demeure à ce jour impayée malgré l'échéance dépassée.</p>
+      <p>Par la présente, nous vous mettons <strong>formellement en demeure</strong> de procéder au règlement intégral de cette somme dans un délai de <strong>8 jours</strong>.</p>
+
+      <div class="avertissement">
+        ⚠️ Vous êtes invité(e) à régulariser votre situation au plus tard le <strong>${dateEchStr}</strong>.<br>
+        Passé ce délai, des poursuites judiciaires seront engagées à vos frais.
+      </div>
+
+      ${societe.iban ? `<div class="iban-box">
+        💳 <strong>Coordonnées de paiement :</strong><br>
+        IBAN : <strong>${societe.iban}</strong><br>
+        Communication obligatoire : <strong>FAC-${ticket.id}</strong>
+      </div>` : ''}
+
+      <p>À défaut de paiement dans ce délai, nous nous verrons contraints d'engager, sans autre préavis, toutes les voies de droit utiles, y compris par voie judiciaire, dont les frais vous seront intégralement répercutés. Des intérêts de retard légaux pourront également être réclamés.</p>
+      <p>Nous restons néanmoins disponibles pour tout arrangement amiable.</p>
+      <p>Dans l'attente d'un règlement rapide, veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</p>
+    </div>
+
+    <div class="signature">
+      <strong>${societe.nom}</strong><br>
+      <span style="font-size:12px;color:#555;">La direction</span>
+    </div>
+
+    <div class="legal-note">
+      Ce document constitue une mise en demeure formelle au sens des articles 1344 et suivants du Code civil belge.
+      La présente est envoyée par voie électronique conformément à l'article XII.15 du Code de droit économique belge.
+      En cas de non-paiement, des intérêts de retard au taux légal seront appliqués.
+    </div>
+
+  </div>
+</div>
+</body></html>`;
+  }
+
+  // ==================== RENDER ====================
+  function renderTable() {
+    // Toujours recharger depuis localStorage — franchise + statut toujours frais
+    historiqueFactures = JSON.parse(localStorage.getItem("historiqueFactures")) || [];
+    tbody.innerHTML = "";
+
+    if (filteredTickets.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8">Aucune facture trouvée 📭</td></tr>';
+      paginationDiv.innerHTML = "";
+      return;
+    }
+
+    const totalPages = Math.ceil(filteredTickets.length / itemsPerPage);
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * itemsPerPage;
+    const pageTickets = filteredTickets.slice(start, start + itemsPerPage);
+
+    pageTickets.forEach(t => {
+      const total = calculerTotal(t);
+      const statut = getStatutFacture(t.id) || 'encaisser';
+      const email = getMembreEmail(t);
+      const dateEnvoi = getDateEnvoi(t.id);
+      const hist = historiqueFactures.find(h => String(h.ticketId) === String(t.id));
+      const estEnvoye = hist?.status === 'success';
+
+      const tr = document.createElement("tr");
+      if (window.ticketAEnvoyer && window.ticketAEnvoyer.ticketId === t.id) tr.classList.add("ticket-highlight");
+
+      tr.innerHTML = `
+        <td><strong style="color:var(--primary-dark);font-family:'Playfair Display',serif;">#${t.id}</strong></td>
+        <td>${t.membrePrenom || ''} ${t.membreNom || ''}</td>
+        <td style="color:var(--text-light);font-size:0.85em;">${email || '<span style="color:var(--danger)">— manquant</span>'}</td>
+        <td style="color:var(--text-light);">${t.datePaiement || '—'}</td>
+        <td class="montant">${total.toFixed(2)} €</td>
+        <td>
+          <span class="status-badge ${getStatutBadgeClass(statut)}">${formatStatutLabel(statut)}</span>
+          ${estEnvoye ? '<span class="status-badge status-envoye" style="margin-left:4px;">📧</span>' : ''}
+        </td>
+        <td>
+          <button class="btn-send ${getBoutonClass(statut)}"
+                  onclick="sendFacture('${t.id}', '${email || ''}', '${(t.membrePrenom||'').replace(/'/g,"\\'")}', '${(t.membreNom||'').replace(/'/g,"\\'")}', '${statut}')"
+                  ${!email ? 'disabled title="Email manquant"' : ''}>
+            <i class="fas fa-paper-plane"></i> Envoyer
+          </button>
+        </td>
+        <td style="color:var(--text-light);font-size:0.83em;">${dateEnvoi ? dateEnvoi.toLocaleString('fr-BE') : '—'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Pagination
+    paginationDiv.innerHTML = "";
+    const prev = document.createElement("button");
+    prev.innerHTML = "◀"; prev.disabled = currentPage === 1;
+    prev.onclick = () => { currentPage--; renderTable(); };
+    paginationDiv.appendChild(prev);
+
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i; btn.classList.toggle("active", i === currentPage);
+      btn.onclick = () => { currentPage = i; renderTable(); };
+      paginationDiv.appendChild(btn);
+    }
+
+    const next = document.createElement("button");
+    next.innerHTML = "▶"; next.disabled = currentPage === totalPages;
+    next.onclick = () => { currentPage++; renderTable(); };
+    paginationDiv.appendChild(next);
+  }
+
+  // ==================== OPTIONS ====================
+
+  // Templates par défaut selon le statut
+  const TEMPLATES_DEFAUT = {
+    encaisser: {
+      subject: "Votre facture FAC-{{ticketId}} — Le Cube Club",
+      body: "Bonjour {{prenom}} {{nom}},\n\nVeuillez trouver ci-joint votre facture n°{{ticketId}} d'un montant de {{montant}} €.\n\nMerci de bien vouloir procéder au règlement dans les meilleurs délais.\n\nCordialement,\nLe Cube Club Karaoké ASBL"
+    },
+    paye: {
+      subject: "Votre facture FAC-{{ticketId}} — Le Cube Club",
+      body: "Bonjour {{prenom}} {{nom}},\n\nNous vous remercions pour votre règlement.\n\nVeuillez trouver ci-joint votre facture n°{{ticketId}} d'un montant de {{montant}} € pour vos archives.\n\nNous espérons vous revoir très prochainement !\n\nCordialement,\nLe Cube Club Karaoké ASBL"
+    },
+    impaye: {
+      subject: "⚠️ Facture impayée FAC-{{ticketId}} — Mise en demeure",
+      body: "Bonjour {{prenom}} {{nom}},\n\nMalgré nos précédents rappels, votre facture n°{{ticketId}} d'un montant de {{montant}} € demeure impayée à ce jour.\n\nVeuillez trouver ci-joint votre facture ainsi qu'une mise en demeure officielle.\n\nNous vous prions de bien vouloir régulariser votre situation dans un délai de 8 jours à compter de la réception de ce message.\n\nPassé ce délai, nous nous verrons dans l'obligation d'engager les procédures légales de recouvrement.\n\nCordialement,\nLe Cube Club Karaoké ASBL"
+    }
+  };
+
+  let tabStatutActif = 'encaisser';
+
+  function getTemplate(statut) {
+    const key = `mailTemplate_${statut}`;
+    const saved = localStorage.getItem(key);
+    if (saved) return JSON.parse(saved);
+    return TEMPLATES_DEFAUT[statut] || TEMPLATES_DEFAUT.encaisser;
+  }
+
+  function changerTabStatut(statut) {
+    tabStatutActif = statut;
+    document.querySelectorAll('.tab-statut').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.tab-statut[data-statut="${statut}"]`).classList.add('active');
+    const tpl = getTemplate(statut);
+    subjectInput.value = tpl.subject;
+    bodyInput.value = tpl.body;
+    mettreAJourApercu();
+    document.getElementById('impayeNote').style.display = statut === 'impaye' ? 'block' : 'none';
+  }
+
+  function mettreAJourApercu() {
+    const preview = document.getElementById('mailPreview');
+    let text = bodyInput.value
+      .replace(/{{prenom}}/g, 'Jean')
+      .replace(/{{nom}}/g, 'Dupont')
+      .replace(/{{ticketId}}/g, '42')
+      .replace(/{{montant}}/g, '24.50')
+      .replace(/{{statut}}/g, tabStatutActif);
+    preview.textContent = text;
+  }
+
+  function resetTemplate() {
+    const tpl = TEMPLATES_DEFAUT[tabStatutActif];
+    subjectInput.value = tpl.subject;
+    bodyInput.value = tpl.body;
+    mettreAJourApercu();
+    showToast("Modèle réinitialisé", "info");
+  }
+
+  const btnOptions = document.getElementById("btnOptions");
+  const panel = document.getElementById("optionsPanel");
+  const btnSaveOptions = document.getElementById("btnSaveOptions");
+  const subjectInput = document.getElementById("mailSubject");
+  const bodyInput = document.getElementById("mailBody");
+
+  btnOptions.onclick = () => {
+    const open = panel.style.display !== "none";
+    panel.style.display = open ? "none" : "block";
+    if (!open) changerTabStatut('encaisser'); // reset à encaisser à l'ouverture
+  };
+
+  subjectInput.addEventListener('input', mettreAJourApercu);
+  bodyInput.addEventListener('input', mettreAJourApercu);
+
+  btnSaveOptions.onclick = () => {
+    localStorage.setItem(`mailTemplate_${tabStatutActif}`, JSON.stringify({
+      subject: subjectInput.value,
+      body: bodyInput.value
+    }));
+    showToast(`✅ Modèle "${tabStatutActif}" sauvegardé !`, "success");
+  };
+
+  window.changerTabStatut = changerTabStatut;
+  window.resetTemplate = resetTemplate;
+
+  // ==================== MODAL FACTURE MANQUANTE ====================
+  function showFactureModal(ticket) {
+    missingTicketInfo.textContent = `Ticket #${ticket.id} — ${ticket.membrePrenom || ''} ${ticket.membreNom || ''}`;
+    factureModal.style.display = "flex";
+  }
+  function closeFactureModal() { factureModal.style.display = "none"; pendingTicket = null; }
+  function goToTicketSelection() {
+    if (pendingTicket) localStorage.setItem("factureAGenerer", JSON.stringify(pendingTicket));
+    window.location.href = "factures.html";
+  }
+
+  // ==================== ENVOI ====================
+  async function sendFacture(id, email, prenom, nom, statut) {
+    // Normaliser l'id en string pour les comparaisons
+    id = String(id);
+
+    // Résolution depuis ticketAEnvoyer si nécessaire
+    if ((!id || id === 'undefined') && window.ticketAEnvoyer) {
+      const t = tickets.find(t => String(t.id) === String(window.ticketAEnvoyer.ticketId));
+      if (t) {
+        id = String(t.id); email = getMembreEmail(t);
+        prenom = t.membrePrenom || ''; nom = t.membreNom || '';
+        statut = getStatutFacture(t.id) || 'encaisser';
+      }
+      window.ticketAEnvoyer = null;
+    }
+
+    if (!email) { showToast("⚠️ Adresse email manquante pour ce membre.", "error"); return; }
+
+    // Vérifier si la facture a été générée (comparaison string/string)
+    const factureExiste = historiqueFactures.some(h => String(h.ticketId) === id);
+    if (!factureExiste) {
+      const ticket = tickets.find(t => String(t.id) === id);
+      if (ticket) { pendingTicket = ticket; showFactureModal(ticket); }
+      else showToast("⚠️ Ticket introuvable. Générez d'abord la facture.", "error");
+      return;
+    }
+
+    showLoadingModal({ id, membrePrenom: prenom, membreNom: nom });
+
+    const ticket = tickets.find(t => String(t.id) === id);
+    const montant = ticket ? calculerTotal(ticket) : 0;
+    const statutNorm = normaliserStatut(statut);
+
+    // Template selon le statut
+    const tpl = getTemplate(statutNorm);
+    const subject = tpl.subject
+      .replace(/{{prenom}}/g, prenom || "").replace(/{{nom}}/g, nom || "")
+      .replace(/{{ticketId}}/g, id).replace(/{{montant}}/g, montant.toFixed(2))
+      .replace(/{{statut}}/g, statut);
+
+    let body = tpl.body
+      .replace(/{{prenom}}/g, prenom || "")
+      .replace(/{{nom}}/g, nom || "")
+      .replace(/{{ticketId}}/g, id)
+      .replace(/{{montant}}/g, montant.toFixed(2))
+      .replace(/{{statut}}/g, statut);
+
+    // Recharger historiqueFactures depuis localStorage (toujours frais)
+    historiqueFactures = JSON.parse(localStorage.getItem("historiqueFactures")) || [];
+
+    // Lire franchise directement ici après rechargement
+    const histEntry = historiqueFactures.find(h => String(h.ticketId) === id);
+    const franchise = histEntry?.franchise === true;
+
+    // Générer le HTML de la facture pour la pièce jointe
+    let factureHtml = '';
+    if (ticket) {
+      factureHtml = genererFactureHtml(ticket, statut, statutNorm === 'encaisser' || statutNorm === 'impaye', franchise);
+    }
+
+    // Mise en demeure automatique si impayé
+    let lettreHtml = '';
+    if (statutNorm === 'impaye' && ticket) {
+      lettreHtml = genererLettreHtml(ticket);
+    }
+
+    // Infos société et membre pour le serveur
+    const societeInfo = {
+      nom:      parametres.companyName    || '',
+      adresse:  parametres.companyAddress || '',
+      localite: parametres.companyLocality|| '',
+      numero:   parametres.companyNumber  || '',
+      iban:     parametres.bankIban       || ''
+    };
+    const membreInfo = { prenom: prenom || '', nom: nom || '' };
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, email, subject, body, statut, montant, factureHtml, lettreHtml, societe: societeInfo, membre: membreInfo })
+      });
+
+      hideLoadingModal();
+      const ok = res.ok;
+
+      // Mettre à jour l'historique
+      const idx = historiqueFactures.findIndex(h => h.ticketId === id);
+      const entry = { ticketId: id, statut, status: ok ? "success" : "error", dateEnvoi: new Date().toISOString() };
+      if (idx !== -1) historiqueFactures[idx] = { ...historiqueFactures[idx], ...entry };
+      else historiqueFactures.push(entry);
+
+      localStorage.setItem("historiqueFactures", JSON.stringify(historiqueFactures));
+      tickets = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+      membres = JSON.parse(localStorage.getItem("membres")) || [];
+      appliquerFiltresEtRecherche();
+      if (ok) {
+        showToast("✅ Facture envoyée avec succès !", "success");
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        showErreurServeur(errData.error || "Erreur serveur");
+      }
+
+    } catch (err) {
+      hideLoadingModal();
+      console.error("Erreur envoi facture:", err);
+      const idx = historiqueFactures.findIndex(h => String(h.ticketId) === id);
+      const entry = { ticketId: id, statut, status: "error", dateEnvoi: new Date().toISOString() };
+      if (idx !== -1) historiqueFactures[idx] = { ...historiqueFactures[idx], ...entry };
+      else historiqueFactures.push(entry);
+      localStorage.setItem("historiqueFactures", JSON.stringify(historiqueFactures));
+      tickets = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+      membres = JSON.parse(localStorage.getItem("membres")) || [];
+      appliquerFiltresEtRecherche();
+      // Message d'erreur persistant si serveur offline
+      showErreurServeur();
+    }
+  }
+
+  // Auto-envoi si on vient de factures.html
+  if (window.ticketAEnvoyer) {
+    setTimeout(() => {
+      sendFacture(window.ticketAEnvoyer.ticketId, null, null, null, window.ticketAEnvoyer.statut);
+    }, 150);
+  }
+
+  // Initialisation
+  filteredTickets = [...tickets];
+  mettreAJourStats();
+  renderTable();
+
+  function showErreurServeur(detail) {
+    const msg = detail || "Impossible de contacter le serveur. Vérifiez que serveurmail.sh est lancé.";
+    document.getElementById('erreurDetail').textContent = msg;
+    document.getElementById('erreurModal').style.display = 'flex';
+  }
+
+  // Fonctions globales
+  window.sendFacture = sendFacture;
+  window.filterTickets = filterTickets;
+  window.closeFactureModal = closeFactureModal;
+  window.goToTicketSelection = goToTicketSelection;
+</script>
+</body>
+</html>

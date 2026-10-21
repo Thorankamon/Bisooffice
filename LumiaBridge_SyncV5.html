@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<button class="back-btn" onclick="window.history.back()">← Retour</button>
+  <title>LumiaBridge · Synchronisation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ============================
+       VISTA GLASS THEME — LumiaBridge
+    ============================ */
+    :root {
+      --sky: #e8f4fd;
+      --blue: #2a7fd4;
+      --blue2: #1a6bbf;
+      --blue3: #0d4f9a;
+      --blue-light: #5ba3e8;
+      --green: #5aad2e;
+      --green2: #4a9422;
+      --green-pale: #e8f5dc;
+      --yellow: #e8a800;
+      --yellow2: #d49400;
+      --yellow-pale: #fff8dc;
+      --orange: #e06820;
+      --red: #c0392b;
+      --red-pale: #fde8e8;
+      --text: #1a2b4a;
+      --text2: #4a6080;
+      --text3: #7a98b8;
+      --border: #b0cce8;
+      --border2: #d0e4f4;
+      --shadow: rgba(30,80,160,0.18);
+      --shadow2: rgba(30,80,160,0.09);
+      --glass: rgba(255,255,255,0.72);
+      --glass2: rgba(255,255,255,0.55);
+      --radius: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: linear-gradient(135deg, #c8dff5 0%, #dceeff 35%, #e8f4fb 65%, #cfe8f7 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      font-family: 'Nunito', 'Segoe UI', Tahoma, sans-serif;
+      padding: 0 0 60px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    .wrap {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+      z-index: 1;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(160deg, #0d4f9a 0%, #1a6bbf 40%, #2a7fd4 100%);
+      color: white;
+      padding: 26px 32px 24px;
+      margin-bottom: 28px;
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      box-shadow: 0 6px 32px rgba(10,50,120,0.35), 0 1px 0 rgba(255,255,255,0.2) inset;
+      position: relative; overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02));
+      border-radius: 0 0 60% 60%;
+      pointer-events: none;
+    }
+    header::after {
+      content: '';
+      position: absolute; right: -60px; top: -60px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .logo-row {
+      display: flex; align-items: center; gap: 16px; position: relative;
+    }
+
+    .logo-icon {
+      width: 50px; height: 50px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.3) inset;
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      font-size: 2rem; font-weight: 900; color: white;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+
+    .version-badge {
+      display: inline-flex; align-items: center;
+      margin-left: 10px; font-size: 0.72rem;
+      padding: 3px 10px;
+      background: rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.9);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px; font-weight: 700;
+      vertical-align: middle; letter-spacing: 0.3px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem; color: rgba(255,255,255,0.65);
+      margin-top: 6px; font-weight: 600; position: relative;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius-lg);
+      padding: 24px 26px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 20px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+      animation: cardIn 0.35s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes cardIn {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .card-title {
+      font-size: 1rem; font-weight: 800; color: var(--text);
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      letter-spacing: -0.2px;
+    }
+
+    .badge {
+      font-size: 0.7rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
+      background: rgba(42,127,212,0.12); color: var(--blue2);
+      border: 1px solid rgba(42,127,212,0.25); letter-spacing: 0.3px;
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      gap: 10px; margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: rgba(255,255,255,0.6);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 14px 10px; text-align: center;
+      box-shadow: 0 2px 8px var(--shadow2);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .stat-box:hover { transform: translateY(-2px); box-shadow: 0 6px 16px var(--shadow); }
+
+    .stat-val {
+      font-size: 1.25rem; font-weight: 900; margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .stat-label {
+      font-size: 0.7rem; color: var(--text3);
+      text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700;
+    }
+
+    /* DECOMPO */
+    .decompo-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px; margin-bottom: 4px;
+    }
+
+    .decompo-box {
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius); padding: 16px;
+    }
+
+    .decompo-box h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 12px; color: var(--text); }
+
+    .decompo-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0; border-bottom: 1px solid rgba(176,204,232,0.4); font-size: 0.82rem;
+    }
+    .decompo-row:last-child { border-bottom: none; }
+
+    .decompo-name { color: var(--text2); font-size: 0.78rem; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    .decompo-net { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+    .decompo-total { color: var(--text); font-size: 0.8rem; font-weight: 700; }
+    .decompo-don-sub { color: var(--yellow); font-size: 0.72rem; font-weight: 700; }
+    .decompo-final { color: var(--green); font-weight: 800; font-size: 0.8rem; }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto; border-radius: var(--radius);
+      border: 1px solid var(--border2); box-shadow: 0 2px 8px var(--shadow2);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+
+    th {
+      background: linear-gradient(180deg, rgba(232,244,253,0.95), rgba(208,228,244,0.95));
+      padding: 10px 14px; text-align: left;
+      font-size: 0.72rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text2); border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    th:hover { color: var(--blue2); }
+    th.sorted { color: var(--blue); }
+
+    td {
+      padding: 9px 14px; border-bottom: 1px solid rgba(176,204,232,0.35);
+      font-size: 0.82rem; font-weight: 600; color: var(--text);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(42,127,212,0.05); }
+
+    /* PILLS */
+    .pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
+    .pill-recettes { background: var(--green-pale); color: var(--green2); border: 1px solid rgba(90,173,46,0.25); }
+    .pill-dons     { background: var(--yellow-pale); color: var(--yellow2); border: 1px solid rgba(232,168,0,0.25); }
+    .pill-membres  { background: rgba(91,163,232,0.15); color: var(--blue2); border: 1px solid rgba(91,163,232,0.3); }
+    .pill-especes  { background: rgba(42,127,212,0.1); color: var(--blue); border: 1px solid rgba(42,127,212,0.2); }
+
+    /* BUTTONS */
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+    button {
+      font-family: 'Nunito', sans-serif; font-weight: 700;
+      cursor: pointer; border: none; border-radius: 10px;
+      padding: 9px 20px; font-size: 0.88rem; transition: all 0.18s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
+      color: white; box-shadow: 0 3px 12px rgba(42,127,212,0.35);
+    }
+    .btn-primary:hover { background: linear-gradient(135deg, var(--blue-light), var(--blue)); transform: translateY(-1px); box-shadow: 0 5px 16px rgba(42,127,212,0.45); }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--green), var(--green2));
+      color: white; box-shadow: 0 3px 12px rgba(90,173,46,0.3);
+    }
+    .btn-success:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(90,173,46,0.4); }
+
+    .btn-warning {
+      background: linear-gradient(135deg, var(--yellow), var(--yellow2));
+      color: white; box-shadow: 0 3px 10px rgba(232,168,0,0.3);
+    }
+    .btn-warning:hover { transform: translateY(-1px); }
+
+    .btn-danger {
+      background: rgba(192,57,43,0.1); color: var(--red);
+      border: 1px solid rgba(192,57,43,0.3);
+    }
+    .btn-danger:hover { background: rgba(192,57,43,0.2); transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.5); color: var(--text2);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.8); color: var(--text); }
+
+    button:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+    /* FILTERS */
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+
+    .filter-chip {
+      padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+      cursor: pointer; border: 1px solid var(--border2);
+      background: rgba(255,255,255,0.5); color: var(--text2); transition: all 0.15s;
+    }
+    .filter-chip.active { border-color: var(--blue); color: var(--blue); background: rgba(42,127,212,0.1); }
+    .filter-chip.active.f-dons { border-color: var(--yellow); color: var(--yellow2); background: var(--yellow-pale); }
+    .filter-chip.active.f-membres { border-color: var(--blue-light); color: var(--blue2); background: rgba(91,163,232,0.12); }
+    .filter-chip.active.f-especes { border-color: var(--green); color: var(--green2); background: var(--green-pale); }
+
+    /* LOG */
+    #logBox {
+      font-family: 'Nunito', monospace; font-size: 0.82rem; font-weight: 600;
+      background: rgba(255,255,255,0.5); border: 1px solid var(--border2);
+      border-radius: var(--radius); padding: 14px 16px;
+      max-height: 200px; overflow-y: auto; line-height: 1.9;
+    }
+    .log-ok   { color: var(--green2); }
+    .log-warn { color: var(--yellow2); }
+    .log-err  { color: var(--red); }
+    .log-info { color: var(--text3); }
+
+    /* PROGRESS */
+    .progress-bar {
+      height: 6px; background: var(--border2);
+      border-radius: 3px; margin: 14px 0;
+      overflow: hidden; display: none;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      border-radius: 3px; transition: width 0.3s ease; width: 0%;
+    }
+
+    /* INFO TIP */
+    .info-tip {
+      font-size: 0.82rem; font-weight: 600; color: var(--text2);
+      padding: 12px 16px; background: rgba(232,244,253,0.7);
+      border-radius: var(--radius); border-left: 3px solid var(--blue-light);
+      margin-bottom: 16px; line-height: 1.8;
+    }
+
+    /* USER CHIPS */
+    .bridge-user-chip {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; border-radius: var(--radius);
+      border: 2px solid var(--border2);
+      background: rgba(255,255,255,0.55);
+      transition: all 0.15s; cursor: pointer;
+      box-shadow: 0 2px 6px var(--shadow2);
+    }
+    .bridge-user-chip:hover { border-color: var(--blue-light); background: rgba(255,255,255,0.8); box-shadow: 0 4px 12px var(--shadow); }
+    .bridge-chip-active { border-color: var(--blue) !important; background: rgba(42,127,212,0.08) !important; box-shadow: 0 0 0 3px rgba(42,127,212,0.15) !important; }
+    .bridge-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--blue3));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 900; color: white; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(13,79,154,0.3);
+    }
+
+    .empty { text-align: center; padding: 30px; color: var(--text3); font-size: 0.88rem; font-weight: 600; }
+
+    @media (max-width: 700px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 1.5rem; }
+      header { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="logo-row">
+        <div class="logo-icon">🌉</div>
+        <div>
+          <h1>LumiaBridge <span class="version-badge">v4.0</span></h1>
+          <div class="subtitle">Membres banque détectés auto · Dons déduits · Espèces nettes · Multi-comptes</div>
+        </div>
+      </div>
+    </div>
+  </header>
+<div class="wrap">
+
+  <!-- STEP 1 -->
+  <div class="card">
+    <div class="card-title">
+      📂 Étape 1 — Lire les Rapports
+      <span class="badge">localStorage</span>
+    </div>
+    <div class="info-tip">
+      ⚠️ Ouvrir dans le <strong>même navigateur</strong> que rapports.html et ComptaLumia2026.html pour accéder au localStorage partagé.
+    </div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val" id="statRapports" style="color:var(--accent)">—</div>
+        <div class="stat-label">Rapports</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statCA" style="color:var(--green)">—</div>
+        <div class="stat-label">CA Net</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statEsp" style="color:var(--accent)">—</div>
+        <div class="stat-label">Espèces nettes</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statDons" style="color:var(--yellow)">—</div>
+        <div class="stat-label">Total Dons</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statMembres" style="color:var(--blue-light)">—</div>
+        <div class="stat-label">Membres</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="chargerDonnees()">🔄 Charger les Rapports</button>
+      <button class="btn-ghost" onclick="effacerApercu()">✕ Effacer</button>
+    </div>
+  </div>
+
+  <!-- DÉCOMPOSITION -->
+  <div class="card" id="decompoCard" style="display:none">
+    <div class="card-title">🔬 Décomposition intelligente par rapport</div>
+    <div id="decompoGrid" class="decompo-grid"></div>
+  </div>
+
+  <!-- APERÇU -->
+  <div class="card" id="apercuCard" style="display:none">
+    <div class="card-title">
+      👁️ Aperçu — Transactions à importer
+      <span class="badge" id="apercuCount">0</span>
+    </div>
+    <div class="filters">
+      <span style="font-size:0.78rem;color:var(--text3);margin-right:4px">Filtrer :</span>
+      <button class="filter-chip active" onclick="filtrer(this,'all')">Tout</button>
+      <button class="filter-chip f-especes" onclick="filtrer(this,'especes')">💵 Espèces</button>
+      <button class="filter-chip f-membres" onclick="filtrer(this,'membres')">👤 Membres banque</button>
+      <button class="filter-chip f-dons" onclick="filtrer(this,'dons')">🎁 Dons</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="trierColonne('date')">Date <span id="sort-date">↑</span></th>
+            <th onclick="trierColonne('source')">Rapport <span id="sort-source">↕</span></th>
+            <th onclick="trierColonne('nom')">Description <span id="sort-nom">↕</span></th>
+            <th onclick="trierColonne('subtype')">Type <span id="sort-subtype">↕</span></th>
+            <th onclick="trierColonne('montantBrut')">Brut <span id="sort-montantBrut">↕</span></th>
+            <th>Dons déduits</th>
+            <th onclick="trierColonne('montant')">Net <span id="sort-montant">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="apercuBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card" id="importCard" style="display:none">
+    <div class="card-title">⚡ Étape 2 — Importer dans ComptaLumia</div>
+    <div class="info-tip">
+      👤 <strong>Membres banque</strong> : chaque personne avec son montant exact, dons déduits au prorata.<br>
+      💵 <strong>Espèces</strong> : total espèces nettes (hors dons) + ligne séparée pour les dons espèces.<br>
+      🎁 <strong>Dons</strong> : toujours enregistrés séparément, jamais mélangés aux recettes.<br>
+      📅 Tri automatique par date · Doublons ignorés automatiquement.
+    </div>
+
+    <!-- USER SELECTOR -->
+    <div id="userSelectorBox" style="margin:14px 0 18px; padding:14px 18px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.25); border-radius:12px;">
+      <div style="font-weight:700; font-size:0.9rem; margin-bottom:10px; color:#6366f1;">👤 Compte de destination ComptaLumia</div>
+      <div id="userSelectorContent"></div>
+    </div>
+
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-success" id="btnImport" onclick="importerDansCompta()">✅ Importer dans ComptaLumia</button>
+      <button class="btn-warning" onclick="exporterJSON()">📥 Export JSON</button>
+      <button class="btn-danger" id="btnAnnuler" style="display:none" onclick="annulerDernierImport()">↩ Annuler le dernier import</button>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="card">
+    <div class="card-title">📋 Journal</div>
+    <div id="logBox"><span class="log-info">// En attente de lecture des données...</span></div>
+  </div>
+
+</div>
+
+<script>
+  let transactionsAImporter = [];
+  let dernierImportIds = [];
+  let dernierImportPrefix = '';
+  let colonneTriee = 'date';
+  let directionTri = 'asc';
+  let filtreActif = 'all';
+
+  function log(msg, type = 'info') {
+    const box = document.getElementById('logBox');
+    const line = document.createElement('div');
+    line.className = `log-${type}`;
+    line.textContent = `[${new Date().toLocaleTimeString('fr-FR')}] ${msg}`;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function parseDateRapport(d) {
+    if (!d) return new Date().toISOString().split('T')[0];
+    const p = d.split('/');
+    if (p.length === 3) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+    if (d.includes('-')) return d.split('T')[0];
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function chargerDonnees() {
+    log('Lecture localStorage (rapports)...', 'info');
+    transactionsAImporter = [];
+
+    const raw = localStorage.getItem('rapports');
+    if (!raw) { log('❌ Aucun rapport trouvé. Ouvrez rapports.html dans ce même navigateur d\'abord.', 'err'); return; }
+
+    let rapports;
+    try { rapports = JSON.parse(raw); }
+    catch(e) { log('❌ Erreur JSON: ' + e.message, 'err'); return; }
+
+    if (!rapports.length) { log('⚠️ Aucun rapport dans le tableau.', 'warn'); return; }
+
+    log(`✔ ${rapports.length} rapport(s) trouvé(s)`, 'ok');
+
+    let totalCA = 0, totalDons = 0, totalEsp = 0, totalMembres = 0;
+    const decompoData = [];
+
+    rapports.forEach(rapport => {
+      const dateStr    = parseDateRapport(rapport.dateCloture);
+      const rapportId  = `${rapport.type}-${rapport.numero}`;
+      const hasDons    = rapport.afficherDons || false;
+
+      const totalEspeces = parseFloat(rapport.totalEspeces || 0);
+      const totalBanque  = parseFloat(rapport.totalBanque  || 0);
+      const donsEspeces  = hasDons ? parseFloat(rapport.donsEspeces || 0) : 0;
+      const donsBanque   = hasDons ? parseFloat(rapport.donsBanque  || 0) : 0;
+      const totalDonsR   = hasDons ? parseFloat(rapport.totalDons   || 0) : 0;
+
+      const especesNettes = Math.max(0, totalEspeces - donsEspeces);
+      const banqueNette   = Math.max(0, totalBanque  - donsBanque);
+
+      const decompRapport = {
+        id: rapportId, date: dateStr, dateCloture: rapport.dateCloture,
+        totalEspeces, donsEspeces, especesNettes,
+        totalBanque,  donsBanque,  banqueNette,
+        totalDons: totalDonsR,
+        membres: {}, membresDonsEstimes: {}
+      };
+
+      // --- ESPÈCES NETTES ---
+      if (especesNettes > 0.005) {
+        transactionsAImporter.push({
+          source: rapportId, subtype: 'especes', type: 'recettes',
+          date: dateStr,
+          nom: `Espèces nettes ${rapportId} (${rapport.dateCloture})`,
+          categorie: 'Ventes',
+          montant: +especesNettes.toFixed(2),
+          montantBrut: +totalEspeces.toFixed(2),
+          donsDebites: +donsEspeces.toFixed(2),
+          paymentType: 'especes', rapportId
+        });
+        totalEsp += especesNettes;
+        totalCA  += especesNettes;
+      }
+
+      // --- DONS ESPÈCES ---
+      if (donsEspeces > 0.005) {
+        transactionsAImporter.push({
+          source: rapportId, subtype: 'dons', type: 'dons',
+          date: dateStr,
+          nom: `Dons espèces ${rapportId} (${rapport.dateCloture})`,
+          categorie: 'Dons',
+          montant: +donsEspeces.toFixed(2),
+          montantBrut: +donsEspeces.toFixed(2),
+          donsDebites: 0,
+          donationType: 'cash', rapportId
+        });
+        totalDons += donsEspeces;
+      }
+
+      // --- MEMBRES BANQUE ---
+      const membresBanque = rapport.membresBanque || {};
+      const nbMembres     = Object.keys(membresBanque).length;
+
+      if (nbMembres > 0) {
+        // membresBanque est un objet { nom: { montant, nb } } depuis rapports.html
+        const totalMembresBrut = Object.values(membresBanque).reduce((s, v) => {
+          const val = (v && typeof v === 'object') ? (v.montant || 0) : parseFloat(v || 0);
+          return s + val;
+        }, 0);
+
+        Object.entries(membresBanque).forEach(([nom, membreData]) => {
+          const mb = (membreData && typeof membreData === 'object')
+            ? parseFloat(membreData.montant || 0)
+            : parseFloat(membreData || 0);
+          if (mb <= 0) return;
+
+          // Don attribué au prorata du montant de ce membre
+          const donsMembre = (donsBanque > 0 && totalMembresBrut > 0)
+            ? donsBanque * (mb / totalMembresBrut)
+            : 0;
+          const montantNet = Math.max(0, mb - donsMembre);
+
+          decompRapport.membres[nom] = mb;
+          decompRapport.membresDonsEstimes[nom] = donsMembre;
+
+          // Recette nette du membre
+          if (montantNet > 0.005) {
+            transactionsAImporter.push({
+              source: rapportId, subtype: 'membres', type: 'recettes',
+              date: dateStr,
+              nom: `${nom} (${rapport.dateCloture})`,
+              categorie: 'Membres',
+              montant: +montantNet.toFixed(2),
+              montantBrut: +mb.toFixed(2),
+              donsDebites: +donsMembre.toFixed(2),
+              paymentType: 'banque',
+              isMembre: true, membreNom: nom, rapportId
+            });
+            totalMembres += montantNet;
+            totalCA      += montantNet;
+          }
+
+          // Don banque attribué à ce membre
+          if (donsMembre > 0.005) {
+            transactionsAImporter.push({
+              source: rapportId, subtype: 'dons', type: 'dons',
+              date: dateStr,
+              nom: `Don banque · ${nom} (${rapport.dateCloture})`,
+              categorie: 'Dons',
+              montant: +donsMembre.toFixed(2),
+              montantBrut: +donsMembre.toFixed(2),
+              donsDebites: 0,
+              donationType: 'banque',
+              isMembre: true, membreNom: nom, rapportId
+            });
+            totalDons += donsMembre;
+          }
+        });
+      } else if (banqueNette > 0.005) {
+        // Pas de détail membres → recette banque globale
+        transactionsAImporter.push({
+          source: rapportId, subtype: 'membres', type: 'recettes',
+          date: dateStr,
+          nom: `Recettes banque ${rapportId} (${rapport.dateCloture})`,
+          categorie: 'Ventes',
+          montant: +banqueNette.toFixed(2),
+          montantBrut: +totalBanque.toFixed(2),
+          donsDebites: +donsBanque.toFixed(2),
+          paymentType: 'banque', rapportId
+        });
+        totalCA += banqueNette;
+
+        if (donsBanque > 0.005) {
+          transactionsAImporter.push({
+            source: rapportId, subtype: 'dons', type: 'dons',
+            date: dateStr,
+            nom: `Dons banque ${rapportId} (${rapport.dateCloture})`,
+            categorie: 'Dons',
+            montant: +donsBanque.toFixed(2),
+            montantBrut: +donsBanque.toFixed(2),
+            donsDebites: 0,
+            donationType: 'banque', rapportId
+          });
+          totalDons += donsBanque;
+        }
+      }
+
+      decompoData.push(decompRapport);
+      log(`  ↳ ${rapportId} : espèces nettes ${fmt(especesNettes)}, ${nbMembres} membre(s), dons ${fmt(totalDonsR)}`, 'ok');
+    });
+
+    // Trier par date
+    trierTransactions('date', 'asc');
+
+    // Stats
+    document.getElementById('statRapports').textContent = rapports.length;
+    document.getElementById('statCA').textContent      = fmtShort(totalCA);
+    document.getElementById('statEsp').textContent     = fmtShort(totalEsp);
+    document.getElementById('statDons').textContent    = fmtShort(totalDons);
+    document.getElementById('statMembres').textContent = fmtShort(totalMembres);
+
+    renderDecompo(decompoData);
+
+    log(`✔ ${transactionsAImporter.length} transaction(s) prêtes, triées par date`, 'ok');
+
+    ['decompoCard','apercuCard','importCard'].forEach(id => document.getElementById(id).style.display = 'block');
+    renderUserSelector();
+    document.getElementById('apercuCount').textContent = transactionsAImporter.length;
+    renderTable();
+  }
+
+  // =============================================
+  // DÉCOMPOSITION
+  // =============================================
+  function renderDecompo(data) {
+    const grid = document.getElementById('decompoGrid');
+    grid.innerHTML = '';
+
+    data.forEach(r => {
+      const box = document.createElement('div');
+      box.className = 'decompo-box';
+      const nbMembres = Object.keys(r.membres).length;
+
+      let membresHTML = '';
+      if (nbMembres > 0) {
+        membresHTML = Object.entries(r.membres).map(([nom, brut]) => {
+          const don = r.membresDonsEstimes[nom] || 0;
+          const net = Math.max(0, brut - don);
+          return `
+            <div class="decompo-row">
+              <span class="decompo-name" title="${nom}">👤 ${nom}</span>
+              <div class="decompo-net">
+                <span class="decompo-total">${fmtShort(brut)}</span>
+                ${don > 0.01 ? `<span class="decompo-don-sub">- ${fmtShort(don)} don</span>` : ''}
+                <span class="decompo-final">= ${fmtShort(net)}</span>
+              </div>
+            </div>`;
+        }).join('');
+      } else {
+        membresHTML = `<div class="decompo-row"><span class="decompo-name" style="font-style:italic;font-size:0.74rem">Pas de membres détaillés</span><span style="font-family:'Nunito',monospace;color:var(--accent)">${fmtShort(r.banqueNette)}</span></div>`;
+      }
+
+      box.innerHTML = `
+        <h4 style="color:var(--accent)">📊 ${r.id}
+          <span style="font-size:0.74rem;color:var(--text3);font-family:'Nunito',monospace;font-weight:400;margin-left:4px">${r.dateCloture}</span>
+        </h4>
+
+        <div class="decompo-row">
+          <span class="decompo-name">💵 Espèces brutes</span>
+          <span style="font-family:'Nunito',monospace">${fmtShort(r.totalEspeces)}</span>
+        </div>
+        ${r.donsEspeces > 0.01 ? `
+        <div class="decompo-row">
+          <span class="decompo-name">&nbsp;&nbsp;↳ Dons déduits</span>
+          <span style="color:var(--yellow);font-family:'Nunito',monospace">- ${fmtShort(r.donsEspeces)}</span>
+        </div>` : ''}
+        <div class="decompo-row">
+          <span class="decompo-name" style="color:var(--green)">✅ Espèces nettes</span>
+          <span style="color:var(--green);font-weight:700;font-family:'Nunito',monospace">${fmtShort(r.especesNettes)}</span>
+        </div>
+
+        <div style="height:1px;background:var(--border);margin:8px 0"></div>
+        <div style="font-size:0.7rem;color:var(--text3);margin-bottom:6px;font-family:'Nunito',monospace;text-transform:uppercase;letter-spacing:0.05em">Membres banque (${Object.keys(r.membres).length})</div>
+        ${membresHTML}
+
+        ${r.totalDons > 0.01 ? `
+        <div style="height:1px;background:var(--border);margin:8px 0"></div>
+        <div class="decompo-row">
+          <span class="decompo-name" style="color:var(--yellow)">🎁 Total dons rapport</span>
+          <span style="color:var(--yellow);font-weight:600;font-family:'Nunito',monospace">${fmtShort(r.totalDons)}</span>
+        </div>` : ''}
+      `;
+
+      grid.appendChild(box);
+    });
+  }
+
+  // =============================================
+  // TRI
+  // =============================================
+  function trierColonne(col) {
+    if (colonneTriee === col) directionTri = directionTri === 'asc' ? 'desc' : 'asc';
+    else { colonneTriee = col; directionTri = 'asc'; }
+    ['date','source','nom','subtype','montantBrut','montant'].forEach(c => {
+      const el = document.getElementById('sort-' + c);
+      if (el) el.textContent = '↕';
+    });
+    const arrow = document.getElementById('sort-' + col);
+    if (arrow) {
+      arrow.textContent = directionTri === 'asc' ? '↑' : '↓';
+      document.querySelectorAll('th').forEach(t => t.classList.remove('sorted'));
+      arrow.closest('th').classList.add('sorted');
+    }
+    trierTransactions(col, directionTri);
+    renderTable();
+  }
+
+  function trierTransactions(col, dir) {
+    transactionsAImporter.sort((a, b) => {
+      let va, vb;
+      if (col === 'date' || col === 'montant' || col === 'montantBrut') {
+        va = col === 'date' ? a.date : (a[col] || 0);
+        vb = col === 'date' ? b.date : (b[col] || 0);
+      } else {
+        va = (a[col] || '').toLowerCase();
+        vb = (b[col] || '').toLowerCase();
+      }
+      if (va < vb) return dir === 'asc' ? -1 : 1;
+      if (va > vb) return dir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  // =============================================
+  // FILTRE
+  // =============================================
+  function filtrer(btn, type) {
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filtreActif = type;
+    renderTable();
+  }
+
+  // =============================================
+  // TABLE
+  // =============================================
+  function renderTable() {
+    const tbody = document.getElementById('apercuBody');
+    tbody.innerHTML = '';
+
+    let liste = transactionsAImporter;
+    if (filtreActif === 'especes')  liste = liste.filter(t => t.subtype === 'especes');
+    if (filtreActif === 'membres')  liste = liste.filter(t => t.subtype === 'membres');
+    if (filtreActif === 'dons')     liste = liste.filter(t => t.subtype === 'dons');
+
+    if (!liste.length) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty">🔍 Aucune transaction pour ce filtre</div></td></tr>`;
+      document.getElementById('apercuCount').textContent = `0 / ${transactionsAImporter.length}`;
+      return;
+    }
+
+    liste.forEach(t => {
+      const tr = document.createElement('tr');
+      let pillHTML = '';
+      if (t.subtype === 'dons')         pillHTML = `<span class="pill pill-dons">🎁 Don</span>`;
+      else if (t.isMembre)              pillHTML = `<span class="pill pill-membres">👤 Membre</span>`;
+      else if (t.subtype === 'especes') pillHTML = `<span class="pill pill-especes">💵 Espèces</span>`;
+      else                              pillHTML = `<span class="pill pill-recettes">💰 Banque</span>`;
+
+      const dateDisplay = t.date ? new Date(t.date + 'T00:00:00').toLocaleDateString('fr-BE') : '—';
+      const hasDon = t.donsDebites > 0.005;
+
+      tr.innerHTML = `
+        <td>${dateDisplay}</td>
+        <td style="color:var(--text3);font-size:0.76rem">${t.source}</td>
+        <td style="max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.nom}">${t.nom}</td>
+        <td>${pillHTML}</td>
+        <td style="color:var(--text3)">${hasDon ? fmtShort(t.montantBrut) : '—'}</td>
+        <td style="color:var(--yellow)">${hasDon ? '- ' + fmtShort(t.donsDebites) : '—'}</td>
+        <td style="color:${t.subtype === 'dons' ? 'var(--yellow)' : 'var(--green)'};font-weight:600">+${fmtShort(t.montant)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('apercuCount').textContent =
+      liste.length !== transactionsAImporter.length
+        ? `${liste.length} / ${transactionsAImporter.length}`
+        : transactionsAImporter.length;
+  }
+
+  // =============================================
+  // =============================================
+  // USERS — lecture des comptes ComptaLumia
+  // =============================================
+  function getUserPrefix(username) {
+    return 'cl_u_' + username + '_';
+  }
+
+  function loadComptaUsers() {
+    try {
+      const users = JSON.parse(localStorage.getItem('cl_auth_users') || '{}');
+      return users;
+    } catch(e) { return {}; }
+  }
+
+  function renderUserSelector() {
+    const users = loadComptaUsers();
+    const keys = Object.keys(users);
+    const container = document.getElementById('userSelectorContent');
+    if (!container) return;
+
+    if (keys.length === 0) {
+      container.innerHTML = `
+        <div style="color:#f59e0b; font-size:0.88rem;">
+          ⚠️ Aucun compte ComptaLumia détecté dans ce navigateur.<br>
+          <span style="opacity:0.7">Ouvrez d'abord ComptaLumia et créez un compte, puis revenez ici.</span>
+        </div>`;
+      document.getElementById('btnImport').disabled = true;
+      return;
+    }
+
+    // Session active
+    const session = localStorage.getItem('cl_auth_session') || '';
+
+    let html = `<div style="display:flex; flex-wrap:wrap; gap:8px;">`;
+    keys.forEach(uname => {
+      const u = users[uname];
+      const isActive = uname === session;
+      const initials = (u.company || uname).charAt(0).toUpperCase();
+      html += `
+        <label style="cursor:pointer;">
+          <input type="radio" name="bridge_target_user" value="${uname}" ${isActive || keys.length === 1 ? 'checked' : ''} style="display:none">
+          <div class="bridge-user-chip ${isActive ? 'bridge-chip-active' : ''}" onclick="this.closest('label').querySelector('input').checked=true; document.querySelectorAll('.bridge-user-chip').forEach(c=>c.classList.remove('bridge-chip-active')); this.classList.add('bridge-chip-active');">
+            <div class="bridge-avatar">${initials}</div>
+            <div>
+              <div style="font-weight:700; font-size:0.88rem;">${u.company || uname}</div>
+              <div style="font-size:0.73rem; opacity:0.6;">@${uname}${isActive ? ' · connecté' : ''}</div>
+            </div>
+          </div>
+        </label>`;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+    document.getElementById('btnImport').disabled = false;
+  }
+
+  function getSelectedUser() {
+    const checked = document.querySelector('input[name="bridge_target_user"]:checked');
+    return checked ? checked.value : null;
+  }
+
+  // IMPORT
+  // =============================================
+  function importerDansCompta() {
+    if (!transactionsAImporter.length) { log('⚠️ Rien à importer', 'warn'); return; }
+
+    const targetUser = getSelectedUser();
+    if (!targetUser) { log('⚠️ Veuillez sélectionner un compte de destination', 'warn'); return; }
+
+    const prefix = getUserPrefix(targetUser);
+    const users = loadComptaUsers();
+    const userName = users[targetUser]?.company || targetUser;
+    log(`📤 Import vers le compte : ${userName} (@${targetUser})`, 'info');
+
+    const btn = document.getElementById('btnImport');
+    btn.disabled = true;
+    btn.textContent = '⏳ Import en cours...';
+    const bar = document.getElementById('progressBar');
+    const fill = document.getElementById('progressFill');
+    bar.style.display = 'block';
+    fill.style.width = '0%';
+
+    let existantes = [];
+    try {
+      const raw = localStorage.getItem(prefix + 'comptable_transactions');
+      if (raw) existantes = JSON.parse(raw);
+    } catch(e) { log('⚠️ Lecture existantes: ' + e.message, 'warn'); }
+
+    const clesDeja = new Set(existantes.map(t =>
+      `${t.date}_${parseFloat(t.amount || 0).toFixed(2)}_${t.type}_${(t.name || '').substring(0,30)}`
+    ));
+
+    dernierImportIds = [];
+    dernierImportPrefix = prefix;
+    let nbAjoutes = 0, nbDoublons = 0;
+    const total = transactionsAImporter.length;
+
+    transactionsAImporter.forEach((t, i) => {
+      const cle = `${t.date}_${t.montant.toFixed(2)}_${t.type}_${t.nom.substring(0,30)}`;
+      if (clesDeja.has(cle)) { nbDoublons++; fill.style.width = `${((i+1)/total*100)}%`; return; }
+
+      const id = Date.now().toString(36) + Math.random().toString(36).substr(2) + i;
+      existantes.push({
+        id,
+        type: t.type,
+        date: t.date,
+        name: t.nom,
+        amount: t.montant,
+        category: t.categorie,
+        attachment: '',
+        vatRate: null,
+        paymentType: t.paymentType || null,
+        paymentStatus: null,
+        donationType: t.donationType || null,
+        fromBridge: true,
+        fromPeppol: false,
+        bridgeSource: t.rapportId || null
+      });
+
+      dernierImportIds.push(id);
+      clesDeja.add(cle);
+      nbAjoutes++;
+      fill.style.width = `${((i+1)/total*100)}%`;
+    });
+
+    // Tri final par date
+    existantes.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    try {
+      localStorage.setItem(prefix + 'comptable_transactions', JSON.stringify(existantes));
+      // Signal ComptaLumia to reload
+      localStorage.setItem('lumia_bridge_refresh', Date.now().toString());
+      log(`✔ ${nbAjoutes} transaction(s) importée(s) dans "${userName}", ${nbDoublons} doublon(s) ignoré(s)`, 'ok');
+      if (nbAjoutes > 0) {
+        log(`✔ ComptaLumia va se rafraîchir automatiquement si le compte "${userName}" est ouvert`, 'ok');
+        document.getElementById('btnAnnuler').style.display = 'inline-block';
+      } else {
+        log(`ℹ️ Aucune nouvelle transaction — ComptaLumia inchangé`, 'info');
+      }
+    } catch(e) { log('❌ Erreur sauvegarde: ' + e.message, 'err'); }
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '✅ Importer dans ComptaLumia';
+      fill.style.width = '100%';
+      setTimeout(() => bar.style.display = 'none', 1000);
+    }, 600);
+  }
+
+  // =============================================
+  // ANNULER
+  // =============================================
+  function annulerDernierImport() {
+    if (!dernierImportIds.length) { log('⚠️ Rien à annuler', 'warn'); return; }
+    if (!confirm(`Annuler l'import de ${dernierImportIds.length} transaction(s) ?`)) return;
+    const prefix = dernierImportPrefix || '';
+    let existantes = [];
+    try { existantes = JSON.parse(localStorage.getItem(prefix + 'comptable_transactions') || '[]'); } catch(e) {}
+    const avant = existantes.length;
+    existantes = existantes.filter(t => !dernierImportIds.includes(t.id));
+    localStorage.setItem(prefix + 'comptable_transactions', JSON.stringify(existantes));
+    localStorage.setItem('lumia_bridge_refresh', Date.now().toString());
+    log(`↩ ${avant - existantes.length} transaction(s) supprimée(s)`, 'warn');
+    dernierImportIds = [];
+    dernierImportPrefix = '';
+    document.getElementById('btnAnnuler').style.display = 'none';
+  }
+
+  // =============================================
+  // EXPORT
+  // =============================================
+  function exporterJSON() {
+    if (!transactionsAImporter.length) { log('⚠️ Rien à exporter', 'warn'); return; }
+    const blob = new Blob([JSON.stringify({ exportDate: new Date().toISOString(), source: 'LumiaBridge v2', transactions: transactionsAImporter }, null, 2)], { type: 'application/json' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `lumiabridge_v2_${new Date().toISOString().split('T')[0]}.json` });
+    a.click();
+    URL.revokeObjectURL(a.href);
+    log('✔ Export JSON téléchargé', 'ok');
+  }
+
+  function effacerApercu() {
+    transactionsAImporter = [];
+    ['decompoCard','apercuCard','importCard'].forEach(id => document.getElementById(id).style.display = 'none');
+    ['statRapports','statCA','statEsp','statDons','statMembres'].forEach(id => document.getElementById(id).textContent = '—');
+    log('// Effacé', 'info');
+  }
+
+  // =============================================
+  // FORMAT
+  // =============================================
+  function fmt(v) {
+    return new Intl.NumberFormat('fr-BE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 }).format(v);
+  }
+  function fmtShort(v) {
+    const abs = Math.abs(v);
+    const opts = abs >= 1000
+      ? { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }
+      : { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 };
+    return new Intl.NumberFormat('fr-BE', opts).format(v);
+  }
+
+  // Init sort arrow
+  document.getElementById('sort-date').textContent = '↑';
+  document.querySelector('th').classList.add('sorted');
+</script>
+</body>
+</html>

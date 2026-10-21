@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centre de Contrôle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+      --orange:#e06820; --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+      --purple:#8e44ad; --purple-pale:#f5f0ff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+      --glass:rgba(255,255,255,0.82);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Nunito','Segoe UI',sans-serif;font-size:14px;background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);min-height:100vh;color:var(--text);overflow-x:hidden;}
+    body::before{content:'';position:fixed;top:-150px;left:-150px;width:550px;height:550px;background:radial-gradient(circle,rgba(168,213,244,0.55),transparent 70%);pointer-events:none;z-index:0;border-radius:50%;}
+    body::after{content:'';position:fixed;bottom:-100px;right:5%;width:450px;height:450px;background:radial-gradient(circle,rgba(184,232,154,0.45),transparent 70%);pointer-events:none;z-index:0;border-radius:50%;}
+
+    .container{max-width:1300px;margin:0 auto;padding:24px;position:relative;z-index:1;}
+
+    /* HEADER */
+    .page-header{background:linear-gradient(135deg,rgba(255,255,255,0.92),rgba(195,228,252,0.88),rgba(140,196,240,0.92));border:1px solid rgba(255,255,255,0.95);border-radius:var(--radius-xl);padding:20px 28px;margin-bottom:20px;box-shadow:0 6px 28px var(--shadow2),0 1px 0 rgba(255,255,255,0.9) inset;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;animation:fadeInDown .5s ease;}
+    .page-header::before{content:'';position:absolute;top:0;left:0;right:0;height:45%;background:linear-gradient(180deg,rgba(255,255,255,0.55),rgba(255,255,255,0.05));border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;pointer-events:none;}
+    .page-header::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));border-radius:var(--radius-xl) var(--radius-xl) 0 0;}
+    .header-left{display:flex;align-items:center;gap:14px;}
+    .header-icon{font-size:2.4em;animation:pulse 2.5s ease-in-out infinite;filter:drop-shadow(0 3px 8px rgba(30,80,180,0.2));}
+    .header-title h1{font-size:1.7em;font-weight:900;color:var(--blue3);}
+    .header-title p{color:var(--text3);font-size:.85em;font-weight:600;margin-top:2px;}
+    .header-right{display:flex;align-items:center;gap:10px;}
+
+    /* BUTTONS */
+    .btn{font-family:'Nunito',sans-serif;font-weight:700;border-radius:20px;position:relative;overflow:hidden;cursor:pointer;border:none;transition:all .18s ease;display:inline-flex;align-items:center;gap:7px;padding:9px 20px;font-size:.9em;}
+    .btn::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.35);border-radius:20px 20px 0 0;pointer-events:none;}
+    .btn-ghost{background:linear-gradient(180deg,rgba(255,255,255,0.85),rgba(210,220,230,0.85));color:var(--text2);border:1px solid var(--border)!important;box-shadow:0 2px 8px var(--shadow2),0 1px 0 rgba(255,255,255,0.9) inset;}
+    .btn-ghost:hover{background:linear-gradient(180deg,#fff,#d0dcea);transform:translateY(-2px);box-shadow:0 4px 14px var(--shadow);}
+    .btn-blue{background:linear-gradient(180deg,#5bb0f0 0%,#2a7fd4 45%,#1558b0 100%);color:white;box-shadow:0 2px 10px rgba(30,80,180,0.3),0 1px 0 rgba(255,255,255,0.4) inset;}
+    .btn-blue:hover{background:linear-gradient(180deg,#7cc4f8,#3a90e4,#1a6cc0);transform:translateY(-2px);box-shadow:0 5px 16px rgba(30,80,180,0.4);}
+    .btn-green{background:linear-gradient(180deg,#90d860 0%,#5aad2e 45%,#3d8a18 100%);color:white;box-shadow:0 2px 10px rgba(60,140,20,0.3),0 1px 0 rgba(255,255,255,0.4) inset;}
+    .btn-green:hover{background:linear-gradient(180deg,#a4e474,#6ac03a,#4a9a20);transform:translateY(-2px);}
+    .btn-red{background:linear-gradient(180deg,#f08080 0%,#c0392b 45%,#922b21 100%);color:white;box-shadow:0 2px 10px rgba(180,40,30,0.3),0 1px 0 rgba(255,255,255,0.4) inset;}
+    .btn-red:hover{background:linear-gradient(180deg,#f89898,#d44040,#a03030);transform:translateY(-2px);}
+    .btn-yellow{background:linear-gradient(180deg,#ffd84d 0%,#e8a800 45%,#c08800 100%);color:#5a3800;box-shadow:0 2px 10px rgba(200,140,0,0.3),0 1px 0 rgba(255,255,255,0.5) inset;}
+    .btn-yellow:hover{background:linear-gradient(180deg,#ffe460,#f0b800,#d09800);transform:translateY(-2px);}
+
+    /* TABS */
+    .tabs{display:flex;gap:0;border-bottom:2px solid var(--border2);}
+    .tab-btn{font-family:'Nunito',sans-serif;font-size:.95em;font-weight:800;padding:12px 28px;border:none;cursor:pointer;background:transparent;color:var(--text3);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;align-items:center;gap:8px;}
+    .tab-btn:hover{color:var(--text2);}
+    .tab-btn.active{color:var(--blue3);border-bottom-color:var(--blue);}
+    .tab-btn.active-green{color:var(--green2);border-bottom-color:var(--green);}
+
+    /* MAIN PANEL */
+    .main-panel{background:var(--glass);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.95);border-radius:0 var(--radius-xl) var(--radius-xl) var(--radius-xl);padding:28px;box-shadow:0 8px 40px var(--shadow2),0 1px 0 rgba(255,255,255,0.9) inset;position:relative;overflow:hidden;}
+    .main-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(180deg,rgba(255,255,255,0.5),transparent);border-radius:0 var(--radius-xl) 60% 60%;pointer-events:none;}
+    .page{display:none;animation:fadeIn .3s ease;}
+    .page.active{display:block;}
+
+    .section-title{font-size:1.2em;font-weight:900;color:var(--blue3);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+
+    /* STATS */
+    .stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
+    .stat-card{background:linear-gradient(145deg,rgba(255,255,255,0.92),rgba(215,235,255,0.78));border:1px solid rgba(255,255,255,0.95);border-radius:var(--radius-lg);padding:14px 16px;box-shadow:0 3px 12px var(--shadow2),0 1px 0 rgba(255,255,255,0.9) inset;position:relative;overflow:hidden;border-top:3px solid var(--blue);transition:transform .2s;}
+    .stat-card:hover{transform:translateY(-3px);}
+    .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(255,255,255,0.5),transparent);pointer-events:none;}
+    .stat-card.sc-prix{border-top-color:var(--yellow);}
+    .stat-card.sc-qte{border-top-color:var(--blue);}
+    .stat-card.sc-offert{border-top-color:var(--purple);}
+    .stat-card.sc-suppr{border-top-color:var(--red);}
+    .stat-card.sc-ajout{border-top-color:var(--green);}
+    .stat-label{font-size:.72em;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:4px;}
+    .stat-value{font-size:2em;font-weight:900;color:var(--text);line-height:1;}
+    .sc-prix .stat-value{color:var(--yellow2);}
+    .sc-qte .stat-value{color:var(--blue2);}
+    .sc-offert .stat-value{color:var(--purple);}
+    .sc-suppr .stat-value{color:var(--red);}
+    .sc-ajout .stat-value{color:var(--green2);}
+
+    /* LIVE */
+    .live-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-pale);border:1px solid var(--green);color:var(--green2);padding:5px 14px;border-radius:20px;font-size:.8em;font-weight:800;}
+    .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:blinkDot 1.5s infinite;}
+
+    /* FILTERS */
+    .filters-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+    .filter-btn{padding:4px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'Nunito',sans-serif;font-size:.8em;font-weight:700;cursor:pointer;transition:all .15s;}
+    .filter-btn:hover,.filter-btn.active{border-color:var(--blue);color:var(--blue2);background:var(--blue-pale);}
+    .filter-btn.f-PRIX.active{border-color:var(--yellow);color:var(--yellow2);background:var(--yellow-pale);}
+    .filter-btn.f-OFFERT.active{border-color:var(--purple);color:var(--purple);background:var(--purple-pale);}
+    .filter-btn.f-SUPPR.active{border-color:var(--red);color:var(--red);background:var(--red-pale);}
+    .filter-btn.f-AJOUT.active{border-color:var(--green);color:var(--green2);background:var(--green-pale);}
+    .search-input{margin-left:auto;background:rgba(255,255,255,.85);border:1px solid var(--border);color:var(--text);padding:5px 14px;border-radius:20px;font-family:'Nunito',sans-serif;font-size:.85em;font-weight:600;width:220px;outline:none;transition:border-color .2s;box-shadow:0 1px 4px var(--shadow2);}
+    .search-input:focus{border-color:var(--blue-light);}
+    .search-input::placeholder{color:var(--text3);}
+
+    /* LOG TABLE */
+    .log-wrapper{max-height:400px;overflow-y:auto;border-radius:var(--radius-lg);border:1px solid var(--border2);}
+    .log-wrapper::-webkit-scrollbar{width:6px;}
+    .log-wrapper::-webkit-scrollbar-track{background:rgba(200,220,240,.3);}
+    .log-wrapper::-webkit-scrollbar-thumb{background:var(--blue-light);border-radius:3px;}
+    .log-table{width:100%;border-collapse:collapse;}
+    .log-table thead tr{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(215,235,255,.8));position:sticky;top:0;z-index:2;}
+    .log-table th{padding:10px 12px;text-align:left;font-size:.72em;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text3);border-bottom:2px solid var(--border2);white-space:nowrap;}
+    .log-table td{padding:9px 12px;border-bottom:1px solid rgba(180,210,240,.25);vertical-align:middle;font-size:.88em;}
+    .log-table tbody tr{background:rgba(255,255,255,.55);transition:background .15s;}
+    .log-table tbody tr:hover{background:var(--blue-pale);}
+    .log-table tbody tr:last-child td{border-bottom:none;}
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--radius);font-size:.78em;font-weight:800;white-space:nowrap;}
+    .b-PRIX{background:var(--yellow-pale);color:var(--yellow2);border:1px solid rgba(232,168,0,.3);}
+    .b-QTE{background:var(--blue-pale);color:var(--blue2);border:1px solid rgba(42,127,212,.3);}
+    .b-OFFERT{background:var(--purple-pale);color:var(--purple);border:1px solid rgba(142,68,173,.3);}
+    .b-SUPPR{background:var(--red-pale);color:var(--red);border:1px solid rgba(192,57,43,.3);}
+    .b-AJOUT{background:var(--green-pale);color:var(--green2);border:1px solid rgba(90,173,46,.3);}
+    .delta-pos{color:var(--green2);font-weight:800;}
+    .delta-neg{color:var(--red);font-weight:800;}
+    .ticket-ref{color:var(--blue2);font-weight:800;}
+
+    /* ALERTS */
+    .alert-item{display:flex;align-items:flex-start;gap:12px;padding:11px 15px;border-radius:var(--radius);margin-bottom:7px;border-left:4px solid;animation:slideInLeft .3s ease;}
+    .alert-warn{background:var(--yellow-pale);border-color:var(--yellow);}
+    .alert-info{background:var(--blue-pale);border-color:var(--blue);}
+    .alert-danger{background:var(--red-pale);border-color:var(--red);}
+    .alert-icon{font-size:1.1em;flex-shrink:0;margin-top:1px;}
+    .alert-text{flex:1;}
+    .alert-text strong{display:block;font-weight:800;font-size:.88em;color:var(--text);}
+    .alert-text span{color:var(--text2);font-size:.82em;}
+    .alert-ts{color:var(--text3);font-size:.75em;white-space:nowrap;flex-shrink:0;align-self:center;}
+
+    /* EMPTY */
+    .empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
+    .empty-state .es-icon{font-size:3.5em;margin-bottom:12px;filter:drop-shadow(0 4px 10px rgba(30,80,180,0.12));}
+    .empty-state h3{font-size:1.3em;font-weight:900;color:var(--text2);margin-bottom:6px;}
+    .empty-state p{font-size:.9em;}
+
+    /* RAPPORT PAGE */
+    .actions-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+    .reports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+    .report-card{background:linear-gradient(145deg,rgba(255,255,255,0.92),rgba(215,235,255,0.78));border:1px solid rgba(255,255,255,0.95);border-radius:var(--radius-xl);padding:20px;box-shadow:0 3px 16px var(--shadow2),0 1px 0 rgba(255,255,255,0.95) inset;transition:all .22s;position:relative;overflow:hidden;border-left:4px solid var(--blue);}
+    .report-card::before{content:'';position:absolute;top:0;left:0;right:0;height:38%;background:linear-gradient(180deg,rgba(255,255,255,.65),rgba(255,255,255,.08));border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;pointer-events:none;}
+    .report-card:hover{transform:translateY(-4px);box-shadow:0 10px 32px rgba(30,80,180,0.18),0 1px 0 rgba(255,255,255,0.95) inset;}
+    .report-card h3{font-size:1.1em;font-weight:900;color:var(--blue3);margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border2);display:flex;align-items:center;gap:8px;}
+    .info-line{display:flex;justify-content:space-between;padding:6px 0;font-size:.88em;border-bottom:1px solid rgba(180,210,240,.2);}
+    .info-line:last-of-type{border-bottom:none;}
+    .info-line .lbl{font-weight:700;color:var(--text2);}
+    .info-line .val{font-weight:600;color:var(--text3);}
+    .val-alert{color:var(--red)!important;font-weight:900!important;}
+    .report-actions-row{display:flex;gap:8px;margin-top:14px;}
+    .report-actions-row .btn{flex:1;justify-content:center;font-size:.82em;padding:8px;}
+
+    /* OPTIONS */
+    .options-panel{background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(215,235,255,.75));border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:0;border:1px solid var(--border);box-shadow:0 2px 12px var(--shadow2),0 1px 0 rgba(255,255,255,0.9) inset;position:relative;overflow:hidden;}
+    .options-panel::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--green),var(--yellow));border-radius:var(--radius-lg) var(--radius-lg) 0 0;}
+    .options-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(255,255,255,.5),transparent);border-radius:var(--radius-lg) var(--radius-lg) 60% 60%;pointer-events:none;}
+    .options-panel h3{color:var(--blue3);margin-bottom:14px;font-size:1.05em;font-weight:800;display:flex;align-items:center;gap:10px;}
+    .options-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
+    .option-item{display:flex;align-items:center;padding:9px 13px;background:rgba(255,255,255,.7);border-radius:10px;border:1px solid transparent;transition:all .2s;cursor:pointer;}
+    .option-item:hover{box-shadow:0 2px 10px var(--shadow2);border-color:var(--border2);background:rgba(255,255,255,.92);}
+    .option-item input[type="checkbox"]{width:17px;height:17px;margin-right:10px;cursor:pointer;accent-color:var(--blue);}
+    .option-item label{cursor:pointer;font-size:.9em;color:var(--text2);font-weight:700;}
+
+    /* MODAL */
+    .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(10,40,90,.45);backdrop-filter:blur(8px);animation:fadeIn .25s ease;}
+    .modal-content{background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));border:1px solid rgba(255,255,255,0.95);margin:6% auto;padding:28px;border-radius:var(--radius-xl);max-width:560px;box-shadow:0 20px 60px rgba(20,60,180,.25),0 1px 0 rgba(255,255,255,.9) inset;animation:slideDown .28s ease;position:relative;overflow:hidden;}
+    .modal-content::before{content:'';position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(180deg,rgba(255,255,255,.55),transparent);border-radius:var(--radius-xl) var(--radius-xl) 60% 60%;pointer-events:none;}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border2);}
+    .modal-header h2{color:var(--blue3);font-size:1.3em;font-weight:900;margin:0;}
+    .close-modal{width:30px;height:30px;border-radius:50%;background:linear-gradient(180deg,#f08080,#c0392b);border:1px solid #922b21!important;color:#fff;cursor:pointer;font-size:1.2em;display:flex;align-items:center;justify-content:center;transition:all .18s;font-weight:900;box-shadow:0 2px 6px rgba(180,40,30,.35);}
+    .close-modal:hover{background:linear-gradient(180deg,#f89898,#d44040);transform:scale(1.12) rotate(5deg);}
+    .modal-body{margin-bottom:22px;}
+    .modal-footer{display:flex;gap:10px;justify-content:flex-end;}
+    .modal-footer .btn{padding:10px 22px;font-size:.92em;}
+    .form-group{margin-bottom:16px;}
+    .form-group label{display:block;margin-bottom:6px;color:var(--text2);font-weight:800;font-size:.82em;text-transform:uppercase;letter-spacing:.8px;}
+    .form-group input,.form-group select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:.95em;font-family:'Nunito',sans-serif;font-weight:600;color:var(--text);background:rgba(255,255,255,.85);transition:all .2s;box-shadow:0 1px 4px var(--shadow2);}
+    .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(42,127,212,.15);}
+
+    /* RAPPORT COMPLET */
+    .rapport-full-view{font-size:.88em;line-height:1.6;color:var(--text);}
+    .rapport-full-section{background:rgba(255,255,255,.7);border:1px solid var(--border2);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;}
+    .rapport-full-section-title{font-weight:900;font-size:.82em;text-transform:uppercase;letter-spacing:1px;color:var(--blue2);margin-bottom:10px;padding-bottom:7px;border-bottom:2px solid var(--border2);}
+    .rapport-full-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed rgba(176,204,232,.4);font-size:.9em;}
+    .rapport-full-row:last-child{border-bottom:none;}
+    .rapport-full-row .lbl{font-weight:700;color:var(--text2);}
+    .rapport-full-row .val{font-weight:600;color:var(--text3);}
+    .rapport-full-row.hl .val{color:var(--red);font-weight:900;}
+    .rapport-full-row.hl-g .val{color:var(--green2);font-weight:900;}
+
+    /* STATUS */
+    .status-message{position:fixed;top:20px;right:20px;padding:14px 22px;border-radius:var(--radius-lg);font-weight:700;font-family:'Nunito',sans-serif;z-index:9999;animation:slideInRight .3s ease-out;box-shadow:0 6px 24px var(--shadow);border:1px solid rgba(255,255,255,.9);}
+    .status-success{background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(210,245,185,.9));color:var(--green2);border-left:4px solid var(--green);}
+    .status-error{background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,220,220,.9));color:var(--red);border-left:4px solid var(--red);}
+
+    @keyframes fadeInDown{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    @keyframes slideDown{from{transform:translateY(-50px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+    @keyframes slideInRight{from{transform:translateX(400px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+    @keyframes slideInLeft{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+    @keyframes blinkDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.8);}}
+
+    ::-webkit-scrollbar{width:6px;}
+    ::-webkit-scrollbar-track{background:rgba(200,220,240,.3);}
+    ::-webkit-scrollbar-thumb{background:var(--blue-light);border-radius:3px;}
+
+    @media(max-width:768px){
+      .stats-bar{grid-template-columns:repeat(2,1fr);}
+      .reports-grid{grid-template-columns:1fr;}
+      .actions-row{flex-direction:column;}
+      .header-right{flex-wrap:wrap;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- MODAL SESSION -->
+<div id="modalSession" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>📋 Rapport de session</h2>
+      <button class="close-modal" onclick="closeModal('modalSession')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="session-info-box" style="background:var(--blue-pale);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;font-size:.9em;"></div>
+      <div class="options-panel">
+        <h3>⚙️ Contenu du rapport</h3>
+        <div class="options-grid">
+          <div class="option-item"><input type="checkbox" id="os_prix" checked><label for="os_prix">💲 Modifications de prix</label></div>
+          <div class="option-item"><input type="checkbox" id="os_qte" checked><label for="os_qte">± Variations de quantité</label></div>
+          <div class="option-item"><input type="checkbox" id="os_offert" checked><label for="os_offert">🎁 Articles offerts</label></div>
+          <div class="option-item"><input type="checkbox" id="os_suppr" checked><label for="os_suppr">✕ Suppressions</label></div>
+          <div class="option-item"><input type="checkbox" id="os_ajout" checked><label for="os_ajout">➕ Ajouts</label></div>
+          <div class="option-item"><input type="checkbox" id="os_detail" checked><label for="os_detail">📄 Inclure le détail</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalSession')">Annuler</button>
+      <button class="btn btn-blue" onclick="genererRapportSession()">📊 Générer le rapport</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PÉRIODE -->
+<div id="modalPeriode" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>📅 Rapport sur période</h2>
+      <button class="close-modal" onclick="closeModal('modalPeriode')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Date et heure de début</label>
+        <input type="datetime-local" id="p_debut">
+      </div>
+      <div class="form-group">
+        <label>Date et heure de fin</label>
+        <input type="datetime-local" id="p_fin">
+      </div>
+      <div class="options-panel">
+        <h3>⚙️ Contenu</h3>
+        <div class="options-grid">
+          <div class="option-item"><input type="checkbox" id="op_prix" checked><label for="op_prix">💲 Prix modifiés</label></div>
+          <div class="option-item"><input type="checkbox" id="op_qte" checked><label for="op_qte">± Quantités</label></div>
+          <div class="option-item"><input type="checkbox" id="op_offert" checked><label for="op_offert">🎁 Articles offerts</label></div>
+          <div class="option-item"><input type="checkbox" id="op_suppr" checked><label for="op_suppr">✕ Suppressions</label></div>
+          <div class="option-item"><input type="checkbox" id="op_ajout" checked><label for="op_ajout">➕ Ajouts</label></div>
+          <div class="option-item"><input type="checkbox" id="op_detail" checked><label for="op_detail">📄 Inclure le détail</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalPeriode')">Annuler</button>
+      <button class="btn btn-red" onclick="genererRapportPeriode()">📊 Générer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VOIR RAPPORT -->
+<div id="modalVoir" class="modal">
+  <div class="modal-content" style="max-width:700px;max-height:85vh;overflow-y:auto;">
+    <div class="modal-header">
+      <h2 id="modalVoirTitle">🔍 Rapport de contrôle</h2>
+      <button class="close-modal" onclick="closeModal('modalVoir')">×</button>
+    </div>
+    <div class="modal-body"><div id="modalVoirBody"></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalVoir')">Fermer</button></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon">🔍</div>
+      <div class="header-title">
+        <h1>Centre de Contrôle</h1>
+        <p>Surveillance en direct &amp; rapports d'anomalies</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge"><div class="live-dot"></div> EN DIRECT</div>
+      <button class="btn btn-ghost" onclick="window.location.href='rapports.html'">← Rapports X/Z</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-direct" onclick="switchTab('direct')">📡 Contrôle en direct</button>
+    <button class="tab-btn" id="tab-rapports" onclick="switchTab('rapports')">📋 Rapports de contrôle</button>
+  </div>
+
+  <div class="main-panel">
+
+    <!-- PAGE DIRECT -->
+    <div class="page active" id="page-direct">
+      <div class="stats-bar">
+        <div class="stat-card sc-prix"><div class="stat-label">Prix modifiés</div><div class="stat-value" id="s-prix">0</div></div>
+        <div class="stat-card sc-qte"><div class="stat-label">Quantités</div><div class="stat-value" id="s-qte">0</div></div>
+        <div class="stat-card sc-offert"><div class="stat-label">Offerts</div><div class="stat-value" id="s-offert">0</div></div>
+        <div class="stat-card sc-suppr"><div class="stat-label">Suppressions</div><div class="stat-value" id="s-suppr">0</div></div>
+        <div class="stat-card sc-ajout"><div class="stat-label">Ajouts</div><div class="stat-value" id="s-ajout">0</div></div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="section-title" style="margin-bottom:0;">⚠️ Alertes récentes</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" onclick="loadAndAnalyze()">🔄 Actualiser</button>
+          <button class="btn btn-red" onclick="clearLog()">✕ Vider le journal</button>
+        </div>
+      </div>
+
+      <div id="alerts-container" style="margin-bottom:22px;"></div>
+
+      <div class="section-title">📋 Journal complet</div>
+      <div class="filters-row">
+        <button class="filter-btn active" onclick="setFilter('ALL',this)">Tout</button>
+        <button class="filter-btn f-PRIX" onclick="setFilter('PRIX',this)">💲 Prix</button>
+        <button class="filter-btn f-QTE" onclick="setFilter('QTE',this)">± Quantité</button>
+        <button class="filter-btn f-OFFERT" onclick="setFilter('OFFERT',this)">🎁 Offert</button>
+        <button class="filter-btn f-AJOUT" onclick="setFilter('AJOUT',this)">➕ Ajout</button>
+        <button class="filter-btn f-SUPPR" onclick="setFilter('SUPPR',this)">✕ Suppression</button>
+        <input class="search-input" type="text" id="search-input" placeholder="🔎 Article / ticket…" oninput="renderLog()">
+      </div>
+      <div class="log-wrapper">
+        <table class="log-table">
+          <thead><tr><th>Heure</th><th>Ticket</th><th>Table</th><th>Article</th><th>Type</th><th>Avant</th><th>Après</th><th>Delta</th></tr></thead>
+          <tbody id="log-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE RAPPORTS -->
+    <div class="page" id="page-rapports">
+      <div class="actions-row">
+        <button class="btn btn-blue" onclick="ouvrirModalSession()">📋 Rapport session (ouverture → maintenant)</button>
+        <button class="btn btn-red" onclick="ouvrirModalPeriode()">📅 Rapport sur période libre</button>
+        <button class="btn btn-ghost" style="margin-left:auto;" onclick="if(confirm('Supprimer tous les rapports de contrôle ?')){rapportsCtrl=[];saveRapports();renderRapports();}">🗑 Tout supprimer</button>
+      </div>
+      <div class="section-title">📂 Rapports générés</div>
+      <div id="reports-grid" class="reports-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Sync serveur automatique ──────────────────────────────────────────────────
+const _IS_SERVER = window.location.protocol === "http:";
+const _API_BASE  = window.location.origin + "/api";
+async function syncToServer(...keys) {
+  if (!_IS_SERVER) return;
+  const body = {};
+  keys.forEach(k => {
+    try { body[k] = JSON.parse(localStorage.getItem(k) || "null"); } catch(e) {}
+  });
+  try {
+    await fetch(_API_BASE + "/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  } catch(e) {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+  let controlLog   = JSON.parse(localStorage.getItem("ctrl_log")     || "[]");
+  let rapportsCtrl = JSON.parse(localStorage.getItem("ctrl_rapports") || "[]");
+  let previousTickets = null;
+  let activeFilter = "ALL";
+
+  function saveLog()      { localStorage.setItem("ctrl_log", JSON.stringify(controlLog)); }
+  function saveRapports() { localStorage.setItem("ctrl_rapports", JSON.stringify(rapportsCtrl)); }
+  syncToServer("ctrl_log", "ctrl_rapports");
+
+  // ---- TABS ----
+  function switchTab(t) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active','active-green'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-'+t).classList.add(t==='rapports'?'active-green':'active');
+    document.getElementById('page-'+t).classList.add('active');
+    if (t==='rapports') renderRapports();
+  }
+
+  // ---- MODALS ----
+  function closeModal(id) { document.getElementById(id).style.display='none'; }
+  window.addEventListener('click', e => {
+    ['modalSession','modalPeriode','modalVoir'].forEach(id => {
+      if (e.target===document.getElementById(id)) closeModal(id);
+    });
+  });
+
+  function ouvrirModalSession() {
+    const evts = controlLog.length;
+    const rapports = JSON.parse(localStorage.getItem("rapports")||"[]");
+    const lastZ = rapports.filter(r=>r.type==='Z').sort((a,b)=>new Date(b.dateCloture+' '+b.heureCloture)-new Date(a.dateCloture+' '+a.heureCloture))[0];
+    const depuis = lastZ ? `${lastZ.dateCloture} à ${lastZ.heureCloture}` : "début du journal";
+    document.getElementById('session-info-box').innerHTML = `
+      <div style="font-weight:800;color:var(--blue2);margin-bottom:8px;">📊 Session en cours</div>
+      <div style="display:flex;gap:28px;align-items:center;">
+        <div><div style="font-size:1.8em;font-weight:900;color:var(--blue3);line-height:1;">${evts}</div><div style="font-size:.78em;color:var(--text3);font-weight:700;text-transform:uppercase;">événements</div></div>
+        <div><div style="font-size:.85em;color:var(--text2);font-weight:700;">Depuis dernier rapport Z :</div><div style="font-weight:800;color:var(--text);">${depuis}</div></div>
+      </div>`;
+    document.getElementById('modalSession').style.display='block';
+  }
+
+  function ouvrirModalPeriode() {
+    const now = new Date(); const fmt = d => d.toISOString().slice(0,16);
+    const debut = new Date(now); debut.setHours(0,0,0,0);
+    document.getElementById('p_debut').value = fmt(debut);
+    document.getElementById('p_fin').value   = fmt(now);
+    document.getElementById('modalPeriode').style.display='block';
+  }
+
+  // ---- ANALYSE ----
+  function loadAndAnalyze() {
+    const tickets = JSON.parse(localStorage.getItem("tickets")||"[]");
+    const tables  = JSON.parse(localStorage.getItem("tables") ||"[]");
+    if (previousTickets !== null) detectChanges(previousTickets, tickets, tables);
+    previousTickets = JSON.parse(JSON.stringify(tickets));
+    updateStats(); renderAlerts(); renderLog();
+  }
+
+  function tsNow() { return new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",second:"2-digit"}); }
+  function dtNow() { return new Date().toISOString(); }
+  function getTable(tables, tid) { const t=tables.find(t=>t.ticketId===tid); return t?t.nom:"—"; }
+
+  function detectChanges(oldT, newT, tables) {
+    const ts=tsNow(), dt=dtNow();
+    newT.forEach(nt => {
+      const ot = oldT.find(o=>o.id===nt.id);
+      const tbl = getTable(tables, nt.id);
+      if (!ot) return;
+      nt.articles.forEach(na => {
+        const oa = ot.articles.find(a=>a.id===na.id&&a.nom===na.nom);
+        if (!oa) { controlLog.unshift({ts,dt,ticketId:nt.id,table:tbl,article:na.nom,type:"AJOUT",avant:"—",apres:`x${na.qte}`,delta:`+${na.qte}`}); return; }
+        if (oa.qte!==na.qte) { const d=na.qte-oa.qte; controlLog.unshift({ts,dt,ticketId:nt.id,table:tbl,article:na.nom,type:"QTE",avant:`x${oa.qte}`,apres:`x${na.qte}`,delta:(d>0?"+":"")+d}); }
+        if (Math.abs(oa.prix-na.prix)>0.001) { const d=(na.prix-oa.prix).toFixed(2); controlLog.unshift({ts,dt,ticketId:nt.id,table:tbl,article:na.nom,type:"PRIX",avant:oa.prix.toFixed(2)+" €",apres:na.prix.toFixed(2)+" €",delta:(parseFloat(d)>0?"+":"")+d+" €"}); }
+        if (!!oa.offert!==!!na.offert) controlLog.unshift({ts,dt,ticketId:nt.id,table:tbl,article:na.nom,type:"OFFERT",avant:oa.offert?"Offert ✓":"Normal",apres:na.offert?"Offert ✓":"Normal",delta:na.offert?"→ Offert":"→ Annulé"});
+      });
+      ot.articles.forEach(oa => { if (!nt.articles.find(a=>a.id===oa.id&&a.nom===oa.nom)) controlLog.unshift({ts,dt,ticketId:nt.id,table:tbl,article:oa.nom,type:"SUPPR",avant:`x${oa.qte}`,apres:"—",delta:`-${oa.qte}`}); });
+    });
+    saveLog();
+  }
+
+  function clearLog() {
+    if (!confirm("Vider tout le journal de contrôle ?")) return;
+    controlLog=[]; saveLog(); previousTickets=null; loadAndAnalyze();
+  }
+
+  // ---- STATS ----
+  function updateStats() {
+    const c = t => controlLog.filter(e=>e.type===t).length;
+    ['prix','qte','offert','suppr','ajout'].forEach(k => document.getElementById('s-'+k).textContent=c(k.toUpperCase()));
+  }
+
+  // ---- ALERTES ----
+  function renderAlerts() {
+    const sec = document.getElementById('alerts-container');
+    const alerts = [];
+    controlLog.filter(e=>e.type==='PRIX').slice(0,5).forEach(e=>alerts.push({cls:'alert-warn',icon:'⚠️',title:`Prix modifié — ${e.article}`,detail:`Ticket #${e.ticketId} (${e.table}) : ${e.avant} → ${e.apres}`,ts:e.ts}));
+    controlLog.filter(e=>e.type==='OFFERT'&&e.apres==='Offert ✓').slice(0,3).forEach(e=>alerts.push({cls:'alert-info',icon:'🎁',title:`Article offert — ${e.article}`,detail:`Ticket #${e.ticketId} (${e.table})`,ts:e.ts}));
+    controlLog.filter(e=>e.type==='SUPPR').slice(0,3).forEach(e=>alerts.push({cls:'alert-danger',icon:'🗑️',title:`Article supprimé — ${e.article}`,detail:`Ticket #${e.ticketId} (${e.table}) — était ${e.avant}`,ts:e.ts}));
+    if (!alerts.length) { sec.innerHTML='<div style="color:var(--text3);font-size:.9em;font-weight:600;padding:10px 0;">✅ Aucune anomalie détectée pour le moment.</div>'; return; }
+    sec.innerHTML = alerts.slice(0,8).map(a=>`<div class="alert-item ${a.cls}"><div class="alert-icon">${a.icon}</div><div class="alert-text"><strong>${a.title}</strong><span>${a.detail}</span></div><div class="alert-ts">${a.ts}</div></div>`).join('');
+  }
+
+  // ---- LOG ----
+  function setFilter(f, btn) {
+    activeFilter=f;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLog();
+  }
+
+  function renderLog() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+    let list = activeFilter==='ALL' ? controlLog : controlLog.filter(e=>e.type===activeFilter);
+    if (search) list=list.filter(e=>e.article.toLowerCase().includes(search)||String(e.ticketId).includes(search)||(e.table&&e.table.toLowerCase().includes(search)));
+    const tbody = document.getElementById('log-body');
+    if (!list.length) { tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="es-icon">📋</div><h3>Aucun événement</h3><p>Les modifications apparaîtront ici automatiquement.</p></div></td></tr>`; return; }
+    const icons={PRIX:'💲',QTE:'±',OFFERT:'🎁',AJOUT:'➕',SUPPR:'✕'};
+    const lbls={PRIX:'PRIX',QTE:'QTÉ',OFFERT:'OFFERT',AJOUT:'AJOUT',SUPPR:'SUPPRIMÉ'};
+    tbody.innerHTML = list.map(e=>{
+      const dn=parseFloat(e.delta); const dc=!isNaN(dn)?(dn>0?'delta-pos':dn<0?'delta-neg':''):'';
+      return `<tr><td style="color:var(--text3);white-space:nowrap;">${e.ts}</td><td><span class="ticket-ref">#${e.ticketId}</span></td><td style="color:var(--text2);font-weight:600;">${e.table||'—'}</td><td style="font-weight:700;">${e.article}</td><td><span class="badge b-${e.type}">${icons[e.type]||''} ${lbls[e.type]||e.type}</span></td><td style="color:var(--text3);">${e.avant}</td><td style="font-weight:700;">${e.apres}</td><td class="${dc}">${e.delta}</td></tr>`;
+    }).join('');
+  }
+
+  // ---- GÉNÉRATION RAPPORTS ----
+  function getOpts(pfx) {
+    return {prix:document.getElementById(pfx+'_prix').checked,qte:document.getElementById(pfx+'_qte').checked,offert:document.getElementById(pfx+'_offert').checked,suppr:document.getElementById(pfx+'_suppr').checked,ajout:document.getElementById(pfx+'_ajout').checked,detail:document.getElementById(pfx+'_detail').checked};
+  }
+
+  function filtrerEvts(evts, opts) {
+    return evts.filter(e=>{
+      if (e.type==='PRIX'  &&!opts.prix)  return false;
+      if (e.type==='QTE'   &&!opts.qte)   return false;
+      if (e.type==='OFFERT'&&!opts.offert) return false;
+      if (e.type==='SUPPR' &&!opts.suppr) return false;
+      if (e.type==='AJOUT' &&!opts.ajout) return false;
+      return true;
+    });
+  }
+
+  function buildRapport(evts, opts, titre, periode) {
+    const f = filtrerEvts(evts, opts);
+    const now = new Date();
+    const r = {
+      id:Date.now(), titre, periode,
+      date:now.toLocaleDateString('fr-FR'),
+      heure:now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),
+      stats:{total:f.length,prix:f.filter(e=>e.type==='PRIX').length,qte:f.filter(e=>e.type==='QTE').length,offert:f.filter(e=>e.type==='OFFERT').length,suppr:f.filter(e=>e.type==='SUPPR').length,ajout:f.filter(e=>e.type==='AJOUT').length},
+      opts, detail:opts.detail?f:[]
+    };
+    rapportsCtrl.unshift(r); saveRapports(); return r;
+  }
+
+  function genererRapportSession() {
+    const opts = getOpts('os');
+    const now = new Date();
+    const periode = `Session jusqu'au ${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+    buildRapport(controlLog, opts, 'Rapport de session', periode);
+    closeModal('modalSession'); switchTab('rapports');
+    showMessage('✔ Rapport de session généré !','success');
+  }
+
+  function genererRapportPeriode() {
+    const debut=document.getElementById('p_debut').value, fin=document.getElementById('p_fin').value;
+    if (!debut||!fin) { showMessage('⚠ Veuillez renseigner les deux dates','error'); return; }
+    const dD=new Date(debut), dF=new Date(fin);
+    if (dF<=dD) { showMessage('⚠ La fin doit être après le début','error'); return; }
+    const opts=getOpts('op');
+    const evts=controlLog.filter(e=>{ const d=new Date(e.dt); return d>=dD&&d<=dF; });
+    const fdt=d=>new Date(d).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    buildRapport(evts, opts, 'Rapport période', `${fdt(debut)} → ${fdt(fin)}`);
+    closeModal('modalPeriode'); switchTab('rapports');
+    showMessage(`✔ Rapport généré (${evts.length} événement(s))`, 'success');
+  }
+
+  // ---- AFFICHAGE RAPPORTS ----
+  function renderRapports() {
+    const grid=document.getElementById('reports-grid');
+    if (!rapportsCtrl.length) {
+      grid.innerHTML=`<div style="grid-column:1/-1;"><div class="empty-state"><div class="es-icon">📂</div><h3>Aucun rapport généré</h3><p>Utilisez les boutons ci-dessus pour créer votre premier rapport de contrôle.</p></div></div>`;
+      return;
+    }
+    grid.innerHTML = rapportsCtrl.map((r,i)=>`
+      <div class="report-card">
+        <h3>🔍 ${r.titre} <span style="font-size:.7em;font-weight:700;color:var(--text3);">n°${rapportsCtrl.length-i}</span></h3>
+        <div class="info-line"><span class="lbl">📅 Période</span><span class="val">${r.periode}</span></div>
+        <div class="info-line"><span class="lbl">🕐 Généré le</span><span class="val">${r.date} à ${r.heure}</span></div>
+        <div class="info-line"><span class="lbl">📋 Total événements</span><span class="val ${r.stats.total>0?'val-alert':''}">${r.stats.total}</span></div>
+        <div class="info-line"><span class="lbl">💲 Prix modifiés</span><span class="val ${r.stats.prix>0?'val-alert':''}">${r.stats.prix}</span></div>
+        <div class="info-line"><span class="lbl">🎁 Articles offerts</span><span class="val ${r.stats.offert>0?'val-alert':''}">${r.stats.offert}</span></div>
+        <div class="info-line"><span class="lbl">✕ Suppressions</span><span class="val ${r.stats.suppr>0?'val-alert':''}">${r.stats.suppr}</span></div>
+        <div class="info-line"><span class="lbl">± Quantités / ➕ Ajouts</span><span class="val">${r.stats.qte} / ${r.stats.ajout}</span></div>
+        <div class="report-actions-row">
+          <button class="btn btn-yellow" onclick="voirRapport(${i})">👁 Voir</button>
+          <button class="btn btn-blue" onclick="exporterRapport(${i})">📄 Export</button>
+          <button class="btn btn-red" onclick="supprimerRapport(${i})">🗑</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function voirRapport(i) {
+    const r=rapportsCtrl[i];
+    document.getElementById('modalVoirTitle').textContent=`🔍 ${r.titre} — ${r.periode}`;
+    const icons={PRIX:'💲',QTE:'±',OFFERT:'🎁',AJOUT:'➕',SUPPR:'✕'};
+    const lbls={PRIX:'PRIX',QTE:'QTÉ',OFFERT:'OFFERT',AJOUT:'AJOUT',SUPPR:'SUPPRIMÉ'};
+    let html=`<div class="rapport-full-view">
+      <div class="rapport-full-section">
+        <div class="rapport-full-section-title">📊 Résumé</div>
+        <div class="rapport-full-row"><span class="lbl">Période</span><span class="val">${r.periode}</span></div>
+        <div class="rapport-full-row"><span class="lbl">Généré le</span><span class="val">${r.date} à ${r.heure}</span></div>
+        <div class="rapport-full-row hl"><span class="lbl">Total événements</span><span class="val">${r.stats.total}</span></div>
+      </div>
+      <div class="rapport-full-section">
+        <div class="rapport-full-section-title">🔢 Répartition</div>
+        <div class="rapport-full-row"><span class="lbl">💲 Prix modifiés</span><span class="val" style="${r.stats.prix>0?'color:var(--red);font-weight:900;':''}">${r.stats.prix}</span></div>
+        <div class="rapport-full-row"><span class="lbl">± Quantités</span><span class="val">${r.stats.qte}</span></div>
+        <div class="rapport-full-row"><span class="lbl">🎁 Articles offerts</span><span class="val" style="${r.stats.offert>0?'color:var(--red);font-weight:900;':''}">${r.stats.offert}</span></div>
+        <div class="rapport-full-row"><span class="lbl">✕ Suppressions</span><span class="val" style="${r.stats.suppr>0?'color:var(--red);font-weight:900;':''}">${r.stats.suppr}</span></div>
+        <div class="rapport-full-row hl-g"><span class="lbl">➕ Ajouts</span><span class="val">${r.stats.ajout}</span></div>
+      </div>`;
+    if (r.detail && r.detail.length) {
+      html+=`<div class="rapport-full-section"><div class="rapport-full-section-title">📋 Détail (${r.detail.length} événements)</div>`;
+      r.detail.forEach(e=>{
+        const dn=parseFloat(e.delta); const st=!isNaN(dn)?(dn>0?'color:var(--green2);font-weight:900;':dn<0?'color:var(--red);font-weight:900;':''):'';
+        html+=`<div class="rapport-full-row"><span class="lbl">${icons[e.type]||''} ${e.article} <span style="font-size:.82em;color:var(--text3);">#${e.ticketId} ${e.table} — ${e.ts}</span></span><span class="val"><span style="${st}">${e.avant} → ${e.apres}</span></span></div>`;
+      });
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+    document.getElementById('modalVoirBody').innerHTML=html;
+    document.getElementById('modalVoir').style.display='block';
+  }
+
+  function supprimerRapport(i) {
+    if (!confirm('Supprimer ce rapport ?')) return;
+    rapportsCtrl.splice(i,1); saveRapports(); renderRapports();
+    showMessage('Rapport supprimé.','error');
+  }
+
+  function exporterRapport(i) {
+    const r=rapportsCtrl[i];
+    const lines=[
+      `═══════════════════════════════════════════`,
+      `  RAPPORT DE CONTRÔLE — ${r.titre.toUpperCase()}`,
+      `═══════════════════════════════════════════`,
+      `Période  : ${r.periode}`,
+      `Généré   : ${r.date} à ${r.heure}`,
+      ``,`─── RÉSUMÉ ─────────────────────────────────`,
+      `Total événements : ${r.stats.total}`,
+      `  💲 Prix modifiés    : ${r.stats.prix}`,
+      `  ± Quantités        : ${r.stats.qte}`,
+      `  🎁 Articles offerts : ${r.stats.offert}`,
+      `  ✕ Suppressions     : ${r.stats.suppr}`,
+      `  ➕ Ajouts           : ${r.stats.ajout}`,
+    ];
+    if (r.detail&&r.detail.length) {
+      lines.push(``,`─── DÉTAIL ──────────────────────────────────`);
+      r.detail.forEach(e=>lines.push(`[${e.ts}] ${e.type.padEnd(6)} | #${e.ticketId} ${e.table} | ${e.article} | ${e.avant} → ${e.apres} (${e.delta})`));
+    }
+    lines.push(`═══════════════════════════════════════════`);
+    const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download=`rapport_controle_${r.date.replace(/\//g,'-')}.txt`;
+    a.click(); URL.revokeObjectURL(a.href);
+    showMessage('📄 Export téléchargé !','success');
+  }
+
+  // ---- STATUS ----
+  function showMessage(txt, type) {
+    const m=document.createElement('div'); m.className=`status-message status-${type}`; m.textContent=txt;
+    document.body.appendChild(m);
+    setTimeout(()=>{m.style.animation='slideInRight .3s ease-out reverse';setTimeout(()=>m.remove(),300);},3000);
+  }
+
+  // ---- INIT ----
+  loadAndAnalyze();
+  setInterval(loadAndAnalyze, 3000);
+</script>
+</body>
+</html>

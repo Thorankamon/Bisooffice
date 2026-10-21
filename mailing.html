@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>📨 Mailing & Affiches</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+      --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+      --yellow:#e8a800; --yellow-pale:#fff8dc;
+      --red:#c0392b; --red-pale:#fde8e8;
+      --orange:#d97706; --orange-pale:#fff7ed;
+      --purple:#7c3aed; --purple-pale:#f5f3ff;
+      --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+      --border:#b0cce8; --border2:#d0e4f4;
+      --shadow:rgba(30,80,160,0.15);
+      --radius:12px; --radius-lg:18px; --radius-xl:22px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family:'Nunito','Segoe UI',sans-serif;
+      background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+      min-height:100vh;
+      color:var(--text);
+      background-attachment:fixed;
+      padding-bottom:30px;
+    }
+
+    /* HEADER */
+    .app-header {
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white;
+      padding:15px 18px;
+      position:sticky;
+      top:0;
+      z-index:100;
+      box-shadow:0 3px 15px rgba(20,60,160,0.3);
+    }
+    .app-header::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background:rgba(255,255,255,.25); pointer-events:none;
+    }
+    .header-row { display:flex; justify-content:space-between; align-items:center; position:relative; }
+    .header-title { font-size:1.3em; font-weight:900; }
+    .header-back {
+      background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.4);
+      color:white; border-radius:50px; padding:7px 14px;
+      font-weight:800; font-size:13px; cursor:pointer; text-decoration:none;
+    }
+
+    /* TABS */
+    .tabs-bar {
+      display:flex; gap:0; background:rgba(255,255,255,.75);
+      border-bottom:2px solid var(--border2); overflow-x:auto;
+    }
+    .tab-btn {
+      flex:1; padding:13px 10px; border:none; background:transparent;
+      font-family:'Nunito',sans-serif; font-weight:800; font-size:13px;
+      color:var(--text2); cursor:pointer; white-space:nowrap;
+      border-bottom:3px solid transparent; transition:all .2s;
+    }
+    .tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); background:rgba(42,127,212,.06); }
+    .tab-btn i { margin-right:5px; }
+
+    /* CONTENT */
+    .tab-content { display:none; padding:16px; }
+    .tab-content.active { display:block; }
+
+    /* CARDS */
+    .card {
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--border2);
+      border-radius:var(--radius-lg);
+      padding:16px;
+      margin-bottom:14px;
+      box-shadow:0 2px 10px var(--shadow);
+    }
+    .card-title {
+      font-weight:900; font-size:14px; color:var(--blue3);
+      margin-bottom:12px; display:flex; align-items:center; gap:7px;
+    }
+    .card-title i { color:var(--blue); }
+
+    /* MEMBRES LIST */
+    .membres-toolbar {
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px;
+    }
+    .search-box {
+      flex:1; min-width:160px; padding:9px 13px;
+      border:1.5px solid var(--border); border-radius:50px;
+      font-family:'Nunito',sans-serif; font-size:13px; background:rgba(255,255,255,.9);
+    }
+    .select-all-btn {
+      padding:9px 14px; border-radius:50px; border:1.5px solid var(--border);
+      background:rgba(255,255,255,.9); font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:12px; cursor:pointer; color:var(--text2);
+    }
+    .select-all-btn.active { background:var(--blue-pale); border-color:var(--blue); color:var(--blue); }
+
+    .membres-list { max-height:280px; overflow-y:auto; border:1px solid var(--border2); border-radius:var(--radius); }
+    .membre-row {
+      display:flex; align-items:center; gap:10px; padding:9px 13px;
+      border-bottom:1px solid var(--border2); cursor:pointer; transition:background .15s;
+    }
+    .membre-row:last-child { border-bottom:none; }
+    .membre-row:hover { background:var(--blue-pale); }
+    .membre-row.selected { background:linear-gradient(90deg,rgba(42,127,212,.08),rgba(42,127,212,.04)); }
+    .membre-check {
+      width:18px; height:18px; border-radius:5px;
+      border:2px solid var(--border); background:white; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; transition:all .15s;
+    }
+    .membre-row.selected .membre-check {
+      background:var(--blue); border-color:var(--blue);
+    }
+    .membre-check i { color:white; font-size:10px; }
+    .membre-info { flex:1; min-width:0; }
+    .membre-name { font-weight:800; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .membre-email { font-size:11px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .membre-badge {
+      font-size:10px; font-weight:800; padding:2px 8px; border-radius:50px;
+      flex-shrink:0;
+    }
+    .badge-admin { background:var(--blue-pale); color:var(--blue3); }
+    .badge-benevole { background:var(--green-pale); color:var(--green2); }
+    .badge-inactif { background:#f1f5f9; color:#94a3b8; }
+
+    .selected-count {
+      font-size:12px; font-weight:800; color:var(--text3);
+      padding:4px 10px; background:var(--blue-pale); border-radius:50px;
+    }
+
+    /* FORM */
+    label.field-label {
+      display:block; font-weight:800; font-size:12px;
+      color:var(--text2); margin-bottom:5px;
+    }
+    input[type=text], input[type=email], textarea, select {
+      width:100%; padding:11px 13px;
+      border:1.5px solid var(--border); border-radius:var(--radius);
+      font-family:'Nunito',sans-serif; font-size:14px;
+      background:rgba(255,255,255,.95); color:var(--text);
+      transition:border-color .2s;
+    }
+    input:focus, textarea:focus, select:focus { outline:none; border-color:var(--blue); }
+    textarea { resize:vertical; min-height:100px; }
+    .form-row { margin-bottom:12px; }
+
+    /* TEMPLATES EVENTS */
+    .templates-grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));
+      gap:8px; margin-bottom:14px;
+    }
+    .tpl-btn {
+      padding:10px 8px; border-radius:var(--radius); border:2px solid var(--border2);
+      background:rgba(255,255,255,.85); cursor:pointer; text-align:center;
+      font-family:'Nunito',sans-serif; font-weight:800; font-size:12px;
+      color:var(--text); transition:all .15s;
+    }
+    .tpl-btn:hover { transform:scale(1.03); box-shadow:0 3px 10px var(--shadow); }
+    .tpl-btn.active { border-color:var(--blue); background:var(--blue-pale); color:var(--blue3); }
+    .tpl-btn .tpl-icon { font-size:22px; display:block; margin-bottom:4px; }
+
+    /* DELAY */
+    .delay-row {
+      display:flex; align-items:center; gap:10px; padding:10px 14px;
+      background:var(--yellow-pale); border:1px solid rgba(232,168,0,.3);
+      border-radius:var(--radius); margin-bottom:14px;
+    }
+    .delay-row i { color:var(--yellow); font-size:16px; }
+    .delay-input {
+      width:70px; padding:7px 10px; border:1.5px solid var(--border);
+      border-radius:var(--radius); font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:14px; text-align:center;
+    }
+
+    /* SEND BTN */
+    .btn-send-all {
+      width:100%; padding:15px; margin-top:4px;
+      background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+      color:white; border:none; border-radius:var(--radius-lg);
+      font-family:'Nunito',sans-serif; font-weight:900; font-size:16px;
+      cursor:pointer; box-shadow:0 4px 15px rgba(21,88,176,.35);
+      transition:transform .15s, box-shadow .15s;
+    }
+    .btn-send-all:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(21,88,176,.45); }
+    .btn-send-all:active { transform:scale(.97); }
+    .btn-send-all:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+
+    /* AFFICHE */
+    .affiche-type-grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px; margin-bottom:14px;
+    }
+    .affiche-type-btn {
+      padding:14px 10px; border-radius:var(--radius-lg); border:2px solid var(--border2);
+      background:rgba(255,255,255,.85); cursor:pointer; text-align:center;
+      font-family:'Nunito',sans-serif; font-weight:800; font-size:13px;
+      color:var(--text); transition:all .2s;
+    }
+    .affiche-type-btn:hover { transform:scale(1.03); }
+    .affiche-type-btn.active { border-width:2.5px; }
+    .affiche-type-btn .aff-icon { font-size:28px; display:block; margin-bottom:6px; }
+    .affiche-type-btn .aff-name { font-size:12px; }
+
+    /* CANVAS preview */
+    #affichePreviewWrap {
+      position:relative; border-radius:var(--radius-lg); overflow:hidden;
+      box-shadow:0 4px 20px rgba(0,0,0,.25); margin-bottom:14px;
+      background:#111;
+    }
+    #afficheCanvas { display:block; width:100%; height:auto; max-height:400px; object-fit:contain; }
+
+    .btn-dl {
+      width:100%; padding:14px;
+      background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a);
+      color:white; border:1px solid #2d6a1a; border-radius:var(--radius-lg);
+      font-family:'Nunito',sans-serif; font-weight:900; font-size:15px;
+      cursor:pointer; box-shadow:0 4px 12px rgba(45,106,26,.3); transition:transform .15s;
+    }
+    .btn-dl:hover { transform:translateY(-1px); }
+
+    /* LOADING MODAL */
+    .loading-overlay {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(10,40,90,.55); z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+      backdrop-filter:blur(6px);
+      opacity:0; pointer-events:none; transition:opacity .3s;
+    }
+    .loading-overlay.show { opacity:1; pointer-events:all; }
+    .loading-box {
+      background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+      border-radius:var(--radius-xl); padding:30px 36px;
+      box-shadow:0 20px 60px rgba(20,60,180,.35);
+      text-align:center; width:90%; max-width:360px;
+      transform:scale(.9) translateY(20px); transition:transform .3s;
+    }
+    .loading-overlay.show .loading-box { transform:scale(1) translateY(0); }
+    .loading-spinner {
+      width:56px; height:56px; margin:0 auto 16px;
+      border-radius:50%;
+      border:5px solid var(--blue-pale);
+      border-top-color:var(--blue);
+      animation:spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-title { font-weight:900; font-size:17px; color:var(--blue3); margin-bottom:6px; }
+    .loading-sub { font-size:13px; color:var(--text2); line-height:1.5; }
+    .loading-progress {
+      margin-top:14px; background:var(--blue-pale); border-radius:50px;
+      height:8px; overflow:hidden;
+    }
+    .loading-bar {
+      height:100%; background:linear-gradient(90deg,var(--blue-light),var(--blue));
+      border-radius:50px; width:0%; transition:width .4s ease;
+    }
+    .loading-count { margin-top:8px; font-size:12px; font-weight:800; color:var(--text3); }
+
+    /* TOAST */
+    .toast {
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
+      background:linear-gradient(135deg,#1a3a6a,#2a7fd4);
+      color:white; padding:12px 22px; border-radius:50px;
+      font-weight:800; font-size:14px; z-index:10000;
+      box-shadow:0 6px 24px rgba(20,60,160,.4);
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+      white-space:nowrap;
+    }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+    .toast.success { background:linear-gradient(135deg,#1a5a2a,#4a9422); }
+    .toast.error { background:linear-gradient(135deg,#7a1a1a,#c0392b); }
+
+    /* RESULT LOG */
+    #sendLog {
+      max-height:200px; overflow-y:auto; border:1px solid var(--border2);
+      border-radius:var(--radius); padding:10px; background:rgba(255,255,255,.7);
+      font-size:12px; line-height:1.8; display:none;
+    }
+    .log-ok { color:var(--green2); }
+    .log-err { color:var(--red); }
+    .log-info { color:var(--text2); }
+
+    /* INPUT AFFICHE TEXT */
+    .affiche-text-inputs { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+    .color-row { display:flex; gap:10px; align-items:center; }
+    input[type=color] { width:40px; height:36px; border:none; border-radius:8px; cursor:pointer; padding:2px; }
+
+    /* SERVER URL */
+    .server-row { display:flex; gap:8px; align-items:center; }
+    .server-row input { flex:1; }
+    .server-test-btn {
+      padding:9px 14px; border-radius:var(--radius); border:1.5px solid var(--border);
+      background:rgba(255,255,255,.9); font-family:'Nunito',sans-serif;
+      font-weight:800; font-size:12px; cursor:pointer; white-space:nowrap; color:var(--text2);
+    }
+    .server-status { font-size:12px; font-weight:800; padding:5px 10px; border-radius:50px; }
+    .server-status.ok { background:var(--green-pale); color:var(--green2); }
+    .server-status.fail { background:var(--red-pale); color:var(--red); }
+
+    @media (max-width:480px) {
+      .templates-grid { grid-template-columns:repeat(3,1fr); }
+      .affiche-type-grid { grid-template-columns:repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-row">
+    <div class="header-title">📨 Mailing & Affiches</div>
+    <a href="javascript:history.back()" class="header-back">← Retour</a>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('mailing')"><i class="fas fa-envelope"></i> Mailing</button>
+  <button class="tab-btn" onclick="switchTab('affiche')"><i class="fas fa-image"></i> Affiches</button>
+  <button class="tab-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Paramètres</button>
+</div>
+
+<!-- ======== TAB MAILING ======== -->
+<div id="tab-mailing" class="tab-content active">
+
+  <!-- Sélection membres -->
+  <div class="card">
+    <div class="card-title"><i class="fas fa-users"></i> Destinataires</div>
+    <div class="membres-toolbar">
+      <input class="search-box" type="text" placeholder="🔍 Rechercher…" oninput="filterMembres(this.value)">
+      <button class="select-all-btn" id="selectAllBtn" onclick="toggleSelectAll()">Tout sélectionner</button>
+      <span class="selected-count" id="selectedCount">0 sélectionné(s)</span>
+    </div>
+    <div class="membres-list" id="membresList"></div>
+  </div>
+
+  <!-- Template événement -->
+  <div class="card">
+    <div class="card-title"><i class="fas fa-calendar-star"></i> Modèle de message</div>
+    <div class="templates-grid">
+      <button class="tpl-btn active" onclick="applyTemplate('libre',this)">
+        <span class="tpl-icon">✏️</span>Libre
+      </button>
+      <button class="tpl-btn" onclick="applyTemplate('halloween',this)">
+        <span class="tpl-icon">🎃</span>Halloween
+      </button>
+      <button class="tpl-btn" onclick="applyTemplate('noel',this)">
+        <span class="tpl-icon">🎄</span>Noël
+      </button>
+      <button class="tpl-btn" onclick="applyTemplate('paques',this)">
+        <span class="tpl-icon">🐣</span>Pâques
+      </button>
+      <button class="tpl-btn" onclick="applyTemplate('spectacle',this)">
+        <span class="tpl-icon">🎭</span>Spectacle
+      </button>
+      <button class="tpl-btn" onclick="applyTemplate('transformiste',this)">
+        <span class="tpl-icon">💃</span>Transformiste
+      </button>
+      <button class="tpl-btn" onclick="applyTemplate('karaoke',this)">
+        <span class="tpl-icon">🎤</span>Karaoké
+      </button>
+      <button class="tpl-btn" onclick="applyTemplate('anniversaire',this)">
+        <span class="tpl-icon">🎂</span>Anniversaire
+      </button>
+    </div>
+    <div class="form-row">
+      <label class="field-label">📅 Date de l'événement</label>
+      <div style="display:flex;gap:8px;">
+        <input type="date" id="eventDate" style="flex:1;" onchange="onEventDateChange()">
+        <input type="time" id="eventTime" value="20:00" style="width:110px;" onchange="onEventDateChange()">
+      </div>
+      <div style="font-size:11px;color:var(--text3);font-weight:700;margin-top:5px;">
+        ℹ️ Utilise <code>{{date}}</code> dans un modèle pour l'insérer automatiquement — elle est aussi reportée sur l'affiche.
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="field-label">📌 Objet de l'email</label>
+      <input type="text" id="mailSubject" value="Un événement vous attend chez {{entreprise}} !">
+    </div>
+    <div class="form-row">
+      <label class="field-label">💬 Corps du message</label>
+      <textarea id="mailBody" rows="6"></textarea>
+    </div>
+  </div>
+
+  <!-- Pièce jointe affiche -->
+  <div class="card">
+    <div class="card-title"><i class="fas fa-paperclip"></i> Affiche en pièce jointe (optionnelle)</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+
+      <div id="attachGeneratedWrap" onclick="selectAttachMode('generated')"
+        style="display:flex;align-items:center;gap:12px;padding:13px 15px;border:2px solid var(--border2);border-radius:var(--radius);cursor:pointer;transition:all .15s;">
+        <div id="attachGeneratedDot" style="width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .15s;"></div>
+        <span style="font-weight:800;font-size:13px;">🎨 Utiliser l'affiche de l'onglet Affiches</span>
+      </div>
+
+      <div id="attachFileWrap" onclick="selectAttachMode('file')"
+        style="display:flex;align-items:center;gap:12px;padding:13px 15px;border:2px solid var(--border2);border-radius:var(--radius);cursor:pointer;transition:all .15s;">
+        <div id="attachFileDot" style="width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .15s;"></div>
+        <span style="font-weight:800;font-size:13px;">📁 Importer ma propre image (PNG/JPG)</span>
+      </div>
+
+      <div id="attachFileZone" style="display:none;padding:12px 14px;border:1.5px dashed var(--border);border-radius:var(--radius);">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <label style="padding:9px 16px;background:var(--blue-pale);border:1.5px solid var(--blue);border-radius:50px;font-weight:800;font-size:12px;color:var(--blue3);cursor:pointer;">
+            <i class="fas fa-upload"></i> Choisir une image
+            <input type="file" id="attachFile" accept="image/png,image/jpeg,image/gif" style="display:none" onchange="handleAttachFile(this)">
+          </label>
+          <span id="attachFileName" style="font-size:12px;color:var(--text3);font-weight:700;">Aucun fichier</span>
+          <button onclick="clearAttach()" id="attachClearBtn" style="display:none;padding:6px 12px;border-radius:50px;border:1px solid var(--border);background:rgba(255,255,255,.8);font-size:12px;font-weight:800;cursor:pointer;color:var(--red);">✕ Retirer</button>
+        </div>
+        <div id="attachImgPreview" style="margin-top:10px;display:none;">
+          <img id="attachImgThumb" style="max-height:100px;border-radius:8px;border:1px solid var(--border2);">
+        </div>
+      </div>
+
+      <button onclick="selectAttachMode('none')" id="attachNoneBtn"
+        style="padding:9px;border-radius:var(--radius);border:1px solid var(--border);background:rgba(255,255,255,.7);font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;color:var(--text3);cursor:pointer;">
+        ✕ Aucune pièce jointe
+      </button>
+    </div>
+  </div>
+
+  <!-- Délai anti-spam -->
+  <div class="delay-row">
+    <i class="fas fa-clock"></i>
+    <span style="font-weight:800;font-size:13px;flex:1;">Délai entre chaque envoi</span>
+    <input type="number" class="delay-input" id="delayInput" min="2" max="30" value="5">
+    <span style="font-size:13px;font-weight:700;color:var(--text2);">secondes</span>
+  </div>
+
+  <!-- Bouton envoi -->
+  <button class="btn-send-all" id="btnSendAll" onclick="startSending()">
+    <i class="fas fa-paper-plane"></i> Envoyer à tous les sélectionnés
+  </button>
+
+  <!-- Log résultats -->
+  <div id="sendLog" style="margin-top:12px;"></div>
+
+</div>
+
+<!-- ======== TAB AFFICHES ======== -->
+<div id="tab-affiche" class="tab-content">
+
+  <div class="card">
+    <div class="card-title"><i class="fas fa-palette"></i> Type d'affiche</div>
+    <div class="affiche-type-grid" id="afficheTypeGrid">
+      <button class="affiche-type-btn active" style="border-color:#e97c00;" onclick="setAfficheType('halloween',this)">
+        <span class="aff-icon">🎃</span><span class="aff-name">Halloween</span>
+      </button>
+      <button class="affiche-type-btn" style="" onclick="setAfficheType('noel',this)">
+        <span class="aff-icon">🎄</span><span class="aff-name">Noël</span>
+      </button>
+      <button class="affiche-type-btn" style="" onclick="setAfficheType('paques',this)">
+        <span class="aff-icon">🐣</span><span class="aff-name">Pâques</span>
+      </button>
+      <button class="affiche-type-btn" style="" onclick="setAfficheType('spectacle',this)">
+        <span class="aff-icon">🎭</span><span class="aff-name">Spectacle</span>
+      </button>
+      <button class="affiche-type-btn" style="" onclick="setAfficheType('transformiste',this)">
+        <span class="aff-icon">💃</span><span class="aff-name">Transformiste</span>
+      </button>
+      <button class="affiche-type-btn" style="" onclick="setAfficheType('karaoke',this)">
+        <span class="aff-icon">🎤</span><span class="aff-name">Karaoké</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="fas fa-text-width"></i> Textes de l'affiche</div>
+    <div class="affiche-text-inputs">
+      <div class="form-row">
+        <label class="field-label">🏷️ Titre principal</label>
+        <input type="text" id="aff-title" value="SOIRÉE HALLOWEEN" oninput="drawAffiche()">
+      </div>
+      <div class="form-row">
+        <label class="field-label">📅 Date / Sous-titre</label>
+        <input type="text" id="aff-date" value="Samedi 31 Octobre 2025 — 20h" oninput="drawAffiche()">
+      </div>
+      <div class="form-row">
+        <label class="field-label">📝 Description</label>
+        <textarea id="aff-desc" rows="3" oninput="drawAffiche()">Venez fêter Halloween avec nous !
+Déguisements obligatoires 🎭
+Au {{entreprise}}</textarea>
+      </div>
+      <div class="color-row">
+        <div style="flex:1;">
+          <label class="field-label">🎨 Couleur accent</label>
+          <input type="color" id="aff-accent" value="#ff6b00" oninput="drawAffiche()">
+        </div>
+        <div style="flex:1;">
+          <label class="field-label">✏️ Couleur texte</label>
+          <input type="color" id="aff-textcolor" value="#ffffff" oninput="drawAffiche()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="fas fa-eye"></i> Aperçu</div>
+    <div id="affichePreviewWrap">
+      <canvas id="afficheCanvas" width="800" height="1100"></canvas>
+    </div>
+    <button class="btn-dl" onclick="downloadAffiche()">
+      <i class="fas fa-download"></i> Télécharger l'affiche PNG
+    </button>
+  </div>
+
+</div>
+
+<!-- ======== TAB SETTINGS ======== -->
+<div id="tab-settings" class="tab-content">
+  <div class="card">
+    <div class="card-title"><i class="fas fa-server"></i> Serveur d'envoi</div>
+    <div class="form-row">
+      <label class="field-label">🌐 URL du serveur</label>
+      <div class="server-row">
+        <input type="text" id="serverUrl" value="http://localhost:3000">
+        <button class="server-test-btn" onclick="testServer()">Tester</button>
+      </div>
+      <span id="serverStatus" class="server-status" style="display:none;margin-top:6px;display:inline-block;"></span>
+    </div>
+    <div class="form-row" style="margin-top:10px;">
+      <label class="field-label">💾 Données membres (localStorage)</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+        <button class="server-test-btn" onclick="reloadMembres()"><i class="fas fa-sync"></i> Recharger les membres</button>
+        <button class="server-test-btn" onclick="openImportJSON()"><i class="fas fa-file-import"></i> Importer JSON</button>
+        <input type="file" id="importJsonFile" accept=".json" style="display:none" onchange="importMembresJSON(this)">
+      </div>
+    </div>
+    <div id="membresStats" style="margin-top:10px;font-size:13px;color:var(--text2);font-weight:700;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="fas fa-building"></i> Infos expéditeur</div>
+    <div class="form-row">
+      <label class="field-label">🏢 Nom de l'association</label>
+      <input type="text" id="senderName" placeholder="Chargé depuis les paramètres...">
+    </div>
+    <button onclick="saveSettings()" style="padding:12px 22px; background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); color:white; border:1px solid #2d6a1a; border-radius:var(--radius-lg); font-family:'Nunito',sans-serif; font-weight:900; font-size:14px; cursor:pointer; margin-top:4px;">
+      <i class="fas fa-save"></i> Sauvegarder
+    </button>
+  </div>
+</div>
+
+<!-- LOADING MODAL -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <div class="loading-title" id="loadingTitle">Envoi en cours…</div>
+    <div class="loading-sub" id="loadingSub">Préparation des emails…</div>
+    <div class="loading-progress">
+      <div class="loading-bar" id="loadingBar"></div>
+    </div>
+    <div class="loading-count" id="loadingCount"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==============================
+   DONNÉES
+============================== */
+let membres = [];
+let selectedIds = new Set();
+let currentAfficheType = 'halloween';
+let sendingAborted = false;
+
+const TEMPLATES = {
+  libre: { subject: '', body: '' },
+  halloween: {
+    subject: '🎃 Soirée Halloween chez {{entreprise}} !',
+    body: `Bonjour {prenom},
+
+🎃 La nuit des frissons approche ! 🎃
+
+{{entreprise}} vous invite à sa grande Soirée Halloween !
+Déguisements obligatoires — concours de costumes — ambiance mortelle garantie 💀
+
+📅 {{date}}
+📍 {{entreprise}}
+
+Venez chanter, frissonner et faire la fête avec nous !
+
+À très vite,
+L'équipe de {{entreprise}} 🎃`
+  },
+  noel: {
+    subject: '🎄 Joyeuses fêtes de {{entreprise}} !',
+    body: `Bonjour {prenom},
+
+🎄 Les fêtes de fin d'année approchent ! ✨
+
+{{entreprise}} vous souhaite de joyeuses fêtes
+et vous convie à sa soirée de Noël magique !
+
+🎅 Karaoké de Noël — Ambiance chaleureuse — Vin chaud ☕
+📅 {{date}}
+📍 {{entreprise}}
+
+Venez partager la magie des fêtes avec nous !
+
+Joyeux Noël et Bonne Année,
+L'équipe de {{entreprise}} 🎁`
+  },
+  paques: {
+    subject: '🐣 Joyeuses Pâques — Soirée spéciale !',
+    body: `Bonjour {prenom},
+
+🐣 Le printemps arrive chez {{entreprise}} ! 🌸
+
+Venez fêter Pâques avec nous lors d'une soirée karaoké festive !
+Chocolats, surprises et bonne humeur au programme 🍫
+
+📅 {{date}}
+📍 {{entreprise}}
+
+Joyeuses Pâques !
+L'équipe de {{entreprise}} 🐰`
+  },
+  spectacle: {
+    subject: '🎭 Spectacle exceptionnel chez {{entreprise}} !',
+    body: `Bonjour {prenom},
+
+🎭 Une soirée pas comme les autres vous attend !
+
+{{entreprise}} est fier de vous présenter
+un spectacle exceptionnel que vous n'oublierez pas !
+
+🌟 Artistes de renom — Ambiance festive — Surprises garanties
+📅 {{date}}
+📍 {{entreprise}}
+
+Réservez vite votre place !
+
+À très bientôt,
+L'équipe de {{entreprise}} 🎭`
+  },
+  transformiste: {
+    subject: '💃 Soirée Transformiste — {{entreprise}} !',
+    body: `Bonjour {prenom},
+
+💃 La magie du cabaret transformiste s'invite chez {{entreprise}} ! ✨
+
+Préparez-vous pour une soirée hors du commun :
+glamour, paillettes et performances époustouflantes au programme !
+
+🌈 Show transformiste — Ambiance cabaret — Karaoké festif
+📅 {{date}}
+📍 {{entreprise}}
+
+Une soirée à ne pas manquer !
+
+Avec tout notre éclat,
+L'équipe de {{entreprise}} 💃`
+  },
+  karaoke: {
+    subject: '🎤 Soirée Karaoké — {{entreprise}} !',
+    body: `Bonjour {prenom},
+
+🎤 Vos plus belles voix sont attendues ! 🎶
+
+{{entreprise}} vous invite à sa soirée karaoké !
+Des centaines de chansons, une ambiance survoltée et beaucoup de fun !
+
+🏆 Concours de chant — Surprises — Bonne humeur garantie
+📅 {{date}}
+📍 {{entreprise}}
+
+Venez chanter avec nous !
+
+L'équipe de {{entreprise}} 🎤`
+  },
+  anniversaire: {
+    subject: '🎂 Joyeux Anniversaire — {{entreprise}} !',
+    body: `Bonjour {prenom},
+
+🎂 {{entreprise}} a une pensée spéciale pour vous ! 🎉
+
+À l'occasion de votre anniversaire, nous vous souhaitons
+une journée merveilleuse pleine de joie et de bonheur ! 🎈
+
+Venez fêter ça avec nous lors de notre prochaine soirée !
+
+Joyeux Anniversaire,
+L'équipe de {{entreprise}} 🎂`
+  }
+};
+
+const AFFICHE_THEMES = {
+  halloween: {
+    bg: ['#1a0a2e','#3d0a0a','#0d0d1a'],
+    accent: '#ff6b00', emoji:'🎃',
+    deco:['🕷️','💀','🦇','🕸️','👻'],
+    accentInput:'#ff6b00'
+  },
+  noel: {
+    bg: ['#0d2414','#1a0d08','#050d0a'],
+    accent: '#e8a800', emoji:'🎄',
+    deco:['⭐','❄️','🎁','🔔','✨'],
+    accentInput:'#e8a800'
+  },
+  paques: {
+    bg: ['#1a2e0a','#2e1a2e','#0a1a0a'],
+    accent: '#7ec850', emoji:'🐣',
+    deco:['🌸','🐰','🌷','🌿','🥚'],
+    accentInput:'#7ec850'
+  },
+  spectacle: {
+    bg: ['#0d0d2e','#1a0a2e','#2e0a3d'],
+    accent: '#e040fb', emoji:'🎭',
+    deco:['⭐','🌟','✨','🎶','🎵'],
+    accentInput:'#e040fb'
+  },
+  transformiste: {
+    bg: ['#1a0a2e','#2e0a1a','#0a0a2e'],
+    accent: '#ff3fa4', emoji:'💃',
+    deco:['💄','👑','✨','💅','🌈'],
+    accentInput:'#ff3fa4'
+  },
+  karaoke: {
+    bg: ['#0a1a2e','#0d0d2e','#1a0a0a'],
+    accent: '#00b4d8', emoji:'🎤',
+    deco:['🎶','🎵','🎼','🎸','⭐'],
+    accentInput:'#00b4d8'
+  }
+};
+
+/* ==============================
+   INIT
+============================== */
+document.addEventListener('DOMContentLoaded', () => {
+  loadSettings();
+  loadEventDate();
+  reloadMembres();
+  applyTemplate('halloween', null);
+  setAfficheType('halloween', document.querySelector('.affiche-type-btn'));
+  drawAffiche();
+});
+
+/* ==============================
+   TABS
+============================== */
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+/* ==============================
+   MEMBRES
+============================== */
+function reloadMembres() {
+  try {
+    const raw = localStorage.getItem('membres');
+    if (raw) {
+      membres = JSON.parse(raw).filter(m => m.email && m.email.trim());
+    } else { membres = []; }
+  } catch(e) { membres = []; }
+  selectedIds.clear();
+  renderMembres(membres);
+  updateStats();
+}
+
+function updateStats() {
+  const el = document.getElementById('membresStats');
+  if (el) el.textContent = `${membres.length} membre(s) avec email trouvé(s) dans localStorage`;
+}
+
+function filterMembres(q) {
+  const filtered = q.trim() === '' ? membres :
+    membres.filter(m => `${m.prenom} ${m.nom} ${m.email}`.toLowerCase().includes(q.toLowerCase()));
+  renderMembres(filtered);
+}
+
+function renderMembres(list) {
+  const el = document.getElementById('membresList');
+  if (!list.length) {
+    el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;font-weight:700;">Aucun membre trouvé</div>';
+    return;
+  }
+  el.innerHTML = list.map(m => {
+    const sel = selectedIds.has(m.id);
+    const badge = m.statut === 'admin' ? 'badge-admin' : m.statut === 'benevole' ? 'badge-benevole' : 'badge-inactif';
+    const badgeLabel = m.statut === 'admin' ? '🛡️ Admin' : m.statut === 'benevole' ? '🤝 Bénévole' : '⚫ Inactif';
+    return `<div class="membre-row ${sel?'selected':''}" onclick="toggleMembre('${m.id}')">
+      <div class="membre-check">${sel?'<i class="fas fa-check"></i>':''}</div>
+      <div class="membre-info">
+        <div class="membre-name">${m.prenom || ''} ${m.nom || ''}</div>
+        <div class="membre-email">${m.email}</div>
+      </div>
+      <span class="membre-badge ${badge}">${badgeLabel}</span>
+    </div>`;
+  }).join('');
+  updateSelectedCount();
+}
+
+function toggleMembre(id) {
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  // re-render
+  const rows = document.querySelectorAll('.membre-row');
+  rows.forEach(row => {
+    const mId = row.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+    if (mId === id) {
+      row.classList.toggle('selected', selectedIds.has(id));
+      row.querySelector('.membre-check').innerHTML = selectedIds.has(id) ? '<i class="fas fa-check"></i>' : '';
+    }
+  });
+  updateSelectedCount();
+}
+
+function toggleSelectAll() {
+  const all = membres.every(m => selectedIds.has(m.id));
+  if (all) { selectedIds.clear(); }
+  else { membres.forEach(m => selectedIds.add(m.id)); }
+  renderMembres(membres);
+  const btn = document.getElementById('selectAllBtn');
+  btn.classList.toggle('active', !all);
+}
+
+function updateSelectedCount() {
+  document.getElementById('selectedCount').textContent = `${selectedIds.size} sélectionné(s)`;
+}
+
+/* ==============================
+   SEND TYPE
+============================== */
+/* ==============================
+   PIÈCES JOINTES
+============================== */
+let attachFileData = null;
+let attachMode = 'none'; // 'none' | 'generated' | 'file'
+
+function selectAttachMode(mode) {
+  attachMode = mode;
+  // Reset styles
+  ['Generated','File'].forEach(k => {
+    document.getElementById('attach'+k+'Wrap').style.borderColor = 'var(--border2)';
+    document.getElementById('attach'+k+'Wrap').style.background = '';
+    document.getElementById('attach'+k+'Dot').style.background = '';
+    document.getElementById('attach'+k+'Dot').style.borderColor = 'var(--border)';
+  });
+  document.getElementById('attachFileZone').style.display = 'none';
+  if (mode === 'generated') {
+    document.getElementById('attachGeneratedWrap').style.borderColor = 'var(--blue)';
+    document.getElementById('attachGeneratedWrap').style.background = 'var(--blue-pale)';
+    document.getElementById('attachGeneratedDot').style.background = 'var(--blue)';
+    document.getElementById('attachGeneratedDot').style.borderColor = 'var(--blue)';
+  } else if (mode === 'file') {
+    document.getElementById('attachFileWrap').style.borderColor = 'var(--blue)';
+    document.getElementById('attachFileWrap').style.background = 'var(--blue-pale)';
+    document.getElementById('attachFileDot').style.background = 'var(--blue)';
+    document.getElementById('attachFileDot').style.borderColor = 'var(--blue)';
+    document.getElementById('attachFileZone').style.display = 'block';
+  }
+}
+
+function handleAttachFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const base64 = e.target.result.split(',')[1];
+    attachFileData = { name: file.name, base64, mimeType: file.type };
+    document.getElementById('attachFileName').textContent = file.name;
+    document.getElementById('attachClearBtn').style.display = 'inline-block';
+    document.getElementById('attachImgPreview').style.display = 'block';
+    document.getElementById('attachImgThumb').src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearAttach() {
+  attachFileData = null;
+  document.getElementById('attachFile').value = '';
+  document.getElementById('attachFileName').textContent = 'Aucun fichier';
+  document.getElementById('attachClearBtn').style.display = 'none';
+  document.getElementById('attachImgPreview').style.display = 'none';
+}
+
+function getAttachmentPayload() {
+  if (attachMode === 'file' && attachFileData) {
+    return { attachmentBase64: attachFileData.base64, attachmentName: attachFileData.name, attachmentMime: attachFileData.mimeType };
+  }
+  if (attachMode === 'generated') {
+    drawAffiche();
+    const canvas = document.getElementById('afficheCanvas');
+    const base64 = canvas.toDataURL('image/png').split(',')[1];
+    return { attachmentBase64: base64, attachmentName: `affiche_${currentAfficheType}.png`, attachmentMime: 'image/png' };
+  }
+  return {};
+}
+
+/* ==============================
+   TEMPLATES MESSAGES
+============================== */
+function getCompanyName() {
+  return (JSON.parse(localStorage.getItem('companySettings') || '{}')).companyName
+    || document.getElementById('senderName').value
+    || '';
+}
+
+/* ---- DATE ÉVÉNEMENT (partagée Mailing + Affiche) ---- */
+function formatEventDate() {
+  const d = document.getElementById('eventDate').value;
+  if (!d) return '';
+  const t = document.getElementById('eventTime').value || '';
+  const date = new Date(d + 'T' + (t || '00:00'));
+  if (isNaN(date.getTime())) return '';
+  let jour = date.toLocaleDateString('fr-FR', { weekday: 'long' });
+  let mois = date.toLocaleDateString('fr-FR', { month: 'long' });
+  jour = jour.charAt(0).toUpperCase() + jour.slice(1);
+  mois = mois.charAt(0).toUpperCase() + mois.slice(1);
+  let heureStr = '';
+  if (t) {
+    const [h, m] = t.split(':');
+    heureStr = ` — ${h}h${m && m !== '00' ? m : ''}`;
+  }
+  return `${jour} ${date.getDate()} ${mois} ${date.getFullYear()}${heureStr}`;
+}
+
+function saveEventDate() {
+  localStorage.setItem('mailing_eventDate', document.getElementById('eventDate').value);
+  localStorage.setItem('mailing_eventTime', document.getElementById('eventTime').value);
+}
+
+function loadEventDate() {
+  const d = localStorage.getItem('mailing_eventDate');
+  const t = localStorage.getItem('mailing_eventTime');
+  if (d) document.getElementById('eventDate').value = d;
+  if (t) document.getElementById('eventTime').value = t;
+}
+
+function escapeRegExp(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Mémorise le texte de date déjà inséré dans le sujet/corps, pour pouvoir
+// le retrouver et le remettre à jour même après un premier remplacement
+// (ex: on choisit d'abord la date, puis on ajuste juste l'heure ensuite).
+let lastFormattedDate = '';
+
+function onEventDateChange() {
+  saveEventDate();
+  // Répercute sur l'affiche (le champ est toujours réécrit en entier, donc pas de souci ici)
+  const affDateEl = document.getElementById('aff-date');
+  const formatted = formatEventDate();
+  if (affDateEl && formatted) { affDateEl.value = formatted; drawAffiche(); }
+
+  // Répercute sur le modèle de mail déjà en cours d'édition
+  const subjEl = document.getElementById('mailSubject');
+  const bodyEl = document.getElementById('mailBody');
+  const newVal = formatted || '{{date}}';
+  [subjEl, bodyEl].forEach(el => {
+    if (!el) return;
+    let v = el.value.replace(/\{\{date\}\}/g, newVal);
+    if (lastFormattedDate && lastFormattedDate !== '{{date}}' && lastFormattedDate !== newVal) {
+      v = v.replace(new RegExp(escapeRegExp(lastFormattedDate), 'g'), newVal);
+    }
+    el.value = v;
+  });
+  lastFormattedDate = newVal;
+}
+
+function applyTemplate(key, btn) {
+  if (btn) {
+    document.querySelectorAll('.templates-grid .tpl-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const tpl = TEMPLATES[key];
+  if (!tpl) return;
+  const nom = getCompanyName();
+  const dateStr = formatEventDate() || '{{date}}';
+  const replaceAll = s => s.replace(/\{\{entreprise\}\}/g, nom).replace(/\{\{date\}\}/g, dateStr);
+  if (tpl.subject) document.getElementById('mailSubject').value = replaceAll(tpl.subject);
+  if (tpl.body) document.getElementById('mailBody').value = replaceAll(tpl.body);
+  lastFormattedDate = dateStr;
+}
+
+/* ==============================
+   SENDING
+============================== */
+async function startSending() {
+  const targets = membres.filter(m => selectedIds.has(m.id));
+  if (!targets.length) { showToast('⚠️ Sélectionne au moins un membre', 'error'); return; }
+  const _nomEnt = getCompanyName();
+  const _dateEvt = formatEventDate();
+  const subject = document.getElementById('mailSubject').value.trim().replace(/\{\{entreprise\}\}/g, _nomEnt).replace(/\{\{date\}\}/g, _dateEvt);
+  const bodyTpl = document.getElementById('mailBody').value.trim();
+  const delay = Math.max(2, parseInt(document.getElementById('delayInput').value) || 5) * 1000;
+  const serverUrl = (document.getElementById('serverUrl').value || 'http://localhost:3000').replace(/\/$/, '');
+  const attachPayload = getAttachmentPayload();
+  const hasAttach = !!attachPayload.attachmentBase64;
+
+  const log = document.getElementById('sendLog');
+  log.style.display = 'block';
+  log.innerHTML = `<div class="log-info">📤 Envoi à ${targets.length} membre(s) — délai: ${delay/1000}s${hasAttach ? ' — 📎 avec pièce jointe' : ''}</div>`;
+
+  showLoading(`Envoi en cours…`, `Préparation…`, 0);
+
+  let ok = 0, fail = 0;
+
+  for (let i = 0; i < targets.length; i++) {
+    const m = targets[i];
+    const nomEntreprise = getCompanyName();
+    const body = bodyTpl.replace(/\{prenom\}/g, m.prenom||'').replace(/\{nom\}/g, m.nom||'').replace(/\{\{entreprise\}\}/g, nomEntreprise).replace(/\{\{date\}\}/g, _dateEvt);
+    updateLoading(`Envoi ${i+1} / ${targets.length}…`, `📧 ${m.prenom} ${m.nom} (${m.email})`, Math.round((i/targets.length)*100));
+
+    try {
+      const payload = { id: m.id, email: m.email, subject, body, ...attachPayload };
+      const res = await fetch(`${serverUrl}/send-mailing`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        ok++;
+        log.innerHTML += `<div class="log-ok">✅ ${m.prenom} ${m.nom} — ${m.email}</div>`;
+      } else {
+        fail++;
+        log.innerHTML += `<div class="log-err">❌ ${m.prenom} ${m.nom} — ${data.error||'Erreur'}</div>`;
+      }
+    } catch(e) {
+      fail++;
+      log.innerHTML += `<div class="log-err">❌ ${m.prenom} ${m.nom} — ${e.message}</div>`;
+    }
+    log.scrollTop = log.scrollHeight;
+
+    if (i < targets.length - 1) {
+      for (let s = delay/1000; s > 0; s--) {
+        updateLoading(`Pause anti-spam…`, `⏱️ Prochain envoi dans ${s}s`, Math.round(((i+1)/targets.length)*100));
+        await sleep(1000);
+      }
+    }
+  }
+
+  hideLoading();
+  const msg = `✅ ${ok} envoyé(s)${fail ? ` — ❌ ${fail} échoué(s)` : ''}`;
+  log.innerHTML += `<div class="log-info" style="margin-top:6px;font-weight:900;">${msg}</div>`;
+  showToast(msg, ok > 0 ? 'success' : 'error');
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ==============================
+   LOADING
+============================== */
+function showLoading(title, sub, pct) {
+  document.getElementById('loadingTitle').textContent = title;
+  document.getElementById('loadingSub').textContent = sub;
+  document.getElementById('loadingBar').style.width = pct + '%';
+  document.getElementById('loadingCount').textContent = '';
+  document.getElementById('loadingOverlay').classList.add('show');
+  document.getElementById('btnSendAll').disabled = true;
+}
+function updateLoading(title, sub, pct) {
+  document.getElementById('loadingTitle').textContent = title;
+  document.getElementById('loadingSub').textContent = sub;
+  document.getElementById('loadingBar').style.width = pct + '%';
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+  document.getElementById('btnSendAll').disabled = false;
+}
+
+/* ==============================
+   TOAST
+============================== */
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type?' '+type:'');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* ==============================
+   SERVER TEST
+============================== */
+async function testServer() {
+  const url = document.getElementById('serverUrl').value.replace(/\/$/, '');
+  const el = document.getElementById('serverStatus');
+  el.style.display = 'inline-block';
+  el.textContent = '⏳ Test…'; el.className = 'server-status';
+  try {
+    const r = await fetch(url, { method:'GET', signal: AbortSignal.timeout(3000) });
+    el.textContent = '✅ Serveur accessible'; el.className = 'server-status ok';
+  } catch(e) {
+    el.textContent = '❌ Inaccessible'; el.className = 'server-status fail';
+  }
+}
+
+/* ==============================
+   SETTINGS
+============================== */
+function saveSettings() {
+  localStorage.setItem('mailing_serverUrl', document.getElementById('serverUrl').value);
+  localStorage.setItem('mailing_senderName', document.getElementById('senderName').value);
+  showToast('✅ Paramètres sauvegardés', 'success');
+}
+function loadSettings() {
+  // Priorité : companySettings (paramètres) → mailing_* sauvegardé → valeur par défaut
+  const company = JSON.parse(localStorage.getItem('companySettings') || '{}');
+  const serverCfg = JSON.parse(localStorage.getItem('serverConfig') || '{}');
+
+  const url  = localStorage.getItem('mailing_serverUrl')  || serverCfg.serverUrl || 'http://localhost:3000';
+  const name = localStorage.getItem('mailing_senderName') || company.companyName  || '';
+
+  document.getElementById('serverUrl').value  = url;
+  document.getElementById('senderName').value = name;
+}
+
+function openImportJSON() { document.getElementById('importJsonFile').click(); }
+function importMembresJSON(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      localStorage.setItem('membres', JSON.stringify(data));
+      reloadMembres();
+      showToast(`✅ ${data.length} membres importés`, 'success');
+    } catch(err) { showToast('❌ Fichier JSON invalide', 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+/* ==============================
+   AFFICHE
+============================== */
+function setAfficheType(type, btn) {
+  currentAfficheType = type;
+  document.querySelectorAll('.affiche-type-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const theme = AFFICHE_THEMES[type];
+  if (theme) {
+    document.getElementById('aff-accent').value = theme.accentInput;
+  }
+  // Apply template text
+  const tpl = TEMPLATES[type];
+  if (tpl) {
+    const titleEl = document.getElementById('aff-title');
+    const dateEl = document.getElementById('aff-date');
+    const descEl = document.getElementById('aff-desc');
+    const dateVal = formatEventDate() || '[Choisis une date dans l\'onglet Mailing]';
+    if (type === 'halloween') { titleEl.value = 'SOIRÉE HALLOWEEN'; dateEl.value = dateVal; descEl.value = 'Déguisements obligatoires 🎭\nConcours de costumes — Karaoké endiablé\nAu {{entreprise}}'; }
+    else if (type === 'noel') { titleEl.value = 'SOIRÉE DE NOËL'; dateEl.value = dateVal; descEl.value = '✨ Ambiance festive — Vin chaud\nKaraoké de Noël 🎄\nAu {{entreprise}}'; }
+    else if (type === 'paques') { titleEl.value = 'SOIRÉE PÂQUES'; dateEl.value = dateVal; descEl.value = 'Venez fêter le printemps avec nous ! 🌸\nSurprises et chocolats 🍫\nAu {{entreprise}}'; }
+    else if (type === 'spectacle') { titleEl.value = 'SPECTACLE'; dateEl.value = dateVal; descEl.value = '🌟 Une soirée inoubliable\nArtistes exceptionnels — Surprise garantie\nAu {{entreprise}}'; }
+    else if (type === 'transformiste') { titleEl.value = 'SOIRÉE TRANSFORMISTE'; dateEl.value = dateVal; descEl.value = '💃 Glamour — Paillettes — Show incroyable\nLa magie du cabaret vous attend !\nAu {{entreprise}}'; }
+    else if (type === 'karaoke') { titleEl.value = 'SOIRÉE KARAOKÉ'; dateEl.value = dateVal; descEl.value = '🎤 Des centaines de chansons\nConcours de chant — Ambiance survoltée\nAu {{entreprise}}'; }
+  }
+  drawAffiche();
+}
+
+function drawAffiche() {
+  const canvas = document.getElementById('afficheCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = 800, H = 1100;
+  canvas.width = W; canvas.height = H;
+
+  const theme = AFFICHE_THEMES[currentAfficheType] || AFFICHE_THEMES.halloween;
+  const accent = document.getElementById('aff-accent').value || theme.accentInput;
+  const textColor = document.getElementById('aff-textcolor').value || '#ffffff';
+  const nomEntreprise = getCompanyName() || document.getElementById('senderName').value || 'Mon Entreprise';
+  const dateFormatted = formatEventDate();
+  const replacePlaceholders = s => s.replace(/\{\{entreprise\}\}/g, nomEntreprise).replace(/\{\{date\}\}/g, dateFormatted || '[date à définir]');
+  const titleText = replacePlaceholders(document.getElementById('aff-title').value || 'ÉVÉNEMENT');
+  const dateText = replacePlaceholders(document.getElementById('aff-date').value || '');
+  const descText = replacePlaceholders(document.getElementById('aff-desc').value || '');
+
+  // BG gradient
+  const grd = ctx.createLinearGradient(0, 0, W, H);
+  grd.addColorStop(0, theme.bg[0]);
+  grd.addColorStop(0.5, theme.bg[1]);
+  grd.addColorStop(1, theme.bg[2]);
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+
+  // Decorative circles
+  ctx.save();
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = accent;
+  ctx.beginPath(); ctx.arc(W*0.9, H*0.1, 200, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W*0.1, H*0.85, 160, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 0.06;
+  ctx.beginPath(); ctx.arc(W*0.5, H*0.5, 350, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // Top deco line
+  const lineGrd = ctx.createLinearGradient(0, 0, W, 0);
+  lineGrd.addColorStop(0, 'transparent');
+  lineGrd.addColorStop(0.5, accent);
+  lineGrd.addColorStop(1, 'transparent');
+  ctx.fillStyle = lineGrd;
+  ctx.fillRect(0, 0, W, 6);
+  ctx.fillRect(0, H-6, W, 6);
+
+  // Big emoji
+  ctx.font = '140px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(theme.emoji, W/2, 220);
+
+  // Glow behind title
+  ctx.save();
+  ctx.shadowColor = accent;
+  ctx.shadowBlur = 40;
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 72px Nunito, Arial';
+  ctx.textAlign = 'center';
+  // wrap title
+  const words = titleText.split(' ');
+  let line = '', lines = [], maxW = W - 80;
+  ctx.font = 'bold 72px Arial';
+  words.forEach(w => {
+    const test = line + (line?' ':'') + w;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+    else line = test;
+  });
+  lines.push(line);
+  lines.forEach((l, i) => ctx.fillText(l, W/2, 340 + i*82));
+  ctx.restore();
+
+  // Separator
+  ctx.save();
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 3;
+  ctx.globalAlpha = 0.7;
+  const sepY = 340 + lines.length*82 + 20;
+  ctx.beginPath();
+  ctx.moveTo(W*0.2, sepY); ctx.lineTo(W*0.8, sepY);
+  ctx.stroke();
+  ctx.restore();
+
+  // Date text
+  let y = sepY + 55;
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 32px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(dateText, W/2, y);
+
+  // Deco emojis row
+  y += 70;
+  ctx.font = '38px serif';
+  const decos = theme.deco;
+  const spacing = W / (decos.length + 1);
+  decos.forEach((d, i) => ctx.fillText(d, spacing*(i+1), y));
+
+  // Description lines
+  y += 70;
+  ctx.fillStyle = textColor;
+  ctx.font = '26px Arial';
+  ctx.globalAlpha = 0.9;
+  const descLines = descText.split('\n');
+  descLines.forEach(dl => {
+    ctx.fillText(dl.trim(), W/2, y);
+    y += 42;
+  });
+  ctx.globalAlpha = 1;
+
+  // Bottom logo / club name
+  y = H - 80;
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 24px Arial';
+  ctx.fillText('★ ' + (document.getElementById('senderName').value || 'Mon Entreprise') + ' ★', W/2, y);
+
+  // Bottom deco line dots
+  ctx.fillStyle = accent;
+  ctx.globalAlpha = 0.5;
+  for (let x = 40; x < W; x += 30) {
+    ctx.beginPath(); ctx.arc(x, H-20, 2, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+function downloadAffiche() {
+  drawAffiche();
+  const canvas = document.getElementById('afficheCanvas');
+  const link = document.createElement('a');
+  link.download = `affiche_${currentAfficheType}_${(getCompanyName()||'evenement').toLowerCase().replace(/\s+/g,'_')}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('✅ Affiche téléchargée !', 'success');
+}
+</script>
+</body>
+</html>

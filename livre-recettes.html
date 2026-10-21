@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Livre des Recettes - Karaoké</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --sky: #e8f4fd; --sky2: #c8e6f8; --sky3: #a8d5f4;
+    --blue: #2a7fd4; --blue2: #1a6bbf; --blue3: #0d4f9a;
+    --blue-light: #5ba3e8;
+    --green: #5aad2e; --green2: #4a9422; --green-light: #8dd45e;
+    --green-pale: #e8f5dc;
+    --yellow: #e8a800; --yellow2: #d49400; --yellow-light: #ffd84d;
+    --yellow-pale: #fff8dc;
+    --orange: #e06820; --red: #c0392b; --red-pale: #fde8e8;
+    --white: #ffffff; --pearl: #f0f6ff; --pearl2: #e2eeff;
+    --text: #1a2b4a; --text2: #4a6080; --text3: #7a98b8;
+    --border: #b0cce8; --border2: #d0e4f4;
+    --shadow: rgba(30,80,160,0.15); --shadow2: rgba(30,80,160,0.08);
+    --glass: rgba(255,255,255,0.82);
+    --radius: 12px; --radius-lg: 18px; --radius-xl: 22px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', 'Segoe UI', sans-serif;
+    font-size: 14px;
+    background: linear-gradient(160deg, #cde8f8 0%, #e2f0fb 25%, #d8edff 50%, #e8f5dc 75%, #fff8dc 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: var(--text);
+  }
+
+  body::before {
+    content: '';
+    position: fixed; top: -150px; left: -150px;
+    width: 550px; height: 550px;
+    background: radial-gradient(circle, rgba(168,213,244,0.55), transparent 70%);
+    pointer-events: none; z-index: 0; border-radius: 50%;
+  }
+  body::after {
+    content: '';
+    position: fixed; bottom: -100px; right: 5%;
+    width: 450px; height: 450px;
+    background: radial-gradient(circle, rgba(184,232,154,0.45), transparent 70%);
+    pointer-events: none; z-index: 0; border-radius: 50%;
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* ===== Banner ===== */
+  .banner {
+    background: linear-gradient(135deg,
+      rgba(255,255,255,0.92) 0%,
+      rgba(195,228,252,0.88) 50%,
+      rgba(140,196,240,0.92) 100%
+    );
+    border: 1px solid rgba(255,255,255,0.95);
+    border-radius: var(--radius-xl);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 28px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+    position: relative; overflow: hidden;
+  }
+  .banner::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 45%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.05));
+    border-radius: var(--radius-xl) var(--radius-xl) 60% 60%;
+    pointer-events: none;
+  }
+  .banner h1 {
+    font-size: 1.5em; font-weight: 900; color: var(--blue3);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .banner p { color: var(--text2); font-weight: 600; margin-top: 6px; font-size: 0.92em; }
+
+  /* ===== Toolbar ===== */
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-top: 16px;
+  }
+  .btn {
+    padding: 10px 18px;
+    font-size: 0.88em;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 2px 10px rgba(30,60,100,0.25), 0 1px 0 rgba(255,255,255,0.3) inset;
+    transition: all 0.18s ease;
+    position: relative;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-blue { background: linear-gradient(180deg, var(--blue-light), var(--blue), var(--blue3)); }
+  .btn-green { background: linear-gradient(180deg, var(--green-light), var(--green), var(--green2)); }
+  .btn-yellow { background: linear-gradient(180deg, var(--yellow-light), var(--yellow), var(--yellow2)); color: #4a3800; }
+  .btn-grey { background: linear-gradient(180deg, #7a8ea8, #4a6080, #2e4060); }
+  .file-wrapper { position: relative; display: inline-flex; }
+  .file-wrapper input[type=file] { position: absolute; left: -9999px; }
+  .file-wrapper label { cursor: pointer; }
+
+  .label-field {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--glass); border: 1px solid var(--border2);
+    border-radius: 16px; padding: 6px 8px 6px 14px;
+    font-weight: 700; color: var(--text2);
+  }
+  .label-field input {
+    border: none; background: transparent; font-family: 'Nunito', sans-serif;
+    font-weight: 800; color: var(--blue3); font-size: 0.95em;
+    padding: 6px 10px; border-radius: 10px; min-width: 180px;
+  }
+  .label-field input:focus { outline: 2px solid var(--sky3); background: white; }
+
+  /* ===== Empty state ===== */
+  .empty {
+    background: var(--glass); border: 1px dashed var(--border);
+    border-radius: var(--radius-lg); padding: 40px 20px; text-align: center;
+    color: var(--text2); font-weight: 700; margin-top: 10px;
+  }
+  .empty small { display:block; font-weight: 600; color: var(--text3); margin-top: 8px; }
+
+  /* ===== Month card ===== */
+  .month-card {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.95);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 6px 24px var(--shadow2), 0 1px 0 rgba(255,255,255,0.9) inset;
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .month-head {
+    background: linear-gradient(135deg, var(--blue), var(--blue3));
+    color: white; padding: 14px 20px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+  }
+  .month-head h2 { font-size: 1.05em; font-weight: 900; text-transform: capitalize; }
+  .month-head .count { font-size: 0.82em; font-weight: 700; opacity: 0.9; }
+
+  table.livre-table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+  table.livre-table thead th {
+    background: rgba(42,127,212,0.10);
+    color: var(--blue3); font-weight: 800;
+    padding: 10px 14px; text-align: left;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  table.livre-table thead th.num { text-align: right; }
+  table.livre-table tbody td {
+    padding: 9px 14px; border-bottom: 1px solid var(--border2);
+    color: var(--text);
+  }
+  table.livre-table tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.livre-table tbody tr:hover { background: var(--pearl); }
+  table.livre-table tfoot td {
+    padding: 11px 14px; font-weight: 900; color: var(--blue3);
+    background: rgba(90,173,46,0.10);
+    border-top: 2px solid var(--green);
+  }
+  table.livre-table tfoot td.num { text-align: right; }
+
+  /* ===== Grand total ===== */
+  .grand-total {
+    background: linear-gradient(135deg, var(--green-pale), var(--white));
+    border: 1px solid var(--green-light);
+    border-radius: var(--radius-xl);
+    padding: 20px 24px;
+    box-shadow: 0 6px 24px var(--shadow2);
+    display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center;
+  }
+  .grand-total h2 { color: var(--green2); font-size: 1.1em; font-weight: 900; }
+  .grand-total .totals { display: flex; flex-wrap: wrap; gap: 22px; }
+  .grand-total .tot-item { text-align: right; }
+  .grand-total .tot-item .lbl { font-size: 0.78em; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+  .grand-total .tot-item .val { font-size: 1.15em; font-weight: 900; color: var(--blue3); }
+  .grand-total .tot-item.net .val { color: var(--green2); }
+
+  /* toast */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--blue3); color: white; padding: 12px 22px; border-radius: 30px;
+    font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.25); opacity: 0; pointer-events: none;
+    transition: all 0.25s ease; z-index: 999; font-size: 0.9em;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { background: var(--red); }
+
+  @media print {
+    .toolbar, .banner .toolbar { display: none !important; }
+    body { background: white; padding: 0; }
+    .month-card, .grand-total { box-shadow: none; border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="banner">
+    <h1>📒 Livre des Recettes — Karaoké</h1>
+    <p>Récapitulatif mensuel automatique des rapports <strong>Z</strong> (clôtures de caisse) — chiffre complet, dons et net.</p>
+    <div class="toolbar">
+      <div class="label-field">
+        🏷️ Libellé :
+        <input id="libelleInput" type="text" value="Recettes karaoké">
+      </div>
+      <div class="file-wrapper">
+        <input type="file" id="importFile" accept=".json" onchange="importerJSON(event)">
+        <label class="btn btn-blue" for="importFile">📥 Importer JSON</label>
+      </div>
+      <button class="btn btn-grey" onclick="exporterJSON()">💾 Exporter JSON</button>
+      <button class="btn btn-green" onclick="exporterExcel()">📊 Générer Excel</button>
+      <button class="btn btn-yellow" onclick="window.print()">🖨️ Imprimer</button>
+    </div>
+  </div>
+
+  <div id="contenu"></div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const MOIS_NOMS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const CLE_LOCALE = 'livre_recettes_data';
+
+let rapportsData = [];
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = type === 'error' ? 'show error' : 'show';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=> t.classList.remove('show'), 3000);
+}
+
+function parseDateRapport(r){
+  if (r.isoCloture) {
+    const d = new Date(r.isoCloture);
+    if (!isNaN(d)) return d;
+  }
+  if (r.dateCloture) {
+    const parts = r.dateCloture.split('/');
+    if (parts.length === 3) {
+      const d = new Date(parseInt(parts[2],10), parseInt(parts[1],10)-1, parseInt(parts[0],10));
+      if (!isNaN(d)) return d;
+    }
+  }
+  return null;
+}
+
+function monthKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+
+function euro(n){ return (n||0).toFixed(2).replace('.', ',') + ' €'; }
+
+function getLibelle(){
+  const v = document.getElementById('libelleInput').value.trim();
+  return v || 'Recettes karaoké';
+}
+
+// ---------------------------------------------------------
+// Chargement
+// ---------------------------------------------------------
+function chargerDepuisRapportsPartage(){
+  try {
+    const raw = localStorage.getItem('rapports');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) {
+        rapportsData = parsed;
+        localStorage.setItem(CLE_LOCALE, JSON.stringify(rapportsData));
+        return true;
+      }
+    }
+  } catch(e){}
+  return false;
+}
+
+function chargerDepuisStockagePropre(){
+  try {
+    const raw = localStorage.getItem(CLE_LOCALE);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) { rapportsData = parsed; return true; }
+    }
+  } catch(e){}
+  return false;
+}
+
+function importerJSON(event){
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (Array.isArray(data)) {
+        rapportsData = data;
+        localStorage.setItem(CLE_LOCALE, JSON.stringify(rapportsData));
+        render();
+        toast('✔ Import réussi : ' + data.length + ' rapport(s)');
+      } else {
+        toast('✗ Fichier JSON invalide (tableau attendu)', 'error');
+      }
+    } catch(err){
+      toast('✗ Erreur de lecture du fichier JSON', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function exporterJSON(){
+  if (!rapportsData.length) return toast('⚠ Aucune donnée à exporter', 'error');
+  const data = JSON.stringify(rapportsData, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `livre_recettes_export_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✔ Export JSON réussi');
+}
+
+// ---------------------------------------------------------
+// Regroupement par mois (uniquement les Z)
+// ---------------------------------------------------------
+function getMoisGroupes(){
+  const zRapports = rapportsData.filter(r => r.type === 'Z');
+  const groupes = {};
+  zRapports.forEach(r => {
+    const d = parseDateRapport(r);
+    if (!d) return;
+    const key = monthKey(d);
+    if (!groupes[key]) groupes[key] = { annee: d.getFullYear(), mois: d.getMonth(), lignes: [] };
+
+    const complet = (r.caGlobal !== undefined && r.caGlobal !== null) ? r.caGlobal : (r.ca || 0);
+    const donsEsp = r.donsEspeces || 0;
+    const donsBanq = r.donsBanque || 0;
+    const net = complet - donsEsp - donsBanq;
+
+    groupes[key].lignes.push({
+      date: r.dateCloture || '',
+      numero: r.numero || '',
+      complet, donsEsp, donsBanq, net,
+      dateObj: d
+    });
+  });
+
+  Object.values(groupes).forEach(g => g.lignes.sort((a,b) => a.dateObj - b.dateObj));
+
+  return Object.keys(groupes).sort().map(k => groupes[k]);
+}
+
+// ---------------------------------------------------------
+// Rendu
+// ---------------------------------------------------------
+function render(){
+  const contenu = document.getElementById('contenu');
+  const groupes = getMoisGroupes();
+  const libelle = getLibelle();
+
+  if (!groupes.length) {
+    contenu.innerHTML = `<div class="empty">
+      Aucun rapport <strong>Z</strong> trouvé.
+      <small>Importez un fichier JSON exporté depuis l'application des rapports (bouton "📥 Importer JSON"),
+      ou ouvrez cette page depuis le même dossier / serveur que rapports.html pour une récupération automatique.</small>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  let totComplet = 0, totEsp = 0, totBanq = 0, totNet = 0, totCount = 0;
+
+  groupes.forEach(g => {
+    let sComplet = 0, sEsp = 0, sBanq = 0, sNet = 0;
+    let rows = '';
+    g.lignes.forEach(l => {
+      sComplet += l.complet; sEsp += l.donsEsp; sBanq += l.donsBanq; sNet += l.net;
+      rows += `<tr>
+        <td>${l.date}</td>
+        <td>Z${l.numero !== '' ? ' n°' + l.numero : ''}</td>
+        <td>${libelle}</td>
+        <td class="num">${euro(l.complet)}</td>
+        <td class="num">${euro(l.donsEsp)}</td>
+        <td class="num">${euro(l.donsBanq)}</td>
+        <td class="num">${euro(l.net)}</td>
+      </tr>`;
+    });
+
+    totComplet += sComplet; totEsp += sEsp; totBanq += sBanq; totNet += sNet; totCount += g.lignes.length;
+
+    html += `<div class="month-card">
+      <div class="month-head">
+        <h2>${MOIS_NOMS[g.mois]} ${g.annee}</h2>
+        <span class="count">${g.lignes.length} rapport${g.lignes.length>1?'s':''} Z</span>
+      </div>
+      <div style="overflow-x:auto;">
+      <table class="livre-table">
+        <thead>
+          <tr>
+            <th>Date (Z)</th>
+            <th>N°</th>
+            <th>Libellé</th>
+            <th class="num">Chiffre complet<br><small>(dons compris)</small></th>
+            <th class="num">Dons espèces</th>
+            <th class="num">Dons banque</th>
+            <th class="num">Total<br><small>(complet − dons)</small></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3">TOTAL ${MOIS_NOMS[g.mois]} ${g.annee}</td>
+            <td class="num">${euro(sComplet)}</td>
+            <td class="num">${euro(sEsp)}</td>
+            <td class="num">${euro(sBanq)}</td>
+            <td class="num">${euro(sNet)}</td>
+          </tr>
+        </tfoot>
+      </table>
+      </div>
+    </div>`;
+  });
+
+  html += `<div class="grand-total">
+    <h2>💰 Total général — ${totCount} rapport${totCount>1?'s':''} Z</h2>
+    <div class="totals">
+      <div class="tot-item"><div class="lbl">Chiffre complet</div><div class="val">${euro(totComplet)}</div></div>
+      <div class="tot-item"><div class="lbl">Dons espèces</div><div class="val">${euro(totEsp)}</div></div>
+      <div class="tot-item"><div class="lbl">Dons banque</div><div class="val">${euro(totBanq)}</div></div>
+      <div class="tot-item net"><div class="lbl">Total net</div><div class="val">${euro(totNet)}</div></div>
+    </div>
+  </div>`;
+
+  contenu.innerHTML = html;
+}
+
+// ---------------------------------------------------------
+// Export Excel (client-side, sans serveur)
+// ---------------------------------------------------------
+function exporterExcel(){
+  const groupes = getMoisGroupes();
+  if (!groupes.length) return toast('⚠ Aucune donnée à exporter', 'error');
+  const libelle = getLibelle();
+
+  const aoa = [
+    ['Livre des recettes — Karaoké'],
+    [],
+    ['Date (Z)', 'N°', 'Libellé', 'Chiffre complet (dons compris)', 'Dons espèces', 'Dons banque', 'Total (complet - dons)']
+  ];
+
+  let totComplet = 0, totEsp = 0, totBanq = 0, totNet = 0;
+
+  groupes.forEach(g => {
+    aoa.push([`${MOIS_NOMS[g.mois]} ${g.annee}`]);
+    let sComplet = 0, sEsp = 0, sBanq = 0, sNet = 0;
+    g.lignes.forEach(l => {
+      sComplet += l.complet; sEsp += l.donsEsp; sBanq += l.donsBanq; sNet += l.net;
+      aoa.push([l.date, l.numero, libelle, Number(l.complet.toFixed(2)), Number(l.donsEsp.toFixed(2)), Number(l.donsBanq.toFixed(2)), Number(l.net.toFixed(2))]);
+    });
+    aoa.push(['', '', `TOTAL ${MOIS_NOMS[g.mois]} ${g.annee}`, Number(sComplet.toFixed(2)), Number(sEsp.toFixed(2)), Number(sBanq.toFixed(2)), Number(sNet.toFixed(2))]);
+    aoa.push([]);
+    totComplet += sComplet; totEsp += sEsp; totBanq += sBanq; totNet += sNet;
+  });
+
+  aoa.push(['', '', 'TOTAL GÉNÉRAL', Number(totComplet.toFixed(2)), Number(totEsp.toFixed(2)), Number(totBanq.toFixed(2)), Number(totNet.toFixed(2))]);
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{wch:12},{wch:8},{wch:22},{wch:22},{wch:14},{wch:14},{wch:20}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Livre recettes');
+  XLSX.writeFile(wb, `Livre_recettes_karaoke_${new Date().toISOString().split('T')[0]}.xlsx`);
+  toast('✔ Fichier Excel généré');
+}
+
+document.getElementById('libelleInput').addEventListener('input', render);
+
+window.addEventListener('DOMContentLoaded', () => {
+  const partage = chargerDepuisRapportsPartage();
+  if (!partage) chargerDepuisStockagePropre();
+  render();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Générateur de Tickets</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+  :root {
+    --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-pale:#deeefb;
+    --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+    --yellow:#e8a800; --yellow-pale:#fff8dc;
+    --red:#c0392b; --red-pale:#fde8e8;
+    --purple:#7c3aed; --orange:#d97706; --orange-pale:#fff7ed;
+    --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+    --border:#b0cce8; --border2:#d0e4f4;
+    --glass:rgba(255,255,255,0.82);
+    --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+    --radius:12px; --radius-xl:22px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Nunito','Segoe UI',sans-serif; font-size:14px; color:var(--text);
+    background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+    min-height:100vh; padding:24px;
+  }
+  body::before { content:''; position:fixed; top:-150px; left:-150px; width:550px; height:550px;
+    background:radial-gradient(circle,rgba(168,213,244,.5),transparent 70%); pointer-events:none; z-index:0; border-radius:50%; }
+  body::after { content:''; position:fixed; bottom:-100px; right:5%; width:450px; height:450px;
+    background:radial-gradient(circle,rgba(184,232,154,.4),transparent 70%); pointer-events:none; z-index:0; border-radius:50%; }
+  .wrap { max-width:1100px; margin:0 auto; position:relative; z-index:1; }
+  h1 { text-align:center; color:var(--blue3); font-size:2rem; font-weight:900; letter-spacing:-.5px; margin-bottom:6px; }
+  .sub { text-align:center; color:var(--text2); margin-bottom:22px; font-weight:600; }
+  .card {
+    background:var(--glass); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.95);
+    border-radius:var(--radius-xl); padding:18px 22px; margin-bottom:18px;
+    box-shadow:0 4px 20px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+  }
+  .card h2 { color:var(--blue3); font-size:1.1rem; font-weight:900; margin-bottom:12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px 16px; }
+  label.f { display:flex; flex-direction:column; gap:4px; font-weight:800; font-size:.78rem; color:var(--text2); text-transform:uppercase; letter-spacing:.04em; }
+  input[type=number], input[type=text], input[type=date], input[type=time], select {
+    font-family:inherit; font-size:.95rem; font-weight:700; color:var(--text);
+    padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#fff; width:100%;
+  }
+  input:focus, select:focus { outline:2px solid var(--blue-pale); border-color:var(--blue); }
+  .chk { display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:.9rem; color:var(--text); cursor:pointer; }
+  .dows { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .hint { font-size:.8rem; color:var(--text3); font-weight:600; margin-top:8px; }
+  .hint.warn { color:var(--orange); }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  button.btn {
+    font-family:inherit; font-weight:800; font-size:.95rem; color:#fff; cursor:pointer;
+    padding:10px 22px; border-radius:50px; border:1px solid var(--blue3);
+    background:linear-gradient(180deg,#6cb4f0,var(--blue),var(--blue3));
+    box-shadow:0 2px 8px var(--shadow),0 1px 0 rgba(255,255,255,.4) inset; transition:all .15s;
+  }
+  button.btn:hover { transform:translateY(-2px); box-shadow:0 5px 14px var(--shadow); }
+  button.btn.green { background:linear-gradient(180deg,#8ad85a,var(--green),var(--green2)); border-color:var(--green2); }
+  button.btn.gray { background:linear-gradient(180deg,#fff,#d0e4f4); color:var(--blue2); border-color:var(--border); }
+  button.btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; }
+  .stat { background:#fff; border:1px solid var(--border2); border-radius:var(--radius); padding:12px 14px; }
+  .stat .k { font-size:.72rem; font-weight:800; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; }
+  .stat .v { font-size:1.3rem; font-weight:900; color:var(--blue3); }
+  .stat .d { font-size:.8rem; font-weight:700; color:var(--text2); }
+  .ok { color:var(--green2) !important; } .bad { color:var(--red) !important; }
+  table { width:100%; border-collapse:collapse; font-size:.88rem; }
+  th { text-align:left; background:var(--blue-pale); color:var(--blue3); padding:7px 10px; font-weight:800; }
+  td { padding:6px 10px; border-bottom:1px solid var(--border2); }
+  td.r, th.r { text-align:right; }
+  .artcat { background:var(--green-pale); font-weight:900; color:var(--green2); }
+  .artcat td { padding:6px 10px; }
+  .scroll { max-height:380px; overflow:auto; border:1px solid var(--border2); border-radius:var(--radius); background:#fff; }
+  .badge { font-size:.7rem; font-weight:800; padding:2px 8px; border-radius:20px; background:var(--orange-pale); color:var(--orange); border:1px solid #f5c98a; margin-left:6px; }
+  .tk { border-bottom:1px solid var(--border2); }
+  .tk summary { cursor:pointer; padding:7px 10px; display:grid; grid-template-columns:70px 150px 70px 80px 1fr 90px; gap:8px; align-items:center; font-weight:700; }
+  .tk summary:hover { background:var(--blue-pale); }
+  .tk .lines { padding:4px 14px 10px 90px; color:var(--text2); font-size:.85rem; }
+  .pill { display:inline-block; padding:1px 9px; border-radius:20px; font-size:.75rem; font-weight:800; }
+  .pill.e { background:var(--green-pale); color:var(--green2); } .pill.b { background:var(--blue-pale); color:var(--blue2); }
+  .msgs div { padding:6px 12px; border-radius:10px; margin-top:6px; font-weight:700; font-size:.88rem; background:var(--orange-pale); color:var(--orange); border:1px solid #f5c98a; }
+  .msgs div.info { background:var(--blue-pale); color:var(--blue2); border-color:var(--border); }
+  .back { display:inline-block; margin-bottom:14px; color:var(--blue2); font-weight:800; text-decoration:none; cursor:pointer; }
+  .mem { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:4px 12px; max-height:200px; overflow:auto; padding:8px; background:#fff; border:1px solid var(--border2); border-radius:var(--radius); margin-top:10px; }
+  details.sec > summary { cursor:pointer; font-weight:900; color:var(--blue3); font-size:1.1rem; }
+  @media(max-width:700px){ .tk summary{ grid-template-columns:50px 1fr 70px; } .tk summary span:nth-child(n+4){ display:none; } .tk .lines{padding-left:14px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" onclick="history.back()">← Retour</a>
+  <h1>🎲 Générateur de Tickets</h1>
+  <div class="sub">Crée des tickets à partir de tes articles et de tes membres, selon un chiffre d'affaires cible — puis exporte-les au format de l'historique.</div>
+
+  <!-- SOURCES -->
+  <div class="card">
+    <h2>📦 Données détectées</h2>
+    <div class="stats" id="sources"></div>
+    <div class="row" style="margin-top:12px">
+      <input type="file" id="impArt" accept=".json" style="display:none" onchange="importerArticles(event)">
+      <input type="file" id="impMem" accept=".json" style="display:none" onchange="importerMembres(event)">
+      <button class="btn gray" onclick="document.getElementById('impArt').click()">📂 Charger un JSON d'articles</button>
+      <button class="btn gray" onclick="document.getElementById('impMem').click()">📂 Charger un JSON de membres</button>
+      <button class="btn gray" onclick="rechargerSources()">🔄 Relire le stockage</button>
+    </div>
+    <div class="hint">Les articles et membres sont lus automatiquement depuis le stockage du navigateur (comme l'historique). Si rien n'apparaît, charge les JSON exportés depuis Articles / Membres.</div>
+  </div>
+
+  <!-- PERIODE -->
+  <div class="card">
+    <h2>📅 Période et horaires</h2>
+    <div class="grid">
+      <label class="f">Du <input type="date" id="dateDebut"></label>
+      <label class="f">Au <input type="date" id="dateFin"></label>
+      <label class="f">Ouverture <input type="time" id="hOuv" value="20:00"></label>
+      <label class="f">Fermeture <input type="time" id="hFer" value="02:00"></label>
+      <label class="f">Les objectifs valent…
+        <select id="modeObjectif">
+          <option value="total">pour toute la période (réparti sur les jours)</option>
+          <option value="jour">pour chaque jour d'ouverture</option>
+        </select>
+      </label>
+      <label class="f">Nombre de tables <input type="number" id="nbTables" min="1" value="10"></label>
+    </div>
+    <div class="dows" style="margin-top:12px">
+      <b style="font-size:.8rem;color:var(--text2)">JOURS D'OUVERTURE :</b>
+      <label class="chk"><input type="checkbox" class="dow" value="1" checked>Lun</label>
+      <label class="chk"><input type="checkbox" class="dow" value="2" checked>Mar</label>
+      <label class="chk"><input type="checkbox" class="dow" value="3" checked>Mer</label>
+      <label class="chk"><input type="checkbox" class="dow" value="4" checked>Jeu</label>
+      <label class="chk"><input type="checkbox" class="dow" value="5" checked>Ven</label>
+      <label class="chk"><input type="checkbox" class="dow" value="6" checked>Sam</label>
+      <label class="chk"><input type="checkbox" class="dow" value="0" checked>Dim</label>
+    </div>
+    <div class="hint">Si la fermeture est avant l'ouverture (ex : 20:00 → 02:00), les paiements après minuit sont datés du lendemain.</div>
+  </div>
+
+  <!-- OBJECTIFS -->
+  <div class="card">
+    <h2>🎯 Chiffre d'affaires visé</h2>
+    <div class="grid">
+      <label class="f">💵 Recettes espèces (€) <input type="number" id="cibleEsp" min="0" step="0.01" value="500"></label>
+      <label class="f">💳 Recettes banque (€) <input type="number" id="cibleBan" min="0" step="0.01" value="500"></label>
+      <label class="f">Panier moyen espèces (€) <input type="number" id="panierEsp" min="1" step="0.5" value="10"></label>
+      <label class="f">Panier moyen banque (€) <input type="number" id="panierBan" min="1" step="0.5" value="15"></label>
+    </div>
+    <div class="hint">Les montants sont en TVAC, tels qu'ils apparaîtront dans « Total espèces » et « Total banque » des rapports.</div>
+  </div>
+
+  <!-- DONS -->
+  <div class="card">
+    <h2>🎁 Dons</h2>
+    <div class="grid">
+      <label class="f">Dons en espèces (€) <input type="number" id="donEsp" min="0" step="0.01" value="0"></label>
+      <label class="f">Dons par banque (€) <input type="number" id="donBan" min="0" step="0.01" value="0"></label>
+      <label class="f">Montants possibles d'un don (€) <input type="text" id="donDenoms" value="1, 2, 5, 10, 20"></label>
+      <label class="f">Nom de l'article don <input type="text" id="donNom" value="Don"></label>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <label class="chk"><input type="checkbox" id="donInclus" checked>Les dons sont <b>compris</b> dans les recettes visées (« dont dons »)</label>
+      <label class="chk"><input type="checkbox" id="donAjust" checked>Combler un écart résiduel avec un petit don</label>
+    </div>
+    <div class="hint">Si coché « compris » : espèces 500 € dont 50 € de dons = 450 € d'articles + 50 € de dons. Sinon les dons s'ajoutent aux 500 €. Les dons sont ajoutés comme lignes dans des tickets (le rapport les repère par le mot « don » dans le nom).</div>
+  </div>
+
+  <!-- MEMBRES / TABLES -->
+  <div class="card">
+    <details class="sec">
+      <summary>👥 Membres sur les tickets</summary>
+      <div class="grid" style="margin-top:12px">
+        <label class="f">% de tickets espèces avec un membre <input type="number" id="pctMembEsp" min="0" max="100" value="20"></label>
+        <label class="f">% de tickets banque avec un membre <input type="number" id="pctMembBan" min="0" max="100" value="60"></label>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn gray" onclick="cocherMembres(true)">Tout cocher</button>
+        <button class="btn gray" onclick="cocherMembres(false)">Tout décocher</button>
+        <span class="hint" id="membCount"></span>
+      </div>
+      <div class="mem" id="membList"></div>
+    </details>
+  </div>
+
+  <!-- ARTICLES -->
+  <div class="card">
+    <details class="sec" open>
+      <summary>🍹 Articles utilisés et popularité</summary>
+      <div class="hint" style="margin-bottom:8px">Popularité : plus le chiffre est haut, plus l'article revient souvent (1 = rare, 10 = très fréquent). Décoche un article pour ne jamais l'utiliser.</div>
+      <div class="scroll"><table id="artTable"></table></div>
+    </details>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="card">
+    <div class="row">
+      <label class="f" style="width:170px">N° du 1er ticket <input type="number" id="startId" min="1" value="1"></label>
+      <button class="btn green" onclick="generer()">🎲 Générer les tickets</button>
+      <button class="btn" id="btnExport" onclick="exporter()" disabled>📤 Exporter JSON</button>
+      <button class="btn gray" onclick="resetReglages()">♻ Réglages par défaut</button>
+    </div>
+    <div class="hint" id="startIdHint"></div>
+    <div class="hint warn">Pour recharger : Historique → « 📥 Importer JSON » → <b>Annuler = FUSIONNER</b> (OK remplacerait tous tes tickets actuels !). Les tickets générés portent la mention <code>genere: true</code>.</div>
+  </div>
+
+  <!-- RESULTATS -->
+  <div class="card" id="resCard" style="display:none">
+    <h2>📊 Résultat</h2>
+    <div class="stats" id="resStats"></div>
+    <div class="msgs" id="resMsgs"></div>
+    <h2 style="margin-top:18px">Par jour</h2>
+    <div class="scroll" style="max-height:260px"><table id="dayTable"></table></div>
+    <h2 style="margin-top:18px">Tickets <span id="tkCount" style="color:var(--text3);font-weight:700"></span></h2>
+    <div class="scroll" id="tkList"></div>
+    <div class="row" style="margin-top:10px"><button class="btn gray" id="btnMore" style="display:none" onclick="plusDeTickets()">Voir plus…</button></div>
+  </div>
+</div>
+
+<script>
+// ═════════════ Utilitaires ═════════════
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+const toC = v => Math.round((parseFloat(String(v).replace(',', '.')) || 0) * 100);
+const eur = c => (c / 100).toFixed(2).replace('.', ',') + ' €';
+const rint = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function lsGet(k, def) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? def : v; } catch (e) { return def; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+// Même règle que les rapports : un article est un « don » si son nom contient « don »
+const rapportCompteCommeDon = nom => String(nom).toLowerCase().includes('don');
+// Article réellement dédié aux dons (mot « don(s) » isolé)
+const estArticleDon = nom => /\bdons?\b/i.test(nom);
+
+// ═════════════ Sources ═════════════
+let ARTICLES = [], MEMBRES = [], MAXID = 0, NB_HIST = 0;
+let artState = lsGet('genTk_art', {});     // nom -> {on, w}
+let membState = lsGet('genTk_memb', {});   // id -> bool (false = exclu)
+let TICKETS = [], SHOWN = 0;
+
+function prixArticle(a) { return toC(a.prixTVAC != null ? a.prixTVAC : a.prix); }
+
+function chargerSources() {
+  const ad = lsGet('articlesData', null);
+  if (ad && Array.isArray(ad.articles)) ARTICLES = ad.articles;
+  else if (!ARTICLES.length) ARTICLES = lsGet('articles', []) || [];
+  const m = lsGet('membres', []);
+  if (Array.isArray(m) && m.length) MEMBRES = m;
+  const all = [].concat(lsGet('ticketsHistorique', []), lsGet('deletedTickets', []), lsGet('refundedTickets', []));
+  NB_HIST = lsGet('ticketsHistorique', []).length;
+  MAXID = all.reduce((mx, t) => Math.max(mx, Number(t.id) || 0, Number(t.numero) || 0), 0);
+}
+function rechargerSources() { ARTICLES = []; MEMBRES = []; chargerSources(); dessinerSources(); }
+function importerArticles(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => { try {
+    const d = JSON.parse(e.target.result);
+    const arr = Array.isArray(d) ? d : d.articles;
+    if (!Array.isArray(arr)) throw new Error('Pas de liste d\'articles');
+    ARTICLES = arr; dessinerSources();
+  } catch (err) { alert('Fichier d\'articles invalide : ' + err.message); } };
+  r.readAsText(f); ev.target.value = '';
+}
+function importerMembres(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => { try {
+    const d = JSON.parse(e.target.result);
+    if (!Array.isArray(d)) throw new Error('Pas une liste de membres');
+    MEMBRES = d; dessinerSources();
+  } catch (err) { alert('Fichier de membres invalide : ' + err.message); } };
+  r.readAsText(f); ev.target.value = '';
+}
+
+function dessinerSources() {
+  const nbArt = ARTICLES.filter(a => prixArticle(a) > 0).length;
+  $('sources').innerHTML =
+    '<div class="stat"><div class="k">Articles</div><div class="v ' + (nbArt ? '' : 'bad') + '">' + nbArt + '</div><div class="d">avec un prix</div></div>' +
+    '<div class="stat"><div class="k">Membres</div><div class="v ' + (MEMBRES.length ? '' : 'bad') + '">' + MEMBRES.length + '</div><div class="d">trouvés</div></div>' +
+    '<div class="stat"><div class="k">Tickets déjà en historique</div><div class="v">' + NB_HIST + '</div><div class="d">n° le plus élevé : ' + MAXID + '</div></div>';
+  // don par défaut : article dédié aux dons s'il existe
+  const donArt = ARTICLES.find(a => estArticleDon(a.nom));
+  if (donArt && !lsGet('genTk_set', {}).donNom) $('donNom').value = donArt.nom;
+  if (!lsGet('genTk_set', {}).startId) $('startId').value = MAXID + 1;
+  $('startIdHint').textContent = MAXID ? 'Proposé : ' + (MAXID + 1) + ' (juste après le dernier n° de ton historique, corbeille et remboursés compris).' : '';
+  dessinerArticles(); dessinerMembres();
+}
+
+function dessinerArticles() {
+  const cats = {};
+  ARTICLES.forEach(a => {
+    if (prixArticle(a) <= 0 || estArticleDon(a.nom)) return;
+    const c = a.categorie || 'Sans categorie';
+    (cats[c] = cats[c] || []).push(a);
+  });
+  let h = '<thead><tr><th style="width:40px"></th><th>Article</th><th class="r">Prix</th><th style="width:110px">Popularité</th></tr></thead><tbody>';
+  Object.keys(cats).sort().forEach(c => {
+    h += '<tr class="artcat"><td><input type="checkbox" checked onchange="cocherCat(this,\'' + esc(c).replace(/'/g, "\\'") + '\')"></td><td colspan="3">' + esc(c) + '</td></tr>';
+    cats[c].forEach(a => {
+      const st = artState[a.nom] || { on: true, w: 5 };
+      const warn = rapportCompteCommeDon(a.nom) ? '<span class="badge">⚠ contient « don » : compté comme don par les rapports</span>' : '';
+      h += '<tr data-cat="' + esc(c) + '"><td><input type="checkbox" class="artOn" data-nom="' + esc(a.nom) + '" ' + (st.on ? 'checked' : '') + ' onchange="majArt(this)"></td>' +
+           '<td>' + esc(a.nom) + warn + '</td><td class="r">' + eur(prixArticle(a)) + '</td>' +
+           '<td><input type="number" class="artW" data-nom="' + esc(a.nom) + '" min="1" max="10" value="' + st.w + '" onchange="majArt(this)"></td></tr>';
+    });
+  });
+  if (!Object.keys(cats).length) h += '<tr><td colspan="4" class="bad" style="padding:14px">Aucun article trouvé — charge un JSON d\'articles.</td></tr>';
+  $('artTable').innerHTML = h + '</tbody>';
+}
+function majArt(el) {
+  const nom = el.dataset.nom, row = el.closest('tr');
+  artState[nom] = { on: row.querySelector('.artOn').checked, w: Math.min(10, Math.max(1, parseInt(row.querySelector('.artW').value) || 5)) };
+  lsSet('genTk_art', artState);
+}
+function cocherCat(box, cat) {
+  document.querySelectorAll('#artTable tr[data-cat]').forEach(tr => {
+    if (tr.dataset.cat === cat) { const c = tr.querySelector('.artOn'); c.checked = box.checked; majArt(c); }
+  });
+}
+
+function dessinerMembres() {
+  const list = MEMBRES.filter(m => m && (m.nom || m.prenom));
+  $('membList').innerHTML = list.length ? list.map(m => {
+    const anon = /^anonyme$/i.test((m.prenom || '').trim()) && !(m.nom || '').trim();
+    const on = membState[m.id] === undefined ? !anon : membState[m.id];
+    return '<label class="chk"><input type="checkbox" class="membOn" data-id="' + esc(m.id) + '" ' + (on ? 'checked' : '') + ' onchange="majMemb()">' +
+           esc((m.prenom || '') + ' ' + (m.nom || '')) + '</label>';
+  }).join('') : '<span class="hint">Aucun membre trouvé.</span>';
+  compterMembres();
+}
+function majMemb() {
+  document.querySelectorAll('.membOn').forEach(c => membState[c.dataset.id] = c.checked);
+  lsSet('genTk_memb', membState); compterMembres();
+}
+function cocherMembres(v) { document.querySelectorAll('.membOn').forEach(c => c.checked = v); majMemb(); }
+function compterMembres() {
+  const n = document.querySelectorAll('.membOn:checked').length;
+  $('membCount').textContent = n + ' membre(s) utilisable(s)';
+}
+
+// ═════════════ Réglages mémorisés ═════════════
+const CHAMPS = ['dateDebut','dateFin','hOuv','hFer','modeObjectif','nbTables','cibleEsp','cibleBan','panierEsp','panierBan',
+                'donEsp','donBan','donDenoms','donNom','pctMembEsp','pctMembBan','startId'];
+const CASES = ['donInclus','donAjust'];
+function sauverReglages() {
+  const s = {};
+  CHAMPS.forEach(i => s[i] = $(i).value);
+  CASES.forEach(i => s[i] = $(i).checked);
+  s.dows = [...document.querySelectorAll('.dow')].filter(c => c.checked).map(c => c.value);
+  lsSet('genTk_set', s);
+}
+function chargerReglages() {
+  const s = lsGet('genTk_set', null);
+  const t = new Date(); const iso = t.getFullYear() + '-' + pad(t.getMonth() + 1) + '-' + pad(t.getDate());
+  $('dateDebut').value = iso; $('dateFin').value = iso;
+  if (!s) return;
+  CHAMPS.forEach(i => { if (s[i] !== undefined && s[i] !== '' && i !== 'dateDebut' && i !== 'dateFin') $(i).value = s[i]; });
+  CASES.forEach(i => { if (s[i] !== undefined) $(i).checked = s[i]; });
+  if (s.dows) document.querySelectorAll('.dow').forEach(c => c.checked = s.dows.includes(c.value));
+}
+function resetReglages() {
+  if (!confirm('Remettre tous les réglages par défaut ?')) return;
+  try { localStorage.removeItem('genTk_set'); localStorage.removeItem('genTk_art'); localStorage.removeItem('genTk_memb'); } catch (e) {}
+  location.reload();
+}
+
+// ═════════════ Moteur de génération ═════════════
+function pickW(list, wf) {
+  let tot = 0; for (const x of list) tot += wf(x);
+  let r = Math.random() * tot;
+  for (const x of list) { r -= wf(x); if (r <= 0) return x; }
+  return list[list.length - 1];
+}
+
+// Répartit `total` (centimes) sur n parts aléatoires dont la somme est exacte
+function repartir(total, n) {
+  if (n <= 1) return [total];
+  const w = Array.from({ length: n }, () => 0.6 + 0.8 * Math.random());
+  const sw = w.reduce((a, b) => a + b, 0);
+  const out = w.map(x => Math.floor(total * x / sw));
+  out[n - 1] += total - out.reduce((a, b) => a + b, 0);
+  return out;
+}
+
+// Crée un panier d'environ `avgC` sans jamais dépasser `capC`
+function faireTicket(CAT, avgC, capC) {
+  const goal = Math.max(1, Math.round(avgC * (0.5 + Math.random())));
+  const lines = new Map(); let sum = 0, n = 0;
+  while (n < 12) {
+    const reste = capC - sum;
+    const abordables = CAT.filter(a => a.prix <= reste);
+    if (!abordables.length) break;
+    const a = pickW(abordables, x => x.w * (x.prix <= (goal - sum) * 1.5 + 50 ? 1 : 0.15));
+    let q = 1; if (Math.random() < 0.3) q += rint(1, 2);
+    while (q > 1 && a.prix * q > reste) q--;
+    const key = a.nom + '|' + a.prix;
+    const l = lines.get(key) || { nom: a.nom, prix: a.prix, qte: 0 };
+    l.qte += q; lines.set(key, l);
+    sum += a.prix * q; n += q;
+    if (sum >= goal) break;
+  }
+  return { lines, sum };
+}
+
+// Génère les tickets d'articles d'un jour pour un mode de paiement, pour un montant visé (centimes)
+function genererArticles(CAT, cible, avgC, warns, label) {
+  const tickets = [];
+  if (cible <= 0 || !CAT.length) return { tickets, ecart: cible };
+  const prixMax = Math.max(...CAT.map(a => a.prix));
+  const W = Math.min(30000, Math.max(2 * prixMax, avgC));
+  let rem = cible, garde = 0;
+  while (rem > W && garde++ < 5000) {
+    const t = faireTicket(CAT, avgC, rem);
+    if (!t.sum) break;
+    tickets.push(t); rem -= t.sum;
+  }
+  // Table d'atteignabilité : quels montants exacts peut-on former avec les prix existants ?
+  const taille = Math.min(30000, rem + 10 * avgC) + 1;
+  const prixUniques = [...new Set(CAT.map(a => a.prix))].sort((a, b) => a - b);
+  const reach = new Uint8Array(taille); reach[0] = 1;
+  for (let r = 1; r < taille; r++) for (const p of prixUniques) { if (p > r) break; if (reach[r - p]) { reach[r] = 1; break; } }
+
+  const retires = []; let solution = rem;
+  if (!(rem < taille && reach[rem])) {
+    for (let k = 0; k < 12 && tickets.length; k++) {
+      const t = tickets.pop(); retires.push(t); rem += t.sum;
+      if (rem >= taille) break;
+      if (reach[rem]) { solution = rem; break; }
+    }
+    if (!(rem < taille && reach[rem])) {          // impossible : on rend les tickets et on vise le plus proche en dessous
+      while (retires.length) { const t = retires.pop(); tickets.push(t); rem -= t.sum; }
+      let r = Math.min(rem, taille - 1); while (r > 0 && !reach[r]) r--;
+      solution = r;
+    }
+  }
+  // Compose `solution` exactement avec des articles
+  let r = Math.min(solution, taille - 1); const unites = [];
+  while (r > 0) {
+    const cand = CAT.filter(a => a.prix <= r && reach[r - a.prix]);
+    if (!cand.length) break;
+    const a = pickW(cand, x => x.w * Math.pow(x.prix, 0.3));
+    unites.push(a); r -= a.prix;
+  }
+  const fait = unites.reduce((s, a) => s + a.prix, 0);
+  if (unites.length) {
+    const k = Math.max(1, Math.min(unites.length, Math.round(fait / avgC)));
+    const groupes = Array.from({ length: k }, () => ({ lines: new Map(), sum: 0 }));
+    unites.sort(() => Math.random() - 0.5).forEach((a, i) => {
+      const g = i < k ? groupes[i] : groupes[rint(0, k - 1)];
+      const key = a.nom + '|' + a.prix;
+      const l = g.lines.get(key) || { nom: a.nom, prix: a.prix, qte: 0 };
+      l.qte++; g.lines.set(key, l); g.sum += a.prix;
+    });
+    groupes.forEach(g => tickets.push(g));
+  }
+  const total = tickets.reduce((s, t) => s + t.sum, 0);
+  return { tickets, ecart: cible - total };
+}
+
+// Compose D (centimes) de dons avec les montants possibles ; renvoie une liste de montants
+function composerDons(D, denoms) {
+  const out = []; let rem = D;
+  const ds = denoms.filter(x => x > 0).sort((a, b) => a - b);
+  if (!ds.length) return rem > 0 ? [rem] : [];
+  let garde = 0;
+  while (rem >= ds[0] && garde++ < 5000) {
+    const ok = ds.filter(x => x <= rem);
+    // privilégie un mélange : tire parmi les montants possibles
+    const d = ok[rint(0, ok.length - 1)];
+    out.push(d); rem -= d;
+  }
+  if (rem > 0) out.push(rem);       // reste (< plus petit montant) : un don exact
+  return out;
+}
+
+function ajouterLigne(t, nom, prix, qte) {
+  const key = nom + '|' + prix;
+  const l = t.lines.get(key) || { nom, prix, qte: 0 };
+  l.qte += qte; t.lines.set(key, l); t.sum += prix * qte;
+}
+
+function generer() {
+  sauverReglages();
+  const warns = [];
+  // ── Lecture des réglages
+  const d1 = $('dateDebut').value, d2 = $('dateFin').value;
+  if (!d1 || !d2) return alert('Choisis une date de début et de fin.');
+  const dows = [...document.querySelectorAll('.dow')].filter(c => c.checked).map(c => parseInt(c.value));
+  const jours = [];
+  for (let d = new Date(d1 + 'T00:00:00'); d <= new Date(d2 + 'T00:00:00'); d.setDate(d.getDate() + 1))
+    if (dows.includes(d.getDay())) jours.push(new Date(d));
+  if (!jours.length) return alert('Aucun jour d\'ouverture dans cette période.');
+
+  const CAT = ARTICLES.filter(a => prixArticle(a) > 0 && !estArticleDon(a.nom))
+    .map(a => ({ nom: a.nom, prix: prixArticle(a), w: (artState[a.nom] || { on: true, w: 5 }) }))
+    .filter(a => a.w.on).map(a => ({ nom: a.nom, prix: a.prix, w: a.w.w }));
+  if (!CAT.length) return alert('Aucun article utilisable (vérifie les cases cochées).');
+
+  const [hO, mO] = $('hOuv').value.split(':').map(Number), [hF, mF] = $('hFer').value.split(':').map(Number);
+  const ouv = hO * 60 + mO; let fer = hF * 60 + mF; if (fer <= ouv) fer += 1440;
+
+  const parJour = $('modeObjectif').value === 'jour';
+  const inclus = $('donInclus').checked, ajust = $('donAjust').checked;
+  const donNom = $('donNom').value.trim() || 'Don';
+  if (!rapportCompteCommeDon(donNom)) warns.push('Le nom « ' + donNom + ' » ne contient pas « don » : les rapports ne le compteront pas comme un don.');
+  const denoms = $('donDenoms').value.split(/[;,\s]+/).map(toC).filter(x => x > 0);
+  const modes = [
+    { code: 'especes', cible: toC($('cibleEsp').value), don: toC($('donEsp').value), avg: Math.max(100, toC($('panierEsp').value)), pct: Math.min(100, Math.max(0, parseFloat($('pctMembEsp').value) || 0)) },
+    { code: 'banque',  cible: toC($('cibleBan').value), don: toC($('donBan').value), avg: Math.max(100, toC($('panierBan').value)), pct: Math.min(100, Math.max(0, parseFloat($('pctMembBan').value) || 0)) }
+  ];
+  const membres = MEMBRES.filter(m => document.querySelector('.membOn[data-id="' + CSS.escape(String(m.id)) + '"]:checked'));
+  const nbTables = Math.max(1, parseInt($('nbTables').value) || 10);
+
+  // ── Génération par jour et par mode
+  const brut = [];            // { jourIdx, mode, lines, sum }
+  const attendu = { especes: 0, banque: 0 };
+  modes.forEach(M => {
+    const cibles = parJour ? jours.map(() => M.cible) : repartir(M.cible, jours.length);
+    const dons = parJour ? jours.map(() => M.don) : repartir(M.don, jours.length);
+    attendu[M.code] = parJour ? (M.cible + (inclus ? 0 : M.don)) * jours.length : M.cible + (inclus ? 0 : M.don);
+    jours.forEach((j, ji) => {
+      let cArt = cibles[ji] - (inclus ? dons[ji] : 0);
+      if (cArt < 0) { warns.push('Le ' + M.code + ' du ' + j.toLocaleDateString('fr-FR') + ' est plus petit que les dons demandés : dons réduits.'); dons[ji] = cibles[ji]; cArt = 0; }
+      const res = genererArticles(CAT, cArt, M.avg, warns, M.code);
+      const tk = res.tickets.map(t => ({ jourIdx: ji, mode: M.code, lines: t.lines, sum: t.sum }));
+      let ecart = res.ecart;
+      // dons
+      const listeDons = composerDons(dons[ji], denoms);
+      if (ecart > 0 && ajust && ecart < 100000) { listeDons.push(ecart); ecart = 0; }
+      if (ecart !== 0 && cArt > 0) warns.push('Écart de ' + eur(ecart) + ' non comblé (' + M.code + ', ' + j.toLocaleDateString('fr-FR') + ') : les prix de tes articles ne permettent pas ce montant exact.');
+      listeDons.forEach(m => {
+        let t = tk.length ? tk[rint(0, tk.length - 1)] : null;
+        if (!t) { t = { jourIdx: ji, mode: M.code, lines: new Map(), sum: 0 }; tk.push(t); }
+        ajouterLigne(t, donNom, m, 1);
+      });
+      brut.push(...tk);
+    });
+  });
+
+  // ── Dates, heures, tables, membres
+  const finals = brut.map(t => {
+    const j = jours[t.jourIdx];
+    const minute = ouv + (fer - ouv) * (Math.random() + Math.random()) / 2;
+    const dt = new Date(j.getFullYear(), j.getMonth(), j.getDate(), 0, 0, 0);
+    dt.setSeconds(Math.floor(minute * 60) + rint(0, 59));
+    const M = modes.find(m => m.code === t.mode);
+    const avecMembre = membres.length && Math.random() * 100 < M.pct;
+    const mb = avecMembre ? membres[rint(0, membres.length - 1)] : null;
+    const total = t.sum / 100;
+    const tk = {
+      tableId: rint(1, nbTables),
+      articles: [...t.lines.values()].map(l => ({ nom: l.nom, qte: l.qte, prix: l.prix / 100 })),
+      total,
+      modePaiement: t.mode,
+      montantEspeces: t.mode === 'especes' ? total : 0,
+      montantBanque: t.mode === 'banque' ? total : 0,
+      rendu: 0,
+      datePaiement: pad(dt.getDate()) + '/' + pad(dt.getMonth() + 1) + '/' + dt.getFullYear(),
+      heurePaiement: pad(dt.getHours()) + ':' + pad(dt.getMinutes()) + ':' + pad(dt.getSeconds()),
+      isoPaiement: dt.toISOString(),
+      _dt: dt.getTime(), _sumC: t.sum
+    };
+    tk.tableNom = 'Table ' + tk.tableId;
+    if (mb) { tk.membreId = mb.id; tk.membreNom = mb.nom || ''; tk.membrePrenom = mb.prenom || ''; }
+    tk.genere = true;
+    return tk;
+  }).filter(t => t._sumC > 0).sort((a, b) => a._dt - b._dt);
+
+  let id = Math.max(1, parseInt($('startId').value) || 1);
+  if (id <= MAXID) warns.push('Le n° de départ (' + id + ') chevauche des tickets déjà présents dans ton historique (dernier n° : ' + MAXID + '). À l\'import en fusion, les doublons d\'id seraient ignorés.');
+  finals.forEach(t => { t.id = id; t.numero = id; id++; });
+
+  // ordre des champs proche d'un ticket réel
+  TICKETS = finals.map(t => {
+    const o = { id: t.id, numero: t.numero, tableId: t.tableId, tableNom: t.tableNom, articles: t.articles, total: t.total,
+                modePaiement: t.modePaiement, montantEspeces: t.montantEspeces, montantBanque: t.montantBanque, rendu: 0,
+                datePaiement: t.datePaiement, heurePaiement: t.heurePaiement, isoPaiement: t.isoPaiement };
+    if (t.membreId !== undefined) { o.membreId = t.membreId; o.membreNom = t.membreNom; o.membrePrenom = t.membrePrenom; }
+    o.genere = true;
+    return o;
+  });
+  afficherResultat(attendu, warns, jours.length);
+}
+
+// ═════════════ Résultats ═════════════
+function sommeC(arr, f) { return arr.reduce((s, t) => s + f(t), 0); }
+const tkC = t => Math.round(t.total * 100);
+const donsC = t => t.articles.filter(a => rapportCompteCommeDon(a.nom)).reduce((s, a) => s + Math.round(a.qte * a.prix * 100), 0);
+
+function afficherResultat(attendu, warns, nbJours) {
+  $('resCard').style.display = 'block';
+  const E = TICKETS.filter(t => t.modePaiement === 'especes'), B = TICKETS.filter(t => t.modePaiement === 'banque');
+  const tE = sommeC(E, tkC), tB = sommeC(B, tkC), dE = sommeC(E, donsC), dB = sommeC(B, donsC);
+  const ecE = tE - attendu.especes, ecB = tB - attendu.banque;
+  const stat = (k, v, d, cls) => '<div class="stat"><div class="k">' + k + '</div><div class="v ' + (cls || '') + '">' + v + '</div><div class="d">' + d + '</div></div>';
+  $('resStats').innerHTML =
+    stat('Tickets', TICKETS.length, nbJours + ' jour(s)') +
+    stat('💵 Espèces', eur(tE), 'dont dons ' + eur(dE) + ' · écart ' + eur(ecE), ecE === 0 ? 'ok' : 'bad') +
+    stat('💳 Banque', eur(tB), 'dont dons ' + eur(dB) + ' · écart ' + eur(ecB), ecB === 0 ? 'ok' : 'bad') +
+    stat('Total', eur(tE + tB), 'C.A. net hors dons : ' + eur(tE + tB - dE - dB));
+  const msgs = warns.map(w => '<div>⚠ ' + esc(w) + '</div>');
+  if (!warns.length) msgs.push('<div class="info">✔ Les montants correspondent exactement aux objectifs.</div>');
+  $('resMsgs').innerHTML = msgs.join('');
+  // par jour
+  const jours = {};
+  TICKETS.forEach(t => {
+    const j = jours[t.datePaiement] = jours[t.datePaiement] || { n: 0, e: 0, b: 0, de: 0, db: 0 };
+    j.n++; if (t.modePaiement === 'especes') { j.e += tkC(t); j.de += donsC(t); } else { j.b += tkC(t); j.db += donsC(t); }
+  });
+  $('dayTable').innerHTML = '<thead><tr><th>Date</th><th class="r">Tickets</th><th class="r">Espèces</th><th class="r">dont dons</th><th class="r">Banque</th><th class="r">dont dons</th></tr></thead><tbody>' +
+    Object.keys(jours).map(k => { const j = jours[k]; return '<tr><td>' + k + '</td><td class="r">' + j.n + '</td><td class="r">' + eur(j.e) + '</td><td class="r">' + eur(j.de) + '</td><td class="r">' + eur(j.b) + '</td><td class="r">' + eur(j.db) + '</td></tr>'; }).join('') + '</tbody>';
+  $('tkList').innerHTML = ''; SHOWN = 0; plusDeTickets();
+  $('tkCount').textContent = '(' + TICKETS.length + ')';
+  $('btnExport').disabled = !TICKETS.length;
+  $('resCard').scrollIntoView({ behavior: 'smooth' });
+}
+function plusDeTickets() {
+  const part = TICKETS.slice(SHOWN, SHOWN + 100);
+  $('tkList').insertAdjacentHTML('beforeend', part.map(t => {
+    const mb = t.membreNom !== undefined ? esc((t.membrePrenom || '') + ' ' + t.membreNom) : '';
+    return '<details class="tk"><summary><span>#' + t.id + '</span><span>' + t.datePaiement + ' ' + t.heurePaiement + '</span><span>T' + t.tableId + '</span>' +
+      '<span><span class="pill ' + (t.modePaiement === 'especes' ? 'e' : 'b') + '">' + (t.modePaiement === 'especes' ? 'Espèces' : 'Banque') + '</span></span>' +
+      '<span>' + mb + '</span><span style="text-align:right">' + eur(tkC(t)) + '</span></summary><div class="lines">' +
+      t.articles.map(a => a.qte + ' × ' + esc(a.nom) + ' — ' + eur(Math.round(a.prix * 100)) + (rapportCompteCommeDon(a.nom) ? ' 🎁' : '')).join('<br>') + '</div></details>';
+  }).join(''));
+  SHOWN += part.length;
+  $('btnMore').style.display = SHOWN < TICKETS.length ? 'inline-block' : 'none';
+}
+
+// ═════════════ Export ═════════════
+function exporter() {
+  if (!TICKETS.length) return;
+  const blob = new Blob([JSON.stringify(TICKETS, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const t = new Date();
+  a.href = url; a.download = 'ticketsHistorique-generes-' + t.getFullYear() + pad(t.getMonth() + 1) + pad(t.getDate()) + '.json';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ═════════════ Démarrage ═════════════
+chargerReglages();
+chargerSources();
+dessinerSources();
+if (lsGet('genTk_set', {}).startId) { /* réglage mémorisé */ }
+document.querySelectorAll('input, select').forEach(el => { if (!el.classList.contains('artOn') && !el.classList.contains('artW') && !el.classList.contains('membOn')) el.addEventListener('change', sauverReglages); });
+</script>
+</body>
+</html>

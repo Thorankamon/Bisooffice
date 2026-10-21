@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Gestion des Factures - Vista Style</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="qrcode.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --glass-bg: rgba(255,255,255,0.72);
+    --glass-border: rgba(255,255,255,0.6);
+    --glass-shadow: 0 8px 40px rgba(31,80,135,0.13);
+    --primary: #2a7faa;
+    --primary-light: #5bb3d4;
+    --primary-dark: #145f8a;
+    --primary-glow: rgba(42,127,170,0.18);
+    --accent: #e8a838;
+    --accent-light: #fdf3dc;
+    --success: #38a86a;
+    --success-light: #e6f7ed;
+    --warning: #e8830a;
+    --warning-light: #fff4e5;
+    --danger: #d94040;
+    --danger-light: #fdeaea;
+    --text: #1e3048;
+    --text-light: #5a7a96;
+    --border: #ccdde8;
+    --surface: rgba(255,255,255,0.88);
+    --radius-sm: 14px;
+    --radius-md: 22px;
+    --radius-lg: 32px;
+    --radius-xl: 44px;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(145deg, #b8daf5 0%, #ddeef8 30%, #eef5fb 65%, #fdf6e8 100%);
+    min-height: 100vh;
+    padding: 28px 20px;
+    color: var(--text);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Arrière-plan décoratif Vista */
+body::before {
+    content: '';
+    position: fixed;
+    width: 520px; height: 520px;
+    background: radial-gradient(circle, rgba(168,210,255,0.35) 0%, transparent 65%);
+    top: -180px; right: -180px;
+    border-radius: 50%; pointer-events: none; z-index: 0;
+}
+body::after {
+    content: '';
+    position: fixed;
+    width: 620px; height: 620px;
+    background: radial-gradient(circle, rgba(232,168,56,0.12) 0%, transparent 65%);
+    bottom: -220px; left: -220px;
+    border-radius: 50%; pointer-events: none; z-index: 0;
+}
+
+.vista-orb {
+    position: fixed;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(91,179,212,0.2) 0%, transparent 70%);
+    top: 40%; left: -100px;
+    border-radius: 50%; pointer-events: none; z-index: 0;
+}
+
+.container {
+    position: relative; z-index: 1;
+    max-width: 1400px; margin: 0 auto;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.btn-retour {
+    background: var(--glass-bg);
+    backdrop-filter: blur(14px);
+    border: 1.5px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: 12px 26px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95em;
+    cursor: pointer;
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s ease;
+    display: flex; align-items: center; gap: 8px;
+}
+.btn-retour:hover {
+    transform: translateX(-4px);
+    box-shadow: 0 12px 40px rgba(31,80,135,0.18);
+    background: white;
+    border-color: var(--primary-light);
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--primary-dark);
+    background: var(--glass-bg);
+    backdrop-filter: blur(14px);
+    border: 1.5px solid var(--glass-border);
+    padding: 14px 38px;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--glass-shadow);
+    letter-spacing: 0.3px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 32px;
+}
+.pagination button {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: 10px 22px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 12px rgba(31,80,135,0.08);
+}
+.pagination button:hover:not(:disabled) {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(31,80,135,0.14);
+    border-color: var(--primary-light);
+}
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+.pagination span {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 10px 24px;
+    border-radius: var(--radius-xl);
+    font-weight: 700;
+    font-size: 0.9em;
+    box-shadow: 0 4px 14px rgba(42,127,170,0.3);
+}
+
+/* Tickets Grid */
+.tickets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 24px;
+}
+
+.ticket-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(14px);
+    border: 1.5px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 0;
+    box-shadow: var(--glass-shadow);
+    transition: all 0.35s cubic-bezier(0.34,1.2,0.64,1);
+    overflow: hidden;
+    position: relative;
+}
+.ticket-card-ribbon {
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary-light), var(--accent), var(--primary));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.ticket-card-body {
+    padding: 20px 22px 22px;
+}
+.ticket-card:hover {
+    transform: translateY(-7px) scale(1.01);
+    box-shadow: 0 20px 55px rgba(31,80,135,0.18);
+    border-color: rgba(91,179,212,0.5);
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+.ticket-numero {
+    font-size: 1.25em;
+    font-weight: 800;
+    color: var(--primary-dark);
+    font-family: 'Playfair Display', serif;
+}
+.ticket-badge {
+    padding: 5px 13px;
+    border-radius: var(--radius-xl);
+    font-size: 0.78em;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+.badge-encaisser { background: var(--warning-light); color: var(--warning); border: 1.5px solid rgba(232,131,10,0.3); }
+.badge-paye { background: var(--success-light); color: var(--success); border: 1.5px solid rgba(56,168,106,0.3); }
+.badge-impaye { background: var(--danger-light); color: var(--danger); border: 1.5px solid rgba(217,64,64,0.3); }
+.badge-envoye { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+
+.ticket-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 12px 0;
+}
+
+.ticket-info p {
+    margin: 6px 0;
+    color: var(--text-light);
+    font-size: 0.9em;
+    display: flex; align-items: center; gap: 6px;
+}
+.ticket-info strong { color: var(--text); font-weight: 700; }
+.ticket-info .info-icon { font-size: 0.85em; opacity: 0.7; }
+
+.ticket-total {
+    font-size: 1.35em;
+    font-weight: 800;
+    color: var(--primary-dark);
+    text-align: right;
+    margin: 14px 0 0;
+    font-family: 'Playfair Display', serif;
+}
+
+.btn-generer {
+    width: 100%;
+    margin-top: 14px;
+    padding: 13px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: linear-gradient(145deg, var(--primary-light), var(--primary-dark));
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(42,127,170,0.3);
+    letter-spacing: 0.2px;
+}
+.btn-generer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(42,127,170,0.4);
+    filter: brightness(1.06);
+}
+
+/* MODAL */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,35,65,0.35);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    padding: 20px;
+    overflow-y: auto;
+    align-items: flex-start;
+    justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+    background: rgba(240,249,255,0.92);
+    backdrop-filter: blur(20px);
+    border: 1.5px solid rgba(255,255,255,0.7);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 1020px;
+    margin: 20px auto;
+    box-shadow: 0 30px 80px rgba(20,60,100,0.22), 0 0 0 1px rgba(255,255,255,0.4) inset;
+    animation: modalIn 0.45s cubic-bezier(0.34,1.4,0.64,1);
+    overflow: hidden;
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.88) translateY(40px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 28px;
+    background: linear-gradient(135deg, rgba(42,127,170,0.12), rgba(91,179,212,0.08));
+    border-bottom: 1.5px solid rgba(255,255,255,0.6);
+}
+.modal-header h2 {
+    color: var(--primary-dark);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+.modal-close {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(217,64,64,0.3);
+    background: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    color: var(--text-light);
+    font-weight: 700;
+}
+.modal-close:hover { background: var(--danger); color: white; border-color: var(--danger); transform: rotate(90deg); }
+
+/* Tabs */
+.modal-tabs {
+    display: flex;
+    padding: 0 28px;
+    gap: 6px;
+    background: rgba(255,255,255,0.4);
+    border-bottom: 1.5px solid rgba(255,255,255,0.6);
+    overflow-x: auto;
+}
+.tab {
+    padding: 14px 22px;
+    background: none;
+    border: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.9em;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+    position: relative;
+    bottom: -1.5px;
+    white-space: nowrap;
+}
+.tab.active {
+    background: white;
+    color: var(--primary-dark);
+    box-shadow: 0 -3px 14px rgba(0,0,0,0.06);
+    border: 1.5px solid rgba(255,255,255,0.8);
+    border-bottom: none;
+}
+.tab-content { display: none; padding: 26px 28px; }
+.tab-content.active { display: block; }
+
+/* Status Selector */
+.status-selector {
+    background: rgba(255,255,255,0.6);
+    border-radius: var(--radius-lg);
+    padding: 18px 22px;
+    margin-bottom: 18px;
+    border: 1.5px solid rgba(255,255,255,0.7);
+    box-shadow: 0 2px 12px rgba(31,80,135,0.06);
+}
+.status-title {
+    font-size: 0.85em;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.status-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+.status-btn {
+    padding: 10px 20px;
+    border: 2px solid transparent;
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.88em;
+    transition: all 0.25s ease;
+}
+.status-btn input { display: none; }
+.status-btn.encaisser { color: var(--warning); border-color: rgba(232,131,10,0.4); background: var(--warning-light); }
+.status-btn.paye { color: var(--success); border-color: rgba(56,168,106,0.4); background: var(--success-light); }
+.status-btn.impaye { color: var(--danger); border-color: rgba(217,64,64,0.4); background: var(--danger-light); }
+.status-btn.active { transform: scale(1.05); box-shadow: 0 5px 18px rgba(0,0,0,0.1); }
+
+.options-row {
+    display: flex; gap: 14px; align-items: center;
+    flex-wrap: wrap; margin: 16px 0;
+}
+.opt-checkbox {
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; font-size: 0.92em; font-weight: 600; color: var(--text);
+}
+.opt-checkbox input { width: 17px; height: 17px; cursor: pointer; accent-color: var(--primary); }
+
+/* ===== FACTURE PREVIEW MODERNE ===== */
+.facture-preview {
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.07);
+    margin-top: 18px;
+    border: 1px solid rgba(204,221,232,0.5);
+}
+
+.facture-top-bar {
+    height: 8px;
+    background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-light) 50%, var(--accent) 100%);
+}
+
+.facture-inner {
+    padding: 32px 36px;
+}
+
+.facture-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+    gap: 20px;
+}
+
+.company-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4em;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+.company-info p {
+    color: var(--text-light);
+    margin: 3px 0;
+    font-size: 0.88em;
+}
+.company-info .company-num {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+    padding: 4px 12px;
+    border-radius: var(--radius-xl);
+    font-size: 0.82em;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+.qrcode-section { text-align: center; flex-shrink: 0; }
+
+.status-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: var(--radius-xl);
+    font-weight: 800;
+    font-size: 0.85em;
+    margin-bottom: 12px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+.badge-encaisser-big { background: var(--warning-light); color: var(--warning); border: 2px solid rgba(232,131,10,0.3); }
+.badge-paye-big { background: var(--success-light); color: var(--success); border: 2px solid rgba(56,168,106,0.3); }
+.badge-impaye-big { background: var(--danger-light); color: var(--danger); border: 2px solid rgba(217,64,64,0.3); }
+
+.qrcode {
+    background: white;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 3px 14px rgba(0,0,0,0.1);
+    display: inline-block;
+    border: 1px solid var(--border);
+}
+.qrcode-label {
+    font-size: 0.75em;
+    color: var(--text-light);
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+.facture-ref-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+.ref-chip {
+    background: linear-gradient(135deg, rgba(42,127,170,0.08), rgba(91,179,212,0.06));
+    border: 1.5px solid rgba(42,127,170,0.18);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    font-size: 0.87em;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+.ref-chip span { color: var(--text-light); font-weight: 500; }
+
+.client-box {
+    background: linear-gradient(135deg, rgba(42,127,170,0.05), rgba(91,179,212,0.04));
+    border: 1.5px solid rgba(42,127,170,0.15);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-bottom: 22px;
+}
+.client-box-title {
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--primary);
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+.client-box p { color: var(--text); font-size: 0.92em; margin: 4px 0; font-weight: 600; }
+
+/* Table articles */
+.articles-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    margin-bottom: 22px;
+}
+.articles-table thead tr {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+}
+.articles-table th {
+    color: white;
+    padding: 13px 16px;
+    font-weight: 700;
+    font-size: 0.87em;
+    text-align: left;
+    letter-spacing: 0.3px;
+}
+.articles-table th:last-child, .articles-table td:last-child { text-align: right; }
+.articles-table tbody tr { background: white; transition: background 0.2s; }
+.articles-table tbody tr:nth-child(even) { background: rgba(42,127,170,0.03); }
+.articles-table tbody tr:hover { background: rgba(91,179,212,0.07); }
+.articles-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(204,221,232,0.5);
+    font-size: 0.9em;
+    color: var(--text);
+}
+.articles-table tbody tr:last-child td { border-bottom: none; }
+.art-name { font-weight: 600; }
+.art-gift { color: var(--accent); font-size: 0.85em; font-weight: 700; }
+
+/* Total section */
+.total-section {
+    display: flex;
+    justify-content: flex-end;
+}
+.total-box {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+    border-radius: var(--radius-md);
+    padding: 16px 28px;
+    min-width: 260px;
+    text-align: right;
+}
+.total-box-label { font-size: 0.8em; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.total-box-amount { font-family: 'Playfair Display', serif; font-size: 1.8em; font-weight: 700; }
+.total-box-note { font-size: 0.78em; opacity: 0.75; margin-top: 4px; }
+
+.franchise-note {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.88em;
+    margin-top: 16px;
+    letter-spacing: 0.3px;
+}
+
+.unpaid-warning {
+    background: var(--danger-light);
+    border: 2px solid rgba(217,64,64,0.3);
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    color: var(--danger);
+    font-weight: 700;
+    font-size: 0.9em;
+    margin-top: 16px;
+    text-align: center;
+}
+
+.iban-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--success-light);
+    border: 1.5px solid rgba(56,168,106,0.25);
+    border-radius: var(--radius-md);
+    padding: 13px 18px;
+    margin-top: 16px;
+    font-size: 0.9em;
+}
+.iban-section strong { color: var(--success); font-weight: 800; }
+
+/* Lettre Preview */
+.letter-preview {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 40px 44px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    border: 1px solid rgba(204,221,232,0.5);
+    font-size: 0.93em;
+    line-height: 1.7;
+}
+.letter-expediteur { text-align: right; margin-bottom: 32px; color: var(--text-light); }
+.letter-destinataire { margin-bottom: 32px; }
+.letter-objet {
+    background: var(--danger-light);
+    padding: 15px 18px;
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--danger);
+    margin-bottom: 28px;
+}
+.letter-titre {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--danger);
+    margin: 28px 0;
+    letter-spacing: 1px;
+}
+.letter-corps { line-height: 1.85; color: var(--text); }
+.letter-avertissement {
+    background: var(--danger-light);
+    border: 2px solid rgba(217,64,64,0.3);
+    border-radius: var(--radius-md);
+    padding: 15px 18px;
+    margin: 20px 0;
+    font-weight: 700;
+}
+.letter-signature { margin-top: 50px; }
+
+/* Export Section */
+.export-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 6px;
+}
+.export-card {
+    background: rgba(255,255,255,0.65);
+    border: 1.5px solid rgba(255,255,255,0.8);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    box-shadow: 0 4px 16px rgba(31,80,135,0.07);
+    transition: box-shadow 0.3s;
+}
+.export-card:hover { box-shadow: 0 8px 30px rgba(31,80,135,0.12); }
+.export-card h3 {
+    color: var(--primary-dark);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05em;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+}
+.export-buttons { display: flex; flex-direction: column; gap: 10px; }
+.btn-export {
+    padding: 12px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    letter-spacing: 0.2px;
+}
+.btn-pdf { background: linear-gradient(135deg, #e35050, var(--danger)); color: white; box-shadow: 0 4px 14px rgba(217,64,64,0.25); }
+.btn-xml { background: linear-gradient(135deg, var(--primary-light), var(--primary-dark)); color: white; box-shadow: 0 4px 14px rgba(42,127,170,0.25); }
+.btn-email { background: linear-gradient(135deg, #4dc483, var(--success)); color: white; box-shadow: 0 4px 14px rgba(56,168,106,0.25); }
+.btn-export:hover { transform: translateY(-2px); filter: brightness(1.08); }
+
+.email-info {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.8);
+    border-radius: var(--radius-sm);
+    font-size: 0.87em;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    line-height: 1.6;
+}
+.email-saved {
+    display: none;
+    margin-top: 10px;
+    padding: 11px 14px;
+    background: var(--success-light);
+    border: 1.5px solid rgba(56,168,106,0.3);
+    color: var(--success);
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.88em;
+}
+
+/* XML info card */
+.xml-info {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(42,127,170,0.06);
+    border-radius: var(--radius-sm);
+    font-size: 0.82em;
+    border: 1px solid rgba(42,127,170,0.2);
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+/* Modal Footer */
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 28px;
+    background: rgba(255,255,255,0.4);
+    border-top: 1.5px solid rgba(255,255,255,0.6);
+}
+.btn-nav {
+    padding: 10px 26px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xl);
+    background: rgba(255,255,255,0.8);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-nav:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateX(4px); }
+.btn-nav.prev:hover { transform: translateX(-4px); }
+.step-info {
+    font-weight: 700;
+    color: var(--text-light);
+    font-size: 0.88em;
+    background: rgba(255,255,255,0.7);
+    padding: 8px 18px;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+    .tickets-grid { grid-template-columns: 1fr; }
+    .facture-header { flex-direction: column; gap: 20px; }
+    .page-header { flex-direction: column; }
+    .page-title { font-size: 1.4em; text-align: center; }
+    .facture-inner { padding: 20px; }
+    .letter-preview { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+<div class="vista-orb"></div>
+<div class="container">
+    <div class="page-header">
+        <button class="btn-retour" onclick="window.history.back()">← Retour</button>
+        <div class="page-title">📋 Gestion des Factures</div>
+        <div style="width: 130px;"></div>
+    </div>
+
+    <div class="pagination" id="pagination">
+        <button onclick="changerPage(-1)" id="btnPrev">◀ Précédent</button>
+        <span id="pageInfo">Page 1 / 1</span>
+        <button onclick="changerPage(1)" id="btnNext">Suivant ▶</button>
+    </div>
+
+    <div class="tickets-grid" id="ticketsGrid"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="fermerModalExterieur(event)">
+    <div class="modal" id="modal">
+        <div class="modal-header">
+            <h2 id="modalTitre">Facture — Ticket #</h2>
+            <button class="modal-close" onclick="fermerModal()">✕</button>
+        </div>
+
+        <div class="modal-tabs">
+            <button class="tab active" onclick="changerOnglet(0)">📄 Facture</button>
+            <button class="tab" onclick="changerOnglet(1)">⚖️ Mise en demeure</button>
+            <button class="tab" onclick="changerOnglet(2)">📤 Export</button>
+        </div>
+
+        <!-- Onglet Facture -->
+        <div class="tab-content active" id="ongletFacture">
+            <div class="status-selector">
+                <div class="status-title">Statut de la facture</div>
+                <div class="status-buttons">
+                    <label class="status-btn encaisser" id="btnEncaisser">
+                        <input type="radio" name="statut" value="encaisser" checked onchange="mettreAJourFacture()">
+                        ⏳ Encaisser
+                    </label>
+                    <label class="status-btn paye" id="btnPaye">
+                        <input type="radio" name="statut" value="paye" onchange="mettreAJourFacture()">
+                        ✅ Payé
+                    </label>
+                    <label class="status-btn impaye" id="btnImpaye">
+                        <input type="radio" name="statut" value="impaye" onchange="mettreAJourFacture()">
+                        ⚠️ Impayé
+                    </label>
+                </div>
+            </div>
+
+            <div class="options-row">
+                <label class="opt-checkbox">
+                    <input type="checkbox" id="chkFranchise" onchange="mettreAJourFacture()">
+                    <span>🏷️ ASBL non assujettie à la TVA (régime franchise)</span>
+                </label>
+            </div>
+
+            <div id="facturePreview"></div>
+        </div>
+
+        <!-- Onglet Mise en demeure -->
+        <div class="tab-content" id="ongletLettre">
+            <div class="letter-preview" id="lettrePreview"></div>
+        </div>
+
+        <!-- Onglet Export -->
+        <div class="tab-content" id="ongletExport">
+            <div class="export-options">
+                <div class="export-card">
+                    <h3>📄 Facture</h3>
+                    <div class="export-buttons">
+                        <button class="btn-export btn-pdf" onclick="exporterPDFFacture()">
+                            🖨️ Générer PDF
+                        </button>
+                        <button class="btn-export btn-xml" onclick="exporterXML()">
+                            📦 UBL/XML (Peppol)
+                        </button>
+                    </div>
+                    <div class="xml-info">
+                        ℹ️ Le fichier XML est conforme <strong>EN 16931</strong> / Peppol BIS Billing 3.0 avec IBAN et moyens de paiement inclus.
+                    </div>
+                </div>
+
+                <div class="export-card">
+                    <h3>⚖️ Mise en demeure</h3>
+                    <div class="export-buttons">
+                        <button class="btn-export btn-pdf" onclick="exporterPDFLettre()">
+                            📄 Générer PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="export-card">
+                    <h3>📧 Envoi par email</h3>
+                    <div class="export-buttons">
+                        <button class="btn-export btn-email" onclick="preparerEmail()">
+                            💾 Enregistrer pour envoi
+                        </button>
+                        <button class="btn-export btn-email" id="btnAllerEmail" style="display:none;" onclick="allerVersEnvoi()">
+                            ✉️ Aller à l'envoi
+                        </button>
+                    </div>
+                    <div class="email-info" id="emailInfo"></div>
+                    <div class="email-saved" id="emailSaved">✅ Facture enregistrée avec succès !</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-nav prev" onclick="ongletPrecedent()" id="btnPrevOnglet">◀ Précédent</button>
+            <span class="step-info" id="stepInfo">Étape 1 / 3</span>
+            <button class="btn-nav" onclick="ongletSuivant()" id="btnNextOnglet">Suivant ▶</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== DONNÉES ====================
+let tickets = JSON.parse(localStorage.getItem("ticketsHistorique")) || [];
+let parametres = JSON.parse(localStorage.getItem("companySettings")) || {};
+let membres = JSON.parse(localStorage.getItem("membres")) || [];
+let historiqueFactures = JSON.parse(localStorage.getItem("historiqueFactures")) || [];
+
+let pageCourante = 1;
+const ticketsParPage = 6;
+let ticketActif = null;
+let ongletActif = 0;
+
+// ==================== PAGINATION ====================
+function changerPage(direction) {
+    const totalPages = Math.ceil(tickets.length / ticketsParPage);
+    pageCourante += direction;
+    if (pageCourante < 1) pageCourante = 1;
+    if (pageCourante > totalPages) pageCourante = totalPages;
+    afficherTickets();
+}
+
+function mettreAJourPagination() {
+    const totalPages = Math.max(1, Math.ceil(tickets.length / ticketsParPage));
+    document.getElementById('pageInfo').textContent = `Page ${pageCourante} / ${totalPages}`;
+    document.getElementById('btnPrev').disabled = pageCourante === 1;
+    document.getElementById('btnNext').disabled = pageCourante === totalPages;
+}
+
+// ==================== AFFICHAGE TICKETS ====================
+function afficherTickets() {
+    const grid = document.getElementById('ticketsGrid');
+    if (!tickets.length) {
+        grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:60px 30px;background:var(--glass-bg);border-radius:var(--radius-xl);backdrop-filter:blur(14px);border:1.5px solid var(--glass-border);color:var(--text-light);">
+                <div style="font-size:2.5em;margin-bottom:16px;">📋</div>
+                <div style="font-size:1.1em;font-weight:700;">Aucun ticket disponible</div>
+                <div style="font-size:0.9em;margin-top:6px;">Les tickets apparaîtront ici une fois enregistrés.</div>
+            </div>`;
+        mettreAJourPagination();
+        return;
+    }
+
+    const debut = (pageCourante - 1) * ticketsParPage;
+    const ticketsPage = tickets.slice(debut, debut + ticketsParPage);
+
+    grid.innerHTML = ticketsPage.map(ticket => {
+        const hist = historiqueFactures.find(h => h.ticketId === ticket.id);
+        const total = calculerTotal(ticket);
+        const statut = hist ? hist.statut : 'non';
+        const badgeClass = getBadgeClass(statut);
+        const badgeTexte = getBadgeTexte(statut);
+
+        return `
+            <div class="ticket-card">
+                <div class="ticket-card-ribbon"></div>
+                <div class="ticket-card-body">
+                    <div class="ticket-header">
+                        <span class="ticket-numero">#${ticket.id}</span>
+                        ${badgeTexte ? `<span class="ticket-badge ${badgeClass}">${badgeTexte}</span>` : ''}
+                    </div>
+                    <div class="ticket-divider"></div>
+                    <div class="ticket-info">
+                        <p><span class="info-icon">🪑</span><strong>Table:</strong> ${ticket.tableId || '—'}</p>
+                        <p><span class="info-icon">📅</span><strong>Date:</strong> ${ticket.datePaiement || '—'} ${ticket.heurePaiement || ''}</p>
+                        ${ticket.membreNom ? `<p><span class="info-icon">👤</span><strong>Membre:</strong> ${ticket.membrePrenom} ${ticket.membreNom}</p>` : ''}
+                        <p><span class="info-icon">💳</span><strong>Mode:</strong> ${ticket.modePaiement || '—'}</p>
+                    </div>
+                    <div class="ticket-total">${total.toFixed(2)} €</div>
+                    <button class="btn-generer" onclick="ouvrirModal(${ticket.id})">📄 Générer Facture</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    mettreAJourPagination();
+}
+
+function getBadgeClass(statut) {
+    if (statut === 'success') return 'badge-envoye';
+    if (statut === 'paye') return 'badge-paye';
+    if (statut === 'impaye') return 'badge-impaye';
+    if (statut === 'encaisser') return 'badge-encaisser';
+    return '';
+}
+function getBadgeTexte(statut) {
+    if (statut === 'success') return '📧 Envoyé';
+    if (statut === 'paye') return '✅ Payé';
+    if (statut === 'impaye') return '⚠️ Impayé';
+    if (statut === 'encaisser') return '⏳ À encaisser';
+    return '';
+}
+
+// ==================== MODAL ====================
+function ouvrirModal(ticketId) {
+    ticketActif = tickets.find(t => t.id === ticketId);
+    if (!ticketActif) return;
+    document.getElementById('modalTitre').textContent = `Facture — Ticket #${ticketActif.id}`;
+    document.querySelector('input[name="statut"][value="encaisser"]').checked = true;
+    document.getElementById('chkFranchise').checked = false;
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    afficherFacture();
+    ongletActif = 0;
+    mettreAJourOnglets();
+}
+function fermerModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    ticketActif = null;
+}
+function fermerModalExterieur(e) {
+    if (e.target === document.getElementById('modalOverlay')) fermerModal();
+}
+
+// ==================== ONGLETS ====================
+function changerOnglet(index) {
+    ongletActif = index;
+    mettreAJourOnglets();
+    if (index === 1) afficherLettre();
+    if (index === 2) mettreAJourExport();
+}
+function ongletSuivant() {
+    if (ongletActif < 2) { ongletActif++; mettreAJourOnglets(); if (ongletActif === 1) afficherLettre(); if (ongletActif === 2) mettreAJourExport(); }
+}
+function ongletPrecedent() {
+    if (ongletActif > 0) { ongletActif--; mettreAJourOnglets(); }
+}
+function mettreAJourOnglets() {
+    document.querySelectorAll('.tab').forEach((tab, i) => tab.classList.toggle('active', i === ongletActif));
+    document.getElementById('ongletFacture').classList.toggle('active', ongletActif === 0);
+    document.getElementById('ongletLettre').classList.toggle('active', ongletActif === 1);
+    document.getElementById('ongletExport').classList.toggle('active', ongletActif === 2);
+    document.getElementById('btnPrevOnglet').style.visibility = ongletActif === 0 ? 'hidden' : 'visible';
+    document.getElementById('btnNextOnglet').style.visibility = ongletActif === 2 ? 'hidden' : 'visible';
+    const etapes = ['Facture', 'Mise en demeure', 'Export'];
+    document.getElementById('stepInfo').textContent = `Étape ${ongletActif + 1}/3 — ${etapes[ongletActif]}`;
+}
+
+// ==================== UTILITAIRES ====================
+function calculerTotal(ticket) {
+    return (ticket.articles || []).reduce((sum, a) => sum + (a.prix * a.qte), 0);
+}
+function getInfosSociete() {
+    return {
+        nom: parametres.companyName || 'Nom de l\'entreprise',
+        numero: parametres.companyNumber || '',
+        adresse: parametres.companyAddress || '',
+        localite: parametres.companyLocality || '',
+        tel: parametres.companyPhone || '',
+        logo: parametres.companyLogo || '',
+        iban: parametres.bankIban || ''
+    };
+}
+
+// ==================== QR CODE ====================
+function buildQRPayload(montant, reference) {
+    const iban = parametres.bankIban.replace(/\s/g, '');
+    return ['BCD','002','1','SCT','',parametres.companyName||'',iban,'EUR'+montant.toFixed(2),'','',reference,''].join('\n');
+}
+
+function genererQRCode(containerId, montant, reference) {
+    if (!parametres.bankIban) return;
+    try {
+        new QRCode(document.getElementById(containerId), {
+            text: buildQRPayload(montant, reference),
+            width: 120, height: 120,
+            colorDark: '#145f8a', colorLight: '#ffffff'
+        });
+    } catch(e) { console.error('QR Code error:', e); }
+}
+
+// Génère le QR en base64 via canvas.toDataURL() — synchrone et fiable pour PDF
+function genererQRBase64(montant, reference) {
+    if (!parametres.bankIban) return '';
+    const tmpDiv = document.createElement('div');
+    tmpDiv.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+    document.body.appendChild(tmpDiv);
+    try {
+        new QRCode(tmpDiv, {
+            text: buildQRPayload(montant, reference),
+            width: 160, height: 160,
+            colorDark: '#145f8a', colorLight: '#ffffff'
+        });
+        const canvas = tmpDiv.querySelector('canvas');
+        const dataURL = canvas ? canvas.toDataURL('image/png') : '';
+        document.body.removeChild(tmpDiv);
+        return dataURL;
+    } catch(e) {
+        document.body.removeChild(tmpDiv);
+        return '';
+    }
+}
+
+// ==================== FACTURE PREVIEW ====================
+function afficherFacture() {
+    if (!ticketActif) return;
+    const societe = getInfosSociete();
+    const total = calculerTotal(ticketActif);
+    const statut = document.querySelector('input[name="statut"]:checked').value;
+    const franchise = document.getElementById('chkFranchise').checked;
+    const dateEcheance = new Date(); dateEcheance.setDate(dateEcheance.getDate() + 30);
+    const today = new Date();
+
+    const statutClass = { encaisser:'badge-encaisser-big', paye:'badge-paye-big', impaye:'badge-impaye-big' }[statut];
+    const statutTexte = { encaisser:'⏳ À ENCAISSER', paye:'✅ PAYÉE', impaye:'⚠️ IMPAYÉE' }[statut];
+
+    const tva = franchise ? 0 : 21;
+    const totalHT = franchise ? total : total / 1.21;
+    const montantTVA = total - totalHT;
+
+    // Articles rows
+    const articlesRows = (ticketActif.articles || []).map(article => {
+        const pu = franchise ? article.prix : article.prix / 1.21;
+        const totalLigne = article.prix * article.qte;
+        const totalLigneHT = franchise ? totalLigne : totalLigne / 1.21;
+        return `
+            <tr>
+                <td class="art-name">${article.nom}${article.offert ? ' <span class="art-gift">🎁 offert</span>' : ''}</td>
+                <td>${article.qte}</td>
+                <td>${pu.toFixed(2)} €</td>
+                <td>${totalLigneHT.toFixed(2)} €</td>
+            </tr>
+        `;
+    }).join('');
+
+    const showQR = statut !== 'paye' && societe.iban;
+
+    let html = `
+        <div class="facture-preview">
+            <div class="facture-top-bar"></div>
+            <div class="facture-inner">
+                <div class="facture-header">
+                    <div class="company-info">
+                        ${societe.logo ? `<img src="${societe.logo}" style="max-height:55px;margin-bottom:10px;border-radius:8px;">` : ''}
+                        <h3>${societe.nom}</h3>
+                        ${societe.adresse ? `<p>${societe.adresse}</p>` : ''}
+                        ${societe.localite ? `<p>${societe.localite}</p>` : ''}
+                        ${societe.tel ? `<p>📞 ${societe.tel}</p>` : ''}
+                        ${societe.numero ? `<span class="company-num">N° ${societe.numero}</span>` : ''}
+                    </div>
+                    <div class="qrcode-section">
+                        <div class="status-badge ${statutClass}">${statutTexte}</div>
+                        ${showQR ? `
+                            <div class="qrcode" id="qrcodeContainer"></div>
+                            <div class="qrcode-label">QR Paiement SEPA</div>
+                        ` : `
+                            <div style="text-align:right;color:var(--text-light);font-size:0.85em;margin-top:8px;">
+                                <p>📅 ${ticketActif.datePaiement || ''}</p>
+                                <p>🕐 ${ticketActif.heurePaiement || ''}</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+
+                <div class="facture-ref-row">
+                    <div class="ref-chip">N° Facture <span>FAC-${ticketActif.id}</span></div>
+                    <div class="ref-chip">Date <span>${today.toLocaleDateString('fr-BE')}</span></div>
+                    <div class="ref-chip">Échéance <span>${dateEcheance.toLocaleDateString('fr-BE')}</span></div>
+                    <div class="ref-chip">Mode <span>${ticketActif.modePaiement || '—'}</span></div>
+                </div>
+
+                ${(ticketActif.membreNom || ticketActif.tableId) ? `
+                <div class="client-box">
+                    <div class="client-box-title">👤 Destinataire</div>
+                    ${ticketActif.membreNom ? `<p>${ticketActif.membrePrenom || ''} ${ticketActif.membreNom}</p>` : '<p>Client anonyme</p>'}
+                    ${ticketActif.tableId ? `<p style="color:var(--text-light);font-weight:500;font-size:0.88em;">Table ${ticketActif.tableId}</p>` : ''}
+                </div>` : ''}
+
+                <table class="articles-table">
+                    <thead>
+                        <tr>
+                            <th>Article</th>
+                            <th>Qté</th>
+                            <th>P.U. HT</th>
+                            <th>Total HT</th>
+                        </tr>
+                    </thead>
+                    <tbody>${articlesRows}</tbody>
+                </table>
+
+                <div class="total-section">
+                    <div class="total-box">
+                        ${!franchise ? `<div class="total-box-note">Sous-total HT: ${totalHT.toFixed(2)} €</div><div class="total-box-note">TVA ${tva}%: ${montantTVA.toFixed(2)} €</div>` : ''}
+                        <div class="total-box-label">Total TTC</div>
+                        <div class="total-box-amount">${total.toFixed(2)} €</div>
+                    </div>
+                </div>
+
+                ${franchise ? `<div class="franchise-note">🏷️ Régime de la franchise de TVA — TVA non applicable (Art. 56bis CTV belge)</div>` : ''}
+                ${statut === 'impaye' ? `<div class="unpaid-warning">⚠️ Cette facture est impayée. Merci de procéder au règlement avant le <strong>${dateEcheance.toLocaleDateString('fr-BE')}</strong>.</div>` : ''}
+                ${societe.iban && statut !== 'paye' ? `
+                    <div class="iban-section">
+                        💳 <div><strong>Virement bancaire:</strong> ${societe.iban}<br><span style="font-size:0.85em;color:var(--text-light);">Communication: FAC-${ticketActif.id}</span></div>
+                    </div>` : ''}
+            </div>
+        </div>
+    `;
+
+    document.getElementById('facturePreview').innerHTML = html;
+
+    if (showQR) {
+        // Attendre que le DOM soit peint avant d'injecter le QR
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const container = document.getElementById('qrcodeContainer');
+                if (!container) return;
+                container.innerHTML = ''; // vider si rechargement
+                genererQRCode('qrcodeContainer', total, `FAC-${ticketActif.id}`);
+            });
+        });
+    }
+}
+
+function mettreAJourFacture() { afficherFacture(); }
+
+// ==================== LETTRE MISE EN DEMEURE ====================
+function afficherLettre() {
+    if (!ticketActif) return;
+    const societe = getInfosSociete();
+    const total = calculerTotal(ticketActif);
+    const membre = ticketActif.membreId ? membres.find(m => m.id === ticketActif.membreId) : null;
+    const maintenant = new Date();
+    const dateLimite = new Date(); dateLimite.setDate(dateLimite.getDate() + 8);
+
+    document.getElementById('lettrePreview').innerHTML = `
+        <div class="letter-expediteur">
+            <strong>${societe.nom}</strong><br>
+            ${societe.adresse}<br>${societe.localite}<br>
+            ${societe.numero ? `N° entreprise: ${societe.numero}<br>` : ''}
+            ${societe.tel ? `Tél: ${societe.tel}<br>` : ''}
+            <br>Fait à ${societe.localite.split(' ').pop() || 'Bruxelles'}, le ${maintenant.toLocaleDateString('fr-BE')}
+        </div>
+        <div class="letter-destinataire">
+            <strong>${ticketActif.membrePrenom || ''} ${ticketActif.membreNom || ''}</strong><br>
+            ${membre?.adresse || ''}${membre?.localite ? '<br>' + membre.localite : ''}
+        </div>
+        <div class="letter-objet">
+            <strong>Objet: MISE EN DEMEURE</strong><br>
+            Réf: Ticket n°${ticketActif.id} du ${ticketActif.datePaiement}<br>
+            Montant réclamé: <span style="color:var(--danger);font-weight:700;">${total.toFixed(2)} €</span>
+        </div>
+        <div class="letter-titre">MISE EN DEMEURE</div>
+        <div class="letter-corps">
+            <p>Madame, Monsieur ${ticketActif.membreNom || ''},</p><br>
+            <p>Par la présente, <strong>${societe.nom}</strong> vous met <strong>formellement en demeure</strong> de procéder au règlement de la somme de <span style="color:var(--danger);font-weight:700;">${total.toFixed(2)} €</span>, correspondant à votre consommation enregistrée sous le ticket n°${ticketActif.id} en date du ${ticketActif.datePaiement}.</p><br>
+            <p>À ce jour, malgré l'émission de la facture correspondante, aucun paiement n'a été constaté. Nous vous rappelons que, conformément aux règles de droit commun et aux statuts de notre association, tout membre est tenu de régler ses consommations dans les délais impartis.</p><br>
+            <div class="letter-avertissement">
+                ⚠️ Vous êtes invité(e) à régulariser votre situation dans un délai de <strong>8 jours</strong> à compter de la réception de la présente lettre, soit au plus tard le <strong>${dateLimite.toLocaleDateString('fr-BE')}</strong>.
+            </div>
+            <p>À défaut de paiement dans ce délai, nous nous verrons dans l'obligation d'engager toutes les procédures légales nécessaires au recouvrement de cette créance, notamment par voie de citation devant les juridictions compétentes, et ce aux frais du débiteur défaillant. Des intérêts de retard légaux pourront également être réclamés.</p><br>
+            ${societe.iban ? `
+                <div style="background:var(--success-light);padding:12px 16px;border-radius:var(--radius-md);margin:16px 0;border:1.5px solid rgba(56,168,106,0.2);">
+                    💳 <strong>Coordonnées bancaires:</strong><br>
+                    IBAN: ${societe.iban}<br>Communication: Ticket n°${ticketActif.id}
+                </div>
+            ` : ''}
+            <p>Nous restons néanmoins disponibles pour tout arrangement amiable et vous invitons à prendre contact avec nous dans les meilleurs délais.</p><br>
+            <p>Dans l'attente d'un règlement rapide de ce litige, veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</p>
+        </div>
+        <div class="letter-signature" style="margin-top:50px;">
+            <p><strong>${societe.nom}</strong><br>La direction</p>
+        </div>
+    `;
+}
+
+// ==================== EXPORT ====================
+function mettreAJourExport() {
+    if (!ticketActif) return;
+    const membre = ticketActif.membreId ? membres.find(m => m.id === ticketActif.membreId) : null;
+    const statut = document.querySelector('input[name="statut"]:checked').value;
+    const statutTexte = { encaisser:'⏳ À encaisser', paye:'✅ Payée', impaye:'⚠️ Impayée' }[statut];
+    const emailInfo = document.getElementById('emailInfo');
+    const btnAller = document.getElementById('btnAllerEmail');
+
+    if (membre?.email && membre.email !== 'anonyme') {
+        emailInfo.innerHTML = `<strong>Email:</strong> ${membre.email}<br><strong>Statut:</strong> ${statutTexte}<br><small>Cliquez sur "Enregistrer pour envoi" pour préparer l'email</small>`;
+        const existe = historiqueFactures.find(h => h.ticketId === ticketActif.id);
+        btnAller.style.display = existe ? 'block' : 'none';
+    } else {
+        emailInfo.innerHTML = `<span style="color:var(--warning);">⚠️ Aucun email trouvé pour ce membre</span><br><small>Envoi manuel possible depuis la page d'envoi</small>`;
+        btnAller.style.display = 'none';
+    }
+    document.getElementById('emailSaved').style.display = 'none';
+}
+
+function preparerEmail() {
+    if (!ticketActif) return;
+    const statut = document.querySelector('input[name="statut"]:checked').value;
+    const franchise = document.getElementById('chkFranchise').checked;
+    historiqueFactures = historiqueFactures.filter(h => h.ticketId !== ticketActif.id);
+    historiqueFactures.push({ ticketId: ticketActif.id, statut, franchise, savedAt: new Date().toISOString() });
+    localStorage.setItem('historiqueFactures', JSON.stringify(historiqueFactures));
+    document.getElementById('emailSaved').style.display = 'block';
+    document.getElementById('btnAllerEmail').style.display = 'block';
+    afficherTickets();
+}
+
+function allerVersEnvoi() {
+    localStorage.setItem('factureAEnvoyer', JSON.stringify({ ticketId: ticketActif.id }));
+    window.location.href = 'envoi_factures.html';
+}
+
+// ==================== EXPORT PDF — AVEC QR ET FONTS ====================
+function exporterPDFFacture() {
+    const societe = getInfosSociete();
+    const total = calculerTotal(ticketActif);
+    const statut = document.querySelector('input[name="statut"]:checked').value;
+    const franchise = document.getElementById('chkFranchise').checked;
+    const today = new Date();
+    const dateEcheance = new Date(); dateEcheance.setDate(dateEcheance.getDate() + 30);
+    const tva = franchise ? 0 : 21;
+    const totalHT = franchise ? total : total / 1.21;
+    const montantTVA = total - totalHT;
+    const statutTexte = { encaisser:'⏳ À ENCAISSER', paye:'✅ PAYÉE', impaye:'⚠️ IMPAYÉE' }[statut];
+    const showQR = statut !== 'paye' && societe.iban;
+
+    // Générer le QR code en base64 via canvas (synchrone et fiable)
+    const qrDataURL = showQR ? genererQRBase64(total, `FAC-${ticketActif.id}`) : '';
+
+    const articlesRows = (ticketActif.articles || []).map(article => {
+        const pu = franchise ? article.prix : article.prix / 1.21;
+        const totalLigne = article.prix * article.qte;
+        const totalLigneHT = franchise ? totalLigne : totalLigne / 1.21;
+        return `<tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #e0eaf0;">${article.nom}${article.offert ? ' 🎁' : ''}</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #e0eaf0;text-align:center;">${article.qte}</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #e0eaf0;text-align:right;">${pu.toFixed(2)} €</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #e0eaf0;text-align:right;">${totalLigneHT.toFixed(2)} €</td>
+        </tr>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="UTF-8">
+<title>Facture FAC-${ticketActif.id}</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:white; color:#1e3048; padding:40px; max-width:800px; margin:0 auto; }
+.top-bar { height:7px; background:linear-gradient(90deg,#145f8a,#5bb3d4,#e8a838); border-radius:4px; margin-bottom:32px; }
+.header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; padding-bottom:22px; border-bottom:2px solid #ccdde8; }
+.company h3 { font-family:'Playfair Display',serif; font-size:1.35em; color:#145f8a; margin-bottom:7px; }
+.company p { color:#5a7a96; font-size:0.88em; margin:2px 0; }
+.company .num { display:inline-block; background:linear-gradient(135deg,#145f8a,#2a7faa); color:white; padding:4px 12px; border-radius:50px; font-size:0.8em; font-weight:700; margin-top:8px; }
+.qr-section { text-align:center; }
+.status { display:inline-block; padding:7px 18px; border-radius:50px; font-weight:800; font-size:0.82em; margin-bottom:10px; letter-spacing:0.4px; text-transform:uppercase; }
+.status.encaisser { background:#fff4e5; color:#e8830a; border:2px solid rgba(232,131,10,0.3); }
+.status.paye { background:#e6f7ed; color:#38a86a; border:2px solid rgba(56,168,106,0.3); }
+.status.impaye { background:#fdeaea; color:#d94040; border:2px solid rgba(217,64,64,0.3); }
+.refs { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+.ref { background:#f0f8ff; border:1.5px solid #ccdde8; border-radius:10px; padding:7px 14px; font-size:0.85em; font-weight:700; color:#145f8a; }
+.ref span { color:#5a7a96; font-weight:500; }
+.client-box { background:#f5f9fd; border:1.5px solid #ccdde8; border-radius:12px; padding:14px 18px; margin-bottom:20px; }
+.client-box .label { font-size:0.75em; text-transform:uppercase; letter-spacing:0.5px; color:#2a7faa; font-weight:800; margin-bottom:6px; }
+table { width:100%; border-collapse:separate; border-spacing:0; border-radius:12px; overflow:hidden; border:1.5px solid #ccdde8; margin-bottom:22px; }
+thead tr { background:linear-gradient(135deg,#145f8a,#2a7faa); }
+th { color:white; padding:12px 14px; font-weight:700; font-size:0.85em; text-align:left; }
+th:last-child, td:last-child { text-align:right; }
+tbody tr:nth-child(even) { background:#f8fbfe; }
+.total-box { background:linear-gradient(135deg,#145f8a,#2a7faa); color:white; border-radius:12px; padding:16px 24px; text-align:right; margin-left:auto; min-width:240px; }
+.total-box .label2 { font-size:0.75em; opacity:0.75; text-transform:uppercase; letter-spacing:0.5px; }
+.total-box .note { font-size:0.82em; opacity:0.8; margin-bottom:2px; }
+.total-box .amount { font-family:'Playfair Display',serif; font-size:1.75em; font-weight:700; }
+.franchise-note { background:linear-gradient(135deg,#145f8a,#2a7faa); color:white; padding:11px 16px; border-radius:12px; text-align:center; font-weight:700; font-size:0.87em; margin-top:14px; }
+.iban-note { background:#e6f7ed; border:1.5px solid rgba(56,168,106,0.3); border-radius:12px; padding:12px 16px; margin-top:14px; font-size:0.88em; }
+.unpaid-note { background:#fdeaea; border:1.5px solid rgba(217,64,64,0.25); border-radius:12px; padding:12px 16px; margin-top:14px; font-size:0.88em; color:#d94040; font-weight:700; text-align:center; }
+@media print { body { padding:20px; } }
+</style></head><body>
+<div class="top-bar"></div>
+<div class="header">
+    <div class="company">
+        ${societe.logo ? `<img src="${societe.logo}" style="max-height:50px;margin-bottom:10px;border-radius:6px;"><br>` : ''}
+        <h3>${societe.nom}</h3>
+        ${societe.adresse ? `<p>${societe.adresse}</p>` : ''}
+        ${societe.localite ? `<p>${societe.localite}</p>` : ''}
+        ${societe.tel ? `<p>📞 ${societe.tel}</p>` : ''}
+        ${societe.numero ? `<span class="num">N° ${societe.numero}</span>` : ''}
+    </div>
+    <div class="qr-section">
+        <div class="status ${statut}">${statutTexte}</div><br>
+        ${qrDataURL ? `<img src="${qrDataURL}" style="width:120px;height:120px;border-radius:10px;border:1px solid #ccdde8;padding:6px;background:white;"><br><div style="font-size:0.75em;color:#5a7a96;margin-top:4px;">QR Paiement SEPA</div>` : `<div style="font-size:0.85em;color:#5a7a96;">📅 ${ticketActif.datePaiement || ''}<br>🕐 ${ticketActif.heurePaiement || ''}</div>`}
+    </div>
+</div>
+<div class="refs">
+    <div class="ref">N° <span>FAC-${ticketActif.id}</span></div>
+    <div class="ref">Date <span>${today.toLocaleDateString('fr-BE')}</span></div>
+    <div class="ref">Échéance <span>${dateEcheance.toLocaleDateString('fr-BE')}</span></div>
+    <div class="ref">Mode <span>${ticketActif.modePaiement || '—'}</span></div>
+</div>
+${ticketActif.membreNom ? `<div class="client-box"><div class="label">👤 Destinataire</div><strong>${ticketActif.membrePrenom||''} ${ticketActif.membreNom}</strong>${ticketActif.tableId ? `<br><span style="color:#5a7a96;font-size:0.88em;">Table ${ticketActif.tableId}</span>` : ''}</div>` : ''}
+<table>
+    <thead><tr><th>Article</th><th style="text-align:center;">Qté</th><th style="text-align:right;">P.U. HT</th><th style="text-align:right;">Total HT</th></tr></thead>
+    <tbody>${articlesRows}</tbody>
+</table>
+<div style="display:flex;justify-content:flex-end;">
+    <div class="total-box">
+        ${!franchise ? `<div class="note">HT: ${totalHT.toFixed(2)} €</div><div class="note">TVA ${tva}%: ${montantTVA.toFixed(2)} €</div>` : ''}
+        <div class="label2">Total TTC</div>
+        <div class="amount">${total.toFixed(2)} €</div>
+    </div>
+</div>
+${franchise ? '<div class="franchise-note">🏷️ Régime franchise TVA — TVA non applicable (Art. 56bis CTV belge)</div>' : ''}
+${statut === 'impaye' ? `<div class="unpaid-note">⚠️ Facture impayée — Règlement attendu avant le ${dateEcheance.toLocaleDateString('fr-BE')}</div>` : ''}
+${societe.iban && statut !== 'paye' ? `<div class="iban-note">💳 <strong>Virement:</strong> ${societe.iban} — Comm.: FAC-${ticketActif.id}</div>` : ''}
+</body></html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 800);
+}
+
+function exporterPDFLettre() {
+    const societe = getInfosSociete();
+    const total = calculerTotal(ticketActif);
+    const membre = ticketActif.membreId ? membres.find(m => m.id === ticketActif.membreId) : null;
+    const maintenant = new Date();
+    const dateLimite = new Date(); dateLimite.setDate(dateLimite.getDate() + 8);
+
+    const html = `<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="UTF-8">
+<title>Mise en demeure — Ticket ${ticketActif.id}</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:white; color:#1e3048; padding:50px 60px; max-width:800px; margin:0 auto; line-height:1.8; }
+.expediteur { text-align:right; margin-bottom:36px; color:#5a7a96; }
+.destinataire { margin-bottom:36px; }
+.objet { background:#fdeaea; padding:14px 18px; border-radius:12px; border-left:4px solid #d94040; margin-bottom:28px; }
+.titre { text-align:center; font-family:'Playfair Display',serif; font-size:1.4em; color:#d94040; margin:28px 0; letter-spacing:1px; text-decoration:underline; }
+.avertissement { background:#fdeaea; border:2px solid rgba(217,64,64,0.3); border-radius:12px; padding:14px 18px; margin:18px 0; font-weight:700; }
+.iban-box { background:#e6f7ed; padding:12px 16px; border-radius:12px; border:1.5px solid rgba(56,168,106,0.25); margin:16px 0; }
+.signature { margin-top:56px; }
+p { margin-bottom:14px; }
+@media print { body { padding:30px; } }
+</style></head><body>
+<div class="expediteur">
+    <strong>${societe.nom}</strong><br>${societe.adresse}<br>${societe.localite}<br>
+    ${societe.numero ? `N° entreprise: ${societe.numero}<br>` : ''}
+    ${societe.tel ? `Tél: ${societe.tel}<br>` : ''}
+    <br>Fait à ${societe.localite.split(' ').pop() || 'Bruxelles'}, le ${maintenant.toLocaleDateString('fr-BE')}
+</div>
+<div class="destinataire">
+    <strong>${ticketActif.membrePrenom||''} ${ticketActif.membreNom||''}</strong><br>
+    ${membre?.adresse||''}${membre?.localite ? '<br>'+membre.localite : ''}
+</div>
+<div class="objet">
+    <strong>Objet: MISE EN DEMEURE</strong><br>
+    Réf: Ticket n°${ticketActif.id} du ${ticketActif.datePaiement}<br>
+    Montant réclamé: <span style="color:#d94040;font-weight:800;">${total.toFixed(2)} €</span>
+</div>
+<div class="titre">MISE EN DEMEURE</div>
+<p>Madame, Monsieur ${ticketActif.membreNom||''},</p>
+<p>Par la présente, <strong>${societe.nom}</strong> vous met <strong>formellement en demeure</strong> de procéder au règlement de la somme de <span style="color:#d94040;font-weight:800;">${total.toFixed(2)} €</span>, correspondant à votre consommation enregistrée sous le ticket n°${ticketActif.id} en date du ${ticketActif.datePaiement}.</p>
+<p>À ce jour, malgré l'émission de la facture correspondante, aucun paiement n'a été constaté. Nous vous rappelons que, conformément aux règles de droit commun et aux statuts de notre association, tout membre est tenu de régler ses consommations dans les délais impartis.</p>
+<div class="avertissement">⚠️ Vous êtes invité(e) à régulariser votre situation dans un délai de <strong>8 jours</strong> à compter de la réception de la présente lettre, soit au plus tard le <strong>${dateLimite.toLocaleDateString('fr-BE')}</strong>.</div>
+<p>À défaut de paiement dans ce délai, nous nous verrons dans l'obligation d'engager toutes les procédures légales nécessaires au recouvrement de cette créance, notamment par voie de citation devant les juridictions compétentes, et ce aux frais du débiteur défaillant. Des intérêts de retard légaux pourront également être réclamés.</p>
+${societe.iban ? `<div class="iban-box">💳 <strong>Coordonnées bancaires:</strong><br>IBAN: ${societe.iban}<br>Communication: Ticket n°${ticketActif.id}</div>` : ''}
+<p>Nous restons néanmoins disponibles pour tout arrangement amiable et vous invitons à prendre contact avec nous dans les meilleurs délais.</p>
+<p>Dans l'attente d'un règlement rapide de ce litige, veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</p>
+<div class="signature"><strong>${societe.nom}</strong><br>La direction</div>
+</body></html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 600);
+}
+
+// ==================== EXPORT XML UBL/PEPPOL (corrigé) ====================
+function exporterXML() {
+    if (!ticketActif) return;
+    const societe = getInfosSociete();
+    const total = calculerTotal(ticketActif);
+    const statut = document.querySelector('input[name="statut"]:checked').value;
+    const franchise = document.getElementById('chkFranchise').checked;
+
+    const maintenant = new Date();
+    const dateFacture = maintenant.toISOString().split('T')[0];
+    const dateEcheance = new Date(maintenant); dateEcheance.setDate(dateEcheance.getDate() + 30);
+    const dueDate = dateEcheance.toISOString().split('T')[0];
+
+    const tva = franchise ? 0 : 21;
+    const totalHT = franchise ? total : total / 1.21;
+    const montantTVA = total - totalHT;
+
+    // Correction: code raison franchise BE
+    const taxCategoryId = franchise ? 'E' : 'S';
+    const taxExemptionBlock = franchise ? `
+                <cbc:TaxExemptionReasonCode>VATEX-BE-AE</cbc:TaxExemptionReasonCode>
+                <cbc:TaxExemptionReason>Régime de franchise de TVA (Art. 56bis CTV belge)</cbc:TaxExemptionReason>` : '';
+
+    // Nettoyage IBAN pour XML
+    const ibanPropre = societe.iban ? societe.iban.replace(/\s/g, '') : '';
+
+    // QR code SEPA en base64 pour inclusion dans l'XML (AdditionalDocumentReference)
+    const showQR = statut !== 'paye' && societe.iban;
+    const qrBase64 = showQR ? genererQRBase64(total, `FAC-${ticketActif.id}`) : '';
+    const qrBase64Data = qrBase64 ? qrBase64.replace(/^data:image\/png;base64,/, '') : '';
+
+    // PaymentMeans obligatoire Peppol
+    const paymentMeansBlock = ibanPropre ? `
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cbc:PaymentDueDate>${dueDate}</cbc:PaymentDueDate>
+        <cbc:InstructionNote>FAC-${ticketActif.id}</cbc:InstructionNote>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>${ibanPropre}</cbc:ID>
+            <cbc:Name>${escXML(societe.nom)}</cbc:Name>
+            <cac:FinancialInstitutionBranch>
+                <cbc:ID>NOTPROVIDED</cbc:ID>
+            </cac:FinancialInstitutionBranch>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>` : `
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>1</cbc:PaymentMeansCode>
+        <cbc:PaymentDueDate>${dueDate}</cbc:PaymentDueDate>
+    </cac:PaymentMeans>`;
+
+    const linesXML = (ticketActif.articles || []).map((article, index) => {
+        const totalLigne = article.prix * article.qte;
+        const totalLigneHT = franchise ? totalLigne : totalLigne / 1.21;
+        const puHT = franchise ? article.prix : article.prix / 1.21;
+        return `
+    <cac:InvoiceLine>
+        <cbc:ID>${index + 1}</cbc:ID>
+        <cbc:InvoicedQuantity unitCode="C62">${article.qte}</cbc:InvoicedQuantity>
+        <cbc:LineExtensionAmount currencyID="EUR">${totalLigneHT.toFixed(2)}</cbc:LineExtensionAmount>
+        <cac:Item>
+            <cbc:Name>${escXML(article.nom)}${article.offert ? ' (offert)' : ''}</cbc:Name>
+            <cac:ClassifiedTaxCategory>
+                <cbc:ID>${taxCategoryId}</cbc:ID>
+                <cbc:Percent>${tva}</cbc:Percent>
+                <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+        </cac:Item>
+        <cac:Price>
+            <cbc:PriceAmount currencyID="EUR">${puHT.toFixed(4)}</cbc:PriceAmount>
+        </cac:Price>
+    </cac:InvoiceLine>`;
+    }).join('');
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+    xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+
+    <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
+    <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
+    <cbc:ID>FAC-${ticketActif.id}-${Date.now()}</cbc:ID>
+    <cbc:IssueDate>${dateFacture}</cbc:IssueDate>
+    <cbc:DueDate>${dueDate}</cbc:DueDate>
+    <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+    <cbc:Note>Statut: ${statut}</cbc:Note>
+    <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
+    <cbc:BuyerReference>FAC-${ticketActif.id}</cbc:BuyerReference>
+
+    ${qrBase64Data ? `
+    <cac:AdditionalDocumentReference>
+        <cbc:ID>QR-SEPA-FAC-${ticketActif.id}</cbc:ID>
+        <cbc:DocumentTypeCode>916</cbc:DocumentTypeCode>
+        <cbc:DocumentDescription>QR Code paiement SEPA SCT</cbc:DocumentDescription>
+        <cac:Attachment>
+            <cbc:EmbeddedDocumentBinaryObject mimeCode="image/png" filename="qr_sepa_FAC-${ticketActif.id}.png">${qrBase64Data}</cbc:EmbeddedDocumentBinaryObject>
+        </cac:Attachment>
+    </cac:AdditionalDocumentReference>` : ''}
+
+    <cac:AccountingSupplierParty>
+        <cac:Party>
+            <cac:PartyName><cbc:Name>\${escXML(societe.nom)}</cbc:Name></cac:PartyName>
+            <cac:PostalAddress>
+                <cbc:StreetName>${escXML(societe.adresse)}</cbc:StreetName>
+                <cbc:CityName>${escXML(societe.localite)}</cbc:CityName>
+                <cac:Country><cbc:IdentificationCode>BE</cbc:IdentificationCode></cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyTaxScheme>
+                <cbc:CompanyID>${escXML(societe.numero)}</cbc:CompanyID>
+                <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>
+            </cac:PartyTaxScheme>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>${escXML(societe.nom)}</cbc:RegistrationName>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:AccountingSupplierParty>
+
+    <cac:AccountingCustomerParty>
+        <cac:Party>
+            <cac:PartyName>
+                <cbc:Name>${escXML((ticketActif.membrePrenom||'') + ' ' + (ticketActif.membreNom||'Client'))}</cbc:Name>
+            </cac:PartyName>
+            <cac:PostalAddress>
+                <cac:Country><cbc:IdentificationCode>BE</cbc:IdentificationCode></cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>${escXML((ticketActif.membrePrenom||'') + ' ' + (ticketActif.membreNom||'Client'))}</cbc:RegistrationName>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:AccountingCustomerParty>
+${paymentMeansBlock}
+
+    <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="EUR">${montantTVA.toFixed(2)}</cbc:TaxAmount>
+        <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="EUR">${totalHT.toFixed(2)}</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">${montantTVA.toFixed(2)}</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID>${taxCategoryId}</cbc:ID>
+                <cbc:Percent>${tva}</cbc:Percent>${taxExemptionBlock}
+                <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+    </cac:TaxTotal>
+
+    <cac:LegalMonetaryTotal>
+        <cbc:LineExtensionAmount currencyID="EUR">${totalHT.toFixed(2)}</cbc:LineExtensionAmount>
+        <cbc:TaxExclusiveAmount currencyID="EUR">${totalHT.toFixed(2)}</cbc:TaxExclusiveAmount>
+        <cbc:TaxInclusiveAmount currencyID="EUR">${total.toFixed(2)}</cbc:TaxInclusiveAmount>
+        <cbc:PayableAmount currencyID="EUR">${total.toFixed(2)}</cbc:PayableAmount>
+    </cac:LegalMonetaryTotal>
+${linesXML}
+</Invoice>`;
+
+    const blob = new Blob([xml], { type: 'application/xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `facture_peppol_FAC-${ticketActif.id}.xml`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Échappement XML
+function escXML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
+
+// ==================== INIT ====================
+afficherTickets();
+</script>
+</body>
+</html>

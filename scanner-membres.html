@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scanner Membres</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --blue:#2a7fd4; --blue2:#1a6bbf; --blue3:#0d4f9a; --blue-light:#5ba3e8; --blue-pale:#deeefb;
+  --green:#5aad2e; --green2:#4a9422; --green-pale:#e8f5dc;
+  --yellow:#e8a800; --yellow2:#d49400; --yellow-light:#ffd84d; --yellow-pale:#fff8dc;
+  --red:#c0392b; --red2:#922b21; --red-pale:#fde8e8;
+  --purple:#7c3aed; --purple-pale:#f5f3ff;
+  --orange:#d97706; --orange-pale:#fff7ed;
+  --text:#1a2b4a; --text2:#4a6080; --text3:#7a98b8;
+  --border:#b0cce8; --border2:#d0e4f4;
+  --shadow:rgba(30,80,160,0.15); --shadow2:rgba(30,80,160,0.08);
+  --radius:12px; --radius-lg:18px; --radius-xl:22px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'Nunito','Segoe UI',sans-serif;
+  font-size:14px;
+  background:linear-gradient(160deg,#cde8f8 0%,#e2f0fb 25%,#d8edff 50%,#e8f5dc 75%,#fff8dc 100%);
+  min-height:100vh;
+  padding:20px;
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  position:relative;
+}
+
+body::before {
+  content:''; position:fixed; top:-150px; left:-150px;
+  width:550px; height:550px;
+  background:radial-gradient(circle,rgba(168,213,244,0.5),transparent 70%);
+  pointer-events:none; z-index:0; border-radius:50%;
+}
+body::after {
+  content:''; position:fixed; bottom:-100px; right:5%;
+  width:450px; height:450px;
+  background:radial-gradient(circle,rgba(184,232,154,0.4),transparent 70%);
+  pointer-events:none; z-index:0; border-radius:50%;
+}
+
+/* Header */
+.page-header {
+  width:100%; max-width:900px;
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:25px; padding:0 10px;
+  position:relative; z-index:2;
+}
+
+h1 {
+  font-size:2.2rem; font-weight:900; color:var(--blue3);
+  flex:1; text-align:center; letter-spacing:-0.02em;
+}
+
+.btn-back {
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(210,228,248,.85));
+  color:var(--text2); border:1px solid var(--border);
+  padding:12px 22px; border-radius:50px;
+  font-weight:800; font-size:0.95rem; cursor:pointer;
+  transition:all .2s; display:flex; align-items:center; gap:8px;
+  box-shadow:0 2px 8px var(--shadow2);
+  position:relative; overflow:hidden;
+}
+.btn-back::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.5); border-radius:50px 50px 0 0; pointer-events:none;
+}
+.btn-back:hover { background:linear-gradient(180deg,#fff,#d0e4f8); color:var(--blue3); transform:translateY(-2px); }
+
+/* Layout principal */
+.main-layout {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:25px;
+  width:100%; max-width:900px;
+  position:relative; z-index:2;
+}
+@media(min-width:800px) {
+  .main-layout { grid-template-columns:1fr 1fr; }
+}
+
+/* Cards */
+.card {
+  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(215,238,255,.75));
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:var(--radius-xl);
+  padding:25px;
+  box-shadow:0 4px 16px var(--shadow2),0 1px 0 rgba(255,255,255,.9) inset;
+  backdrop-filter:blur(10px);
+  position:relative; overflow:hidden;
+}
+.card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:5px;
+  background:linear-gradient(90deg,var(--blue-light),var(--green),var(--yellow));
+}
+.card::after {
+  content:''; position:absolute; top:5px; left:0; right:0; height:22%;
+  background:rgba(255,255,255,.42); border-radius:0 0 60% 60%; pointer-events:none;
+}
+.card > * { position:relative; z-index:2; }
+
+.card h3 {
+  font-size:1.2rem; font-weight:900; color:var(--blue3);
+  display:flex; align-items:center; gap:10px; margin-bottom:18px;
+}
+
+/* Scanner vidéo */
+.scanner-wrapper {
+  position:relative; border-radius:var(--radius-lg); overflow:hidden;
+  background:#0d1b2a; aspect-ratio:1/1; width:100%;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+
+#video {
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+
+/* Cadre de scan animé */
+.scan-frame {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none;
+}
+.scan-frame-inner {
+  width:65%; height:65%;
+  position:relative;
+}
+.scan-frame-inner::before,
+.scan-frame-inner::after,
+.scan-frame-inner span::before,
+.scan-frame-inner span::after {
+  content:''; position:absolute;
+  width:28px; height:28px;
+  border-color:#5ba3e8; border-style:solid;
+}
+.scan-frame-inner::before  { top:0;    left:0;  border-width:3px 0 0 3px; border-radius:4px 0 0 0; }
+.scan-frame-inner::after   { top:0;    right:0; border-width:3px 3px 0 0; border-radius:0 4px 0 0; }
+.scan-frame-inner span::before { bottom:0; left:0;  border-width:0 0 3px 3px; border-radius:0 0 0 4px; }
+.scan-frame-inner span::after  { bottom:0; right:0; border-width:0 3px 3px 0; border-radius:0 0 4px 0; }
+
+/* Ligne de scan animée */
+.scan-line {
+  position:absolute; left:5%; right:5%; height:2px;
+  background:linear-gradient(90deg,transparent,#5ba3e8,#84d47c,#5ba3e8,transparent);
+  border-radius:2px;
+  animation:scanAnim 2.5s ease-in-out infinite;
+  box-shadow:0 0 8px rgba(91,163,232,0.7);
+}
+@keyframes scanAnim {
+  0%   { top:10%; opacity:0.4; }
+  50%  { opacity:1; }
+  100% { top:88%; opacity:0.4; }
+}
+
+/* Statut scanner */
+.scanner-status {
+  position:absolute; bottom:0; left:0; right:0;
+  padding:10px 15px; font-size:0.85rem; font-weight:700;
+  text-align:center; backdrop-filter:blur(5px);
+  transition:all .3s;
+}
+.status-waiting  { background:rgba(13,79,154,0.75); color:#a8d4f8; }
+.status-scanning { background:rgba(74,148,34,0.8);  color:#d4f8a8; }
+.status-found    { background:rgba(74,148,34,0.9);  color:white; }
+.status-error    { background:rgba(192,57,43,0.85); color:white; }
+.status-off      { background:rgba(30,30,50,0.75);  color:#7a98b8; }
+
+/* Canvas caché pour jsQR */
+#canvas { display:none; }
+
+/* Boutons caméra */
+.camera-controls {
+  display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;
+}
+
+.btn-cam {
+  flex:1; min-width:130px;
+  padding:12px 16px; border:none; border-radius:var(--radius);
+  font-weight:800; font-size:0.95rem; cursor:pointer;
+  transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px;
+  position:relative; overflow:hidden; color:white;
+}
+.btn-cam::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.25); border-radius:var(--radius) var(--radius) 0 0; pointer-events:none;
+}
+.btn-cam:hover { transform:translateY(-2px); }
+.btn-cam:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+.btn-start { background:linear-gradient(180deg,#84d47c,#4a9422,#2d6a1a); border:1px solid #2d6a1a; box-shadow:0 4px 12px rgba(74,148,34,.3); }
+.btn-start:hover:not(:disabled) { background:linear-gradient(180deg,#a4e474,#5aad2e,#3d8a18); }
+
+.btn-stop  { background:linear-gradient(180deg,#f08080,#c0392b,#922b21); border:1px solid #882020; box-shadow:0 4px 12px rgba(192,57,43,.3); }
+.btn-stop:hover:not(:disabled)  { background:linear-gradient(180deg,#f89898,#d44040,#a03030); }
+
+.btn-flip  { background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); border:1px solid #1050a0; box-shadow:0 4px 12px rgba(42,127,212,.3); }
+.btn-flip:hover:not(:disabled)  { background:linear-gradient(180deg,#98d0fb,#3a8fe0,#1e68c0); }
+
+/* Sélecteur caméra */
+.camera-select-wrapper {
+  margin-top:12px;
+}
+.camera-select-wrapper label {
+  font-weight:700; color:var(--text2); font-size:0.88rem; margin-bottom:6px; display:block;
+}
+.camera-select-wrapper select {
+  width:100%; padding:10px 14px; border:1.5px solid var(--border);
+  border-radius:var(--radius); font-size:0.9rem; background:rgba(255,255,255,.85);
+  font-family:'Nunito',sans-serif; font-weight:600; color:var(--text);
+  cursor:pointer; outline:none;
+}
+.camera-select-wrapper select:focus {
+  border-color:var(--blue-light); box-shadow:0 0 0 3px rgba(42,127,212,.15);
+}
+
+/* Toast résultat scan */
+.scan-result-toast {
+  display:none;
+  background:linear-gradient(135deg,var(--green-pale),#d0f0b0);
+  border:2px solid var(--green); border-radius:var(--radius-lg);
+  padding:16px 20px; margin-top:15px;
+  animation:popIn .3s ease;
+  position:relative; overflow:hidden;
+}
+.scan-result-toast::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:40%;
+  background:rgba(255,255,255,.4); border-radius:var(--radius-lg) var(--radius-lg) 60% 60%; pointer-events:none;
+}
+.scan-result-toast > * { position:relative; z-index:2; }
+.scan-result-toast.error {
+  background:linear-gradient(135deg,var(--red-pale),#fbc8c8);
+  border-color:var(--red);
+}
+@keyframes popIn {
+  from { opacity:0; transform:scale(0.9); }
+  to   { opacity:1; transform:scale(1); }
+}
+.toast-name { font-size:1.2rem; font-weight:900; color:var(--green2); }
+.toast-name.error { color:var(--red2); }
+.toast-details { font-size:0.9rem; color:var(--text2); font-weight:600; margin-top:4px; }
+
+/* Section liste */
+.list-card {
+  grid-column: 1 / -1;
+}
+
+/* Barre d'actions liste */
+.list-topbar {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:18px; flex-wrap:wrap; gap:12px;
+}
+.list-topbar h3 { margin-bottom:0; }
+
+.list-actions { display:flex; gap:10px; flex-wrap:wrap; }
+
+.btn-action {
+  padding:10px 18px; border:none; border-radius:50px;
+  font-weight:800; font-size:0.88rem; cursor:pointer;
+  transition:all .2s; display:flex; align-items:center; gap:7px;
+  position:relative; overflow:hidden; color:white;
+}
+.btn-action::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:rgba(255,255,255,.25); border-radius:50px 50px 0 0; pointer-events:none;
+}
+.btn-action:hover { transform:translateY(-2px); }
+
+.btn-clear  { background:linear-gradient(180deg,#f08080,#c0392b,#922b21); border:1px solid #882020; box-shadow:0 3px 10px rgba(192,57,43,.25); }
+.btn-save   { background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0); border:1px solid #1050a0; box-shadow:0 3px 10px rgba(42,127,212,.25); }
+.btn-export { background:linear-gradient(180deg,#ffc870,var(--orange),#b86200); border:1px solid #a05800; box-shadow:0 3px 10px rgba(200,120,0,.25); }
+
+/* Compteur */
+.scan-counter {
+  background:linear-gradient(180deg,#7cc4f8,#2a7fd4,#1558b0);
+  color:white; padding:6px 16px; border-radius:50px;
+  font-weight:800; font-size:0.9rem;
+  box-shadow:0 3px 10px rgba(42,127,212,.3);
+  border:1px solid #1050a0;
+}
+
+/* Tableau */
+.table-wrapper {
+  overflow-x:auto; border-radius:var(--radius-lg);
+  box-shadow:0 2px 10px var(--shadow2);
+  max-height:450px; overflow-y:auto;
+}
+
+table {
+  width:100%; border-collapse:collapse;
+  background:rgba(255,255,255,.7); font-size:0.92rem;
+}
+
+thead th {
+  background:linear-gradient(180deg,#2a7fd4,#1558b0);
+  color:white; padding:14px 16px; text-align:left;
+  font-weight:800; white-space:nowrap; position:sticky; top:0; z-index:3;
+}
+thead th:first-child { border-radius:var(--radius-lg) 0 0 0; }
+thead th:last-child  { border-radius:0 var(--radius-lg) 0 0; }
+
+tbody tr { border-bottom:1px solid var(--border2); transition:background .15s; }
+tbody tr:hover { background:rgba(91,163,232,.1); }
+tbody tr:last-child { border-bottom:none; }
+
+tbody td { padding:12px 16px; color:var(--text2); font-weight:600; }
+tbody td:first-child { font-weight:800; color:var(--blue3); }
+
+.badge-statut {
+  display:inline-block; padding:4px 12px; border-radius:50px;
+  font-size:0.8rem; font-weight:800;
+}
+.badge-benevole { background:var(--green-pale); color:var(--green2); border:1px solid var(--green); }
+.badge-admin    { background:var(--purple-pale); color:var(--purple); border:1px solid var(--purple); }
+.badge-inactif  { background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1; }
+
+.empty-state {
+  text-align:center; padding:40px 20px; color:var(--text3);
+  font-weight:700; font-size:1rem;
+}
+.empty-icon { font-size:3rem; margin-bottom:12px; }
+
+/* Historique */
+.history-section {
+  margin-top:20px;
+}
+.history-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:14px; flex-wrap:wrap; gap:10px;
+}
+.history-title {
+  font-size:1rem; font-weight:900; color:var(--blue3);
+  display:flex; align-items:center; gap:8px;
+}
+
+.history-list {
+  display:flex; flex-direction:column; gap:8px;
+  max-height:300px; overflow-y:auto;
+}
+
+.history-item {
+  background:rgba(255,255,255,.7); border:1px solid var(--border2);
+  border-radius:var(--radius); padding:12px 16px;
+  display:flex; justify-content:space-between; align-items:center;
+  transition:background .15s; gap:10px; flex-wrap:wrap;
+}
+.history-item:hover { background:rgba(91,163,232,.1); }
+.history-item-info { font-weight:700; color:var(--text); font-size:0.92rem; }
+.history-item-info small { color:var(--text3); font-weight:600; font-size:0.8rem; display:block; }
+.history-item-date { color:var(--text3); font-size:0.82rem; font-weight:700; white-space:nowrap; }
+
+.btn-del-history {
+  background:none; border:none; cursor:pointer;
+  color:var(--text3); font-size:1rem; padding:4px 8px;
+  border-radius:var(--radius); transition:all .2s;
+}
+.btn-del-history:hover { background:var(--red-pale); color:var(--red); }
+
+/* Modal historique */
+.modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(10,40,90,.45); backdrop-filter:blur(8px);
+  z-index:9998; justify-content:center; align-items:center;
+}
+.modal-overlay.active { display:flex; }
+
+.modal {
+  background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(215,238,255,.95));
+  border:1px solid rgba(255,255,255,.95); border-radius:var(--radius-xl);
+  padding:30px; max-width:650px; width:92%; max-height:80vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(20,60,180,.25);
+  animation:slideIn .3s ease; position:relative;
+}
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(-25px) scale(0.96); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.modal::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:22%;
+  background:rgba(255,255,255,.45); border-radius:var(--radius-xl) var(--radius-xl) 60% 60%; pointer-events:none;
+}
+.modal > * { position:relative; z-index:2; }
+
+.modal-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:22px; padding-bottom:15px; border-bottom:2px solid var(--border2);
+}
+.modal-header h3 { font-size:1.3rem; font-weight:900; color:var(--blue3); }
+
+.btn-close-modal {
+  background:none; border:none; font-size:1.8rem; cursor:pointer;
+  color:var(--text3); width:38px; height:38px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%; transition:all .2s;
+}
+.btn-close-modal:hover { background:var(--red-pale); color:var(--red); }
+
+/* Toast notification */
+.notif {
+  position:fixed; bottom:25px; left:50%; transform:translateX(-50%);
+  padding:14px 28px; border-radius:50px; font-weight:800; font-size:0.95rem;
+  color:white; z-index:9999; opacity:0; transition:all .3s;
+  pointer-events:none; white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);
+}
+.notif.show { opacity:1; transform:translateX(-50%) translateY(-8px); }
+.notif.success { background:linear-gradient(135deg,#4a9422,#2d6a1a); }
+.notif.error   { background:linear-gradient(135deg,#c0392b,#922b21); }
+.notif.info    { background:linear-gradient(135deg,#2a7fd4,#1558b0); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--blue-light); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="page-header">
+  <button class="btn-back" onclick="window.history.back()">← Retour</button>
+  <h1>📷 Scanner Membres</h1>
+  <div style="width:100px;"></div>
+</div>
+
+<!-- Layout principal -->
+<div class="main-layout">
+
+  <!-- Colonne gauche : Scanner -->
+  <div class="card">
+    <h3>📷 Caméra</h3>
+
+    <div class="scanner-wrapper">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div class="scan-frame">
+        <div class="scan-frame-inner">
+          <span></span>
+          <div class="scan-line"></div>
+        </div>
+      </div>
+      <div class="scanner-status status-off" id="scannerStatus">⏸ Scanner arrêté</div>
+    </div>
+
+    <!-- Résultat immédiat du scan -->
+    <div class="scan-result-toast" id="scanResultToast">
+      <div class="toast-name" id="toastName"></div>
+      <div class="toast-details" id="toastDetails"></div>
+    </div>
+
+    <!-- Contrôles -->
+    <div class="camera-controls">
+      <button class="btn-cam btn-start" id="btnStart" onclick="startScanner()">▶ Démarrer</button>
+      <button class="btn-cam btn-stop"  id="btnStop"  onclick="stopScanner()"  disabled>⏹ Arrêter</button>
+      <button class="btn-cam btn-flip"  id="btnFlip"  onclick="flipCamera()"   disabled>🔄 Retourner</button>
+    </div>
+
+    <!-- Sélecteur de caméra -->
+    <div class="camera-select-wrapper" id="cameraSelectWrapper" style="display:none;">
+      <label>📹 Choisir la caméra</label>
+      <select id="cameraSelect" onchange="changeCamera()"></select>
+    </div>
+  </div>
+
+  <!-- Colonne droite : Session en cours -->
+  <div class="card">
+    <div class="list-topbar">
+      <h3>📋 Session en cours</h3>
+      <span class="scan-counter" id="scanCounter">0 scan(s)</span>
+    </div>
+
+    <div class="list-actions" style="margin-bottom:15px;">
+      <button class="btn-action btn-save"   onclick="saveToHistory()">💾 Enregistrer</button>
+      <button class="btn-action btn-export" onclick="exportSession()">📥 Exporter CSV</button>
+      <button class="btn-action btn-clear"  onclick="clearSession()">🗑 Vider</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="sessionTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Statut</th>
+            <th>Heure</th>
+          </tr>
+        </thead>
+        <tbody id="sessionBody">
+          <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div>Aucun scan pour le moment</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Historique (pleine largeur) -->
+  <div class="card list-card">
+    <div class="history-header">
+      <div class="history-title">🗂 Historique des sessions</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-action btn-export" onclick="exportHistory()">📥 Exporter tout</button>
+        <button class="btn-action btn-clear"  onclick="clearHistory()">🗑 Effacer tout</button>
+      </div>
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="empty-state"><div class="empty-icon">📂</div>Aucune session enregistrée</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal détail session historique -->
+<div class="modal-overlay" id="modalHistoire">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalHistoireTitle">Session du ...</h3>
+      <button class="btn-close-modal" onclick="closeModal()">✕</button>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Prénom</th><th>Nom</th><th>Statut</th><th>Heure scan</th></tr>
+        </thead>
+        <tbody id="modalHistoireBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="notif" id="notif"></div>
+
+<!-- jsQR en local (télécharger jsqr.min.js dans le même dossier) -->
+<!-- Télécharger depuis : https://raw.githubusercontent.com/cozmo/jsQR/master/dist/jsQR.js -->
+<script src="jsqr.min.js"></script>
+
+<script>
+// ==========================================
+//  DONNÉES MEMBRES (depuis localStorage)
+// ==========================================
+function getMembres() {
+  try { return JSON.parse(localStorage.getItem('membres') || '[]'); }
+  catch(e) { return []; }
+}
+
+function findMembre(id) {
+  const membres = getMembres();
+  // Cherche par ID exact (string ou number)
+  return membres.find(m => String(m.id) === String(id).trim()) || null;
+}
+
+// ==========================================
+//  ÉTAT GLOBAL
+// ==========================================
+let stream       = null;
+let scanning     = false;
+let animFrame    = null;
+let currentFacingMode = 'environment'; // caméra arrière par défaut (GSM)
+let allDevices   = [];
+let currentDeviceIndex = 0;
+let sessionScans = []; // scans de la session en cours
+let lastScannedId = null;
+let lastScannedTime = 0;
+
+const video    = document.getElementById('video');
+const canvas   = document.getElementById('canvas');
+const ctx      = canvas.getContext('2d');
+
+// ==========================================
+//  DÉMARRER LE SCANNER
+// ==========================================
+async function startScanner() {
+  // Vérifier que jsQR est chargé
+  if (typeof jsQR === 'undefined') {
+    showNotif('⚠️ jsqr.min.js introuvable ! Télécharge-le et place-le dans le même dossier.', 'error', 5000);
+    return;
+  }
+
+  try {
+    setStatus('⏳ Demande d\'accès à la caméra...', 'status-waiting');
+
+    // Lister les caméras disponibles
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    allDevices = devices.filter(d => d.kind === 'videoinput');
+
+    // Construire le sélecteur de caméra
+    buildCameraSelector();
+
+    // Démarrer avec la caméra arrière si dispo (mobile), sinon la première
+    const constraints = buildConstraints();
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+    video.srcObject = stream;
+    await video.play();
+
+    scanning = true;
+    setStatus('🔍 Scan en cours...', 'status-scanning');
+
+    document.getElementById('btnStart').disabled = true;
+    document.getElementById('btnStop').disabled  = false;
+    document.getElementById('btnFlip').disabled  = false;
+    if (allDevices.length > 1) {
+      document.getElementById('cameraSelectWrapper').style.display = 'block';
+    }
+
+    scanLoop();
+
+  } catch(err) {
+    console.error(err);
+    if (err.name === 'NotAllowedError') {
+      setStatus('🚫 Accès caméra refusé', 'status-error');
+      showNotif('❌ Autorise l\'accès à la caméra dans ton navigateur !', 'error', 5000);
+    } else if (err.name === 'NotFoundError') {
+      setStatus('❌ Aucune caméra trouvée', 'status-error');
+      showNotif('❌ Aucune caméra détectée sur cet appareil', 'error', 4000);
+    } else {
+      setStatus('❌ Erreur caméra', 'status-error');
+      showNotif('❌ Erreur : ' + err.message, 'error', 4000);
+    }
+  }
+}
+
+// ==========================================
+//  CONSTRUIRE LES CONTRAINTES CAMÉRA
+// ==========================================
+function buildConstraints() {
+  // Si on a un device spécifique sélectionné
+  if (allDevices.length > 0 && currentDeviceIndex < allDevices.length) {
+    const deviceId = allDevices[currentDeviceIndex].deviceId;
+    if (deviceId) {
+      return { video: { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } } };
+    }
+  }
+  // Sinon, utiliser facingMode (marche bien sur GSM)
+  return { video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } } };
+}
+
+// ==========================================
+//  BOUCLE DE SCAN
+// ==========================================
+function scanLoop() {
+  if (!scanning) return;
+
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: 'dontInvert'
+    });
+
+    if (code) {
+      const now = Date.now();
+      // Anti-doublon : même ID pas re-scanné avant 3 secondes
+      if (code.data !== lastScannedId || (now - lastScannedTime) > 3000) {
+        lastScannedId   = code.data;
+        lastScannedTime = now;
+        handleScan(code.data);
+      }
+    }
+  }
+
+  animFrame = requestAnimationFrame(scanLoop);
+}
+
+// ==========================================
+//  TRAITER UN SCAN
+// ==========================================
+function handleScan(rawData) {
+  const id = rawData.trim();
+  const membre = findMembre(id);
+  const heure  = new Date().toLocaleTimeString('fr-BE', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+
+  const toast = document.getElementById('scanResultToast');
+  const toastName    = document.getElementById('toastName');
+  const toastDetails = document.getElementById('toastDetails');
+
+  if (membre) {
+    setStatus('✅ Membre trouvé !', 'status-found');
+
+    // Afficher le toast vert
+    toast.className = 'scan-result-toast';
+    toastName.className = 'toast-name';
+    toastName.textContent = '✅ ' + membre.prenom + ' ' + membre.nom;
+    toastDetails.textContent = '🪪 ID ' + membre.id + '  •  ' + (membre.statut || 'inactif') + '  •  ' + heure;
+    toast.style.display = 'block';
+
+    // Ajouter à la session (éviter les doublons dans la session)
+    const dejaDans = sessionScans.find(s => s.id === String(membre.id));
+    if (!dejaDans) {
+      sessionScans.unshift({
+        id:     String(membre.id),
+        prenom: membre.prenom,
+        nom:    membre.nom,
+        statut: membre.statut || 'inactif',
+        heure:  heure
+      });
+      refreshSessionTable();
+      showNotif('✅ ' + membre.prenom + ' ' + membre.nom, 'success');
+    } else {
+      showNotif('ℹ️ Déjà scanné : ' + membre.prenom + ' ' + membre.nom, 'info');
+    }
+
+    setTimeout(() => setStatus('🔍 Scan en cours...', 'status-scanning'), 2000);
+
+  } else {
+    // ID inconnu
+    setStatus('❓ ID inconnu : ' + id, 'status-error');
+    toast.className = 'scan-result-toast error';
+    toastName.className = 'toast-name error';
+    toastName.textContent = '❓ Membre introuvable';
+    toastDetails.textContent = 'ID scanné : ' + id + '  •  ' + heure;
+    toast.style.display = 'block';
+
+    showNotif('❓ Aucun membre avec l\'ID : ' + id, 'error');
+    setTimeout(() => setStatus('🔍 Scan en cours...', 'status-scanning'), 2000);
+  }
+}
+
+// ==========================================
+//  ARRÊTER LE SCANNER
+// ==========================================
+function stopScanner() {
+  scanning = false;
+  if (animFrame) cancelAnimationFrame(animFrame);
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+  video.srcObject = null;
+
+  setStatus('⏸ Scanner arrêté', 'status-off');
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStop').disabled  = true;
+  document.getElementById('btnFlip').disabled  = true;
+  document.getElementById('cameraSelectWrapper').style.display = 'none';
+}
+
+// ==========================================
+//  RETOURNER LA CAMÉRA (avant/arrière)
+// ==========================================
+async function flipCamera() {
+  currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
+  // Trouver le prochain device dans la liste
+  currentDeviceIndex = (currentDeviceIndex + 1) % Math.max(allDevices.length, 1);
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+  }
+  scanning = false;
+  if (animFrame) cancelAnimationFrame(animFrame);
+
+  try {
+    const constraints = buildConstraints();
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
+    await video.play();
+    scanning = true;
+    // Mettre à jour le select
+    document.getElementById('cameraSelect').selectedIndex = currentDeviceIndex;
+    scanLoop();
+  } catch(err) {
+    showNotif('❌ Impossible de changer de caméra : ' + err.message, 'error');
+  }
+}
+
+// ==========================================
+//  CHANGER DE CAMÉRA VIA SELECT
+// ==========================================
+async function changeCamera() {
+  const sel = document.getElementById('cameraSelect');
+  currentDeviceIndex = sel.selectedIndex;
+
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  scanning = false;
+  if (animFrame) cancelAnimationFrame(animFrame);
+
+  try {
+    const constraints = buildConstraints();
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
+    await video.play();
+    scanning = true;
+    scanLoop();
+  } catch(err) {
+    showNotif('❌ Erreur changement caméra : ' + err.message, 'error');
+  }
+}
+
+// ==========================================
+//  CONSTRUIRE LE SÉLECTEUR DE CAMÉRA
+// ==========================================
+function buildCameraSelector() {
+  const sel = document.getElementById('cameraSelect');
+  sel.innerHTML = '';
+  allDevices.forEach((d, i) => {
+    const opt = document.createElement('option');
+    opt.value = d.deviceId;
+    opt.textContent = d.label || ('Caméra ' + (i + 1));
+    sel.appendChild(opt);
+  });
+  sel.selectedIndex = currentDeviceIndex;
+}
+
+// ==========================================
+//  AFFICHAGE TABLE SESSION
+// ==========================================
+function refreshSessionTable() {
+  const tbody = document.getElementById('sessionBody');
+  document.getElementById('scanCounter').textContent = sessionScans.length + ' scan(s)';
+
+  if (sessionScans.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div>Aucun scan pour le moment</div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = sessionScans.map(s => `
+    <tr>
+      <td>${s.id}</td>
+      <td>${s.prenom}</td>
+      <td>${s.nom}</td>
+      <td><span class="badge-statut badge-${s.statut}">${s.statut}</span></td>
+      <td>${s.heure}</td>
+    </tr>
+  `).join('');
+}
+
+function clearSession() {
+  if (sessionScans.length === 0) { showNotif('ℹ️ La session est déjà vide', 'info'); return; }
+  if (!confirm('Vider la session en cours ?')) return;
+  sessionScans = [];
+  lastScannedId = null;
+  document.getElementById('scanResultToast').style.display = 'none';
+  refreshSessionTable();
+  showNotif('🗑 Session vidée', 'info');
+}
+
+// ==========================================
+//  ENREGISTRER DANS L'HISTORIQUE
+// ==========================================
+function saveToHistory() {
+  if (sessionScans.length === 0) {
+    showNotif('ℹ️ Rien à enregistrer dans la session', 'info');
+    return;
+  }
+
+  const history = getHistory();
+  const now = new Date();
+  const entry = {
+    id:    Date.now(),
+    date:  now.toLocaleDateString('fr-BE', { weekday:'long', day:'2-digit', month:'long', year:'numeric' }),
+    heure: now.toLocaleTimeString('fr-BE', { hour:'2-digit', minute:'2-digit' }),
+    scans: [...sessionScans]
+  };
+
+  history.unshift(entry);
+  localStorage.setItem('scannerHistorique', JSON.stringify(history));
+  refreshHistory();
+  showNotif('💾 Session enregistrée (' + sessionScans.length + ' membre(s))', 'success');
+}
+
+// ==========================================
+//  HISTORIQUE
+// ==========================================
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('scannerHistorique') || '[]'); }
+  catch(e) { return []; }
+}
+
+function refreshHistory() {
+  const history = getHistory();
+  const container = document.getElementById('historyList');
+
+  if (history.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📂</div>Aucune session enregistrée</div>';
+    return;
+  }
+
+  container.innerHTML = history.map(entry => `
+    <div class="history-item">
+      <div class="history-item-info">
+        📅 ${entry.date} à ${entry.heure}
+        <small>${entry.scans.length} membre(s) scanné(s)</small>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn-action btn-save" style="padding:7px 14px;font-size:0.8rem;" onclick="viewHistoryEntry(${entry.id})">👁 Voir</button>
+        <button class="btn-del-history" onclick="deleteHistoryEntry(${entry.id})" title="Supprimer">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function viewHistoryEntry(id) {
+  const history = getHistory();
+  const entry = history.find(e => e.id === id);
+  if (!entry) return;
+
+  document.getElementById('modalHistoireTitle').textContent = '📅 ' + entry.date + ' à ' + entry.heure;
+  document.getElementById('modalHistoireBody').innerHTML = entry.scans.map(s => `
+    <tr>
+      <td>${s.id}</td>
+      <td>${s.prenom}</td>
+      <td>${s.nom}</td>
+      <td><span class="badge-statut badge-${s.statut}">${s.statut}</span></td>
+      <td>${s.heure}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('modalHistoire').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modalHistoire').classList.remove('active');
+}
+
+function deleteHistoryEntry(id) {
+  if (!confirm('Supprimer cette session de l\'historique ?')) return;
+  let history = getHistory();
+  history = history.filter(e => e.id !== id);
+  localStorage.setItem('scannerHistorique', JSON.stringify(history));
+  refreshHistory();
+  showNotif('🗑 Session supprimée', 'info');
+}
+
+function clearHistory() {
+  if (getHistory().length === 0) { showNotif('ℹ️ Historique déjà vide', 'info'); return; }
+  if (!confirm('Effacer tout l\'historique ?')) return;
+  localStorage.removeItem('scannerHistorique');
+  refreshHistory();
+  showNotif('🗑 Historique effacé', 'info');
+}
+
+// ==========================================
+//  EXPORT CSV
+// ==========================================
+function exportSession() {
+  if (sessionScans.length === 0) { showNotif('ℹ️ Rien à exporter', 'info'); return; }
+  const now = new Date();
+  exportCSV(sessionScans, 'session_' + now.toISOString().slice(0,10));
+}
+
+function exportHistory() {
+  const history = getHistory();
+  if (history.length === 0) { showNotif('ℹ️ Historique vide', 'info'); return; }
+  // Aplatir toutes les sessions
+  const all = [];
+  history.forEach(entry => {
+    entry.scans.forEach(s => {
+      all.push({ ...s, session: entry.date + ' ' + entry.heure });
+    });
+  });
+  exportCSV(all, 'historique_scanner');
+}
+
+function exportCSV(data, filename) {
+  const headers = ['ID', 'Prénom', 'Nom', 'Statut', 'Heure scan', 'Session'];
+  const rows = data.map(s => [
+    s.id, s.prenom, s.nom, s.statut, s.heure, s.session || ''
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename + '.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showNotif('📥 Export CSV téléchargé', 'success');
+}
+
+// ==========================================
+//  UTILITAIRES
+// ==========================================
+function setStatus(msg, cls) {
+  const el = document.getElementById('scannerStatus');
+  el.textContent = msg;
+  el.className = 'scanner-status ' + cls;
+}
+
+function showNotif(msg, type = 'info', duration = 3000) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = 'notif ' + type + ' show';
+  setTimeout(() => el.className = 'notif ' + type, duration);
+}
+
+// Fermer modal en cliquant à côté
+document.getElementById('modalHistoire').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Init
+refreshSessionTable();
+refreshHistory();
+
+// Vérifier jsQR au chargement
+window.addEventListener('load', () => {
+  if (typeof jsQR === 'undefined') {
+    showNotif('⚠️ jsqr.min.js manquant ! Voir les instructions.', 'error', 8000);
+    setStatus('⚠️ jsqr.min.js manquant', 'status-error');
+  }
+});
+</script>
+</body>
+</html>

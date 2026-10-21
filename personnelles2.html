@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Gestion Personnel - Design Moderne</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        display: flex;
+        height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    /* Formulaire latéral */
+    #formulaire {
+        width: 320px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 25px;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+        overflow-y: auto;
+        border-right: 1px solid rgba(255,255,255,0.2);
+    }
+
+    #formulaire h2 {
+        color: #2d3748;
+        font-weight: 600;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #formulaire h2::before {
+        content: '👥';
+        font-size: 1.8rem;
+    }
+
+    .btn-retour {
+        background: transparent;
+        border: 1px solid #cbd5e0;
+        color: #4a5568;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        transition: all 0.2s;
+    }
+
+    .btn-retour:hover {
+        background: #edf2f7;
+        border-color: #a0aec0;
+    }
+
+    .btn-ajouter {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-bottom: 15px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-ajouter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Zone des cartes */
+    #cartes {
+        flex: 1;
+        padding: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        overflow-y: auto;
+        align-content: flex-start;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+    }
+
+    /* Cartes modernes */
+    .carte {
+        background: white;
+        border-radius: 16px;
+        padding: 16px;
+        width: 200px;
+        height: 140px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 1px solid rgba(255,255,255,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .carte::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .carte:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 20px 30px rgba(0,0,0,0.15);
+    }
+
+    .carte-header h4 {
+        margin: 0 0 6px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #2d3748;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .carte-header p {
+        margin: 2px 0;
+        font-size: 0.7rem;
+        color: #718096;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .carte-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        margin-top: 4px;
+    }
+
+    .badge-benevole { 
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb); 
+        color: #1976d2; 
+        border: 1px solid #90caf9;
+    }
+    .badge-independant { 
+        background: linear-gradient(135deg, #f3e5f5, #e1bee7); 
+        color: #7b1fa2; 
+        border: 1px solid #ba68c8;
+    }
+    .badge-admin { 
+        background: linear-gradient(135deg, #e8f5e8, #c8e6c9); 
+        color: #2e7d32; 
+        border: 1px solid #81c784;
+    }
+
+    .carte-footer {
+        display: flex;
+        gap: 4px;
+        margin-top: 8px;
+        opacity: 0.9;
+    }
+
+    .carte-footer button {
+        flex: 1;
+        font-size: 0.6rem;
+        padding: 4px 0;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .btn-modifier {
+        background: #ebf4ff;
+        color: #4299e1;
+    }
+    .btn-modifier:hover { background: #bee3f8; }
+
+    .btn-supprimer {
+        background: #fff5f5;
+        color: #f56565;
+    }
+    .btn-supprimer:hover { background: #fed7d7; }
+
+    .btn-details {
+        background: #f0f4f8;
+        color: #4a5568;
+    }
+    .btn-details:hover { background: #e2e8f0; }
+
+    /* Modales modernes */
+    .modal-formulaire, .modal-carte {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(5px);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .modal-form-content, .modal-carte-content {
+        background: white;
+        border-radius: 24px;
+        padding: 30px;
+        width: 500px;
+        max-height: 90%;
+        overflow-y: auto;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        animation: slideUp 0.3s;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-form-content h3, .modal-carte-content h3 {
+        color: #2d3748;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    /* Formulaire stylisé */
+    input, select {
+        width: 100%;
+        padding: 12px 15px;
+        margin-bottom: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+    }
+
+    input:focus, select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: white;
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        padding: 8px 0;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+        width: auto;
+        margin-right: 10px;
+        accent-color: #667eea;
+    }
+
+    .date-disabled {
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        border-color: #cbd5e1;
+        cursor: not-allowed;
+    }
+
+    /* Boutons de modale */
+    .modal-form-content button, .modal-carte-content button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-right: 10px;
+    }
+
+    .btn-enregistrer {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .btn-enregistrer:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-annuler {
+        background: #f1f5f9;
+        color: #475569;
+    }
+    .btn-annuler:hover {
+        background: #e2e8f0;
+    }
+
+    /* Détails dans la modale carte */
+    .info {
+        margin: 10px 0;
+        padding: 8px 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        color: #334155;
+        border-left: 3px solid #667eea;
+    }
+
+    .info strong {
+        color: #1e293b;
+        width: 120px;
+        display: inline-block;
+    }
+
+    /* Section commentaires */
+    #commentaires {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 15px 0;
+        background: #f8fafc;
+    }
+
+    .commentaire {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        margin-bottom: 5px;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        font-size: 0.9rem;
+    }
+
+    .commentaire button {
+        padding: 4px 8px;
+        margin-left: 5px;
+        background: #f1f5f9;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8rem;
+    }
+
+    .commentaire button:hover {
+        background: #e2e8f0;
+    }
+
+    /* Convention badge */
+    .convention-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        color: #92400e;
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        border: 1px solid #fbbf24;
+    }
+
+    /* Scrollbar stylisée */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+    }
+</style>
+</head>
+<body>
+<div id="formulaire">
+    <button class="btn-retour" onclick="location.href='index.html'">← Retour</button>
+    <h2>Gestion du personnel</h2>
+    <button class="btn-ajouter" onclick="ouvrirModalFormulaire()">
+        <span>➕</span> Ajouter un membre
+    </button>
+    <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5; background: #f8fafc; padding: 12px; border-radius: 10px;">
+        <span style="display: block; margin-bottom: 5px;">💡 Astuce :</span>
+        Cliquez sur "Ajouter" pour créer une fiche, ou utilisez les boutons sous chaque carte pour modifier/supprimer.
+    </p>
+</div>
+
+<div id="cartes"></div>
+
+<!-- Modale Formulaire Ajout/Modification -->
+<div class="modal-formulaire" id="modalFormulaire">
+    <div class="modal-form-content">
+        <h3 id="modalTitre">Ajouter un membre</h3>
+        <input type="hidden" id="editIndex">
+        <input type="text" id="nom" placeholder="Nom *" required>
+        <input type="text" id="prenom" placeholder="Prénom *" required>
+        <input type="text" id="numero" placeholder="Numéro national / SIS *" required>
+        <input type="text" id="adresse" placeholder="Adresse">
+        <input type="text" id="localite" placeholder="Localité">
+        <input type="text" id="telephone" placeholder="Téléphone">
+        <input type="email" id="email" placeholder="Email">
+        <select id="statut">
+            <option value="">-- Sélectionnez un statut --</option>
+            <option value="bénévole">Bénévole</option>
+            <option value="indépendant">Indépendant</option>
+            <option value="admin">Admin</option>
+        </select>
+        <input type="date" id="dateContrat" placeholder="Date du contrat">
+        
+        <h4 style="margin: 15px 0 10px; color: #334155;">📋 Convention</h4>
+        <input type="date" id="dateDebutConvention" placeholder="Date début convention">
+        <div class="checkbox-container">
+            <input type="checkbox" id="dateFinIllimitee" onchange="toggleDateFin()">
+            <label for="dateFinIllimitee">Date de fin illimitée</label>
+        </div>
+        <input type="date" id="dateFinConvention" placeholder="Date fin convention">
+        
+        <div style="margin-top: 20px;">
+            <button class="btn-enregistrer" onclick="ajouterMembre()">Enregistrer</button>
+            <button class="btn-annuler" onclick="fermerModalFormulaire()">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modale CARTE DE VISITE (détails) -->
+<div class="modal-carte" id="modalCarte">
+    <div class="modal-carte-content">
+        <h3 id="modalNom"></h3>
+        <div class="info"><strong>Numéro SIS :</strong> <span id="modalNumero"></span></div>
+        <div class="info"><strong>Téléphone :</strong> <span id="modalTelephone"></span></div>
+        <div class="info"><strong>Email :</strong> <span id="modalEmail"></span></div>
+        <div class="info"><strong>Adresse :</strong> <span id="modalAdresse"></span></div>
+        <div class="info"><strong>Localité :</strong> <span id="modalLocalite"></span></div>
+        <div class="info"><strong>Statut :</strong> <span id="modalStatut"></span></div>
+        <div class="info"><strong>Date contrat :</strong> <span id="modalDate"></span></div>
+        <div class="info"><strong>Début convention :</strong> <span id="modalDateDebut"></span></div>
+        <div class="info"><strong>Fin convention :</strong> <span id="modalDateFin"></span></div>
+
+        <h4 style="color: #334155; margin: 15px 0 10px;">💬 Commentaires</h4>
+        <div id="commentaires"></div>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="nouveauCommentaire" placeholder="Ajouter un commentaire..." style="flex: 1;">
+            <button onclick="ajouterCommentaire()" style="background: #667eea; color: white; padding: 8px 15px;">Ajouter</button>
+        </div>
+        <button class="btn-annuler" onclick="fermerModalCarte()" style="margin-top: 15px; width: 100%;">Fermer</button>
+    </div>
+</div>
+
+<script>
+const STORAGE_KEY = "gestion_personnel";
+let membres = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+let currentIndex = null;
+
+// Fonction pour activer/désactiver le champ date fin
+function toggleDateFin() {
+    const checkbox = document.getElementById('dateFinIllimitee');
+    const dateFinInput = document.getElementById('dateFinConvention');
+    
+    if (checkbox.checked) {
+        dateFinInput.disabled = true;
+        dateFinInput.classList.add('date-disabled');
+        dateFinInput.value = '';
+    } else {
+        dateFinInput.disabled = false;
+        dateFinInput.classList.remove('date-disabled');
+    }
+}
+
+// Fonction pour obtenir la classe CSS du badge selon le statut
+function getBadgeClass(statut) {
+    switch(statut) {
+        case 'bénévole': return 'badge-benevole';
+        case 'indépendant': return 'badge-independant';
+        case 'admin': return 'badge-admin';
+        default: return '';
+    }
+}
+
+// Afficher cartes compactes
+function afficherCartes() {
+    const container = document.getElementById('cartes');
+    container.innerHTML = '';
+    membres.forEach((membre, index) => {
+        const carte = document.createElement('div');
+        carte.className = 'carte';
+        
+        // Format date contrat (si existante)
+        let dateContratText = '';
+        if (membre.dateContrat) {
+            const date = new Date(membre.dateContrat);
+            dateContratText = date.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit', year: 'numeric'});
+        }
+        
+        // Badge convention si existante
+        let conventionBadge = '';
+        if (membre.dateDebutConvention) {
+            const debutDate = new Date(membre.dateDebutConvention);
+            const debutText = debutDate.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit'});
+            
+            if (membre.dateFinIllimitee) {
+                conventionBadge = `<span class="convention-badge">Conv: ${debutText} → ∞</span>`;
+            } else if (membre.dateFinConvention) {
+                const finDate = new Date(membre.dateFinConvention);
+                const finText = finDate.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit'});
+                conventionBadge = `<span class="convention-badge">Conv: ${debutText} → ${finText}</span>`;
+            }
+        }
+        
+        // Badge statut
+        const badgeClass = getBadgeClass(membre.statut);
+        const statutBadge = badgeClass ? `<span class="carte-badge ${badgeClass}">${membre.statut}</span>` : '';
+        
+        carte.innerHTML = `
+            <div class="carte-header">
+                <h4 title="${membre.nom} ${membre.prenom}">${membre.nom} ${membre.prenom}</h4>
+                <p>📋 ${membre.numero.substring(0, 12)}${membre.numero.length > 12 ? '...' : ''}</p>
+                ${dateContratText ? `<p>📅 ${dateContratText}</p>` : ''}
+                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                    ${statutBadge}
+                    ${conventionBadge}
+                </div>
+            </div>
+            <div class="carte-footer">
+                <button class="btn-modifier" onclick="modifierMembre(${index})">Modifier</button>
+                <button class="btn-supprimer" onclick="supprimerMembre(${index})">Suppr.</button>
+                <button class="btn-details" onclick="ouvrirModalCarte(${index})">Détails</button>
+            </div>
+        `;
+        container.appendChild(carte);
+    });
+}
+
+// Gestion modale formulaire
+function ouvrirModalFormulaire() {
+    resetForm();
+    document.getElementById('modalTitre').innerText = 'Ajouter un membre';
+    document.getElementById('modalFormulaire').style.display = 'flex';
+}
+
+function fermerModalFormulaire() {
+    document.getElementById('modalFormulaire').style.display = 'none';
+    resetForm();
+}
+
+// Ajouter / modifier membre
+function ajouterMembre() {
+    const nom = document.getElementById('nom').value.trim();
+    const prenom = document.getElementById('prenom').value.trim();
+    const numero = document.getElementById('numero').value.trim();
+    const adresse = document.getElementById('adresse').value.trim();
+    const localite = document.getElementById('localite').value.trim();
+    const telephone = document.getElementById('telephone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const statut = document.getElementById('statut').value;
+    const dateContrat = document.getElementById('dateContrat').value;
+    const dateDebutConvention = document.getElementById('dateDebutConvention').value;
+    const dateFinIllimitee = document.getElementById('dateFinIllimitee').checked;
+    const dateFinConvention = dateFinIllimitee ? '' : document.getElementById('dateFinConvention').value;
+
+    if(!nom || !prenom || !numero) { 
+        alert('❌ Nom, prénom et numéro sont obligatoires'); 
+        return; 
+    }
+
+    const membreData = { 
+        nom, 
+        prenom, 
+        numero, 
+        adresse, 
+        localite, 
+        telephone, 
+        email, 
+        statut, 
+        dateContrat, 
+        dateDebutConvention,
+        dateFinIllimitee,
+        dateFinConvention,
+        commentaires: membres[currentIndex]?.commentaires || [] 
+    };
+
+    if(currentIndex !== null) {
+        membres[currentIndex] = membreData;
+    } else {
+        membres.push(membreData);
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(membres));
+    fermerModalFormulaire();
+    afficherCartes();
+}
+
+function modifierMembre(index) {
+    const m = membres[index];
+    document.getElementById('nom').value = m.nom;
+    document.getElementById('prenom').value = m.prenom;
+    document.getElementById('numero').value = m.numero;
+    document.getElementById('adresse').value = m.adresse;
+    document.getElementById('localite').value = m.localite;
+    document.getElementById('telephone').value = m.telephone;
+    document.getElementById('email').value = m.email;
+    document.getElementById('statut').value = m.statut;
+    document.getElementById('dateContrat').value = m.dateContrat;
+    document.getElementById('dateDebutConvention').value = m.dateDebutConvention || '';
+    document.getElementById('dateFinIllimitee').checked = m.dateFinIllimitee || false;
+    document.getElementById('dateFinConvention').value = m.dateFinConvention || '';
+    
+    // Appliquer le grisage si illimité
+    toggleDateFin();
+    
+    currentIndex = index;
+    document.getElementById('modalTitre').innerText = 'Modifier un membre';
+    document.getElementById('modalFormulaire').style.display = 'flex';
+}
+
+function supprimerMembre(index) {
+    if(confirm('🗑️ Voulez-vous vraiment supprimer ce membre ?')) {
+        membres.splice(index, 1);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(membres));
+        afficherCartes();
+    }
+}
+
+function resetForm() {
+    document.getElementById('nom').value = '';
+    document.getElementById('prenom').value = '';
+    document.getElementById('numero').value = '';
+    document.getElementById('adresse').value = '';
+    document.getElementById('localite').value = '';
+    document.getElementById('telephone').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('statut').value = '';
+    document.getElementById('dateContrat').value = '';
+    document.getElementById('dateDebutConvention').value = '';
+    document.getElementById('dateFinIllimitee').checked = false;
+    document.getElementById('dateFinConvention').value = '';
+    document.getElementById('dateFinConvention').disabled = false;
+    document.getElementById('dateFinConvention').classList.remove('date-disabled');
+    currentIndex = null;
+}
+
+// Modal carte de visite
+function ouvrirModalCarte(index) {
+    currentIndex = index;
+    const m = membres[index];
+    document.getElementById('modalNom').innerText = `${m.nom} ${m.prenom}`;
+    document.getElementById('modalNumero').innerText = m.numero;
+    document.getElementById('modalTelephone').innerText = m.telephone || 'Non renseigné';
+    document.getElementById('modalEmail').innerText = m.email || 'Non renseigné';
+    document.getElementById('modalAdresse').innerText = m.adresse || 'Non renseignée';
+    document.getElementById('modalLocalite').innerText = m.localite || 'Non renseignée';
+    document.getElementById('modalStatut').innerText = m.statut || 'Non renseigné';
+    
+    // Formatage des dates
+    if (m.dateContrat) {
+        const dateContrat = new Date(m.dateContrat);
+        document.getElementById('modalDate').innerText = dateContrat.toLocaleDateString('fr-FR');
+    } else {
+        document.getElementById('modalDate').innerText = 'Non renseignée';
+    }
+    
+    if (m.dateDebutConvention) {
+        const dateDebut = new Date(m.dateDebutConvention);
+        document.getElementById('modalDateDebut').innerText = dateDebut.toLocaleDateString('fr-FR');
+    } else {
+        document.getElementById('modalDateDebut').innerText = 'Non renseignée';
+    }
+    
+    if (m.dateFinIllimitee) {
+        document.getElementById('modalDateFin').innerText = 'Illimitée';
+    } else if (m.dateFinConvention) {
+        const dateFin = new Date(m.dateFinConvention);
+        document.getElementById('modalDateFin').innerText = dateFin.toLocaleDateString('fr-FR');
+    } else {
+        document.getElementById('modalDateFin').innerText = 'Non renseignée';
+    }
+    
+    afficherCommentaires();
+    document.getElementById('modalCarte').style.display = 'flex';
+}
+
+function fermerModalCarte() {
+    document.getElementById('modalCarte').style.display = 'none';
+    currentIndex = null;
+}
+
+// Commentaires
+function afficherCommentaires() {
+    const container = document.getElementById('commentaires');
+    container.innerHTML = '';
+    const commentaires = membres[currentIndex].commentaires || [];
+    if (commentaires.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #94a3b8;">Aucun commentaire</p>';
+        return;
+    }
+    commentaires.forEach((com, i) => {
+        const div = document.createElement('div');
+        div.className = 'commentaire';
+        div.innerHTML = `
+            <span style="flex: 1;">${com}</span>
+            <span>
+                <button onclick="modifierCommentaire(${i})" title="Modifier">✏️</button>
+                <button onclick="supprimerCommentaire(${i})" title="Supprimer">🗑️</button>
+            </span>
+        `;
+        container.appendChild(div);
+    });
+    container.scrollTop = container.scrollHeight;
+}
+
+function ajouterCommentaire() {
+    const com = document.getElementById('nouveauCommentaire').value.trim();
+    if(!com) return;
+    if (!membres[currentIndex].commentaires) {
+        membres[currentIndex].commentaires = [];
+    }
+    membres[currentIndex].commentaires.push(com);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(membres));
+    document.getElementById('nouveauCommentaire').value = '';
+    afficherCommentaires();
+}
+
+function modifierCommentaire(i) {
+    const nouveau = prompt("Modifier le commentaire :", membres[currentIndex].commentaires[i]);
+    if(nouveau !== null && nouveau.trim() !== '') {
+        membres[currentIndex].commentaires[i] = nouveau;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(membres));
+        afficherCommentaires();
+    }
+}
+
+function supprimerCommentaire(i) {
+    if(confirm("Supprimer ce commentaire ?")) {
+        membres[currentIndex].commentaires.splice(i, 1);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(membres));
+        afficherCommentaires();
+    }
+}
+
+// Initialisation
+afficherCartes();
+</script>
+</body>
+</html>
